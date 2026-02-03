@@ -13,3 +13,7 @@ tests/**/obj/
 # benchmark output
 benchmark_detect_ms.txt
 **/benchmark_detect_ms.txt
+# backup artifacts
+.bak/
+*.bak
+**/*.bak
