@@ -11,6 +11,8 @@ Funktionalität: Dateityp-Erkennung über Inhaltsanalyse (fail-closed)
     Und die Ressource "sample.docx" existiert
     Und die Ressource "sample.xlsx" existiert
     Und die Ressource "sample.pptx" existiert
+    Und die Ressource "sample_pdf_as_txt.txt" existiert
+    Und die Ressource "sample_pdf_no_extension" existiert
     Und die Ressource "invalid_docx_marker_only.zip" existiert
     Und die Ressource "invalid_xlsx_marker_only.zip" existiert
     Und die Ressource "invalid_pptx_marker_only.zip" existiert
@@ -67,6 +69,22 @@ Funktionalität: Dateityp-Erkennung über Inhaltsanalyse (fail-closed)
       | invalid_docx_marker_only.zip |
       | invalid_xlsx_marker_only.zip |
       | invalid_pptx_marker_only.zip |
+
+  Szenario: Endungspruefung liefert fail-closed Unknown bei Mismatch
+    Angenommen die Datei "sample_pdf_as_txt.txt"
+    Wenn ich den Dateityp mit Endungspruefung ermittle
+    Dann ist der erkannte Typ "Unknown"
+
+  Szenariogrundriss: Endungspruefung liefert boolesches Ergebnis
+    Angenommen die Datei "<datei>"
+    Wenn ich die Endung gegen den erkannten Typ pruefe
+    Dann ist das Endungsergebnis "<ergebnis>"
+
+    Beispiele:
+      | datei                 | ergebnis |
+      | sample.pdf            | True     |
+      | sample_pdf_as_txt.txt | False    |
+      | sample_pdf_no_extension | True   |
 
   Szenario: Zu große Datei wird fail-closed als Unknown klassifiziert
     Angenommen die maximale Dateigroesse ist 32 Bytes

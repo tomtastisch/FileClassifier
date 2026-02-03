@@ -10,11 +10,13 @@ Namespace FileTypeDetection
     ''' <summary>
     ''' Oeffentliche API zur inhaltsbasierten Dateityp-Erkennung.
     '''
+    ''' <remarks>
     ''' Sicherheits- und Architekturprinzipien:
     ''' - fail-closed: jeder Fehlerpfad liefert FileKind.Unknown.
     ''' - SSOT: Magic-Bytes werden nur in MagicDetect gepflegt.
     ''' - Dateiendung ist nur Metadatum; die Entscheidung basiert auf Content.
     ''' - ZIP-Dateien laufen immer durch ZIP-Gate und optionales OOXML-Refinement.
+    ''' </remarks>
     ''' </summary>
     Public NotInheritable Class FileTypeDetector
 
@@ -25,6 +27,7 @@ Namespace FileTypeDetection
         ''' <summary>
         ''' Setzt globale Default-Optionen als Snapshot.
         ''' </summary>
+        ''' <param name="opt">Quelloptionen fuer den globalen Snapshot.</param>
         Public Shared Sub SetDefaultOptions(opt As FileTypeDetectorOptions)
             SyncLock _optionsLock
                 _defaultOptions = Snapshot(opt)
@@ -34,6 +37,7 @@ Namespace FileTypeDetection
         ''' <summary>
         ''' Liefert einen Snapshot der aktuellen Default-Optionen.
         ''' </summary>
+        ''' <returns>Unabhaengige Kopie der globalen Optionen.</returns>
         Public Shared Function GetDefaultOptions() As FileTypeDetectorOptions
             SyncLock _optionsLock
                 Return Snapshot(_defaultOptions)
@@ -44,6 +48,8 @@ Namespace FileTypeDetection
         ''' Laedt Optionen aus einer JSON-Datei.
         ''' Unbekannte Schluessel werden ignoriert, Parse-/IO-Fehler fallen auf Defaults zurueck.
         ''' </summary>
+        ''' <param name="path">Pfad zur JSON-Konfigurationsdatei.</param>
+        ''' <returns>Geparste Optionen oder Defaults.</returns>
         Public Shared Function LoadOptions(path As String) As FileTypeDetectorOptions
             Dim defaults = GetDefaultOptions()
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
@@ -89,6 +95,8 @@ Namespace FileTypeDetection
         ''' <summary>
         ''' Liest eine Datei begrenzt in Memory ein. Wird z. B. fuer Detect(byte())-Workflows verwendet.
         ''' </summary>
+        ''' <param name="path">Dateipfad.</param>
+        ''' <returns>Gelesene Bytes oder leeres Array bei Fehler/Verletzung der Grenzen.</returns>
         Public Shared Function ReadFileSafe(path As String) As Byte()
             Dim opt = GetDefaultOptions()
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
@@ -123,7 +131,38 @@ Namespace FileTypeDetection
         ''' 3) ZIP-Gate und OOXML-Refinement
         ''' 4) fail-closed auf Unknown
         ''' </summary>
+        ''' <param name="path">Dateipfad.</param>
+        ''' <returns>Erkannter Typ oder Unknown.</returns>
         Public Function Detect(path As String) As FileType
+            Return Detect(path, verifyExtension:=False)
+        End Function
+
+        ''' <summary>
+        ''' Erkennt den Dateityp anhand eines Dateipfads und optionaler Endungspruefung.
+        ''' </summary>
+        ''' <param name="path">Dateipfad.</param>
+        ''' <param name="verifyExtension">Aktiviert die fail-closed Endungspruefung nach Inhaltsdetektion.</param>
+        ''' <returns>Erkannter Typ oder Unknown bei Mismatch/Fehler.</returns>
+        Public Function Detect(path As String, verifyExtension As Boolean) As FileType
+            Dim detected = DetectPathCore(path)
+
+            If Not verifyExtension Then Return detected
+            If ExtensionMatchesKind(path, detected.Kind) Then Return detected
+
+            Return FileTypeRegistry.Resolve(FileKind.Unknown)
+        End Function
+
+        ''' <summary>
+        ''' Prueft, ob die Dateiendung zum inhaltsbasiert erkannten Typ passt.
+        ''' </summary>
+        ''' <param name="path">Dateipfad.</param>
+        ''' <returns>True bei fehlender Endung oder passender Endung, sonst False.</returns>
+        Public Function DetectAndVerifyExtension(path As String) As Boolean
+            Dim detected = DetectPathCore(path)
+            Return ExtensionMatchesKind(path, detected.Kind)
+        End Function
+
+        Private Function DetectPathCore(path As String) As FileType
             Dim opt = GetDefaultOptions()
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(opt.Logger, "[Detect] Datei nicht gefunden.")
@@ -159,6 +198,8 @@ Namespace FileTypeDetection
         ''' <summary>
         ''' Erkennt den Dateityp anhand von In-Memory-Daten.
         ''' </summary>
+        ''' <param name="data">Zu pruefende Nutzdaten.</param>
+        ''' <returns>Erkannter Typ oder Unknown.</returns>
         Public Function Detect(data As Byte()) As FileType
             Dim opt = GetDefaultOptions()
             Return DetectInternalBytes(data, opt)
@@ -167,6 +208,9 @@ Namespace FileTypeDetection
         ''' <summary>
         ''' Deterministische Typpruefung als Convenience-API.
         ''' </summary>
+        ''' <param name="data">Zu pruefende Nutzdaten.</param>
+        ''' <param name="kind">Erwarteter Typ.</param>
+        ''' <returns>True bei Typgleichheit, sonst False.</returns>
         Public Function IsOfType(data As Byte(), kind As FileKind) As Boolean
             Return Detect(data).Kind = kind
         End Function
@@ -236,6 +280,30 @@ Namespace FileTypeDetection
             End If
 
             Return baseType
+        End Function
+
+        Private Shared Function ExtensionMatchesKind(path As String, detectedKind As FileKind) As Boolean
+            Dim ext = System.IO.Path.GetExtension(If(path, String.Empty))
+            If String.IsNullOrWhiteSpace(ext) Then Return True
+
+            If detectedKind = FileKind.Unknown Then Return False
+
+            Dim normalizedExt = FileTypeRegistry.NormalizeAlias(ext)
+            Dim detectedType = FileTypeRegistry.Resolve(detectedKind)
+
+            If normalizedExt = FileTypeRegistry.NormalizeAlias(detectedType.CanonicalExtension) Then
+                Return True
+            End If
+
+            If Not detectedType.Aliases.IsDefault Then
+                For Each a In detectedType.Aliases
+                    If String.Equals(a, normalizedExt, StringComparison.OrdinalIgnoreCase) Then
+                        Return True
+                    End If
+                Next
+            End If
+
+            Return False
         End Function
 
         Private Shared Function SafeInt(el As JsonElement, fallback As Integer) As Integer

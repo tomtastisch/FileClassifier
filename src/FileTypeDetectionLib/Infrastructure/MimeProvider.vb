@@ -36,6 +36,8 @@ Namespace FileTypeDetection
         ''' Liefert den MIME-Typ fuer eine Endung (mit oder ohne fuehrenden Punkt).
         ''' Gibt bei Fehlern oder unbekannter Endung einen leeren String zurueck.
         ''' </summary>
+        ''' <param name="extWithDot">Dateiendung mit oder ohne fuehrenden Punkt.</param>
+        ''' <returns>Kanonischer MIME-Typ oder leerer String.</returns>
         Friend Function GetMime(extWithDot As String) As String
             If String.IsNullOrWhiteSpace(extWithDot) Then Return String.Empty
 

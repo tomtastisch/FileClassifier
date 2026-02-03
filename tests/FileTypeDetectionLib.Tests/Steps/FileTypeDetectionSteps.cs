@@ -64,6 +64,26 @@ public sealed class FileTypeDetectionSteps
         state.LastResult = detector.Detect(state.CurrentPath!);
     }
 
+    [When("ich den Dateityp mit Endungspruefung ermittle")]
+    public void WhenIDetectTheFileTypeWithExtensionVerification()
+    {
+        var state = State();
+        Assert.False(string.IsNullOrWhiteSpace(state.CurrentPath));
+
+        var detector = new FileTypeDetector();
+        state.LastResult = detector.Detect(state.CurrentPath!, verifyExtension: true);
+    }
+
+    [When("ich die Endung gegen den erkannten Typ pruefe")]
+    public void WhenIVerifyExtensionAgainstDetectedType()
+    {
+        var state = State();
+        Assert.False(string.IsNullOrWhiteSpace(state.CurrentPath));
+
+        var detector = new FileTypeDetector();
+        state.ExtensionMatchResult = detector.DetectAndVerifyExtension(state.CurrentPath!);
+    }
+
     [Then("ist der erkannte Typ {string}")]
     public void ThenTheDetectedKindIs(string expectedKind)
     {
@@ -75,6 +95,15 @@ public sealed class FileTypeDetectionSteps
             $"Unknown FileKind literal in feature: {expectedKind}");
 
         Assert.Equal(expected, state.LastResult!.Kind);
+    }
+
+    [Then("ist das Endungsergebnis {string}")]
+    public void ThenTheExtensionResultIs(string expectedBoolean)
+    {
+        var state = State();
+        Assert.NotNull(state.ExtensionMatchResult);
+        Assert.True(bool.TryParse(expectedBoolean, out var expected), $"Expected boolean literal but got: {expectedBoolean}");
+        Assert.Equal(expected, state.ExtensionMatchResult.Value);
     }
 
     [Then("ist der MIME-Provider build-konform aktiv")]

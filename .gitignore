@@ -1,0 +1,15 @@
+
+# build output
+bin/
+obj/
+**/bin/
+**/obj/
+# macOS
+.DS_Store
+**/.DS_Store
+# test artifacts
+tests/**/bin/
+tests/**/obj/
+# benchmark output
+benchmark_detect_ms.txt
+**/benchmark_detect_ms.txt

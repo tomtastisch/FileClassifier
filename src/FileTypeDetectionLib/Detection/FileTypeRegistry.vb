@@ -80,12 +80,22 @@ Namespace FileTypeDetection
             Return s.ToLowerInvariant()
         End Function
 
+        ''' <summary>
+        ''' Liefert den zugeordneten FileType fuer einen Enumwert.
+        ''' </summary>
+        ''' <param name="kind">Enumwert des Typs.</param>
+        ''' <returns>Registrierter Typ oder Unknown.</returns>
         Friend Shared Function Resolve(kind As FileKind) As FileType
             Dim t As FileType = Nothing
             If TypesByKind.TryGetValue(kind, t) AndAlso t IsNot Nothing Then Return t
             Return TypesByKind(FileKind.Unknown)
         End Function
 
+        ''' <summary>
+        ''' Liefert den zugeordneten FileType fuer einen Aliaswert.
+        ''' </summary>
+        ''' <param name="aliasKey">Alias mit oder ohne fuehrenden Punkt.</param>
+        ''' <returns>Registrierter Typ oder Unknown.</returns>
         Friend Shared Function ResolveByAlias(aliasKey As String) As FileType
             Dim k As FileKind = FileKind.Unknown
             If KindByAlias.TryGetValue(NormalizeAlias(aliasKey), k) Then

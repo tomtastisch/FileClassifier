@@ -120,27 +120,26 @@ Namespace FileTypeDetection
                             If ratio > opt.MaxZipCompressionRatio Then Return False
                         End If
 
-                        If opt.MaxZipNestingDepth > 0 AndAlso depth < opt.MaxZipNestingDepth Then
-                            Dim name = If(e.FullName, String.Empty)
-                            If name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) Then
-                                If u <= 0 OrElse u > opt.MaxZipNestedBytes Then Return False
+                        Dim name = If(e.FullName, String.Empty)
+                        If name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) Then
+                            If depth >= opt.MaxZipNestingDepth Then Return False
+                            If u <= 0 OrElse u > opt.MaxZipNestedBytes Then Return False
 
-                                Try
-                                    Using es = e.Open()
-                                        Using nestedMs As New MemoryStream(CInt(Math.Min(u, Integer.MaxValue)))
-                                            StreamBounds.CopyBounded(es, nestedMs, opt.MaxZipNestedBytes)
-                                            nestedMs.Position = 0
+                            Try
+                                Using es = e.Open()
+                                    Using nestedMs As New MemoryStream(CInt(Math.Min(u, Integer.MaxValue)))
+                                        StreamBounds.CopyBounded(es, nestedMs, opt.MaxZipNestedBytes)
+                                        nestedMs.Position = 0
 
-                                            If Not IsZipSafeStream(nestedMs, opt, depth + 1) Then
-                                                Return False
-                                            End If
-                                        End Using
+                                        If Not IsZipSafeStream(nestedMs, opt, depth + 1) Then
+                                            Return False
+                                        End If
                                     End Using
-                                Catch ex As Exception
-                                    LogGuard.Debug(opt.Logger, $"[ZipGate] Nested-Fehler: {ex.Message}")
-                                    Return False
-                                End Try
-                            End If
+                                End Using
+                            Catch ex As Exception
+                                LogGuard.Debug(opt.Logger, $"[ZipGate] Nested-Fehler: {ex.Message}")
+                                Return False
+                            End Try
                         End If
                     Next
                 End Using

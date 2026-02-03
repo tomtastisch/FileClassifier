@@ -8,8 +8,9 @@ Der Fokus liegt auf BDD (Reqnroll/Gherkin, Sprache `de`) sowie auf eigenschaftsb
 - `Features/` - fachliche Akzeptanzszenarien in Gherkin.
 - `Steps/` - explizite Step-Bindings, keine komplexen Regex-Gruppen.
 - `Support/` - geteilte Hilfen (Szenariozustand, Ressourcenauflosung, Testfabriken, Options-Scope).
-- `Properties/` - eigenschafts- und grenzwertorientierte Regressionstests.
-- `Performance/` - benchmark-orientierte Smoke-Tests ohne harte Timing-Grenzen.
+- `Unit/` - direkte, adversariale Funktions- und Regressionsfaelle.
+- `Property/` - eigenschafts- und grenzwertorientierte Regressionstests.
+- `Benchmarks/` - benchmark-orientierte Smoke-Tests ohne harte Timing-Grenzen.
 - `resources/` - statische Testdateien (binaer), die zur Laufzeit kopiert werden.
 
 ## 3) Determinismus-Regeln
@@ -32,6 +33,11 @@ Der Benchmark-Smoke schreibt eine Messzeile in:
 - `tests/FileTypeDetectionLib.Tests/bin/Debug/net10.0/benchmark_detect_ms.txt`
 
 Die Messung dient der Trendbeobachtung. Es gibt keine harte Zeitgrenze.
+Benchmark-Szenarien sind ueber Trait separat ausfuehrbar:
+```bash
+dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -v minimal --filter "Category=Benchmark"
+dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -v minimal --filter "Category!=Benchmark"
+```
 
 ## 6) Rollback (lokal, deterministisch)
 Wenn eine Einzeldatei auf Baseline zurueckgesetzt werden soll:

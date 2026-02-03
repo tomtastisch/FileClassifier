@@ -23,6 +23,23 @@ internal static class ZipPayloadFactory
         return ms.ToArray();
     }
 
+    internal static byte[] CreateZipWithEntrySizes(params int[] entrySizes)
+    {
+        using var ms = new MemoryStream();
+        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            for (var i = 0; i < entrySizes.Length; i++)
+            {
+                var entry = zip.CreateEntry($"entry_{i}.bin", CompressionLevel.SmallestSize);
+                using var es = entry.Open();
+                var payload = CreatePayload(Math.Max(0, entrySizes[i]), (byte)('K' + (i % 7)));
+                es.Write(payload, 0, payload.Length);
+            }
+        }
+
+        return ms.ToArray();
+    }
+
     internal static byte[] CreateNestedZip(int nestedZipBytes)
     {
         return CreateNestedZipWithInnerLength(nestedZipBytes).zipBytes;
@@ -41,6 +58,27 @@ internal static class ZipPayloadFactory
         }
 
         return (ms.ToArray(), nestedContent.LongLength);
+    }
+
+    internal static byte[] CreateDeepNestedZip(int depth, int innerPayloadSize)
+    {
+        var current = CreateZipWithEntries(1, Math.Max(1, innerPayloadSize));
+        var levels = Math.Max(1, depth);
+
+        for (var i = 1; i < levels; i++)
+        {
+            using var ms = new MemoryStream();
+            using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
+            {
+                var nestedEntry = zip.CreateEntry("inner.zip", CompressionLevel.SmallestSize);
+                using var es = nestedEntry.Open();
+                es.Write(current, 0, current.Length);
+            }
+
+            current = ms.ToArray();
+        }
+
+        return current;
     }
 
     private static byte[] CreatePayload(int size, byte value)
