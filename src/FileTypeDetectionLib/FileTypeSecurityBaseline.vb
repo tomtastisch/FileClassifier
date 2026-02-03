@@ -13,7 +13,7 @@ Namespace FileTypeDetection
         ''' <summary>
         ''' Erzeugt ein hartes Default-Profil fuer produktive, fail-closed Szenarien.
         ''' </summary>
-        Public Shared Function CreateDeterministicDefaults() As FileTypeDetectorOptions
+        private Shared Function CreateDeterministicDefaults() As FileTypeDetectorOptions
             Return New FileTypeDetectorOptions With {
                 .MaxBytes = 128L * 1024L * 1024L,
                 .SniffBytes = 64 * 1024,

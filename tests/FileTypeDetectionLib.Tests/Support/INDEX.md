@@ -1,16 +1,17 @@
 # Index - Support
 
-## Zweck
-Geteilte Test-Helfer, Zustandsverwaltung und BDD-Console-Hooks.
+## 1. Purpose
+Gemeinsame Test-Helfer fuer stabilen, deterministischen Testbetrieb.
 
-- `BddConsoleHooks.cs`
-- `DetectionScenarioState.cs`
+## 2. Inputs
+- Testzustand, Ressourcen, Options-Snapshots
+
+## 3. Outputs
+- reproduzierbare Testkontexte und BDD-Konsolenausgabe
+
+## 4. Failure Modes / Guarantees
+- Testisolation via Scope/State-Helfer
+
+## 5. Verification & Evidence
 - `DetectorOptionsScope.cs`
-- `TestAssemblyConfig.cs`
-- `TestResources.cs`
-- `ZipPayloadFactory.cs`
-
-## Rollen
-- Ressourcenaufloesung und Testdatenaufbau
-- Optionen-Snapshot fuer deterministische Ruecksetzung
-- menschenlesbare BDD-Console-Ausgabe
+- `BddConsoleHooks.cs`

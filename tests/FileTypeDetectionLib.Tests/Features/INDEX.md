@@ -1,7 +1,16 @@
 # Index - Features
 
-## Zweck
-Fachliche BDD-Szenarien in Gherkin (`# language: de`).
+## 1. Purpose
+Fachliche BDD-Spezifikation.
 
-## Inhalte
-- `file_type_detection.feature`: End-to-End-Erwartungen fuer Erkennung, Endungs-Policy und fail-closed Verhalten.
+## 2. Inputs
+- Gherkin-Szenarien
+
+## 3. Outputs
+- menschenlesbare Akzeptanzverifikation
+
+## 4. Failure Modes / Guarantees
+- Abweichende Fachlogik wird sofort sichtbar.
+
+## 5. Verification & Evidence
+- `file_type_detection.feature`

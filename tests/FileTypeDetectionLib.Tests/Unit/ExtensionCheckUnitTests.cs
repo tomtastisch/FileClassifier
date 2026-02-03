@@ -1,5 +1,7 @@
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
+using System;
+using System.IO;
 using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
@@ -16,5 +18,26 @@ public sealed class ExtensionCheckUnitTests
         var verified = detector.DetectAndVerifyExtension(path);
 
         Assert.True(verified, $"detected={detected.Kind}, path={path}");
+    }
+
+    [Fact]
+    public void Detect_DoesNotTrustFileNameExtension_WhenHeaderIsUnknown()
+    {
+        var detector = new FileTypeDetector();
+        var path = Path.Combine(Path.GetTempPath(), "ftd-fake-" + Guid.NewGuid().ToString("N") + ".pdf");
+        File.WriteAllBytes(path, new byte[] { 0x01, 0x23, 0x45, 0x67 });
+
+        try
+        {
+            var detected = detector.Detect(path);
+            Assert.Equal(FileKind.Unknown, detected.Kind);
+        }
+        finally
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
     }
 }

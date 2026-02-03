@@ -1,14 +1,20 @@
 # Index - Abstractions
 
-## Zweck
-Fachliche Basistypen fuer stabile Rueckgabewerte.
+## 1. Purpose
+Unveraenderliche Fachobjekte fuer stabile, portable Rueckgaben.
 
-## Dateien und Verantwortung
-| Datei | Verantwortung |
-|---|---|
-| `FileKind.vb` | Kanonische Typ-ID fuer alle Erkennungsresultate. |
-| `FileType.vb` | Unveraenderliches Ergebnisobjekt (`Kind`, `Mime`, `Allowed`, `Aliases`). |
+## 2. Inputs
+- Werte aus Detection-/Infrastructure-Schicht
 
-## Verwendung
-- Verwende `FileKind` fuer fachliche Entscheidungen im Anwendungsflow.
-- Verwende `FileType` fuer Ausgabe, Logging und Weitergabe in Pipelines.
+## 3. Outputs
+- `DetectionDetail`
+- `FileKind`
+- `FileType`
+- `ZipExtractedEntry`
+
+## 4. Failure Modes / Guarantees
+- `Unknown` bleibt verpflichtender fail-closed Typ.
+- Objekte sind immutable und serialisierbar nutzbar.
+
+## 5. Verification & Evidence
+- Unit-Tests in `tests/FileTypeDetectionLib.Tests/Unit/`

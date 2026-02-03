@@ -90,6 +90,38 @@ public sealed class ZipExtractionUnitTests
         }
     }
 
+    [Fact]
+    public void ExtractZipSafeToMemory_Succeeds_ForValidZip_WithVerification()
+    {
+        var source = TestResources.Resolve("sample.zip");
+        var entries = new FileTypeDetector().ExtractZipSafeToMemory(source, verifyBeforeExtract: true);
+
+        Assert.NotNull(entries);
+        Assert.Single(entries);
+        Assert.Equal("note.txt", entries[0].RelativePath);
+        Assert.NotEmpty(entries[0].Content);
+    }
+
+    [Fact]
+    public void ExtractZipSafeToMemory_FailsClosed_ForTraversalEntry()
+    {
+        var tempRoot = CreateTempRoot();
+        var zipPath = Path.Combine(tempRoot, "traversal.zip");
+        File.WriteAllBytes(zipPath, ZipPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8));
+
+        try
+        {
+            var entries = new FileTypeDetector().ExtractZipSafeToMemory(zipPath, verifyBeforeExtract: false);
+            Assert.NotNull(entries);
+            Assert.Empty(entries);
+            Assert.False(File.Exists(Path.Combine(tempRoot, "evil.txt")));
+        }
+        finally
+        {
+            CleanupTempRoot(tempRoot);
+        }
+    }
+
     private static string CreateTempRoot()
     {
         var path = Path.Combine(Path.GetTempPath(), "ftd-extract-test-" + Guid.NewGuid().ToString("N"));

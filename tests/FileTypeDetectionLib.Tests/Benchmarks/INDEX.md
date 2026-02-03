@@ -1,7 +1,16 @@
 # Index - Benchmarks
 
-## Zweck
-Smoke-Benchmarks ohne harte Timing-Grenzen.
+## 1. Purpose
+Smoke-Benchmarks fuer relative Laufzeitentwicklung.
 
-## Inhalte
-- `DetectionBenchmarkSmokeTests.cs`: Vergleich Header-lastiger vs. ZIP-lastiger Erkennungsfaelle.
+## 2. Inputs
+- repraesentative Header-/ZIP-Faelle
+
+## 3. Outputs
+- trendbasierte Laufzeitbeobachtung
+
+## 4. Failure Modes / Guarantees
+- keine harten Performance-SLOs; Fokus auf Regressionstrends.
+
+## 5. Verification & Evidence
+- `DetectionBenchmarkSmokeTests.cs`

@@ -48,9 +48,9 @@ Namespace FileTypeDetection
             End If
 
             If dedup.Count = 0 Then
-                Aliases = ImmutableArray(Of String).Empty
+                Me.Aliases = ImmutableArray(Of String).Empty
             Else
-                Aliases = dedup.ToImmutableArray()
+                Me.Aliases = dedup.ToImmutableArray()
             End If
         End Sub
 

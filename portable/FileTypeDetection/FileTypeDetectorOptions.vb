@@ -13,6 +13,12 @@ Namespace FileTypeDetection
     ''' - Logger darf Beobachtbarkeit liefern, aber niemals das Ergebnis beeinflussen.
     ''' </summary>
     Public NotInheritable Class FileTypeDetectorOptions
+        ''' <summary>
+        ''' Erzwingt Header-only-Erkennung fuer Nicht-ZIP-Typen.
+        ''' Sonderregel: ZIP-Container werden weiterhin sicher inhaltlich verfeinert (OOXML/ZIP).
+        ''' Default ist True und read-only.
+        ''' </summary>
+        Public ReadOnly Property HeaderOnlyNonZip As Boolean
 
         ''' <summary>
         ''' Harte Obergrenze fuer Datei-/Byte-Payloads.
@@ -53,8 +59,16 @@ Namespace FileTypeDetection
         ''' <summary>Optionaler Logger fuer Diagnosezwecke.</summary>
         Public Property Logger As ILogger = Nothing
 
+        Public Sub New()
+            Me.New(True)
+        End Sub
+
+        Friend Sub New(headerOnlyNonZip As Boolean)
+            Me.HeaderOnlyNonZip = headerOnlyNonZip
+        End Sub
+
         Friend Function Clone() As FileTypeDetectorOptions
-            Return New FileTypeDetectorOptions With {
+            Return New FileTypeDetectorOptions(Me.HeaderOnlyNonZip) With {
                 .MaxBytes = Me.MaxBytes,
                 .SniffBytes = Me.SniffBytes,
                 .MaxZipEntries = Me.MaxZipEntries,

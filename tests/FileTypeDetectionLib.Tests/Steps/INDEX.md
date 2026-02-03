@@ -1,7 +1,16 @@
 # Index - Steps
 
-## Zweck
-Reqnroll-Step-Bindings fuer die Feature-Saetze.
+## 1. Purpose
+Bindet Gherkin-Schritte an konkrete Testlogik.
 
-## Inhalte
-- `FileTypeDetectionSteps.cs`: Given/When/Then-Implementierungen inkl. Optionen und Assertions.
+## 2. Inputs
+- Feature-Schritte
+
+## 3. Outputs
+- Testaktionen/Assertions
+
+## 4. Failure Modes / Guarantees
+- Inkonsistenzen zwischen Feature und Code schlagen fehl.
+
+## 5. Verification & Evidence
+- `FileTypeDetectionSteps.cs`

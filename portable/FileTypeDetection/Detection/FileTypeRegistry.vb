@@ -1,16 +1,17 @@
 Option Strict On
 Option Explicit On
 
+Imports System.Collections.Generic
 Imports System.Collections.Immutable
 
 Namespace FileTypeDetection
 
     ''' <summary>
-    ''' Zentrale Registry als SSOT fuer Typmetadaten und Alias-Aufloesung.
+    ''' Zentrale Registry als SSOT fuer Typmetadaten, Alias-Aufloesung und Magic-Patterns.
     '''
     ''' Regeln:
-    ''' - Neue Typen nur hier registrieren.
-    ''' - Aufloesung ist deterministisch und case-insensitive.
+    ''' - Neue Typen werden primaer ueber FileKind erweitert.
+    ''' - Metadaten werden deterministisch aus FileKind + zentralen Overrides aufgebaut.
     ''' - Unknown ist immer als fail-closed Fallback vorhanden.
     ''' </summary>
     Friend NotInheritable Class FileTypeRegistry
@@ -20,39 +21,206 @@ Namespace FileTypeDetection
         Friend Shared ReadOnly TypesByKind As ImmutableDictionary(Of FileKind, FileType)
         Friend Shared ReadOnly KindByAlias As ImmutableDictionary(Of String, FileKind)
 
+        Private Shared ReadOnly _extensionOverrides As ImmutableDictionary(Of FileKind, String) =
+            ImmutableDictionary.CreateRange(Of FileKind, String)(
+                {New KeyValuePair(Of FileKind, String)(FileKind.Jpeg, ".jpg")})
+
+        Private Shared ReadOnly _aliasOverrides As ImmutableDictionary(Of FileKind, ImmutableArray(Of String)) =
+            ImmutableDictionary.CreateRange(Of FileKind, ImmutableArray(Of String))(
+                {New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Jpeg, ImmutableArray.Create("jpe"))})
+
+        Private Shared ReadOnly _magicPatternCatalog As ImmutableDictionary(Of FileKind, ImmutableArray(Of MagicPattern)) = BuildMagicPatternCatalog()
+        Private Shared ReadOnly _magicRules As ImmutableArray(Of MagicRule)
+
         Shared Sub New()
-            TypesByKind = BuildTypes()
+            Dim definitions = BuildDefinitionsFromEnum()
+            TypesByKind = BuildTypes(definitions)
             KindByAlias = BuildAliasMap(TypesByKind)
+            _magicRules = BuildMagicRules(definitions)
         End Sub
 
-        Private Shared Function BuildTypes() As ImmutableDictionary(Of FileKind, FileType)
-            Dim mimeProvider As MimeProvider = MimeProvider.Instance
-            Dim b = ImmutableDictionary.CreateBuilder(Of FileKind, FileType)()
+        Private Shared Function BuildDefinitionsFromEnum() As ImmutableArray(Of FileTypeDefinition)
+            Dim b = ImmutableArray.CreateBuilder(Of FileTypeDefinition)()
 
-            b(FileKind.Unknown) = New FileType(FileKind.Unknown, Nothing, Nothing, False, ImmutableArray(Of String).Empty)
+            For Each kind In OrderedKinds()
+                If kind = FileKind.Unknown Then Continue For
 
-            For Each d In KnownTypeDefinitions()
-                b(d.kind) = New FileType(d.kind, d.extension, mimeProvider.GetMime(d.extension), True, d.aliases)
+                Dim canonicalExtension = GetCanonicalExtension(kind)
+                Dim aliases = BuildAliases(kind, canonicalExtension)
+                Dim magicPatterns = GetMagicPatterns(kind)
+
+                b.Add(New FileTypeDefinition(kind, canonicalExtension, aliases, magicPatterns))
             Next
 
             Return b.ToImmutable()
         End Function
 
-        ''' <summary>
-        ''' Kanonische Typdefinitionen in einer Liste (SSOT fuer Metadaten-Initialisierung).
-        ''' </summary>
-        Private Shared Function KnownTypeDefinitions() As (kind As FileKind, extension As String, aliases As String())()
-            Return {
-                (FileKind.Pdf, ".pdf", {"pdf"}),
-                (FileKind.Png, ".png", {"png"}),
-                (FileKind.Jpeg, ".jpg", {"jpg", "jpeg", "jpe"}),
-                (FileKind.Gif, ".gif", {"gif"}),
-                (FileKind.Webp, ".webp", {"webp"}),
-                (FileKind.Zip, ".zip", {"zip"}),
-                (FileKind.Docx, ".docx", {"docx"}),
-                (FileKind.Xlsx, ".xlsx", {"xlsx"}),
-                (FileKind.Pptx, ".pptx", {"pptx"})
-            }
+        Private Shared Function OrderedKinds() As ImmutableArray(Of FileKind)
+            Dim kinds As New List(Of FileKind)()
+            For Each raw As Object In [Enum].GetValues(GetType(FileKind))
+                kinds.Add(CType(raw, FileKind))
+            Next
+
+            kinds.Sort(Function(a, b) CInt(a).CompareTo(CInt(b)))
+            Return kinds.ToImmutableArray()
+        End Function
+
+        Private Shared Function GetCanonicalExtension(kind As FileKind) As String
+            Dim overrideExt As String = Nothing
+            If _extensionOverrides.TryGetValue(kind, overrideExt) Then
+                Return overrideExt
+            End If
+
+            Return "." & NormalizeAlias(kind.ToString())
+        End Function
+
+        Private Shared Function BuildAliases(kind As FileKind, canonicalExtension As String) As String()
+            Dim aliases As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
+
+            Dim extAlias = NormalizeAlias(canonicalExtension)
+            If extAlias.Length > 0 Then aliases.Add(extAlias)
+
+            Dim enumAlias = NormalizeAlias(kind.ToString())
+            If enumAlias.Length > 0 Then aliases.Add(enumAlias)
+
+            Dim additional As ImmutableArray(Of String) = ImmutableArray(Of String).Empty
+            If _aliasOverrides.TryGetValue(kind, additional) Then
+                For Each item In additional
+                    Dim normalized = NormalizeAlias(item)
+                    If normalized.Length > 0 Then aliases.Add(normalized)
+                Next
+            End If
+
+            Return aliases.ToArray()
+        End Function
+
+        Private Shared Function GetMagicPatterns(kind As FileKind) As ImmutableArray(Of MagicPattern)
+            Dim patterns As ImmutableArray(Of MagicPattern) = ImmutableArray(Of MagicPattern).Empty
+            If _magicPatternCatalog.TryGetValue(kind, patterns) Then
+                Return patterns
+            End If
+
+            Return ImmutableArray(Of MagicPattern).Empty
+        End Function
+
+        Private Shared Function BuildTypes(definitions As ImmutableArray(Of FileTypeDefinition)) As ImmutableDictionary(Of FileKind, FileType)
+            Dim mimeProvider As MimeProvider = MimeProvider.Instance
+            Dim b = ImmutableDictionary.CreateBuilder(Of FileKind, FileType)()
+
+            b(FileKind.Unknown) = New FileType(FileKind.Unknown, Nothing, Nothing, False, ImmutableArray(Of String).Empty)
+
+            For Each d In definitions
+                b(d.Kind) = New FileType(d.Kind, d.CanonicalExtension, mimeProvider.GetMime(d.CanonicalExtension), True, d.Aliases)
+            Next
+
+            Return b.ToImmutable()
+        End Function
+
+        Friend Shared Function DetectByMagic(header As Byte()) As FileKind
+            If header Is Nothing OrElse header.Length = 0 Then Return FileKind.Unknown
+
+            For Each rule In _magicRules
+                For Each magicPattern In rule.Patterns
+                    Dim allMatched = True
+                    For Each segment In magicPattern.Segments
+                        If Not HasSegment(header, segment) Then
+                            allMatched = False
+                            Exit For
+                        End If
+                    Next
+
+                    If allMatched Then
+                        Return rule.Kind
+                    End If
+                Next
+            Next
+
+            Return FileKind.Unknown
+        End Function
+
+        Friend Shared Function HasDirectHeaderDetection(kind As FileKind) As Boolean
+            If kind = FileKind.Unknown Then Return False
+            Dim patterns As ImmutableArray(Of MagicPattern) = ImmutableArray(Of MagicPattern).Empty
+            Return _magicPatternCatalog.TryGetValue(kind, patterns) AndAlso Not patterns.IsDefaultOrEmpty
+        End Function
+
+        Friend Shared Function HasStructuredContainerDetection(kind As FileKind) As Boolean
+            Return kind = FileKind.Docx OrElse
+                kind = FileKind.Xlsx OrElse
+                kind = FileKind.Pptx
+        End Function
+
+        Friend Shared Function HasDirectContentDetection(kind As FileKind) As Boolean
+            Return HasDirectHeaderDetection(kind) OrElse HasStructuredContainerDetection(kind)
+        End Function
+
+        Friend Shared Function KindsWithoutDirectContentDetection() As ImmutableArray(Of FileKind)
+            Dim b = ImmutableArray.CreateBuilder(Of FileKind)()
+            For Each kind In OrderedKinds()
+                If kind = FileKind.Unknown Then Continue For
+                If Not HasDirectContentDetection(kind) Then
+                    b.Add(kind)
+                End If
+            Next
+            Return b.ToImmutable()
+        End Function
+
+        Private Shared Function BuildMagicRules(definitions As ImmutableArray(Of FileTypeDefinition)) As ImmutableArray(Of MagicRule)
+            Dim b = ImmutableArray.CreateBuilder(Of MagicRule)()
+            For Each d In definitions
+                If d.MagicPatterns.IsDefaultOrEmpty Then Continue For
+                b.Add(New MagicRule(d.Kind, d.MagicPatterns))
+            Next
+            Return b.ToImmutable()
+        End Function
+
+        Private Shared Function BuildMagicPatternCatalog() As ImmutableDictionary(Of FileKind, ImmutableArray(Of MagicPattern))
+            Dim b = ImmutableDictionary.CreateBuilder(Of FileKind, ImmutableArray(Of MagicPattern))()
+
+            b(FileKind.Pdf) = ImmutableArray.Create(
+                Pattern(Prefix(0, &H25, &H50, &H44, &H46, &H2D)))
+
+            b(FileKind.Png) = ImmutableArray.Create(
+                Pattern(Prefix(0, &H89, &H50, &H4E, &H47, &HD, &HA, &H1A, &HA)))
+
+            b(FileKind.Jpeg) = ImmutableArray.Create(
+                Pattern(Prefix(0, &HFF, &HD8, &HFF)))
+
+            b(FileKind.Gif) = ImmutableArray.Create(
+                Pattern(Prefix(0, &H47, &H49, &H46, &H38, &H37, &H61)),
+                Pattern(Prefix(0, &H47, &H49, &H46, &H38, &H39, &H61)))
+
+            b(FileKind.Webp) = ImmutableArray.Create(
+                Pattern(Prefix(0, &H52, &H49, &H46, &H46), Prefix(8, &H57, &H45, &H42, &H50)))
+
+            b(FileKind.Zip) = ImmutableArray.Create(
+                Pattern(Prefix(0, &H50, &H4B, &H3, &H4)),
+                Pattern(Prefix(0, &H50, &H4B, &H5, &H6)),
+                Pattern(Prefix(0, &H50, &H4B, &H7, &H8)))
+
+            Return b.ToImmutable()
+        End Function
+
+        Private Shared Function Pattern(ParamArray segments As MagicSegment()) As MagicPattern
+            Return New MagicPattern(ImmutableArray.Create(segments))
+        End Function
+
+        Private Shared Function Prefix(offset As Integer, ParamArray bytesValue As Byte()) As MagicSegment
+            Return New MagicSegment(offset, ImmutableArray.Create(bytesValue))
+        End Function
+
+        Private Shared Function HasSegment(data As Byte(), segment As MagicSegment) As Boolean
+            If data Is Nothing Then Return False
+            If segment.Offset < 0 Then Return False
+            If segment.Bytes.IsDefaultOrEmpty Then Return False
+
+            Dim endPos = segment.Offset + segment.Bytes.Length
+            If endPos < 0 OrElse data.Length < endPos Then Return False
+
+            For i As Integer = 0 To segment.Bytes.Length - 1
+                If data(segment.Offset + i) <> segment.Bytes(i) Then Return False
+            Next
+            Return True
         End Function
 
         Private Shared Function BuildAliasMap(types As ImmutableDictionary(Of FileKind, FileType)) As ImmutableDictionary(Of String, FileKind)
@@ -103,6 +271,48 @@ Namespace FileTypeDetection
             End If
             Return Resolve(FileKind.Unknown)
         End Function
+
+        Private Structure FileTypeDefinition
+            Friend ReadOnly Kind As FileKind
+            Friend ReadOnly CanonicalExtension As String
+            Friend ReadOnly Aliases As String()
+            Friend ReadOnly MagicPatterns As ImmutableArray(Of MagicPattern)
+
+            Friend Sub New(kind As FileKind, canonicalExtension As String, aliases As String(), magicPatterns As ImmutableArray(Of MagicPattern))
+                Me.Kind = kind
+                Me.CanonicalExtension = canonicalExtension
+                Me.Aliases = aliases
+                Me.MagicPatterns = magicPatterns
+            End Sub
+        End Structure
+
+        Private Structure MagicRule
+            Friend ReadOnly Kind As FileKind
+            Friend ReadOnly Patterns As ImmutableArray(Of MagicPattern)
+
+            Friend Sub New(kind As FileKind, patterns As ImmutableArray(Of MagicPattern))
+                Me.Kind = kind
+                Me.Patterns = patterns
+            End Sub
+        End Structure
+
+        Private Structure MagicPattern
+            Friend ReadOnly Segments As ImmutableArray(Of MagicSegment)
+
+            Friend Sub New(segments As ImmutableArray(Of MagicSegment))
+                Me.Segments = segments
+            End Sub
+        End Structure
+
+        Private Structure MagicSegment
+            Friend ReadOnly Offset As Integer
+            Friend ReadOnly Bytes As ImmutableArray(Of Byte)
+
+            Friend Sub New(offset As Integer, bytes As ImmutableArray(Of Byte))
+                Me.Offset = offset
+                Me.Bytes = bytes
+            End Sub
+        End Structure
 
     End Class
 
