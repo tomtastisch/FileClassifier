@@ -1,0 +1,12 @@
+/Users/tomwerner/RiderProjects/FileClassifier/src/FileTypeDetectionLib/bin/Debug/net10.0/FileTypeDetectionLib.deps.json
+/Users/tomwerner/RiderProjects/FileClassifier/src/FileTypeDetectionLib/bin/Debug/net10.0/FileTypeDetectionLib.dll
+/Users/tomwerner/RiderProjects/FileClassifier/src/FileTypeDetectionLib/bin/Debug/net10.0/FileTypeDetectionLib.pdb
+/Users/tomwerner/RiderProjects/FileClassifier/src/FileTypeDetectionLib/obj/Debug/net10.0/FileTypeDetectionLib.vbproj.AssemblyReference.cache
+/Users/tomwerner/RiderProjects/FileClassifier/src/FileTypeDetectionLib/obj/Debug/net10.0/FileTypeDetectionLib.GeneratedMSBuildEditorConfig.editorconfig
+/Users/tomwerner/RiderProjects/FileClassifier/src/FileTypeDetectionLib/obj/Debug/net10.0/FileTypeDetectionLib.AssemblyInfoInputs.cache
+/Users/tomwerner/RiderProjects/FileClassifier/src/FileTypeDetectionLib/obj/Debug/net10.0/FileTypeDetectionLib.AssemblyInfo.vb
+/Users/tomwerner/RiderProjects/FileClassifier/src/FileTypeDetectionLib/obj/Debug/net10.0/FileTypeDetectionLib.vbproj.CoreCompileInputs.cache
+/Users/tomwerner/RiderProjects/FileClassifier/src/FileTypeDetectionLib/obj/Debug/net10.0/FileTypeDetectionLib.dll
+/Users/tomwerner/RiderProjects/FileClassifier/src/FileTypeDetectionLib/obj/Debug/net10.0/refint/FileTypeDetectionLib.dll
+/Users/tomwerner/RiderProjects/FileClassifier/src/FileTypeDetectionLib/obj/Debug/net10.0/FileTypeDetectionLib.pdb
+/Users/tomwerner/RiderProjects/FileClassifier/src/FileTypeDetectionLib/obj/Debug/net10.0/ref/FileTypeDetectionLib.dll
