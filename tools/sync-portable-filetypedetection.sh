@@ -10,6 +10,7 @@ mkdir -p "${OUT_DIR}/Abstractions" "${OUT_DIR}/Detection" "${OUT_DIR}/Infrastruc
 
 cp "${SRC_DIR}/FileTypeDetector.vb" "${OUT_DIR}/"
 cp "${SRC_DIR}/FileTypeDetectorOptions.vb" "${OUT_DIR}/"
+cp "${SRC_DIR}/FileTypeSecurityBaseline.vb" "${OUT_DIR}/"
 cp "${SRC_DIR}/Abstractions/FileKind.vb" "${OUT_DIR}/Abstractions/"
 cp "${SRC_DIR}/Abstractions/FileType.vb" "${OUT_DIR}/Abstractions/"
 cp "${SRC_DIR}/Detection/FileTypeRegistry.vb" "${OUT_DIR}/Detection/"
@@ -17,161 +18,138 @@ cp "${SRC_DIR}/Infrastructure/Internals.vb" "${OUT_DIR}/Infrastructure/"
 cp "${SRC_DIR}/Infrastructure/MimeProvider.vb" "${OUT_DIR}/Infrastructure/"
 
 cat > "${OUT_DIR}/README.md" <<'EOF'
-# Portable FileTypeDetection (Deutsch)
+# Portable FileTypeDetection
 
-Dieser Ordner ist bewusst copy/paste-freundlich aufgebaut und enthaelt nur
-die benoetigten Quellcodedateien fuer `FileTypeDetector` (ohne Tests, ohne `bin/`, ohne `obj/`).
+Copy/paste-freundliche Struktur der Kernbibliothek (ohne Tests, ohne `bin/`, ohne `obj/`).
 
-## Schnellstart im Zielprojekt
-1. Ordner `FileTypeDetection` in dein Zielprojekt kopieren.
+## 1) Schnellstart
+1. Ordner `FileTypeDetection` in das Zielprojekt kopieren.
 2. In der Ziel-`.vbproj` sicherstellen:
-   - NuGet: `DocumentFormat.OpenXml` (3.4.1)
-   - NuGet: `Mime` (3.8.0)
-   - FrameworkReference: `Microsoft.AspNetCore.App`
-3. Empfohlen: `<RootNamespace></RootNamespace>` setzen.
+   - `DocumentFormat.OpenXml` `3.4.1`
+   - `Mime` `3.8.0`
+   - `Microsoft.IO.RecyclableMemoryStream` `3.0.1`
+   - `FrameworkReference` auf `Microsoft.AspNetCore.App`
+3. Empfohlen: `<RootNamespace></RootNamespace>`.
 4. Projekt bauen.
 
-## Dokumentstruktur
-- [Abstractions/index.md](Abstractions/index.md) - fachliche Basistypen (`FileKind`, `FileType`)
-- [Detection/index.md](Detection/index.md) - SSOT-Registry und Alias-Aufloesung
-- [Infrastructure/index.md](Infrastructure/index.md) - Sicherheits- und Infrastrukturkomponenten
+## 2) Oeffentliche API (wann und warum)
+| API | Zweck | Wann verwenden | Warum |
+|---|---|---|---|
+| `Detect(path)` | Inhaltsbasierte Dateityp-Erkennung | Standardfall fuer Dateien auf Disk | Header + Fallback + ZIP-Gate |
+| `Detect(path, verifyExtension)` | Erkennung + optionale Endungs-Policy | Wenn Dateiendung sicherheitsrelevant ist | Fail-closed bei Mismatch |
+| `Detect(data)` | Erkennung fuer In-Memory-Daten | Upload-Bytes, Queue-Workflows | Kein Dateisystem notwendig |
+| `DetectAndVerifyExtension(path)` | Endungsvalidierung gegen Erkennung | Compliance/Policy-Pruefungen | Ergebnis als Bool |
+| `ReadFileSafe(path)` | Begrenztes Datei-Einlesen | Vor `Detect(data)` | Bounded-I/O gegen DoS |
+| `ExtractZipSafe(path, dest, verify)` | Sicheres ZIP-Entpacken | Kontrolliertes Entpacken in neue Zielstruktur | Traversal-Block, Limits, atomic stage |
+| `FileTypeSecurityBaseline.ApplyDeterministicDefaults()` | Harte Sicherheitsdefaults global setzen | App-Startup | Einheitliches, reproduzierbares Profil |
 
-## Oeffentliche API (extern nutzbar)
-### FileTypeDetector (Methoden)
-| Methode | Zweck | Typischer Einsatz |
-|---|---|---|
-| `SetDefaultOptions(opt)` | Globale Optionen setzen (Snapshot). | Einmalig beim Start (z. B. strengere Limits). |
-| `GetDefaultOptions()` | Aktuelle globale Optionen lesen (Kopie). | Vor Anpassungen/Debugging. |
-| `LoadOptions(path)` | Optionen aus JSON laden (defensiv, mit Fallback). | Konfigurierbare Betriebsparameter aus Datei. |
-| `ReadFileSafe(path)` | Datei bounded in Bytes lesen. | Sicheres Vorladen fuer `Detect(byte())`. |
-| `Detect(path)` | Dateityp inhaltsbasiert bestimmen. | Standardfall fuer Pfadinput. |
-| `Detect(path, verifyExtension)` | Erkennung + optionale Endungspruefung. | Bei Bedarf auf stricte Endungs-Konsistenz. |
-| `DetectAndVerifyExtension(path)` | Nur Endungs-Validitaet gegen Inhalt pruefen. | Policy-/Compliance-Checks. |
-| `Detect(data)` | Dateityp aus Byte-Array bestimmen. | Streams, Uploads, In-Memory-Workflows. |
-| `IsOfType(data, kind)` | Shortcut fuer Typvergleich. | Schnelle Guard-Checks in Pipelines. |
-
-### Wann nutze ich welche Methode?
-1. Normalfall: `Detect(path)`
-2. Strikte Endungspruefung: `Detect(path, verifyExtension:=True)`
-3. Nur Endung validieren: `DetectAndVerifyExtension(path)`
-4. In-Memory/Upload-Bytes: `Detect(data)` bzw. `IsOfType(data, kind)`
-5. Sicherheitsgrenzen steuern: `LoadOptions(...)` + `SetDefaultOptions(...)`
-
-## Architektur und Ablauf (Logik + Sicherheitsinstanzen)
-
-### 1) Hauptablauf der Typentscheidung
-#### 1.1 Vorentscheidung (Signatur + Fallback)
+## 3) Ablauf und Sicherheitsinstanzen
+### 3.1 Typentscheidung
 ```mermaid
 flowchart TD
-    A[Input] --> B[Header lesen]
+    A[Input: Path/Bytes] --> B[Header lesen]
     B --> C{MagicDetect}
     C -->|Treffer != ZIP| D[Direkter Typ]
-    C -->|Unknown oder ZIP| E[LibMagicSniffer]
+    C -->|Unknown/ZIP| E[Sniffer Alias]
     E --> F{ZIP-Kandidat?}
-    F -->|Nein| G[Alias -> FileTypeRegistry]
-    F -->|Ja| H[ZIP-Pfad]
+    F -->|Nein| G[Registry Alias -> FileType]
+    F -->|Ja| H[ZipSafetyGate]
+    H -->|Fail| U[Unknown]
+    H -->|Pass| I[OpenXmlRefiner]
+    I -->|Docx/Xlsx/Pptx| O[OOXML Typ]
+    I -->|kein OOXML| Z[Zip]
 ```
 
-#### 1.2 ZIP-Pfad (Sicherheitspruefung + Verfeinerung)
+### 3.2 Sicheres Entpacken
 ```mermaid
 flowchart TD
-    H[ZIP-Kandidat] --> I{ZipSafetyGate ok?}
-    I -->|Nein| U[Unknown]
-    I -->|Ja| J{OpenXmlRefiner}
-    J -->|DOCX/XLSX/PPTX| K[OOXML-Typ]
-    J -->|kein OOXML| L[Zip]
+    A[ExtractZipSafe] --> B{verifyBeforeExtract}
+    B -->|True| C[Detect(path)]
+    C --> D{Zip/OOXML?}
+    D -->|Nein| X[False]
+    D -->|Ja| E[TryExtractZipStream]
+    B -->|False| E
+    E --> F[ProcessZipStream SSOT]
+    F --> G[Entry-Checks + Path-Checks]
+    G --> H[Stage-Directory schreiben]
+    H --> I[Atomarer Move]
+    I --> J[True]
 ```
 
-#### 1.3 Finale Policy (optionale Endungspruefung)
-```mermaid
-flowchart TD
-    D[Direkter Typ] --> M{verifyExtension?}
-    G[Alias-Typ] --> M
-    K[OOXML-Typ] --> M
-    L[Zip] --> M
-    U[Unknown] --> M
-    M -->|Nein| O[Ergebnis]
-    M -->|Ja + Match| O
-    M -->|Ja + Mismatch| U2[Unknown]
-```
+## 4) Sicherheitswirkungen
+- fail-closed bei Fehlern (`Unknown` / `False`)
+- ZIP-Limits: Entries, Gesamtgroesse, Entry-Groesse, Ratio, Nesting
+- Path-Traversal-Blockade beim Entpacken
+- deterministic ordering bei ZIP-Entry-Verarbeitung
+- stream-bounded copy fuer harte Byte-Grenzen
 
-### 2) Sicherheitsinstanzen (Gate-Reihenfolge)
-```mermaid
-flowchart LR
-    A[Input] --> B[MaxBytes / SniffBytes]
-    B --> C[StreamBounds: bounded copy]
-    C --> D[ZipSafetyGate]
-    D --> E[OpenXmlRefiner]
-    E --> F[Extension-Check optional]
-    F --> G[Finales FileType]
+## 5) Dokumentnavigation
+- [Abstractions/INDEX.md](Abstractions/INDEX.md)
+- [Detection/INDEX.md](Detection/INDEX.md)
+- [Infrastructure/INDEX.md](Infrastructure/INDEX.md)
 
-    D -. Verletzt Limit .-> X[Unknown]
-    B -. Fehler/Ungueltig .-> X
-    C -. Ueberschreitung .-> X
-    F -. Mismatch .-> X
-```
-
-## Unterordner-Indexe (normorientierte Detaildokumentation)
-- [Abstractions/index.md](Abstractions/index.md)
-- [Detection/index.md](Detection/index.md)
-- [Infrastructure/index.md](Infrastructure/index.md)
-
-## Grundlegende Sicherheitswirkungen der Umsetzung
-- Zip-Bomb-Reduktion durch Limits fuer Entries, Groessen, Ratio und Nesting.
-- Sicheres Byte-Handling ueber harte Bounded-I/O-Grenzen.
-- Keine Codeausfuehrung bei Erkennung (Analyse auf Bytes/Metadatenebene).
-- Fail-Closed bei Fehlern (`Unknown`/`False`).
-- Optional stricte Endungs-Policy mit `verifyExtension`.
-
-## Pflege / Aktualisierung des Portable-Ordners
-Im Repo-Root ausfuehren: `./tools/sync-portable-filetypedetection.sh`
+## 6) Pflege
+- Portable-Struktur neu erzeugen: `./tools/sync-portable-filetypedetection.sh`
+- Portable Smoke-Check: `./tools/check-portable-filetypedetection.sh --clean`
 EOF
 
-cat > "${OUT_DIR}/Abstractions/index.md" <<'EOF'
+
+cat > "${OUT_DIR}/Abstractions/INDEX.md" <<'EOF'
 # Index - Abstractions
 
-## 1. Zweck
-Grundtypen der Dateityp-Erkennung: `FileKind` und `FileType`.
+## Zweck
+Definiert die fachlichen Basistypen, die als stabile, oeffentliche Ergebnisse der Bibliothek dienen.
 
-## 2. Dateien und Verantwortung
-- `FileKind.vb`: kanonischer Enum-Katalog der unterstuetzten Typen.
-- `FileType.vb`: unveraenderliches Metadatenobjekt pro erkannten Typ.
+## Dateien und Verantwortung
+| Datei | Verantwortung |
+|---|---|
+| `FileKind.vb` | Kanonischer Typkatalog (`Unknown`, Medienformate, ZIP/OOXML). |
+| `FileType.vb` | Unveraenderliche Metadaten (`Kind`, Extension, Mime, Allowed, Aliases). |
 
-## 3. Normorientierte Regeln
+## Regeln
 1. `FileKind` ist die einzige fachliche Typ-ID.
-2. `FileType` bleibt unveraenderlich (ReadOnly-Eigenschaften).
-3. `Unknown` ist obligatorischer fail-closed Fallback.
+2. `FileType` bleibt immutable.
+3. `Unknown` bleibt verpflichtender fail-closed Rueckgabewert.
+4. Keine I/O- oder Netzwerkabhaengigkeit in diesem Ordner.
 EOF
 
-cat > "${OUT_DIR}/Detection/index.md" <<'EOF'
+cat > "${OUT_DIR}/Detection/INDEX.md" <<'EOF'
 # Index - Detection
 
-## 1. Zweck
-SSOT-Registry fuer Typmetadaten und Alias-Aufloesung.
+## Zweck
+SSOT fuer Typdefinitionen und Aliasauflosung.
 
-## 2. Dateien und Verantwortung
-- `FileTypeRegistry.vb`: `TypesByKind`, `KindByAlias`, `Resolve`, `ResolveByAlias`, `NormalizeAlias`.
+## Dateien und Verantwortung
+| Datei | Verantwortung |
+|---|---|
+| `FileTypeRegistry.vb` | Typdefinitionen, Aliasnormalisierung, `Resolve`, `ResolveByAlias`. |
 
-## 3. Normorientierte Regeln
-1. Neue Typen nur in `KnownTypeDefinitions()`.
-2. Alias-Aufloesung ist deterministisch und case-insensitive.
-3. Unbekannte Werte liefern `Unknown`.
+## Schluesselfunktionen
+- `NormalizeAlias(raw)`
+- `Resolve(kind)`
+- `ResolveByAlias(aliasKey)`
+
+## SSOT-Regel
+- Typ- und Aliasdaten werden ausschliesslich hier gepflegt.
 EOF
 
-cat > "${OUT_DIR}/Infrastructure/index.md" <<'EOF'
+cat > "${OUT_DIR}/Infrastructure/INDEX.md" <<'EOF'
 # Index - Infrastructure
 
-## 1. Zweck
-Technische und sicherheitsrelevante Hilfskomponenten fuer die Erkennung.
+## Zweck
+Sicherheits- und Infrastrukturkomponenten fuer Erkennung und ZIP-Verarbeitung.
 
-## 2. Dateien und Verantwortung
-- `MimeProvider.vb`: MIME-Aufloesung und Backend-Toggle.
-- `Internals.vb`: `StreamBounds`, `LibMagicSniffer`, `ZipSafetyGate`, `OpenXmlRefiner`, `LogGuard`.
+## Dateien und Verantwortung
+| Datei | Verantwortung |
+|---|---|
+| `Internals.vb` | `StreamBounds`, `LibMagicSniffer`, `ZipSafetyGate`, `OpenXmlRefiner`, `LogGuard`. |
+| `MimeProvider.vb` | MIME-Aufloesung und Backend-Diagnostik. |
 
-## 3. Normorientierte Regeln
-1. Fehler propagieren nicht als unsicheres Positivergebnis.
-2. Bounded Processing ueber `FileTypeDetectorOptions`.
-3. Logging darf Erkennung nicht beeinflussen.
+## Sicherheitsrelevante Punkte
+1. ZIP-Sicherheitspruefung + Extraktion teilen dieselbe Kernlogik
+2. Path-Traversal-Blockade beim Entpacken
+3. Nested-ZIP-Limits und bounded copy
+4. Atomare Zielverzeichnis-Erstellung (stage + move)
 EOF
 
 echo "Portable sources refreshed: ${OUT_DIR}"

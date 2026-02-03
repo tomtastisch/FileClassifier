@@ -81,6 +81,20 @@ internal static class ZipPayloadFactory
         return current;
     }
 
+    internal static byte[] CreateZipWithSingleEntry(string entryName, int entrySize)
+    {
+        using var ms = new MemoryStream();
+        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            var entry = zip.CreateEntry(entryName, CompressionLevel.SmallestSize);
+            using var es = entry.Open();
+            var payload = CreatePayload(Math.Max(0, entrySize), (byte)'Z');
+            es.Write(payload, 0, payload.Length);
+        }
+
+        return ms.ToArray();
+    }
+
     private static byte[] CreatePayload(int size, byte value)
     {
         var data = new byte[size];

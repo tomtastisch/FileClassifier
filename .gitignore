@@ -4,9 +4,11 @@ bin/
 obj/
 **/bin/
 **/obj/
+
 # macOS
 .DS_Store
 **/.DS_Store
+
 # test artifacts
 tests/**/bin/
 tests/**/obj/
@@ -16,11 +18,22 @@ tests/**/TestResults/
 *.coverage
 *.coveragexml
 # benchmark output
+
 benchmark_detect_ms.txt
 **/benchmark_detect_ms.txt
 # backup artifacts
 .bak/
 *.bak
 **/*.bak
+
 # local transfer artifacts
 /portable.zip
+
+# ide-auto-generated files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.idea/
+*.iml

@@ -145,11 +145,7 @@ Namespace FileTypeDetection
         ''' <returns>Erkannter Typ oder Unknown bei Mismatch/Fehler.</returns>
         Public Function Detect(path As String, verifyExtension As Boolean) As FileType
             Dim detected = DetectPathCore(path)
-
-            If Not verifyExtension Then Return detected
-            If ExtensionMatchesKind(path, detected.Kind) Then Return detected
-
-            Return FileTypeRegistry.Resolve(FileKind.Unknown)
+            Return ApplyExtensionPolicy(path, detected, verifyExtension)
         End Function
 
         ''' <summary>
@@ -158,7 +154,7 @@ Namespace FileTypeDetection
         ''' <param name="path">Dateipfad.</param>
         ''' <returns>True bei fehlender Endung oder passender Endung, sonst False.</returns>
         Public Function DetectAndVerifyExtension(path As String) As Boolean
-            Dim detected = DetectPathCore(path)
+            Dim detected = Detect(path)
             Return ExtensionMatchesKind(path, detected.Kind)
         End Function
 
@@ -177,18 +173,19 @@ Namespace FileTypeDetection
                     Return FileTypeRegistry.Resolve(FileKind.Unknown)
                 End If
 
-                Dim header = ReadHeader(path, opt.SniffBytes, opt.MaxBytes)
-                Return ResolveByHeaderAndFallback(
-                    header,
-                    opt,
-                    Function()
-                        Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, FileOptions.SequentialScan)
+                Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, FileOptions.SequentialScan)
+                    Dim header = ReadHeader(fs, opt.SniffBytes, opt.MaxBytes)
+                    Return ResolveByHeaderAndFallback(
+                        header,
+                        opt,
+                        Function()
+                            If fs.CanSeek Then fs.Position = 0
                             Return ZipSafetyGate.IsZipSafeStream(fs, opt, depth:=0)
-                        End Using
-                    End Function,
-                    Function()
-                        Return CType(New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, FileOptions.SequentialScan), Stream)
-                    End Function)
+                        End Function,
+                        Function()
+                            Return OpenXmlRefiner.TryRefineStream(fs)
+                        End Function)
+                End Using
             Catch ex As Exception
                 LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
                 Return FileTypeRegistry.Resolve(FileKind.Unknown)
@@ -215,6 +212,39 @@ Namespace FileTypeDetection
             Return Detect(data).Kind = kind
         End Function
 
+        ''' <summary>
+        ''' Entpackt ein ZIP deterministisch und fail-closed in ein neues Zielverzeichnis.
+        ''' Sicherheitsregeln (Traversal/Limits/Nesting) sind immer aktiv.
+        ''' </summary>
+        ''' <param name="path">Pfad zur ZIP-Datei.</param>
+        ''' <param name="destinationDirectory">Leeres, noch nicht existierendes Zielverzeichnis.</param>
+        ''' <param name="verifyBeforeExtract">Optionale Vorpruefung ueber Detect(path).</param>
+        ''' <returns>True bei erfolgreichem, atomarem Entpacken.</returns>
+        Public Function ExtractZipSafe(path As String, destinationDirectory As String, verifyBeforeExtract As Boolean) As Boolean
+            Dim opt = GetDefaultOptions()
+            If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
+                LogGuard.Warn(opt.Logger, "[ZipExtract] Quelldatei fehlt.")
+                Return False
+            End If
+
+            If verifyBeforeExtract Then
+                Dim detected = Detect(path)
+                If Not IsZipContainerKind(detected.Kind) Then
+                    LogGuard.Warn(opt.Logger, $"[ZipExtract] Vorpruefung fehlgeschlagen ({detected.Kind}).")
+                    Return False
+                End If
+            End If
+
+            Try
+                Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, FileOptions.SequentialScan)
+                    Return ZipSafetyGate.TryExtractZipStream(fs, destinationDirectory, opt)
+                End Using
+            Catch ex As Exception
+                LogGuard.Error(opt.Logger, "[ZipExtract] Ausnahme, fail-closed.", ex)
+                Return False
+            End Try
+        End Function
+
         Private Function DetectInternalBytes(data As Byte(), opt As FileTypeDetectorOptions) As FileType
             If data Is Nothing OrElse data.Length = 0 Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
             If CLng(data.Length) > opt.MaxBytes Then
@@ -230,7 +260,10 @@ Namespace FileTypeDetection
                         Return ZipSafetyGate.IsZipSafeBytes(data, opt)
                     End Function,
                     Function()
-                        Return CType(New MemoryStream(data, 0, data.Length, writable:=False, publiclyVisible:=False), Stream)
+                        Return OpenXmlRefiner.TryRefine(
+                            Function()
+                                Return CType(New MemoryStream(data, 0, data.Length, writable:=False, publiclyVisible:=False), Stream)
+                            End Function)
                     End Function)
             Catch ex As Exception
                 LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
@@ -245,7 +278,7 @@ Namespace FileTypeDetection
             header As Byte(),
             opt As FileTypeDetectorOptions,
             zipSafetyCheck As Func(Of Boolean),
-            streamFactory As Func(Of Stream)
+            tryRefine As Func(Of FileType)
         ) As FileType
             If header Is Nothing OrElse header.Length = 0 Then
                 Return FileTypeRegistry.Resolve(FileKind.Unknown)
@@ -269,7 +302,11 @@ Namespace FileTypeDetection
                     Return FileTypeRegistry.Resolve(FileKind.Unknown)
                 End If
 
-                Dim refined = OpenXmlRefiner.TryRefine(streamFactory)
+                Dim refined = FileTypeRegistry.Resolve(FileKind.Unknown)
+                If tryRefine IsNot Nothing Then
+                    refined = tryRefine()
+                End If
+
                 If refined.Kind <> FileKind.Unknown Then Return refined
 
                 Return FileTypeRegistry.Resolve(FileKind.Zip)
@@ -280,6 +317,19 @@ Namespace FileTypeDetection
             End If
 
             Return baseType
+        End Function
+
+        Private Shared Function ApplyExtensionPolicy(path As String, detected As FileType, verifyExtension As Boolean) As FileType
+            If Not verifyExtension Then Return detected
+            If ExtensionMatchesKind(path, detected.Kind) Then Return detected
+            Return FileTypeRegistry.Resolve(FileKind.Unknown)
+        End Function
+
+        Private Shared Function IsZipContainerKind(kind As FileKind) As Boolean
+            Return kind = FileKind.Zip OrElse
+                kind = FileKind.Docx OrElse
+                kind = FileKind.Xlsx OrElse
+                kind = FileKind.Pptx
         End Function
 
         Private Shared Function ExtensionMatchesKind(path As String, detectedKind As FileKind) As Boolean
@@ -323,31 +373,37 @@ Namespace FileTypeDetection
             Return opt.Clone()
         End Function
 
-        Private Shared Function ReadHeader(path As String, sniffBytes As Integer, maxBytes As Long) As Byte()
+        Private Shared Function ReadHeader(input As Stream, sniffBytes As Integer, maxBytes As Long) As Byte()
             Try
-                Dim fi As New FileInfo(path)
-                If fi.Length <= 0 OrElse fi.Length > maxBytes Then Return Array.Empty(Of Byte)()
+                If input Is Nothing OrElse Not input.CanRead Then Return Array.Empty(Of Byte)()
+                If maxBytes <= 0 Then Return Array.Empty(Of Byte)()
+                If input.CanSeek Then
+                    If input.Length <= 0 OrElse input.Length > maxBytes Then Return Array.Empty(Of Byte)()
+                    input.Position = 0
+                End If
 
                 Dim want As Integer = sniffBytes
                 If want <= 0 Then want = 4096
-                Dim take As Integer = CInt(Math.Min(fi.Length, want))
+                Dim take As Integer = want
+                If input.CanSeek Then
+                    take = CInt(Math.Min(input.Length, want))
+                End If
+                If take <= 0 Then Return Array.Empty(Of Byte)()
 
                 Dim buf(take - 1) As Byte
-                Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, FileOptions.SequentialScan)
-                    Dim off As Integer = 0
-                    While off < take
-                        Dim n = fs.Read(buf, off, take - off)
-                        If n <= 0 Then Exit While
-                        off += n
-                    End While
+                Dim off As Integer = 0
+                While off < take
+                    Dim n = input.Read(buf, off, take - off)
+                    If n <= 0 Then Exit While
+                    off += n
+                End While
 
-                    If off <= 0 Then Return Array.Empty(Of Byte)()
-                    If off < take Then
-                        Dim exact(off - 1) As Byte
-                        Array.Copy(buf, exact, off)
-                        Return exact
-                    End If
-                End Using
+                If off <= 0 Then Return Array.Empty(Of Byte)()
+                If off < take Then
+                    Dim exact(off - 1) As Byte
+                    Array.Copy(buf, exact, off)
+                    Return exact
+                End If
 
                 Return buf
             Catch
