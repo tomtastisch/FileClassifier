@@ -10,6 +10,11 @@ obj/
 # test artifacts
 tests/**/bin/
 tests/**/obj/
+tests/**/TestResults/
+**/TestResults/
+*.trx
+*.coverage
+*.coveragexml
 # benchmark output
 benchmark_detect_ms.txt
 **/benchmark_detect_ms.txt
@@ -17,3 +22,5 @@ benchmark_detect_ms.txt
 .bak/
 *.bak
 **/*.bak
+# local transfer artifacts
+/portable.zip
