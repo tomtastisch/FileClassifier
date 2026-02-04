@@ -37,3 +37,8 @@ flowchart TD
 ## 6. Testverknuepfungen
 - [FileTypeRegistryUnitTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeRegistryUnitTests.cs)
 - [HeaderCoveragePolicyUnitTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/HeaderCoveragePolicyUnitTests.cs)
+
+## 7. Siehe auch
+- [Modulindex](../README.md)
+- [Architektur und Ablaufe](../docs/02_ARCHITECTURE_AND_FLOWS.md)
+- [Referenzen](../docs/03_REFERENCES.md)

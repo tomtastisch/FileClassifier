@@ -2,23 +2,25 @@
 Funktionalität: Dateityp-Erkennung über Inhaltsanalyse (fail-closed)
 
   Hintergrund:
-    Angenommen die Ressource "sample.pdf" existiert
-    Und die Ressource "sample.jpg" existiert
-    Und die Ressource "sample.png" existiert
-    Und die Ressource "sample.gif" existiert
-    Und die Ressource "sample.webp" existiert
-    Und die Ressource "sample.zip" existiert
-    Und die Ressource "sample.docx" existiert
-    Und die Ressource "sample.xlsx" existiert
-    Und die Ressource "sample.pptx" existiert
-    Und die Ressource "sample_pdf_as_txt.txt" existiert
-    Und die Ressource "sample_pdf_no_extension" existiert
-    Und die Ressource "invalid_docx_marker_only.zip" existiert
-    Und die Ressource "invalid_xlsx_marker_only.zip" existiert
-    Und die Ressource "invalid_pptx_marker_only.zip" existiert
-    Und die Ressource "broken_no_ext" existiert
-    Und die Ressource "empty.bin" existiert
-    Und die Ressource "large_jpeg.bin" existiert
+    Angenommen die folgenden Ressourcen existieren
+      | ressource                    |
+      | sample.pdf                   |
+      | sample.jpg                   |
+      | sample.png                   |
+      | sample.gif                   |
+      | sample.webp                  |
+      | sample.zip                   |
+      | sample.docx                  |
+      | sample.xlsx                  |
+      | sample.pptx                  |
+      | sample_pdf_as_txt.txt        |
+      | sample_pdf_no_extension      |
+      | invalid_docx_marker_only.zip |
+      | invalid_xlsx_marker_only.zip |
+      | invalid_pptx_marker_only.zip |
+      | broken_no_ext                |
+      | empty.bin                    |
+      | large_jpeg.bin               |
 
   Szenariogrundriss: Bekannte Signatur wird korrekt erkannt
     Angenommen die Datei "<datei>"

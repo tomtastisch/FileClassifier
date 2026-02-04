@@ -38,8 +38,20 @@ public sealed class FileTypeDetectionSteps
     [Given("die Ressource {string} existiert")]
     public void GivenTheResourceExists(string name)
     {
-        var path = TestResources.Resolve(name);
-        Assert.True(File.Exists(path), $"Test resource missing: {path}");
+        AssertResourceExists(name);
+    }
+
+    [Given("die folgenden Ressourcen existieren")]
+    public void GivenTheFollowingResourcesExist(Table table)
+    {
+        Assert.NotNull(table);
+        Assert.NotEmpty(table.Rows);
+        Assert.True(table.ContainsColumn("ressource"), "Expected table column 'ressource'.");
+
+        foreach (var row in table.Rows)
+        {
+            AssertResourceExists(row["ressource"]);
+        }
     }
 
     [Given("die Datei {string}")]
@@ -279,4 +291,10 @@ public sealed class FileTypeDetectionSteps
     }
 
     private DetectionScenarioState State() => _scenarioContext.Get<DetectionScenarioState>(StateKey);
+
+    private static void AssertResourceExists(string name)
+    {
+        var path = TestResources.Resolve(name);
+        Assert.True(File.Exists(path), $"Test resource missing: {path}");
+    }
 }
