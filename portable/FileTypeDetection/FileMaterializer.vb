@@ -40,13 +40,13 @@ Namespace FileTypeDetection
                 Return False
             End Try
 
-            If secureExtract AndAlso FileTypeRegistry.DetectByMagic(data) = FileKind.Zip Then
+            If secureExtract AndAlso ZipPayloadGuard.IsZipByMagic(data) Then
                 If Not IsReadableZipArchive(data, opt) Then
                     LogGuard.Warn(opt.Logger, "[Materialize] ZIP kann nicht gelesen werden.")
                     Return False
                 End If
 
-                If Not ZipProcessing.TryValidate(data) Then
+                If Not ZipPayloadGuard.IsSafeZipPayload(data, opt) Then
                     LogGuard.Warn(opt.Logger, "[Materialize] ZIP-Validierung fehlgeschlagen.")
                     Return False
                 End If

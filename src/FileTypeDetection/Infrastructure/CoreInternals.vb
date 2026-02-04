@@ -65,6 +65,27 @@ Namespace FileTypeDetection
     End Class
 
     ''' <summary>
+    ''' Gemeinsame Guards fuer ZIP-Byte-Payloads.
+    ''' </summary>
+    Friend NotInheritable Class ZipPayloadGuard
+        Private Sub New()
+        End Sub
+
+        Friend Shared Function IsZipByMagic(data As Byte()) As Boolean
+            If data Is Nothing OrElse data.Length = 0 Then Return False
+            Return FileTypeRegistry.DetectByMagic(data) = FileKind.Zip
+        End Function
+
+        Friend Shared Function IsSafeZipPayload(data As Byte(), opt As FileTypeDetectorOptions) As Boolean
+            If data Is Nothing OrElse data.Length = 0 Then Return False
+            If opt Is Nothing Then Return False
+            If CLng(data.Length) > opt.MaxBytes Then Return False
+            If Not IsZipByMagic(data) Then Return False
+            Return ZipSafetyGate.IsZipSafeBytes(data, opt)
+        End Function
+    End Class
+
+    ''' <summary>
     ''' Verfeinert ZIP-Dateien zu OOXML-Typen anhand kanonischer Paket-Pfade.
     '''
     ''' Implementationsprinzip:

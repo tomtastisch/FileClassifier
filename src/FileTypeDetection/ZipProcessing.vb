@@ -26,10 +26,7 @@ Namespace FileTypeDetection
         ''' </summary>
         Public Shared Function TryValidate(data As Byte()) As Boolean
             Dim opt = FileTypeOptions.GetSnapshot()
-            If data Is Nothing OrElse data.Length = 0 Then Return False
-            If CLng(data.Length) > opt.MaxBytes Then Return False
-            If FileTypeRegistry.DetectByMagic(data) <> FileKind.Zip Then Return False
-            Return ZipSafetyGate.IsZipSafeBytes(data, opt)
+            Return ZipPayloadGuard.IsSafeZipPayload(data, opt)
         End Function
 
         ''' <summary>
@@ -53,7 +50,7 @@ Namespace FileTypeDetection
             Dim opt = FileTypeOptions.GetSnapshot()
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
 
-            If Not TryValidate(data) Then Return emptyResult
+            If Not ZipPayloadGuard.IsSafeZipPayload(data, opt) Then Return emptyResult
 
             Try
                 Using ms As New MemoryStream(data, writable:=False)
