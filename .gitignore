@@ -28,6 +28,7 @@ benchmark_detect_ms.txt
 
 # local transfer artifacts
 /portable.zip
+/portable/
 
 # ide-auto-generated files
 .vs/
