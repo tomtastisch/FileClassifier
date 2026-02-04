@@ -29,7 +29,7 @@ Alle Low-Level-Implementierungen liegen in Unterordnern.
 ## 5. Architekturdiagramm
 ```mermaid
 flowchart LR
-    API[Root API] --> CFG[Configuration]
+    CFG[Configuration]--> API[Root API]
     API --> DET[Detection]
     API --> INF[Infrastructure]
     DET --> ABS[Abstractions]
