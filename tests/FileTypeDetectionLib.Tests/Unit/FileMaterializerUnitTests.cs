@@ -16,7 +16,7 @@ public sealed class FileMaterializerUnitTests
         options.MaxBytes = 4;
         FileTypeOptions.SetSnapshot(options);
 
-        var tempRoot = CreateTempRoot();
+        var tempRoot = TestTempPaths.CreateTempRoot("ftd-materialize-test");
         var destination = Path.Combine(tempRoot, "raw.bin");
         var payload = new byte[] { 1, 2, 3, 4, 5 };
 
@@ -29,14 +29,14 @@ public sealed class FileMaterializerUnitTests
         finally
         {
             FileTypeOptions.SetSnapshot(original);
-            CleanupTempRoot(tempRoot);
+            TestTempPaths.CleanupTempRoot(tempRoot);
         }
     }
 
     [Fact]
     public void Persist_WritesRawBytes_ByDefault()
     {
-        var tempRoot = CreateTempRoot();
+        var tempRoot = TestTempPaths.CreateTempRoot("ftd-materialize-test");
         var destination = Path.Combine(tempRoot, "raw.bin");
         var payload = new byte[] { 0xDE, 0xAD, 0xBE, 0xEF };
 
@@ -49,14 +49,14 @@ public sealed class FileMaterializerUnitTests
         }
         finally
         {
-            CleanupTempRoot(tempRoot);
+            TestTempPaths.CleanupTempRoot(tempRoot);
         }
     }
 
     [Fact]
     public void Persist_UsesSecureExtract_ForZipPayload_WhenEnabled()
     {
-        var tempRoot = CreateTempRoot();
+        var tempRoot = TestTempPaths.CreateTempRoot("ftd-materialize-test");
         var destination = Path.Combine(tempRoot, "unzipped");
         var payload = File.ReadAllBytes(TestResources.Resolve("sample.zip"));
 
@@ -69,14 +69,14 @@ public sealed class FileMaterializerUnitTests
         }
         finally
         {
-            CleanupTempRoot(tempRoot);
+            TestTempPaths.CleanupTempRoot(tempRoot);
         }
     }
 
     [Fact]
     public void Persist_FailsClosed_ForUnsafeZip_WhenSecureExtractEnabled()
     {
-        var tempRoot = CreateTempRoot();
+        var tempRoot = TestTempPaths.CreateTempRoot("ftd-materialize-test");
         var destination = Path.Combine(tempRoot, "unzipped");
         var traversalZip = ZipPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8);
 
@@ -90,14 +90,14 @@ public sealed class FileMaterializerUnitTests
         }
         finally
         {
-            CleanupTempRoot(tempRoot);
+            TestTempPaths.CleanupTempRoot(tempRoot);
         }
     }
 
     [Fact]
     public void Persist_RespectsOverwrite_ForRawByteWrites()
     {
-        var tempRoot = CreateTempRoot();
+        var tempRoot = TestTempPaths.CreateTempRoot("ftd-materialize-test");
         var destination = Path.Combine(tempRoot, "raw.bin");
 
         try
@@ -113,14 +113,14 @@ public sealed class FileMaterializerUnitTests
         }
         finally
         {
-            CleanupTempRoot(tempRoot);
+            TestTempPaths.CleanupTempRoot(tempRoot);
         }
     }
 
     [Fact]
     public void Persist_Fails_WithoutOverwrite_WhenDestinationAlreadyExists_AndPreservesOriginalBytes()
     {
-        var tempRoot = CreateTempRoot();
+        var tempRoot = TestTempPaths.CreateTempRoot("ftd-materialize-test");
         var destination = Path.Combine(tempRoot, "conflict.bin");
         var original = new byte[] { 0xAA, 0xBB, 0xCC };
 
@@ -134,14 +134,14 @@ public sealed class FileMaterializerUnitTests
         }
         finally
         {
-            CleanupTempRoot(tempRoot);
+            TestTempPaths.CleanupTempRoot(tempRoot);
         }
     }
 
     [Fact]
     public void Persist_AllowsOverloadWithOverwriteOnly()
     {
-        var tempRoot = CreateTempRoot();
+        var tempRoot = TestTempPaths.CreateTempRoot("ftd-materialize-test");
         var destination = Path.Combine(tempRoot, "raw.bin");
 
         try
@@ -152,14 +152,14 @@ public sealed class FileMaterializerUnitTests
         }
         finally
         {
-            CleanupTempRoot(tempRoot);
+            TestTempPaths.CleanupTempRoot(tempRoot);
         }
     }
 
     [Fact]
     public void Persist_WritesRawBytes_WhenSecureExtractEnabledButPayloadIsNotZip()
     {
-        var tempRoot = CreateTempRoot();
+        var tempRoot = TestTempPaths.CreateTempRoot("ftd-materialize-test");
         var destination = Path.Combine(tempRoot, "raw.bin");
         var payload = new byte[] { 0x01, 0x23, 0x45, 0x67 };
 
@@ -172,14 +172,14 @@ public sealed class FileMaterializerUnitTests
         }
         finally
         {
-            CleanupTempRoot(tempRoot);
+            TestTempPaths.CleanupTempRoot(tempRoot);
         }
     }
 
     [Fact]
     public void Persist_FailsClosed_ForMalformedZipHeader_WhenSecureExtractEnabled()
     {
-        var tempRoot = CreateTempRoot();
+        var tempRoot = TestTempPaths.CreateTempRoot("ftd-materialize-test");
         var destination = Path.Combine(tempRoot, "unzipped");
         var malformedZipLikePayload = new byte[] { 0x50, 0x4B, 0x03, 0x04, 0xAA, 0xBB, 0xCC, 0xDD };
 
@@ -192,7 +192,7 @@ public sealed class FileMaterializerUnitTests
         }
         finally
         {
-            CleanupTempRoot(tempRoot);
+            TestTempPaths.CleanupTempRoot(tempRoot);
         }
     }
 
@@ -226,7 +226,7 @@ public sealed class FileMaterializerUnitTests
         try
         {
             var payload = File.ReadAllBytes(TestResources.Resolve("sample.pdf"));
-            var tempRoot = CreateTempRoot();
+            var tempRoot = TestTempPaths.CreateTempRoot("ftd-materialize-test");
             var destination = Path.Combine(tempRoot, "too-large.bin");
 
             try
@@ -237,7 +237,7 @@ public sealed class FileMaterializerUnitTests
             }
             finally
             {
-                CleanupTempRoot(tempRoot);
+                TestTempPaths.CleanupTempRoot(tempRoot);
             }
         }
         finally
@@ -246,18 +246,4 @@ public sealed class FileMaterializerUnitTests
         }
     }
 
-    private static string CreateTempRoot()
-    {
-        var path = Path.Combine(Path.GetTempPath(), "ftd-materialize-test-" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(path);
-        return path;
-    }
-
-    private static void CleanupTempRoot(string path)
-    {
-        if (!string.IsNullOrWhiteSpace(path) && Directory.Exists(path))
-        {
-            Directory.Delete(path, recursive: true);
-        }
-    }
 }

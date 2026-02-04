@@ -11,6 +11,7 @@ namespace FileTypeDetectionLib.Tests.Steps;
 public sealed class FileTypeDetectionSteps
 {
     private const string StateKey = "detection_state";
+    private const string ResourceColumn = "ressource";
     private readonly ScenarioContext _scenarioContext;
 
     public FileTypeDetectionSteps(ScenarioContext scenarioContext)
@@ -29,10 +30,7 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         FileTypeDetector.SetDefaultOptions(state.OriginalOptions);
-        if (!string.IsNullOrWhiteSpace(state.TempRoot) && Directory.Exists(state.TempRoot))
-        {
-            Directory.Delete(state.TempRoot, recursive: true);
-        }
+        TestTempPaths.CleanupTempRoot(state.TempRoot);
     }
 
     [Given("die Ressource {string} existiert")]
@@ -46,11 +44,11 @@ public sealed class FileTypeDetectionSteps
     {
         Assert.NotNull(table);
         Assert.NotEmpty(table.Rows);
-        Assert.True(table.ContainsColumn("ressource"), "Expected table column 'ressource'.");
+        Assert.True(table.ContainsColumn(ResourceColumn), $"Expected table column '{ResourceColumn}'.");
 
         foreach (var row in table.Rows)
         {
-            AssertResourceExists(row["ressource"]);
+            AssertResourceExists(row[ResourceColumn]);
         }
     }
 
@@ -66,9 +64,7 @@ public sealed class FileTypeDetectionSteps
     public void GivenAnEmptyTemporaryTargetDirectory()
     {
         var state = State();
-        var tempRoot = Path.Combine(Path.GetTempPath(), "ftd-bdd-materialize-" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(tempRoot);
-        state.TempRoot = tempRoot;
+        state.TempRoot = TestTempPaths.CreateTempRoot("ftd-bdd-materialize");
     }
 
     [Given("ich lese die Datei {string} als aktuelle Bytes")]
@@ -112,6 +108,7 @@ public sealed class FileTypeDetectionSteps
     }
 
     [When("ich extrahiere die ZIP-Datei sicher in Memory")]
+    [When("ich die ZIP-Datei sicher in den Speicher extrahiere")]
     public void WhenIExtractZipFileSafelyToMemory()
     {
         var state = State();
@@ -130,6 +127,7 @@ public sealed class FileTypeDetectionSteps
     }
 
     [When("ich speichere die aktuellen Bytes als {string}")]
+    [When("ich die aktuellen Bytes als {string} speichere")]
     public void WhenIPersistCurrentBytesAs(string fileName)
     {
         var state = State();
@@ -144,6 +142,7 @@ public sealed class FileTypeDetectionSteps
     }
 
     [When("ich versuche die aktuellen Bytes als {string} ohne overwrite zu speichern")]
+    [When("ich versuche, die aktuellen Bytes als {string} ohne overwrite zu speichern")]
     public void WhenITryPersistCurrentBytesWithoutOverwrite(string fileName)
     {
         var state = State();
@@ -156,6 +155,7 @@ public sealed class FileTypeDetectionSteps
     }
 
     [When("ich versuche die aktuellen Bytes in den Zielpfad {string} zu speichern")]
+    [When("ich versuche, die aktuellen Bytes in den Zielpfad {string} zu speichern")]
     public void WhenITryPersistCurrentBytesToRawDestination(string destinationPath)
     {
         var state = State();
@@ -193,6 +193,27 @@ public sealed class FileTypeDetectionSteps
         state.ExtensionMatchResult = detector.DetectAndVerifyExtension(state.CurrentPath!);
     }
 
+    [When("ich die Datei sicher in Bytes lese")]
+    public void WhenIReadTheFileSafelyAsBytes()
+    {
+        var state = State();
+        Assert.False(string.IsNullOrWhiteSpace(state.CurrentPath));
+        state.LastSafeReadBytes = FileTypeDetector.ReadFileSafe(state.CurrentPath!);
+    }
+
+    [When("ich pruefe ob die aktuellen Bytes vom Typ {string} sind")]
+    public void WhenICheckCurrentBytesType(string expectedKind)
+    {
+        var state = State();
+        Assert.NotNull(state.CurrentPayload);
+        Assert.True(
+            Enum.TryParse<FileKind>(expectedKind, ignoreCase: true, out var kind),
+            $"Unknown FileKind literal in feature: {expectedKind}");
+
+        var detector = new FileTypeDetector();
+        state.LastIsOfTypeResult = detector.IsOfType(state.CurrentPayload!, kind);
+    }
+
     [Then("ist der erkannte Typ {string}")]
     public void ThenTheDetectedKindIs(string expectedKind)
     {
@@ -224,6 +245,24 @@ public sealed class FileTypeDetectionSteps
         const string expectedBackend = "HeyRedMime";
 #endif
         Assert.Equal(expectedBackend, MimeProviderDiagnostics.ActiveBackendName);
+    }
+
+
+    [Then("ist der sicher gelesene Bytestrom nicht leer")]
+    public void ThenSafelyReadByteStreamIsNotEmpty()
+    {
+        var state = State();
+        Assert.NotNull(state.LastSafeReadBytes);
+        Assert.NotEmpty(state.LastSafeReadBytes!);
+    }
+
+    [Then("ist das Typpruefungsergebnis {string}")]
+    public void ThenTypeCheckResultIs(string expectedBoolean)
+    {
+        var state = State();
+        Assert.NotNull(state.LastIsOfTypeResult);
+        Assert.True(bool.TryParse(expectedBoolean, out var expected), $"Expected boolean literal but got: {expectedBoolean}");
+        Assert.Equal(expected, state.LastIsOfTypeResult.Value);
     }
 
     [Then("ist der extrahierte Eintragssatz nicht leer")]
@@ -279,6 +318,18 @@ public sealed class FileTypeDetectionSteps
     public void ThenNoFileExistsAtRawDestination(string destinationPath)
     {
         Assert.False(File.Exists(destinationPath), $"Unexpected file exists: {destinationPath}");
+    }
+
+    [Then("existiert keine Datei im ungueltigen Zielpfad")]
+    public void ThenNoFileExistsAtInvalidDestination()
+    {
+        var state = State();
+        if (string.IsNullOrWhiteSpace(state.LastMaterializedPath))
+        {
+            return;
+        }
+
+        Assert.False(File.Exists(state.LastMaterializedPath), $"Unexpected file exists: {state.LastMaterializedPath}");
     }
 
     [Then("existiert die gespeicherte Datei {string} nicht")]

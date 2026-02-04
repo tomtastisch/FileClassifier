@@ -15,5 +15,7 @@ internal sealed class DetectionScenarioState
     internal bool? LastPersistResult { get; set; }
     internal byte[]? ExistingFileBytes { get; set; }
     internal string? ExistingFilePath { get; set; }
+    internal byte[]? LastSafeReadBytes { get; set; }
+    internal bool? LastIsOfTypeResult { get; set; }
     internal FileTypeDetectorOptions OriginalOptions { get; } = FileTypeDetector.GetDefaultOptions();
 }

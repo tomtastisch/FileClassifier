@@ -31,8 +31,7 @@ public sealed class FileTypeDetectorFacadeUnitTests
     [Fact]
     public void DetectAndVerifyExtension_ReturnsFalse_ForMismatchedExtension()
     {
-        var tempRoot = Path.Combine(Path.GetTempPath(), "ftd-detector-facade-" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(tempRoot);
+        var tempRoot = TestTempPaths.CreateTempRoot("ftd-detector-facade");
         var wrongExtensionPath = Path.Combine(tempRoot, "sample.txt");
 
         try
@@ -44,10 +43,7 @@ public sealed class FileTypeDetectorFacadeUnitTests
         }
         finally
         {
-            if (Directory.Exists(tempRoot))
-            {
-                Directory.Delete(tempRoot, recursive: true);
-            }
+            TestTempPaths.CleanupTempRoot(tempRoot);
         }
     }
 }

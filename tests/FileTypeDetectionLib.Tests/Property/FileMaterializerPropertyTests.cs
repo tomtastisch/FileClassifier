@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using FileTypeDetection;
+using FileTypeDetectionLib.Tests.Support;
 using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Property;
@@ -16,7 +17,7 @@ public sealed class FileMaterializerPropertyTests
         FileTypeOptions.SetSnapshot(options);
 
         var rng = new Random(20260204);
-        var tempRoot = CreateTempRoot();
+        var tempRoot = TestTempPaths.CreateTempRoot("ftd-materializer-prop");
 
         try
         {
@@ -45,7 +46,7 @@ public sealed class FileMaterializerPropertyTests
         finally
         {
             FileTypeOptions.SetSnapshot(original);
-            CleanupTempRoot(tempRoot);
+            TestTempPaths.CleanupTempRoot(tempRoot);
         }
     }
 
@@ -58,7 +59,7 @@ public sealed class FileMaterializerPropertyTests
         FileTypeOptions.SetSnapshot(options);
 
         var rng = new Random(20260205);
-        var tempRoot = CreateTempRoot();
+        var tempRoot = TestTempPaths.CreateTempRoot("ftd-materializer-prop");
 
         try
         {
@@ -110,7 +111,7 @@ public sealed class FileMaterializerPropertyTests
         finally
         {
             FileTypeOptions.SetSnapshot(original);
-            CleanupTempRoot(tempRoot);
+            TestTempPaths.CleanupTempRoot(tempRoot);
         }
     }
 
@@ -127,18 +128,4 @@ public sealed class FileMaterializerPropertyTests
         }
     }
 
-    private static string CreateTempRoot()
-    {
-        var path = Path.Combine(Path.GetTempPath(), "ftd-materializer-prop-" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(path);
-        return path;
-    }
-
-    private static void CleanupTempRoot(string path)
-    {
-        if (!string.IsNullOrWhiteSpace(path) && Directory.Exists(path))
-        {
-            Directory.Delete(path, recursive: true);
-        }
-    }
 }
