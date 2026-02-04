@@ -50,4 +50,21 @@ public sealed class FileTypeRegistryUnitTests
         Assert.Equal(FileKind.Jpeg, FileTypeRegistry.ResolveByAlias("jpe").Kind);
         Assert.Equal(FileKind.Jpeg, FileTypeRegistry.ResolveByAlias("jpeg").Kind);
     }
+
+    [Theory]
+    [InlineData("zip")]
+    [InlineData("tar")]
+    [InlineData("tgz")]
+    [InlineData("gz")]
+    [InlineData("gzip")]
+    [InlineData("bz2")]
+    [InlineData("bzip2")]
+    [InlineData("xz")]
+    [InlineData("7z")]
+    [InlineData("zz")]
+    [InlineData("rar")]
+    public void ResolveByAlias_ResolvesArchiveAliasesAsZip(string alias)
+    {
+        Assert.Equal(FileKind.Zip, FileTypeRegistry.ResolveByAlias(alias).Kind);
+    }
 }

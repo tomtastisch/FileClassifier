@@ -4,7 +4,6 @@ Option Explicit On
 Imports System
 Imports System.Collections.Generic
 Imports System.IO
-Imports System.Text.Json
 
 Namespace FileTypeDetection
 
@@ -21,27 +20,20 @@ Namespace FileTypeDetection
     ''' </summary>
     Public NotInheritable Class FileTypeDetector
 
-        Private Shared ReadOnly _optionsLock As New Object()
-        Private Shared _defaultOptions As FileTypeDetectorOptions = FileTypeDetectorOptions.DefaultOptions()
-
         ''' <summary>
         ''' Setzt globale Default-Optionen als Snapshot.
         ''' </summary>
         ''' <param name="opt">Quelloptionen fuer den globalen Snapshot.</param>
-        Public Shared Sub SetDefaultOptions(opt As FileTypeDetectorOptions)
-            SyncLock _optionsLock
-                _defaultOptions = Snapshot(opt)
-            End SyncLock
+        Friend Shared Sub SetDefaultOptions(opt As FileTypeDetectorOptions)
+            FileTypeOptions.SetSnapshot(opt)
         End Sub
 
         ''' <summary>
         ''' Liefert einen Snapshot der aktuellen Default-Optionen.
         ''' </summary>
         ''' <returns>Unabhaengige Kopie der globalen Optionen.</returns>
-        Public Shared Function GetDefaultOptions() As FileTypeDetectorOptions
-            SyncLock _optionsLock
-                Return Snapshot(_defaultOptions)
-            End SyncLock
+        Friend Shared Function GetDefaultOptions() As FileTypeDetectorOptions
+            Return FileTypeOptions.GetSnapshot()
         End Function
 
         ''' <summary>
@@ -50,8 +42,8 @@ Namespace FileTypeDetection
         ''' </summary>
         ''' <param name="path">Pfad zur JSON-Konfigurationsdatei.</param>
         ''' <returns>Geparste Optionen oder Defaults.</returns>
-        Public Shared Function LoadOptions(path As String) As FileTypeDetectorOptions
-            Dim defaults = GetDefaultOptions()
+        Friend Shared Function LoadOptions(path As String) As FileTypeDetectorOptions
+            Dim defaults = FileTypeDetectorOptions.DefaultOptions()
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(defaults.Logger, "[Config] Datei nicht gefunden, Defaults.")
                 Return defaults
@@ -64,28 +56,8 @@ Namespace FileTypeDetection
 
             Try
                 Dim json = File.ReadAllText(path)
-                Dim result = FileTypeDetectorOptions.DefaultOptions()
-
-                Using doc = JsonDocument.Parse(json, New JsonDocumentOptions With {.AllowTrailingCommas = True})
-                    For Each p In doc.RootElement.EnumerateObject()
-                        
-                        Select Case p.Name.ToLowerInvariant()
-                            Case "maxbytes" : result.MaxBytes = SafeLong(p.Value, result.MaxBytes)
-                            Case "sniffbytes" : result.SniffBytes = SafeInt(p.Value, result.SniffBytes)
-                            Case "maxzipentries" : result.MaxZipEntries = SafeInt(p.Value, result.MaxZipEntries)
-                            Case "maxziptotaluncompressedbytes" : result.MaxZipTotalUncompressedBytes = SafeLong(p.Value, result.MaxZipTotalUncompressedBytes)
-                            Case "maxzipentryuncompressedbytes" : result.MaxZipEntryUncompressedBytes = SafeLong(p.Value, result.MaxZipEntryUncompressedBytes)
-                            Case "maxzipcompressionratio" : result.MaxZipCompressionRatio = SafeInt(p.Value, result.MaxZipCompressionRatio)
-                            Case "maxzipnestingdepth" : result.MaxZipNestingDepth = SafeInt(p.Value, result.MaxZipNestingDepth)
-                            Case "maxzipnestedbytes" : result.MaxZipNestedBytes = SafeLong(p.Value, result.MaxZipNestedBytes)
-                            Case Else
-                                LogGuard.Warn(defaults.Logger, $"[Config] Unbekannter Schluessel '{p.Name}' ignoriert.")
-                        End Select
-                        
-                    Next
-                End Using
-
-                Return result
+                If Not FileTypeOptions.LoadOptions(json) Then Return defaults
+                Return FileTypeOptions.GetSnapshot()
             Catch ex As Exception
                 LogGuard.Warn(defaults.Logger, $"[Config] Parse/IO-Fehler: {ex.Message}, Defaults.")
                 Return defaults
@@ -456,23 +428,6 @@ Namespace FileTypeDetection
             End If
 
             Return False
-        End Function
-
-        Private Shared Function SafeInt(el As JsonElement, fallback As Integer) As Integer
-            Dim v As Integer
-            If el.ValueKind = JsonValueKind.Number AndAlso el.TryGetInt32(v) Then Return v
-            Return fallback
-        End Function
-
-        Private Shared Function SafeLong(el As JsonElement, fallback As Long) As Long
-            Dim v As Long
-            If el.ValueKind = JsonValueKind.Number AndAlso el.TryGetInt64(v) Then Return v
-            Return fallback
-        End Function
-
-        Private Shared Function Snapshot(opt As FileTypeDetectorOptions) As FileTypeDetectorOptions
-            If opt Is Nothing Then Return FileTypeDetectorOptions.DefaultOptions()
-            Return opt.Clone()
         End Function
 
         Private Shared Function ReadHeader(input As FileStream, sniffBytes As Integer, maxBytes As Long) As Byte()

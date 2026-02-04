@@ -40,4 +40,29 @@ public sealed class ExtensionCheckUnitTests
             }
         }
     }
+
+    [Fact]
+    public void DetectAndVerifyExtension_AcceptsArchiveAlias_ForZipContent()
+    {
+        var detector = new FileTypeDetector();
+        var source = TestResources.Resolve("sample.zip");
+        var path = Path.Combine(Path.GetTempPath(), "ftd-zip-alias-" + Guid.NewGuid().ToString("N") + ".tar");
+
+        File.Copy(source, path);
+        try
+        {
+            var detected = detector.Detect(path);
+            var verified = detector.DetectAndVerifyExtension(path);
+
+            Assert.Equal(FileKind.Zip, detected.Kind);
+            Assert.True(verified);
+        }
+        finally
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+    }
 }

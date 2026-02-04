@@ -27,7 +27,10 @@ Namespace FileTypeDetection
 
         Private Shared ReadOnly _aliasOverrides As ImmutableDictionary(Of FileKind, ImmutableArray(Of String)) =
             ImmutableDictionary.CreateRange(Of FileKind, ImmutableArray(Of String))(
-                {New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Jpeg, ImmutableArray.Create("jpe"))})
+                {
+                    New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Jpeg, ImmutableArray.Create("jpe")),
+                    New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Zip, ImmutableArray.Create("tar", "tgz", "gz", "gzip", "bz2", "bzip2", "xz", "7z", "zz", "rar"))
+                })
 
         Private Shared ReadOnly _magicPatternCatalog As ImmutableDictionary(Of FileKind, ImmutableArray(Of MagicPattern)) = BuildMagicPatternCatalog()
         Private Shared ReadOnly _magicRules As ImmutableArray(Of MagicRule)

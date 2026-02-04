@@ -13,14 +13,12 @@ Diese Referenz beschreibt die **vollstaendige oeffentliche API** sowie den empfo
 | Nur ZIP-Sicherheit pruefen (ohne Extraktion) | `FileTypeDetector.TryValidateZip(path)` oder `ZipProcessing.TryValidate(...)` | Gate-only, keine Seiteneffekte |
 | ZIP sicher auf Platte entpacken | `FileTypeDetector.ExtractZipSafe(...)` oder `ZipProcessing.ExtractToDirectory(...)` | Traversal-/Bomb-Schutz |
 | ZIP sicher in Memory entpacken | `FileTypeDetector.ExtractZipSafeToMemory(...)` oder `ZipProcessing.TryExtractToMemory(...)` | Kein Persistieren auf Disk |
+| Byte-Payload persistieren (optional ZIP->Disk) | `FileMaterializer.Persist(...)` | ein Einstieg fuer rohe Bytes und sichere ZIP-Extraktion |
 
 ## 3. Oeffentliche API - Detailtabelle
 ### 3.1 `FileTypeDetector` (Instanz + Shared)
 | Symbol | Signatur | Input | Output | Einsatzzeitpunkt | Verhalten/Trigger |
 |---|---|---|---|---|---|
-| Default setzen | `SetDefaultOptions(opt)` | `FileTypeDetectorOptions` | `Sub` | App-Startup | Snapshot wird global atomar ersetzt |
-| Default lesen | `GetDefaultOptions()` | - | `FileTypeDetectorOptions` | vor lokalen Anpassungen | liefert Clone, kein direkter Shared-State Leak |
-| Optionen laden | `LoadOptions(path)` | JSON-Pfad | `FileTypeDetectorOptions` | externe Konfiguration | unbekannte Keys werden ignoriert, Fehler => Defaults |
 | Datei sicher lesen | `ReadFileSafe(path)` | Datei-Pfad | `Byte()` | Vorverarbeitung fuer Byte-Pipelines | Groessenlimit erzwungen, Fehler => leeres Array |
 | Detect (Pfad) | `Detect(path)` | Datei-Pfad | `FileType` | Standardfall | Header -> ZIP-Gate/Refiner -> fail-closed |
 | Detect (Pfad + Policy) | `Detect(path, verifyExtension)` | Datei-Pfad + Bool | `FileType` | stricte Endungspolitik | Endungskonflikt => `Unknown` |
@@ -42,7 +40,20 @@ Diese Referenz beschreibt die **vollstaendige oeffentliche API** sowie den empfo
 | ZIP->Memory (Pfad) | `ExtractToMemory(path, verifyBeforeExtract)` | Pfad + Bool | `IReadOnlyList(Of ZipExtractedEntry)` | statische API fuer Leser | delegiert auf fail-closed Extract |
 | ZIP->Memory (Bytes) | `TryExtractToMemory(data)` | Payload | `IReadOnlyList(Of ZipExtractedEntry)` | API/Queue ohne Temp-Datei | validiert zuerst, dann extrahiert |
 
-### 3.3 `FileTypeSecurityBaseline`
+### 3.3 `FileMaterializer` (statische Fassade)
+| Symbol | Signatur | Input | Output | Einsatzzeitpunkt | Verhalten/Trigger |
+|---|---|---|---|---|---|
+| Persist (Default) | `Persist(data, destinationPath)` | Payload + Zielpfad | `Boolean` | Standardfall fuer Byte->Datei | schreibt fail-closed direkt auf Disk |
+| Persist (Overwrite) | `Persist(data, destinationPath, overwrite)` | Payload + Zielpfad + Bool | `Boolean` | explizite Overwrite-Policy | `overwrite=False` verhindert Ueberschreiben |
+| Persist (Full) | `Persist(data, destinationPath, overwrite, secureExtract)` | Payload + Zielpfad + 2 Bool | `Boolean` | ZIP-Bytes optional sicher entpacken | bei `secureExtract=True` + ZIP: Validierung und sichere Extraktion statt Raw-Write |
+
+### 3.4 `FileTypeOptions` (statische Fassade)
+| Symbol | Signatur | Input | Output | Einsatzzeitpunkt | Verhalten/Trigger |
+|---|---|---|---|---|---|
+| Optionen laden | `LoadOptions(json)` | JSON-String | `Boolean` | Startup/Runtime-Rekonfiguration | partielle JSON-Werte ueberschreiben Defaults; unbekannte Keys werden ignoriert |
+| Optionen lesen | `GetOptions()` | - | `String` (JSON) | Audit/Diagnose/API-Ausgabe | liefert aktuellen globalen Snapshot als JSON |
+
+### 3.5 `FileTypeSecurityBaseline`
 | Symbol | Signatur | Zweck |
 |---|---|---|
 | Baseline anwenden | `ApplyDeterministicDefaults()` | setzt konservative globale Security-Grenzen |
@@ -113,6 +124,11 @@ Console.WriteLine($"{detail.DetectedType.Kind} / {detail.ReasonCode}")
 ```
 
 ## 7. API-Stabilitaet und Versionierung
-- Oeffentliche Einstiegspunkte liegen im Modul-Root (`FileTypeDetector.vb`, `ZipProcessing.vb`).
+- Oeffentliche Einstiegspunkte liegen im Modul-Root (`FileTypeDetector.vb`, `ZipProcessing.vb`, `FileMaterializer.vb`, `FileTypeOptions.vb`).
 - Sicherheitskritische Low-Level-Bausteine bleiben intern (`Friend`) in `Infrastructure/`.
-- Neue Use-Cases bevorzugt als **additive** Methoden in den beiden Root-APIs.
+- Neue Use-Cases bevorzugt als **additive** Methoden in den Root-APIs.
+
+## 8. Abhaengigkeiten (ZIP/Logging)
+- ZIP-Verarbeitung basiert auf `System.IO.Compression` (BCL, kein zusaetzliches NuGet erforderlich).
+- `FileMaterializer` nutzt zusaetzlich `SharpCompress` fuer defensiven ZIP-Lesbarkeits-Check bei `secureExtract=True`.
+- Logging basiert auf `Microsoft.Extensions.Logging` (via `FrameworkReference Microsoft.AspNetCore.App`).

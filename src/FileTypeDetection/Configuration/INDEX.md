@@ -22,13 +22,13 @@ Deterministische Konfiguration der oeffentlichen API inklusive Sicherheitsbaseli
 
 ## 4. Baseline-Strategie
 - `FileTypeSecurityBaseline.ApplyDeterministicDefaults()` setzt konservative Werte fuer produktive Umgebungen.
-- `FileTypeDetector.SetDefaultOptions(...)` sollte bevorzugt beim Startup erfolgen (einmalig, kontrolliert).
+- `FileTypeOptions.LoadOptions(json)` setzt Optionen via JSON (partiell, default-basiert).
 
 ## 5. Diagramm: Konfigurationsfluss
 ```mermaid
 flowchart LR
     A[Startup] --> B[ApplyDeterministicDefaults]
-    B --> C[SetDefaultOptions]
+    B --> C[LoadOptions]
     C --> D[Detect/Extract Laufzeit]
 ```
 

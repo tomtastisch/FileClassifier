@@ -30,7 +30,7 @@ Namespace FileTypeDetection
         ''' Aktiviert das Sicherheitsprofil global als neue Default-Optionen.
         ''' </summary>
         Public Shared Sub ApplyDeterministicDefaults()
-            FileTypeDetector.SetDefaultOptions(CreateDeterministicDefaults())
+            FileTypeOptions.SetSnapshot(CreateDeterministicDefaults())
         End Sub
     End Class
 

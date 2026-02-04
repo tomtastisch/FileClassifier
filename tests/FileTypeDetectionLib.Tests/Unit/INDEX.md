@@ -12,7 +12,10 @@ Direkter Nachweis von API-Korrektheit, Security-Regeln und Determinismus.
 | `HeaderDetectionWarningUnitTests.cs` | Logging-/Warnpfade |
 | `ExtensionCheckUnitTests.cs` | Endungsregeln und fail-closed |
 | `FileTypeSecurityBaselineUnitTests.cs` | Baseline-Defaults |
+| `FileTypeDetectorFacadeUnitTests.cs` | Root-API fuer Typdetektion und Endungspruefung |
 | `DetectionDetailAndZipValidationUnitTests.cs` | `DetectDetailed` + `TryValidateZip` |
 | `ZipProcessingFacadeUnitTests.cs` | statische ZIP-Fassade |
+| `FileMaterializerUnitTests.cs` | Byte-basierte Persistenz + optional sichere ZIP-Extraktion |
+| `FileTypeOptionsFacadeUnitTests.cs` | zentrale JSON-Optionsschnittstelle |
 | `ZipAdversarialTests.cs` | adversarial ZIP-Faelle |
 | `ZipExtractionUnitTests.cs` | sichere Disk-/Memory-Extraktion |

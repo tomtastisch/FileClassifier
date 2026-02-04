@@ -12,6 +12,8 @@ Deterministische Dateityp-Erkennung und sichere ZIP-Verarbeitung mit fail-closed
 Im Modul-Root liegen **nur** oeffentliche API-Einstiegspunkte:
 - [FileTypeDetector.vb](./FileTypeDetector.vb)
 - [ZipProcessing.vb](./ZipProcessing.vb)
+- [FileMaterializer.vb](./FileMaterializer.vb)
+- [FileTypeOptions.vb](./FileTypeOptions.vb)
 
 Alle Low-Level-Implementierungen liegen in Unterordnern.
 
@@ -38,6 +40,8 @@ flowchart LR
 |---|---|---|
 | `FileTypeDetector` | Erkennung, Policy, ZIP-Path-Operationen | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md#31-filetypedetector-instanz--shared) |
 | `ZipProcessing` | statische ZIP-Fassade (Path/Bytes) | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md#32-zipprocessing-statische-fassade) |
+| `FileMaterializer` | einheitliche Persistenz fuer Byte-Payloads (optional ZIP->Disk) | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md#33-filematerializer-statische-fassade) |
+| `FileTypeOptions` | zentrale JSON-Optionsschnittstelle (laden/lesen) | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md#34-filetypeoptions-statische-fassade) |
 | `FileTypeSecurityBaseline` | konservative Security-Defaults | [Configuration/INDEX.md](./Configuration/INDEX.md) |
 
 ## 7. Qualitaetsziele (ISO/IEC 25010)
