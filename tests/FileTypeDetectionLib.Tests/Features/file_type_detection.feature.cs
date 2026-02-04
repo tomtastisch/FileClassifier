@@ -107,56 +107,44 @@ namespace FileTypeDetectionLib.Tests.Features
         {
 #line 4
   #line hidden
+            global::Reqnroll.Table table1 = new global::Reqnroll.Table(new string[] {
+                        "ressource"});
+            table1.AddRow(new string[] {
+                        "sample.pdf"});
+            table1.AddRow(new string[] {
+                        "sample.jpg"});
+            table1.AddRow(new string[] {
+                        "sample.png"});
+            table1.AddRow(new string[] {
+                        "sample.gif"});
+            table1.AddRow(new string[] {
+                        "sample.webp"});
+            table1.AddRow(new string[] {
+                        "sample.zip"});
+            table1.AddRow(new string[] {
+                        "sample.docx"});
+            table1.AddRow(new string[] {
+                        "sample.xlsx"});
+            table1.AddRow(new string[] {
+                        "sample.pptx"});
+            table1.AddRow(new string[] {
+                        "sample_pdf_as_txt.txt"});
+            table1.AddRow(new string[] {
+                        "sample_pdf_no_extension"});
+            table1.AddRow(new string[] {
+                        "invalid_docx_marker_only.zip"});
+            table1.AddRow(new string[] {
+                        "invalid_xlsx_marker_only.zip"});
+            table1.AddRow(new string[] {
+                        "invalid_pptx_marker_only.zip"});
+            table1.AddRow(new string[] {
+                        "broken_no_ext"});
+            table1.AddRow(new string[] {
+                        "empty.bin"});
+            table1.AddRow(new string[] {
+                        "large_jpeg.bin"});
 #line 5
-    await testRunner.GivenAsync("die Ressource \"sample.pdf\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
-#line hidden
-#line 6
-    await testRunner.AndAsync("die Ressource \"sample.jpg\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
-#line hidden
-#line 7
-    await testRunner.AndAsync("die Ressource \"sample.png\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
-#line hidden
-#line 8
-    await testRunner.AndAsync("die Ressource \"sample.gif\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
-#line hidden
-#line 9
-    await testRunner.AndAsync("die Ressource \"sample.webp\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
-#line hidden
-#line 10
-    await testRunner.AndAsync("die Ressource \"sample.zip\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
-#line hidden
-#line 11
-    await testRunner.AndAsync("die Ressource \"sample.docx\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
-#line hidden
-#line 12
-    await testRunner.AndAsync("die Ressource \"sample.xlsx\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
-#line hidden
-#line 13
-    await testRunner.AndAsync("die Ressource \"sample.pptx\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
-#line hidden
-#line 14
-    await testRunner.AndAsync("die Ressource \"sample_pdf_as_txt.txt\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
-#line hidden
-#line 15
-    await testRunner.AndAsync("die Ressource \"sample_pdf_no_extension\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
-#line hidden
-#line 16
-    await testRunner.AndAsync("die Ressource \"invalid_docx_marker_only.zip\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
-#line hidden
-#line 17
-    await testRunner.AndAsync("die Ressource \"invalid_xlsx_marker_only.zip\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
-#line hidden
-#line 18
-    await testRunner.AndAsync("die Ressource \"invalid_pptx_marker_only.zip\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
-#line hidden
-#line 19
-    await testRunner.AndAsync("die Ressource \"broken_no_ext\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
-#line hidden
-#line 20
-    await testRunner.AndAsync("die Ressource \"empty.bin\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
-#line hidden
-#line 21
-    await testRunner.AndAsync("die Ressource \"large_jpeg.bin\" existiert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
+    await testRunner.GivenAsync("die folgenden Ressourcen existieren", ((string)(null)), table1, "Angenommen ");
 #line hidden
         }
         
@@ -208,7 +196,7 @@ namespace FileTypeDetectionLib.Tests.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Bekannte Signatur wird korrekt erkannt", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 23
+#line 25
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -221,13 +209,13 @@ namespace FileTypeDetectionLib.Tests.Features
 #line 4
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 24
+#line 26
     await testRunner.GivenAsync(string.Format("die Datei \"{0}\"", datei), ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
 #line hidden
-#line 25
+#line 27
     await testRunner.WhenAsync("ich den Dateityp ermittle", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
 #line hidden
-#line 26
+#line 28
     await testRunner.ThenAsync(string.Format("ist der erkannte Typ \"{0}\"", typ), ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
 #line hidden
             }
@@ -245,7 +233,7 @@ namespace FileTypeDetectionLib.Tests.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Kaputte Datei wird fail-closed als Unknown klassifiziert", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 36
+#line 38
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -258,13 +246,13 @@ namespace FileTypeDetectionLib.Tests.Features
 #line 4
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 37
+#line 39
     await testRunner.GivenAsync("die Datei \"broken_no_ext\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
 #line hidden
-#line 38
+#line 40
     await testRunner.WhenAsync("ich den Dateityp ermittle", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
 #line hidden
-#line 39
+#line 41
     await testRunner.ThenAsync("ist der erkannte Typ \"Unknown\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
 #line hidden
             }
@@ -282,7 +270,7 @@ namespace FileTypeDetectionLib.Tests.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Leere Datei wird fail-closed als Unknown klassifiziert", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 41
+#line 43
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -295,13 +283,13 @@ namespace FileTypeDetectionLib.Tests.Features
 #line 4
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 42
+#line 44
     await testRunner.GivenAsync("die Datei \"empty.bin\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
 #line hidden
-#line 43
+#line 45
     await testRunner.WhenAsync("ich den Dateityp ermittle", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
 #line hidden
-#line 44
+#line 46
     await testRunner.ThenAsync("ist der erkannte Typ \"Unknown\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
 #line hidden
             }
@@ -319,7 +307,7 @@ namespace FileTypeDetectionLib.Tests.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("ZIP bleibt ZIP, wenn kein OOXML erkannt wird", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 46
+#line 48
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -332,13 +320,13 @@ namespace FileTypeDetectionLib.Tests.Features
 #line 4
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 47
+#line 49
     await testRunner.GivenAsync("die Datei \"sample.zip\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
 #line hidden
-#line 48
+#line 50
     await testRunner.WhenAsync("ich den Dateityp ermittle", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
 #line hidden
-#line 49
+#line 51
     await testRunner.ThenAsync("ist der erkannte Typ \"Zip\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
 #line hidden
             }
@@ -361,7 +349,7 @@ namespace FileTypeDetectionLib.Tests.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("OOXML ZIP wird auf den konkreten Typ verfeinert", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 51
+#line 53
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -374,13 +362,13 @@ namespace FileTypeDetectionLib.Tests.Features
 #line 4
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 52
+#line 54
     await testRunner.GivenAsync(string.Format("die Datei \"{0}\"", datei), ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
 #line hidden
-#line 53
+#line 55
     await testRunner.WhenAsync("ich den Dateityp ermittle", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
 #line hidden
-#line 54
+#line 56
     await testRunner.ThenAsync(string.Format("ist der erkannte Typ \"{0}\"", typ), ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
 #line hidden
             }
@@ -402,7 +390,7 @@ namespace FileTypeDetectionLib.Tests.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Marker-only ZIP wird nicht als OOXML verfeinert", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 62
+#line 64
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -415,13 +403,13 @@ namespace FileTypeDetectionLib.Tests.Features
 #line 4
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 63
+#line 65
     await testRunner.GivenAsync(string.Format("die Datei \"{0}\"", datei), ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
 #line hidden
-#line 64
+#line 66
     await testRunner.WhenAsync("ich den Dateityp ermittle", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
 #line hidden
-#line 65
+#line 67
     await testRunner.ThenAsync("ist der erkannte Typ \"Zip\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
 #line hidden
             }
@@ -439,7 +427,7 @@ namespace FileTypeDetectionLib.Tests.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Endungspruefung liefert fail-closed Unknown bei Mismatch", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 73
+#line 75
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -452,13 +440,13 @@ namespace FileTypeDetectionLib.Tests.Features
 #line 4
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 74
+#line 76
     await testRunner.GivenAsync("die Datei \"sample_pdf_as_txt.txt\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
 #line hidden
-#line 75
+#line 77
     await testRunner.WhenAsync("ich den Dateityp mit Endungspruefung ermittle", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
 #line hidden
-#line 76
+#line 78
     await testRunner.ThenAsync("ist der erkannte Typ \"Unknown\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
 #line hidden
             }
@@ -481,7 +469,7 @@ namespace FileTypeDetectionLib.Tests.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Endungspruefung liefert boolesches Ergebnis", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 78
+#line 80
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -494,13 +482,13 @@ namespace FileTypeDetectionLib.Tests.Features
 #line 4
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 79
+#line 81
     await testRunner.GivenAsync(string.Format("die Datei \"{0}\"", datei), ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
 #line hidden
-#line 80
+#line 82
     await testRunner.WhenAsync("ich die Endung gegen den erkannten Typ pruefe", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
 #line hidden
-#line 81
+#line 83
     await testRunner.ThenAsync(string.Format("ist das Endungsergebnis \"{0}\"", ergebnis), ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
 #line hidden
             }
@@ -518,7 +506,7 @@ namespace FileTypeDetectionLib.Tests.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Zu große Datei wird fail-closed als Unknown klassifiziert", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 89
+#line 91
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -531,16 +519,16 @@ namespace FileTypeDetectionLib.Tests.Features
 #line 4
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 90
+#line 92
     await testRunner.GivenAsync("die maximale Dateigroesse ist 32 Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
 #line hidden
-#line 91
+#line 93
     await testRunner.AndAsync("die Datei \"large_jpeg.bin\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 92
+#line 94
     await testRunner.WhenAsync("ich den Dateityp ermittle", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
 #line hidden
-#line 93
+#line 95
     await testRunner.ThenAsync("ist der erkannte Typ \"Unknown\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
 #line hidden
             }
@@ -558,7 +546,7 @@ namespace FileTypeDetectionLib.Tests.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("MIME-Provider folgt dem Build-Toggle", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 95
+#line 97
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -571,7 +559,7 @@ namespace FileTypeDetectionLib.Tests.Features
 #line 4
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 96
+#line 98
     await testRunner.ThenAsync("ist der MIME-Provider build-konform aktiv", ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
 #line hidden
             }
@@ -594,7 +582,7 @@ namespace FileTypeDetectionLib.Tests.Features
                     "peichert", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 99
+#line 101
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -607,28 +595,28 @@ namespace FileTypeDetectionLib.Tests.Features
 #line 4
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 100
+#line 102
     await testRunner.GivenAsync("ein leeres temporäres Zielverzeichnis", ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
 #line hidden
-#line 101
+#line 103
     await testRunner.AndAsync("die Datei \"sample.zip\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 102
+#line 104
     await testRunner.WhenAsync("ich extrahiere die ZIP-Datei sicher in Memory", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
 #line hidden
-#line 103
+#line 105
     await testRunner.AndAsync("ich übernehme den ersten extrahierten Eintrag als aktuelle Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 104
+#line 106
     await testRunner.AndAsync("ich speichere die aktuellen Bytes als \"zip-entry-note.txt\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 105
+#line 107
     await testRunner.ThenAsync("ist der extrahierte Eintragssatz nicht leer", ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
 #line hidden
-#line 106
+#line 108
     await testRunner.AndAsync("existiert die gespeicherte Datei \"zip-entry-note.txt\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 107
+#line 109
     await testRunner.AndAsync("entspricht die gespeicherte Datei \"zip-entry-note.txt\" den aktuellen Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
             }
@@ -651,7 +639,7 @@ namespace FileTypeDetectionLib.Tests.Features
                     "ndet", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 110
+#line 112
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -664,28 +652,28 @@ namespace FileTypeDetectionLib.Tests.Features
 #line 4
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 111
+#line 113
     await testRunner.GivenAsync("ein leeres temporäres Zielverzeichnis", ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
 #line hidden
-#line 112
+#line 114
     await testRunner.AndAsync("ich lese die Datei \"sample.pdf\" als aktuelle Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 113
+#line 115
     await testRunner.WhenAsync("ich speichere die aktuellen Bytes als \"chain-original-step1.bin\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
 #line hidden
-#line 114
+#line 116
     await testRunner.AndAsync("ich lade die zuletzt gespeicherten Bytes als aktuelle Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 115
+#line 117
     await testRunner.AndAsync("ich speichere die aktuellen Bytes als \"chain-original-step2.bin\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 116
+#line 118
     await testRunner.ThenAsync("existiert die gespeicherte Datei \"chain-original-step1.bin\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
 #line hidden
-#line 117
+#line 119
     await testRunner.AndAsync("existiert die gespeicherte Datei \"chain-original-step2.bin\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 118
+#line 120
     await testRunner.AndAsync("entspricht die gespeicherte Datei \"chain-original-step2.bin\" den aktuellen Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
             }
@@ -708,7 +696,7 @@ namespace FileTypeDetectionLib.Tests.Features
                     "terverwendet", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 121
+#line 123
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -721,37 +709,37 @@ namespace FileTypeDetectionLib.Tests.Features
 #line 4
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 122
+#line 124
     await testRunner.GivenAsync("ein leeres temporäres Zielverzeichnis", ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
 #line hidden
-#line 123
+#line 125
     await testRunner.AndAsync("die Datei \"sample.zip\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 124
+#line 126
     await testRunner.WhenAsync("ich extrahiere die ZIP-Datei sicher in Memory", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
 #line hidden
-#line 125
+#line 127
     await testRunner.AndAsync("ich übernehme den ersten extrahierten Eintrag als aktuelle Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 126
+#line 128
     await testRunner.AndAsync("ich speichere die aktuellen Bytes als \"chain-zip-step1.bin\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 127
+#line 129
     await testRunner.AndAsync("ich lade die zuletzt gespeicherten Bytes als aktuelle Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 128
+#line 130
     await testRunner.AndAsync("ich speichere die aktuellen Bytes als \"chain-zip-step2.bin\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 129
+#line 131
     await testRunner.ThenAsync("ist der extrahierte Eintragssatz nicht leer", ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
 #line hidden
-#line 130
+#line 132
     await testRunner.AndAsync("existiert die gespeicherte Datei \"chain-zip-step1.bin\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 131
+#line 133
     await testRunner.AndAsync("existiert die gespeicherte Datei \"chain-zip-step2.bin\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 132
+#line 134
     await testRunner.AndAsync("entspricht die gespeicherte Datei \"chain-zip-step2.bin\" den aktuellen Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
             }
@@ -773,7 +761,7 @@ namespace FileTypeDetectionLib.Tests.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Materializer lehnt Speichern ohne overwrite bei bestehender Datei ab", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 135
+#line 137
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -786,22 +774,22 @@ namespace FileTypeDetectionLib.Tests.Features
 #line 4
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 136
+#line 138
     await testRunner.GivenAsync("ein leeres temporäres Zielverzeichnis", ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
 #line hidden
-#line 137
+#line 139
     await testRunner.AndAsync("es existiert bereits eine gespeicherte Datei \"conflict.bin\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 138
+#line 140
     await testRunner.AndAsync("ich lese die Datei \"sample.pdf\" als aktuelle Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 139
+#line 141
     await testRunner.WhenAsync("ich versuche die aktuellen Bytes als \"conflict.bin\" ohne overwrite zu speichern", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
 #line hidden
-#line 140
+#line 142
     await testRunner.ThenAsync("ist der letzte Speicherversuch fehlgeschlagen", ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
 #line hidden
-#line 141
+#line 143
     await testRunner.AndAsync("bleibt die bestehende Datei \"conflict.bin\" unveraendert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
             }
@@ -823,7 +811,7 @@ namespace FileTypeDetectionLib.Tests.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Materializer lehnt ungueltigen Zielpfad ab", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 144
+#line 146
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -836,16 +824,16 @@ namespace FileTypeDetectionLib.Tests.Features
 #line 4
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 145
+#line 147
     await testRunner.GivenAsync("ich lese die Datei \"sample.pdf\" als aktuelle Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
 #line hidden
-#line 146
+#line 148
     await testRunner.WhenAsync("ich versuche die aktuellen Bytes in den Zielpfad \"   \" zu speichern", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
 #line hidden
-#line 147
+#line 149
     await testRunner.ThenAsync("ist der letzte Speicherversuch fehlgeschlagen", ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
 #line hidden
-#line 148
+#line 150
     await testRunner.AndAsync("existiert keine Datei im Zielpfad \"   \"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
             }
@@ -867,7 +855,7 @@ namespace FileTypeDetectionLib.Tests.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Materializer lehnt zu grosse Payload gegen MaxBytes ab", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 151
+#line 153
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -880,22 +868,22 @@ namespace FileTypeDetectionLib.Tests.Features
 #line 4
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 152
+#line 154
     await testRunner.GivenAsync("ein leeres temporäres Zielverzeichnis", ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
 #line hidden
-#line 153
+#line 155
     await testRunner.AndAsync("die maximale Dateigroesse ist 16 Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 154
+#line 156
     await testRunner.AndAsync("ich lese die Datei \"sample.pdf\" als aktuelle Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
-#line 155
+#line 157
     await testRunner.WhenAsync("ich versuche die aktuellen Bytes als \"too-large.bin\" ohne overwrite zu speichern", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
 #line hidden
-#line 156
+#line 158
     await testRunner.ThenAsync("ist der letzte Speicherversuch fehlgeschlagen", ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
 #line hidden
-#line 157
+#line 159
     await testRunner.AndAsync("existiert die gespeicherte Datei \"too-large.bin\" nicht", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
             }
