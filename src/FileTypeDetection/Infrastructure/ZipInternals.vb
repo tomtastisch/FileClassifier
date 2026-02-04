@@ -141,16 +141,11 @@ Namespace FileTypeDetection
                 Return False
             End Try
 
-            If Directory.Exists(destinationFull) Then
-                LogGuard.Warn(opt.Logger, "[ZipExtract] Zielordner existiert bereits.")
+            If Not DestinationPathGuard.ValidateNewExtractionTarget(destinationFull, opt) Then
                 Return False
             End If
 
             Dim parent = Path.GetDirectoryName(destinationFull)
-            If String.IsNullOrWhiteSpace(parent) Then
-                LogGuard.Warn(opt.Logger, "[ZipExtract] Zielordner ohne gueltigen Parent.")
-                Return False
-            End If
 
             Dim stageDir = destinationFull & ".stage-" & Guid.NewGuid().ToString("N")
             Try

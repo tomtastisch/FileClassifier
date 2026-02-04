@@ -24,6 +24,7 @@ Diese Spezifikation beschreibt Anforderungen und Nachweise fuer die oeffentliche
 | FTD-REQ-005 | Einheitliche Byte-Persistenz | Byte-Persistenz mit `overwrite`/`secureExtract` in `FileMaterializer` | `FileMaterializerUnitTests.cs` |
 | FTD-REQ-006 | Archiv-Alias-Normalisierung | `tar/tgz/gz/bz2/xz/7z/rar/zz` werden alias-seitig als `Zip` behandelt | `FileTypeRegistryUnitTests.cs`, `ExtensionCheckUnitTests.cs` |
 | FTD-REQ-007 | Defensive Zielpfad-Sicherheit | Root-Pfade duerfen nicht materialisiert werden; Groessenlimit muss gelten | `FileMaterializerUnitTests.cs` |
+| FTD-REQ-008 | Defensive ZIP-Extraktionsziele | Root-Pfade duerfen nicht als ZIP-Extraktionsziel verwendet werden | `ZipExtractionUnitTests.cs` |
 
 ## 5. Architektur und Verantwortlichkeiten
 | Klasse | Verantwortung | Nicht-Ziel |

@@ -86,6 +86,69 @@ Namespace FileTypeDetection
     End Class
 
     ''' <summary>
+    ''' Gemeinsame Zielpfad-Policy fuer Materialisierung und ZIP-Extraktion.
+    ''' </summary>
+    Friend NotInheritable Class DestinationPathGuard
+        Private Sub New()
+        End Sub
+
+        Friend Shared Function PrepareMaterializationTarget(destinationFull As String, overwrite As Boolean, opt As FileTypeDetectorOptions) As Boolean
+            If IsRootPath(destinationFull) Then
+                LogGuard.Warn(opt.Logger, "[PathGuard] Ziel darf kein Root-Verzeichnis sein.")
+                Return False
+            End If
+
+            If File.Exists(destinationFull) Then
+                If Not overwrite Then Return False
+                File.Delete(destinationFull)
+            ElseIf Directory.Exists(destinationFull) Then
+                If Not overwrite Then Return False
+                Directory.Delete(destinationFull, recursive:=True)
+            End If
+
+            Return True
+        End Function
+
+        Friend Shared Function ValidateNewExtractionTarget(destinationFull As String, opt As FileTypeDetectorOptions) As Boolean
+            If IsRootPath(destinationFull) Then
+                LogGuard.Warn(opt.Logger, "[PathGuard] Ziel darf kein Root-Verzeichnis sein.")
+                Return False
+            End If
+
+            If File.Exists(destinationFull) OrElse Directory.Exists(destinationFull) Then
+                LogGuard.Warn(opt.Logger, "[PathGuard] Ziel existiert bereits.")
+                Return False
+            End If
+
+            Dim parent = Path.GetDirectoryName(destinationFull)
+            If String.IsNullOrWhiteSpace(parent) Then
+                LogGuard.Warn(opt.Logger, "[PathGuard] Ziel ohne gueltigen Parent.")
+                Return False
+            End If
+
+            Return True
+        End Function
+
+        Friend Shared Function IsRootPath(destinationFull As String) As Boolean
+            If String.IsNullOrWhiteSpace(destinationFull) Then Return False
+
+            Dim rootPath As String = Nothing
+            Try
+                rootPath = Path.GetPathRoot(destinationFull)
+            Catch
+                Return False
+            End Try
+
+            If String.IsNullOrWhiteSpace(rootPath) Then Return False
+
+            Return String.Equals(
+                destinationFull.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                rootPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                StringComparison.OrdinalIgnoreCase)
+        End Function
+    End Class
+
+    ''' <summary>
     ''' Verfeinert ZIP-Dateien zu OOXML-Typen anhand kanonischer Paket-Pfade.
     '''
     ''' Implementationsprinzip:

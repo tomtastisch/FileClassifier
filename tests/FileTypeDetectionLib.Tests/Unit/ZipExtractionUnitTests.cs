@@ -91,6 +91,17 @@ public sealed class ZipExtractionUnitTests
     }
 
     [Fact]
+    public void ExtractZipSafe_Fails_ForRootDestinationPath()
+    {
+        var source = TestResources.Resolve("sample.zip");
+        var rootPath = Path.GetPathRoot(Path.GetTempPath());
+        Assert.False(string.IsNullOrWhiteSpace(rootPath));
+
+        var ok = new FileTypeDetector().ExtractZipSafe(source, rootPath!, verifyBeforeExtract: false);
+        Assert.False(ok);
+    }
+
+    [Fact]
     public void ExtractZipSafeToMemory_Succeeds_ForValidZip_WithVerification()
     {
         var source = TestResources.Resolve("sample.zip");

@@ -29,7 +29,7 @@ Ergaenzende normorientierte Spezifikation: [DIN_SPECIFICATION_DE.md](./DIN_SPECI
 | ZIP-Validierung | `TryValidateZip(path)` | Datei-Pfad | `Boolean` | nur Sicherheitspruefung | kein Extract, nur Gate-Entscheid |
 | Detect (Bytes) | `Detect(data)` | Payload | `FileType` | Upload/Queue/Event | gleiche Sicherheitslogik wie Pfad-Variante |
 | Typvergleich | `IsOfType(data, kind)` | Payload + `FileKind` | `Boolean` | Guard-Checks in Workflows | intern auf `Detect(data)` aufgebaut |
-| ZIP->Disk | `ExtractZipSafe(path, destination, verifyBeforeExtract)` | Pfad + Ziel + Bool | `Boolean` | kontrollierte Extraktion | Ziel darf nicht existieren, atomares Stage-Move |
+| ZIP->Disk | `ExtractZipSafe(path, destination, verifyBeforeExtract)` | Pfad + Ziel + Bool | `Boolean` | kontrollierte Extraktion | Ziel darf nicht existieren, Root-Ziele sind blockiert, atomares Stage-Move |
 | ZIP->Memory | `ExtractZipSafeToMemory(path, verifyBeforeExtract)` | Pfad + Bool | `IReadOnlyList(Of ZipExtractedEntry)` | sichere In-Memory-Verarbeitung | bei Fehler: leere Liste |
 
 ### 3.2 `ZipProcessing` (statische Fassade)
@@ -37,7 +37,7 @@ Ergaenzende normorientierte Spezifikation: [DIN_SPECIFICATION_DE.md](./DIN_SPECI
 |---|---|---|---|---|---|
 | ZIP validieren (Pfad) | `TryValidate(path)` | Datei-Pfad | `Boolean` | ZIP-Gate als Utility | delegiert an `FileTypeDetector.TryValidateZip` |
 | ZIP validieren (Bytes) | `TryValidate(data)` | Payload | `Boolean` | Upload-Gate ohne Dateisystem | Header muss ZIP sein, dann Gate |
-| ZIP->Disk | `ExtractToDirectory(path, destination, verifyBeforeExtract)` | Pfad + Ziel + Bool | `Boolean` | einfache statische Nutzung | delegiert auf fail-closed Extract |
+| ZIP->Disk | `ExtractToDirectory(path, destination, verifyBeforeExtract)` | Pfad + Ziel + Bool | `Boolean` | einfache statische Nutzung | delegiert auf fail-closed Extract inkl. Root-Zielschutz |
 | ZIP->Memory (Pfad) | `ExtractToMemory(path, verifyBeforeExtract)` | Pfad + Bool | `IReadOnlyList(Of ZipExtractedEntry)` | statische API fuer Leser | delegiert auf fail-closed Extract |
 | ZIP->Memory (Bytes) | `TryExtractToMemory(data)` | Payload | `IReadOnlyList(Of ZipExtractedEntry)` | API/Queue ohne Temp-Datei | validiert zuerst, dann extrahiert |
 

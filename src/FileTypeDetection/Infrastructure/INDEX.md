@@ -6,7 +6,7 @@ Interne, sicherheitskritische Implementierung (kein Public Surface).
 ## 2. Dateien und Verantwortungen
 | Datei | Verantwortungsbereich | Wichtige Funktionen |
 |---|---|---|
-| [CoreInternals.vb](./CoreInternals.vb) | Bounds, Gate, Payload-Guards, Refiner, Logging-Schutz | `CopyBounded`, `IsZipSafe*`, `IsSafeZipPayload`, `TryRefine*`, `LogGuard.*` |
+| [CoreInternals.vb](./CoreInternals.vb) | Bounds, Gate, Payload-/Path-Guards, Refiner, Logging-Schutz | `CopyBounded`, `IsZipSafe*`, `IsSafeZipPayload`, `PrepareMaterializationTarget`, `ValidateNewExtractionTarget`, `TryRefine*`, `LogGuard.*` |
 | [ZipInternals.vb](./ZipInternals.vb) | ZIP-Iteration, sichere Extraktion, Pfadschutz | `ProcessZipStream`, `TryExtractZipStream*` |
 | [MimeProvider.vb](./MimeProvider.vb) | MIME-Map aus Extension | `GetMime` |
 
