@@ -162,7 +162,7 @@ namespace FileTypeDetectionLib.Tests.Features
         
         private static global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages InitializeCucumberMessages()
         {
-            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/file_type_detection.feature.ndjson", 25);
+            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/file_type_detection.feature.ndjson", 28);
         }
         
         async global::System.Threading.Tasks.Task global::Xunit.IAsyncLifetime.InitializeAsync()
@@ -747,6 +747,138 @@ namespace FileTypeDetectionLib.Tests.Features
 #line hidden
 #line 129
     await testRunner.AndAsync("entspricht die gespeicherte Datei \"chain-zip-step2.bin\" den aktuellen Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="Materializer lehnt Speichern ohne overwrite bei bestehender Datei ab")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "Dateityp-Erkennung über Inhaltsanalyse (fail-closed)")]
+        [global::Xunit.TraitAttribute("Description", "Materializer lehnt Speichern ohne overwrite bei bestehender Datei ab")]
+        public async global::System.Threading.Tasks.Task MaterializerLehntSpeichernOhneOverwriteBeiBestehenderDateiAb()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "23";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Materializer lehnt Speichern ohne overwrite bei bestehender Datei ab", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 131
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 4
+  await this.FeatureBackgroundAsync();
+#line hidden
+#line 132
+    await testRunner.GivenAsync("ein leeres temporäres Zielverzeichnis", ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
+#line hidden
+#line 133
+    await testRunner.AndAsync("es existiert bereits eine gespeicherte Datei \"conflict.bin\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
+#line hidden
+#line 134
+    await testRunner.AndAsync("ich lese die Datei \"sample.pdf\" als aktuelle Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
+#line hidden
+#line 135
+    await testRunner.WhenAsync("ich versuche die aktuellen Bytes als \"conflict.bin\" ohne overwrite zu speichern", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
+#line hidden
+#line 136
+    await testRunner.ThenAsync("ist der letzte Speicherversuch fehlgeschlagen", ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
+#line hidden
+#line 137
+    await testRunner.AndAsync("bleibt die bestehende Datei \"conflict.bin\" unveraendert", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="Materializer lehnt ungueltigen Zielpfad ab")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "Dateityp-Erkennung über Inhaltsanalyse (fail-closed)")]
+        [global::Xunit.TraitAttribute("Description", "Materializer lehnt ungueltigen Zielpfad ab")]
+        public async global::System.Threading.Tasks.Task MaterializerLehntUngueltigenZielpfadAb()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "24";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Materializer lehnt ungueltigen Zielpfad ab", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 139
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 4
+  await this.FeatureBackgroundAsync();
+#line hidden
+#line 140
+    await testRunner.GivenAsync("ich lese die Datei \"sample.pdf\" als aktuelle Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
+#line hidden
+#line 141
+    await testRunner.WhenAsync("ich versuche die aktuellen Bytes in den Zielpfad \"   \" zu speichern", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
+#line hidden
+#line 142
+    await testRunner.ThenAsync("ist der letzte Speicherversuch fehlgeschlagen", ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
+#line hidden
+#line 143
+    await testRunner.AndAsync("existiert keine Datei im Zielpfad \"   \"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::Xunit.SkippableFactAttribute(DisplayName="Materializer lehnt zu grosse Payload gegen MaxBytes ab")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "Dateityp-Erkennung über Inhaltsanalyse (fail-closed)")]
+        [global::Xunit.TraitAttribute("Description", "Materializer lehnt zu grosse Payload gegen MaxBytes ab")]
+        public async global::System.Threading.Tasks.Task MaterializerLehntZuGrossePayloadGegenMaxBytesAb()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "25";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Materializer lehnt zu grosse Payload gegen MaxBytes ab", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 145
+  this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 4
+  await this.FeatureBackgroundAsync();
+#line hidden
+#line 146
+    await testRunner.GivenAsync("ein leeres temporäres Zielverzeichnis", ((string)(null)), ((global::Reqnroll.Table)(null)), "Angenommen ");
+#line hidden
+#line 147
+    await testRunner.AndAsync("die maximale Dateigroesse ist 16 Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
+#line hidden
+#line 148
+    await testRunner.AndAsync("ich lese die Datei \"sample.pdf\" als aktuelle Bytes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
+#line hidden
+#line 149
+    await testRunner.WhenAsync("ich versuche die aktuellen Bytes als \"too-large.bin\" ohne overwrite zu speichern", ((string)(null)), ((global::Reqnroll.Table)(null)), "Wenn ");
+#line hidden
+#line 150
+    await testRunner.ThenAsync("ist der letzte Speicherversuch fehlgeschlagen", ((string)(null)), ((global::Reqnroll.Table)(null)), "Dann ");
+#line hidden
+#line 151
+    await testRunner.AndAsync("existiert die gespeicherte Datei \"too-large.bin\" nicht", ((string)(null)), ((global::Reqnroll.Table)(null)), "Und ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

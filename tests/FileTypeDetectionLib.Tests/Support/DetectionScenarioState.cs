@@ -12,5 +12,8 @@ internal sealed class DetectionScenarioState
     internal IReadOnlyList<ZipExtractedEntry>? LastExtractedEntries { get; set; }
     internal string? TempRoot { get; set; }
     internal string? LastMaterializedPath { get; set; }
+    internal bool? LastPersistResult { get; set; }
+    internal byte[]? ExistingFileBytes { get; set; }
+    internal string? ExistingFilePath { get; set; }
     internal FileTypeDetectorOptions OriginalOptions { get; } = FileTypeDetector.GetDefaultOptions();
 }

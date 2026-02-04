@@ -127,3 +127,25 @@ Funktionalität: Dateityp-Erkennung über Inhaltsanalyse (fail-closed)
     Und existiert die gespeicherte Datei "chain-zip-step1.bin"
     Und existiert die gespeicherte Datei "chain-zip-step2.bin"
     Und entspricht die gespeicherte Datei "chain-zip-step2.bin" den aktuellen Bytes
+
+  Szenario: Materializer lehnt Speichern ohne overwrite bei bestehender Datei ab
+    Angenommen ein leeres temporäres Zielverzeichnis
+    Und es existiert bereits eine gespeicherte Datei "conflict.bin"
+    Und ich lese die Datei "sample.pdf" als aktuelle Bytes
+    Wenn ich versuche die aktuellen Bytes als "conflict.bin" ohne overwrite zu speichern
+    Dann ist der letzte Speicherversuch fehlgeschlagen
+    Und bleibt die bestehende Datei "conflict.bin" unveraendert
+
+  Szenario: Materializer lehnt ungueltigen Zielpfad ab
+    Angenommen ich lese die Datei "sample.pdf" als aktuelle Bytes
+    Wenn ich versuche die aktuellen Bytes in den Zielpfad "   " zu speichern
+    Dann ist der letzte Speicherversuch fehlgeschlagen
+    Und existiert keine Datei im Zielpfad "   "
+
+  Szenario: Materializer lehnt zu grosse Payload gegen MaxBytes ab
+    Angenommen ein leeres temporäres Zielverzeichnis
+    Und die maximale Dateigroesse ist 16 Bytes
+    Und ich lese die Datei "sample.pdf" als aktuelle Bytes
+    Wenn ich versuche die aktuellen Bytes als "too-large.bin" ohne overwrite zu speichern
+    Dann ist der letzte Speicherversuch fehlgeschlagen
+    Und existiert die gespeicherte Datei "too-large.bin" nicht

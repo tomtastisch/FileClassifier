@@ -67,6 +67,20 @@ public sealed class FileTypeDetectionSteps
         State().CurrentPayload = File.ReadAllBytes(path);
     }
 
+    [Given("es existiert bereits eine gespeicherte Datei {string}")]
+    public void GivenExistingMaterializedFile(string fileName)
+    {
+        var state = State();
+        Assert.False(string.IsNullOrWhiteSpace(state.TempRoot));
+
+        var path = Path.Combine(state.TempRoot!, fileName);
+        var bytes = new byte[] { 0xAA, 0xBB, 0xCC };
+        File.WriteAllBytes(path, bytes);
+
+        state.ExistingFilePath = path;
+        state.ExistingFileBytes = bytes;
+    }
+
     [Given("die maximale Dateigroesse ist {long} Bytes")]
     public void GivenTheMaximumSizeInBytes(long maxBytes)
     {
@@ -113,7 +127,29 @@ public sealed class FileTypeDetectionSteps
         var destination = Path.Combine(state.TempRoot!, fileName);
         var ok = FileMaterializer.Persist(state.CurrentPayload!, destination, overwrite: false, secureExtract: false);
         Assert.True(ok);
+        state.LastPersistResult = ok;
         state.LastMaterializedPath = destination;
+    }
+
+    [When("ich versuche die aktuellen Bytes als {string} ohne overwrite zu speichern")]
+    public void WhenITryPersistCurrentBytesWithoutOverwrite(string fileName)
+    {
+        var state = State();
+        Assert.NotNull(state.CurrentPayload);
+        Assert.False(string.IsNullOrWhiteSpace(state.TempRoot));
+
+        var destination = Path.Combine(state.TempRoot!, fileName);
+        state.LastPersistResult = FileMaterializer.Persist(state.CurrentPayload!, destination, overwrite: false, secureExtract: false);
+        state.LastMaterializedPath = destination;
+    }
+
+    [When("ich versuche die aktuellen Bytes in den Zielpfad {string} zu speichern")]
+    public void WhenITryPersistCurrentBytesToRawDestination(string destinationPath)
+    {
+        var state = State();
+        Assert.NotNull(state.CurrentPayload);
+        state.LastPersistResult = FileMaterializer.Persist(state.CurrentPayload!, destinationPath, overwrite: false, secureExtract: false);
+        state.LastMaterializedPath = destinationPath;
     }
 
     [When("ich lade die zuletzt gespeicherten Bytes als aktuelle Bytes")]
@@ -205,6 +241,41 @@ public sealed class FileTypeDetectionSteps
         var path = Path.Combine(state.TempRoot!, fileName);
         Assert.True(File.Exists(path), $"File missing: {path}");
         Assert.Equal(state.CurrentPayload!, File.ReadAllBytes(path));
+    }
+
+    [Then("ist der letzte Speicherversuch fehlgeschlagen")]
+    public void ThenLastPersistAttemptFailed()
+    {
+        var state = State();
+        Assert.NotNull(state.LastPersistResult);
+        Assert.False(state.LastPersistResult!.Value);
+    }
+
+    [Then("bleibt die bestehende Datei {string} unveraendert")]
+    public void ThenExistingFileRemainsUnchanged(string fileName)
+    {
+        var state = State();
+        Assert.NotNull(state.ExistingFileBytes);
+        Assert.False(string.IsNullOrWhiteSpace(state.TempRoot));
+
+        var path = Path.Combine(state.TempRoot!, fileName);
+        Assert.True(File.Exists(path), $"File missing: {path}");
+        Assert.Equal(state.ExistingFileBytes!, File.ReadAllBytes(path));
+    }
+
+    [Then("existiert keine Datei im Zielpfad {string}")]
+    public void ThenNoFileExistsAtRawDestination(string destinationPath)
+    {
+        Assert.False(File.Exists(destinationPath), $"Unexpected file exists: {destinationPath}");
+    }
+
+    [Then("existiert die gespeicherte Datei {string} nicht")]
+    public void ThenMaterializedFileDoesNotExist(string fileName)
+    {
+        var state = State();
+        Assert.False(string.IsNullOrWhiteSpace(state.TempRoot));
+        var path = Path.Combine(state.TempRoot!, fileName);
+        Assert.False(File.Exists(path), $"Unexpected file exists: {path}");
     }
 
     private DetectionScenarioState State() => _scenarioContext.Get<DetectionScenarioState>(StateKey);
