@@ -1,7 +1,7 @@
 # Index - Benchmarks
 
 ## 1. Purpose
-Smoke-Benchmarks fuer relative Laufzeitentwicklung.
+Benchmark-Szenarien fuer relative Laufzeitentwicklung.
 
 ## 2. Inputs
 - repraesentative Header-/ZIP-Faelle

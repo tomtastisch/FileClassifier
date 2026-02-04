@@ -7,7 +7,7 @@ Ergaenzende normorientierte Spezifikation: [DIN_SPECIFICATION_DE.md](./DIN_SPECI
 ## 2. Entscheidungs-Matrix (welche Methode wann)
 | Ziel | Empfohlene API | Warum |
 |---|---|---|
-| Dateityp einer Datei bestimmen | `new FileTypeDetector().Detect(path)` | einfachster fail-closed Einstieg |
+| Dateityp einer Datei bestimmen | `new FileTypeDetector().Detect(path)` | standardisierter fail-closed Einstieg |
 | Dateityp bestimmen und Endung erzwingen | `new FileTypeDetector().Detect(path, verifyExtension:=True)` | Konflikte werden zu `Unknown` normalisiert |
 | Upload/Message-Bytes pruefen | `new FileTypeDetector().Detect(data)` | kein Dateisystemzugriff notwendig |
 | Auditierbares Ergebnis inkl. Grundcode | `new FileTypeDetector().DetectDetailed(...)` | `ReasonCode` + Policy-Flags |
@@ -38,7 +38,7 @@ Ergaenzende normorientierte Spezifikation: [DIN_SPECIFICATION_DE.md](./DIN_SPECI
 |---|---|---|---|---|---|
 | ZIP validieren (Pfad) | `TryValidate(path)` | Datei-Pfad | `Boolean` | ZIP-Gate als Utility | delegiert an `FileTypeDetector.TryValidateZip` |
 | ZIP validieren (Bytes) | `TryValidate(data)` | Payload | `Boolean` | Upload-Gate ohne Dateisystem | Header muss ZIP sein, dann Gate |
-| ZIP->Memory (Pfad) | `ExtractToMemory(path, verifyBeforeExtract)` | Pfad + Bool | `IReadOnlyList(Of ZipExtractedEntry)` | statische API fuer Leser | delegiert auf fail-closed Extract |
+| ZIP->Memory (Pfad) | `ExtractToMemory(path, verifyBeforeExtract)` | Pfad + Bool | `IReadOnlyList(Of ZipExtractedEntry)` | statische API fuer Aufrufer | delegiert auf fail-closed Extract |
 | ZIP->Memory (Bytes) | `TryExtractToMemory(data)` | Payload | `IReadOnlyList(Of ZipExtractedEntry)` | API/Queue ohne Temp-Datei | validiert zuerst, dann extrahiert |
 
 ### 3.3 `FileMaterializer` (statische Fassade)

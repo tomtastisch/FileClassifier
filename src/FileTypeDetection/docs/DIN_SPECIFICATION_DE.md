@@ -8,10 +8,8 @@
 
 ## 2. Zweck und Anwendungsbereich
 Diese Spezifikation beschreibt Anforderungen und Nachweise fuer die oeffentliche API des Moduls nach einem normorientierten Aufbau (Anforderungen, Architektur, Verifikation, Rueckverfolgbarkeit).
-
-Hinweis zur Notwendigkeit:
-- sinnvoll/notwendig fuer Audit-, Freigabe- oder Compliance-getriebene Umgebungen,
-- optional in reinen Entwickler-Setups ohne formale Nachweispflicht.
+Dieses Dokument dient als normativer Nachweis fuer Freigabe-, Audit- und Compliance-Prozesse.
+Die technische Detailbeschreibung der oeffentlichen Schnittstellen ist in `API_REFERENCE.md` dokumentiert.
 
 ## 3. Begriffe und Definitionen
 - `fail-closed`: Fehlerpfad liefert nur sichere Standardwerte.
@@ -62,7 +60,3 @@ Diese Spezifikation ist rueckverfolgbar auf:
 - API-Referenz: `src/FileTypeDetection/docs/API_REFERENCE.md`
 - Modulindex: `src/FileTypeDetection/README.md`
 - Unit-/Property-Tests: `tests/FileTypeDetectionLib.Tests`
-
-## 9. Pflegeentscheidung
-- Wenn kein formaler Audit-Nachweis benoetigt wird, reicht `API_REFERENCE.md` als zentrale Entwicklerdokumentation.
-- Wenn formale Nachweise benoetigt werden, bleibt dieses Dokument verpflichtend und referenziert die API-Referenz als technische Quelle.

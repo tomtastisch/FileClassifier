@@ -9,7 +9,7 @@ Nachweis fuer Sicherheit, Determinismus, Korrektheit und API-Klarheit.
 | Unit | API- und Regelverhalten | [Unit/README.md](./Unit/README.md) |
 | Property | Grenz-/Invarianztests fuer ZIP-Gate, Optionen und Materializer | [Property/README.md](./Property/README.md) |
 | Features (BDD) | fachliche Lesbarkeit und Akzeptanz | [Features/README.md](./Features/README.md) |
-| Benchmarks | smoke-basierte Laufzeittrends | [Benchmarks/README.md](./Benchmarks/README.md) |
+| Benchmarks | regressionsorientierte Laufzeittrends | [Benchmarks/README.md](./Benchmarks/README.md) |
 
 ## 3. Nachweismatrix
 | Qualitaetsziel | Testdatei |

@@ -14,7 +14,6 @@ Professionelle, auditierbare und deterministische Dateityp-Erkennung mit sichere
 - API-Referenz (vollstaendig): [src/FileTypeDetection/docs/API_REFERENCE.md](src/FileTypeDetection/docs/API_REFERENCE.md)
 - DIN-orientierte Spezifikation: [src/FileTypeDetection/docs/DIN_SPECIFICATION_DE.md](src/FileTypeDetection/docs/DIN_SPECIFICATION_DE.md)
 - Ablauf/UML: [src/FileTypeDetection/README.md](src/FileTypeDetection/README.md)
-- Portable Erklaerung: [portable/README.md](portable/README.md)
 
 ## 4. API-Einstiegspunkte
 - [src/FileTypeDetection/FileTypeDetector.vb](src/FileTypeDetection/FileTypeDetector.vb)
@@ -44,4 +43,4 @@ bash tools/check-portable-filetypedetection.sh --clean
 Im Root von `src/FileTypeDetection` liegen nur die Public APIs.
 
 ### 7.2 Portable
-Im Root von `portable/FileTypeDetection` liegen nur die Public APIs, alle anderen Klassen sind in Unterordnern strukturiert.
+Die portable Spiegelstruktur wird lokal ueber die Tools erzeugt und ist nicht Teil des veroeffentlichten Repository-Inhalts.

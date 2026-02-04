@@ -4,7 +4,7 @@ Option Explicit On
 Namespace FileTypeDetection
 
     ''' <summary>
-    ''' Detailiertes, auditierbares Ergebnis einer Detektion.
+    ''' Detailliertes, auditierbares Ergebnis einer Detektion.
     ''' </summary>
     Public NotInheritable Class DetectionDetail
 
