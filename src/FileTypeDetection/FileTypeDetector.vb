@@ -270,9 +270,9 @@ Namespace FileTypeDetection
             If Not CanExtractZipPath(path, verifyBeforeExtract, opt) Then Return False
 
             Try
-                Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, FileOptions.SequentialScan)
-                    Return ZipExtractor.TryExtractZipStream(fs, destinationDirectory, opt)
-                End Using
+                Dim payload = ReadFileSafe(path)
+                If payload.Length = 0 Then Return False
+                Return FileMaterializer.Persist(payload, destinationDirectory, overwrite:=False, secureExtract:=True)
             Catch ex As Exception
                 LogGuard.Error(opt.Logger, "[ZipExtract] Ausnahme, fail-closed.", ex)
                 Return False

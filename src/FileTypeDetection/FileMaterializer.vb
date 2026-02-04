@@ -46,7 +46,7 @@ Namespace FileTypeDetection
                     Return False
                 End If
 
-                If Not ZipPayloadGuard.IsSafeZipPayload(data, opt) Then
+                If Not ZipSafetyGate.IsZipSafeBytes(data, opt) Then
                     LogGuard.Warn(opt.Logger, "[Materialize] ZIP-Validierung fehlgeschlagen.")
                     Return False
                 End If

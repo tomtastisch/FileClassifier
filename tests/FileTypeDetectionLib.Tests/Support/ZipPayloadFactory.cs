@@ -81,6 +81,28 @@ internal static class ZipPayloadFactory
         return current;
     }
 
+    internal static byte[] CreateDeepNestedZipWithEntryName(int depth, int innerPayloadSize, string entryName)
+    {
+        var safeName = string.IsNullOrWhiteSpace(entryName) ? "inner.bin" : entryName;
+        var current = CreateZipWithEntries(1, Math.Max(1, innerPayloadSize));
+        var levels = Math.Max(1, depth);
+
+        for (var i = 1; i < levels; i++)
+        {
+            using var ms = new MemoryStream();
+            using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
+            {
+                var nestedEntry = zip.CreateEntry(safeName, CompressionLevel.SmallestSize);
+                using var es = nestedEntry.Open();
+                es.Write(current, 0, current.Length);
+            }
+
+            current = ms.ToArray();
+        }
+
+        return current;
+    }
+
     internal static byte[] CreateZipWithSingleEntry(string entryName, int entrySize)
     {
         using var ms = new MemoryStream();

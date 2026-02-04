@@ -30,7 +30,7 @@ Diese Spezifikation beschreibt Anforderungen und Nachweise fuer die oeffentliche
 | Klasse | Verantwortung | Nicht-Ziel |
 |---|---|---|
 | `FileTypeDetector` | Dateitypen erkennen und Sicherheitspruefung durchfuehren | keine Persistenz |
-| `ZipProcessing` | sichere ZIP-Validierung und ZIP-Extraktion | keine allgemeine Byte-Persistenz |
+| `ZipProcessing` | sichere ZIP-Validierung und In-Memory-Extraktion | keine allgemeine Byte-Persistenz und kein Disk-Write |
 | `FileMaterializer` | Byte-Persistenz auf Datei/Verzeichnis mit optionalem ZIP-Extract | keine neue ZIP-Policy |
 | `FileTypeOptions` | zentrale globale Optionsschnittstelle (`LoadOptions`, `GetOptions`) | keine Typdetektion |
 

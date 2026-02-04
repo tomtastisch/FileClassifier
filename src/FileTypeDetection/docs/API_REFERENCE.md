@@ -12,7 +12,7 @@ Ergaenzende normorientierte Spezifikation: [DIN_SPECIFICATION_DE.md](./DIN_SPECI
 | Upload/Message-Bytes pruefen | `FileTypeDetector.Detect(data)` | Kein Dateisystemzugriff notwendig |
 | Auditierbares Ergebnis inkl. Grundcode | `FileTypeDetector.DetectDetailed(...)` | `ReasonCode` + Policy-Flags |
 | Nur ZIP-Sicherheit pruefen (ohne Extraktion) | `FileTypeDetector.TryValidateZip(path)` oder `ZipProcessing.TryValidate(...)` | Gate-only, keine Seiteneffekte |
-| ZIP sicher auf Platte entpacken | `FileTypeDetector.ExtractZipSafe(...)` oder `ZipProcessing.ExtractToDirectory(...)` | Traversal-/Bomb-Schutz |
+| ZIP sicher auf Platte entpacken | `FileTypeDetector.ExtractZipSafe(...)` | Traversal-/Bomb-Schutz |
 | ZIP sicher in Memory entpacken | `FileTypeDetector.ExtractZipSafeToMemory(...)` oder `ZipProcessing.TryExtractToMemory(...)` | Kein Persistieren auf Disk |
 | Byte-Payload persistieren (optional ZIP->Disk) | `FileMaterializer.Persist(...)` | ein Einstieg fuer rohe Bytes und sichere ZIP-Extraktion |
 
@@ -37,7 +37,7 @@ Ergaenzende normorientierte Spezifikation: [DIN_SPECIFICATION_DE.md](./DIN_SPECI
 |---|---|---|---|---|---|
 | ZIP validieren (Pfad) | `TryValidate(path)` | Datei-Pfad | `Boolean` | ZIP-Gate als Utility | delegiert an `FileTypeDetector.TryValidateZip` |
 | ZIP validieren (Bytes) | `TryValidate(data)` | Payload | `Boolean` | Upload-Gate ohne Dateisystem | Header muss ZIP sein, dann Gate |
-| ZIP->Disk | `ExtractToDirectory(path, destination, verifyBeforeExtract)` | Pfad + Ziel + Bool | `Boolean` | einfache statische Nutzung | delegiert auf fail-closed Extract inkl. Root-Zielschutz |
+| ZIP->Disk | `ExtractToDirectory(path, destination, verifyBeforeExtract)` | Pfad + Ziel + Bool | `Boolean` | Legacy-Kompatibilitaet | deaktiviert (liefert `False`), Disk-Schreiben nur via `FileMaterializer` |
 | ZIP->Memory (Pfad) | `ExtractToMemory(path, verifyBeforeExtract)` | Pfad + Bool | `IReadOnlyList(Of ZipExtractedEntry)` | statische API fuer Leser | delegiert auf fail-closed Extract |
 | ZIP->Memory (Bytes) | `TryExtractToMemory(data)` | Payload | `IReadOnlyList(Of ZipExtractedEntry)` | API/Queue ohne Temp-Datei | validiert zuerst, dann extrahiert |
 

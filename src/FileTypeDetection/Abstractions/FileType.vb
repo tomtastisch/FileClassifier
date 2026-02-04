@@ -2,6 +2,7 @@ Option Strict On
 Option Explicit On
 
 Imports System.Collections.Immutable
+Imports System.Linq
 
 Namespace FileTypeDetection
 
@@ -50,7 +51,9 @@ Namespace FileTypeDetection
             If dedup.Count = 0 Then
                 Me.Aliases = ImmutableArray(Of String).Empty
             Else
-                Me.Aliases = dedup.ToImmutableArray()
+                Dim orderedAliases = dedup.ToList()
+                orderedAliases.Sort(StringComparer.Ordinal)
+                Me.Aliases = orderedAliases.ToImmutableArray()
             End If
         End Sub
 

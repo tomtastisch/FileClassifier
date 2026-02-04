@@ -52,4 +52,20 @@ public sealed class ZipAdversarialTests
 
         Assert.Equal(FileKind.Unknown, result.Kind);
     }
+
+    [Fact]
+    public void Detect_FailsClosed_WhenNestedZipDepthExceeded_ForNonZipEntryName()
+    {
+        using var scope = new DetectorOptionsScope();
+        var options = FileTypeDetector.GetDefaultOptions();
+        options.MaxZipNestingDepth = 1;
+        options.MaxZipCompressionRatio = 0;
+        options.MaxBytes = 10 * 1024 * 1024;
+        scope.Set(options);
+
+        var deepZip = ZipPayloadFactory.CreateDeepNestedZipWithEntryName(depth: 3, innerPayloadSize: 16, entryName: "payload.bin");
+        var result = new FileTypeDetector().Detect(deepZip);
+
+        Assert.Equal(FileKind.Unknown, result.Kind);
+    }
 }
