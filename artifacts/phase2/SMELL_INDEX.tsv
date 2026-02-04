@@ -1,6 +1,0 @@
-smell	location	severity	fix_class	effort	evidence
-Large Class / Multi-Responsibility	src/FileTypeDetectionLib/FileTypeDetector.vb	P2	Refactor (extract modules)	M	src/FileTypeDetectionLib/FileTypeDetector.vb:21-471
-Large Module / Mixed Concerns	src/FileTypeDetectionLib/Infrastructure/Internals.vb	P2	Refactor (split by responsibility)	M	src/FileTypeDetectionLib/Infrastructure/Internals.vb:18-399
-Extraction + Validation Coupling	src/FileTypeDetectionLib/Infrastructure/Internals.vb	P2	Architectural split (ZipExtractor + ZipSafetyGate over shared engine)	M	src/FileTypeDetectionLib/Infrastructure/Internals.vb:88-160 and 162-227
-Config Mapping by Manual Switch	src/FileTypeDetectionLib/FileTypeDetector.vb	P2	Centralize option-key mapping	S	src/FileTypeDetectionLib/FileTypeDetector.vb:69-83
-No explicit lint/format policy	(repo-level)	P2	Add minimal .editorconfig + formatting command	S	artifacts/phase0/COMMANDS_RUN.md (pattern scan no matches)
