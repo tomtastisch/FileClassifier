@@ -5,8 +5,9 @@ Deterministische Dateityp-Erkennung und sichere ZIP-Verarbeitung mit fail-closed
 
 ## 2. Schnellstart fuer Leser
 1. [API-Referenz](./docs/API_REFERENCE.md)
-2. [Detection-Details](./Detection/INDEX.md)
-3. [Infrastructure-Details](./Infrastructure/INDEX.md)
+2. [DIN-orientierte Spezifikation](./docs/DIN_SPECIFICATION_DE.md)
+3. [Detection-Details](./Detection/INDEX.md)
+4. [Infrastructure-Details](./Infrastructure/INDEX.md)
 
 ## 3. Strukturregel (wichtig)
 Im Modul-Root liegen **nur** oeffentliche API-Einstiegspunkte:

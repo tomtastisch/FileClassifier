@@ -12,12 +12,15 @@ Professionelle, auditierbare und deterministische Dateityp-Erkennung mit sichere
 ## 3. Architektur-Navigation
 - Modulindex: [src/FileTypeDetection/INDEX.md](src/FileTypeDetection/INDEX.md)
 - API-Referenz (vollstaendig): [src/FileTypeDetection/docs/API_REFERENCE.md](src/FileTypeDetection/docs/API_REFERENCE.md)
+- DIN-orientierte Spezifikation: [src/FileTypeDetection/docs/DIN_SPECIFICATION_DE.md](src/FileTypeDetection/docs/DIN_SPECIFICATION_DE.md)
 - Ablauf/UML: [src/FileTypeDetection/INDEX.md](src/FileTypeDetection/INDEX.md)
 - Portable Erklaerung: [portable/README.md](portable/README.md)
 
 ## 4. API-Einstiegspunkte
 - [src/FileTypeDetection/FileTypeDetector.vb](src/FileTypeDetection/FileTypeDetector.vb)
 - [src/FileTypeDetection/ZipProcessing.vb](src/FileTypeDetection/ZipProcessing.vb)
+- [src/FileTypeDetection/FileMaterializer.vb](src/FileTypeDetection/FileMaterializer.vb)
+- [src/FileTypeDetection/FileTypeOptions.vb](src/FileTypeDetection/FileTypeOptions.vb)
 
 ## 5. Traceability (Ziel -> Check -> Evidenz)
 | Ziel | Check | Evidenz |

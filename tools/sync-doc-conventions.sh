@@ -5,12 +5,14 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SRC_ROOT="${ROOT_DIR}/src/FileTypeDetection"
 TEST_ROOT="${ROOT_DIR}/tests/FileTypeDetectionLib.Tests"
 PORTABLE_ROOT="${ROOT_DIR}/portable/FileTypeDetection"
+source "${ROOT_DIR}/tools/filetypedetection-sync-lib.sh"
 
 # Non-destructive validator.
 # This script never overwrites documentation files.
 
 required_files=(
   "${ROOT_DIR}/README.md"
+  "${ROOT_DIR}/src/README.md"
   "${SRC_ROOT}/INDEX.md"
   "${SRC_ROOT}/docs/API_REFERENCE.md"
   "${SRC_ROOT}/Abstractions/INDEX.md"
@@ -40,17 +42,8 @@ TMP_SRC_MANIFEST="$(mktemp /tmp/filetypedetection-doc-src.XXXXXX)"
 TMP_PORTABLE_MANIFEST="$(mktemp /tmp/filetypedetection-doc-portable.XXXXXX)"
 trap 'rm -f "${TMP_SRC_MANIFEST}" "${TMP_PORTABLE_MANIFEST}"' EXIT
 
-cd "${SRC_ROOT}"
-while IFS= read -r -d '' rel; do
-  hash="$(shasum -a 256 "${rel}" | awk '{print $1}')"
-  printf '%s\t%s\n' "${rel#./}" "${hash}"
-done < <(find . \( -name bin -o -name obj \) -prune -o -type f \( -name '*.vb' -o -name '*.md' \) ! -name '*.vbproj' -print0 | LC_ALL=C sort -z) > "${TMP_SRC_MANIFEST}"
-
-cd "${PORTABLE_ROOT}"
-while IFS= read -r -d '' rel; do
-  hash="$(shasum -a 256 "${rel}" | awk '{print $1}')"
-  printf '%s\t%s\n' "${rel#./}" "${hash}"
-done < <(find . -type f \( -name '*.vb' -o -name '*.md' \) -print0 | LC_ALL=C sort -z) > "${TMP_PORTABLE_MANIFEST}"
+build_source_manifest "${SRC_ROOT}" "${TMP_SRC_MANIFEST}"
+build_portable_manifest "${PORTABLE_ROOT}" "${TMP_PORTABLE_MANIFEST}"
 
 if ! diff -u "${TMP_SRC_MANIFEST}" "${TMP_PORTABLE_MANIFEST}" >/dev/null; then
   echo "Mismatch detected between src/FileTypeDetection and portable/FileTypeDetection (*.vb + *.md)." >&2
@@ -59,11 +52,11 @@ if ! diff -u "${TMP_SRC_MANIFEST}" "${TMP_PORTABLE_MANIFEST}" >/dev/null; then
   exit 1
 fi
 
-if ! cmp -s "${ROOT_DIR}/README.md" "${ROOT_DIR}/portable/README.md"; then
-  echo "Mismatch detected: portable/README.md is not 1:1 with root README.md." >&2
+if ! cmp -s "${ROOT_DIR}/src/README.md" "${ROOT_DIR}/portable/README.md"; then
+  echo "Mismatch detected: portable/README.md is not 1:1 with src/README.md." >&2
   echo "Run: bash tools/sync-portable-filetypedetection.sh" >&2
   exit 1
 fi
 
 echo "Documentation conventions validated (non-destructive)."
-echo "Portable mirror is 1:1 with source for *.vb + *.md, and README.md is mirrored."
+echo "Portable mirror is 1:1 with source for *.vb + *.md, and src/README.md is mirrored."

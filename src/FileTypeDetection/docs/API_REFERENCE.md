@@ -2,6 +2,7 @@
 
 ## 1. Zweck
 Diese Referenz beschreibt die **vollstaendige oeffentliche API** sowie den empfohlenen Einsatz je Szenario.
+Ergaenzende normorientierte Spezifikation: [DIN_SPECIFICATION_DE.md](./DIN_SPECIFICATION_DE.md).
 
 ## 2. Entscheidungs-Matrix (welche Methode wann)
 | Ziel | Empfohlene API | Warum |
