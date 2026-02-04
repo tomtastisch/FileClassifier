@@ -8,11 +8,12 @@ Deterministische Dateityp-Erkennung und sichere ZIP-Verarbeitung mit fail-closed
 2. [Funktionen](./docs/01_FUNCTIONS.md)
 3. [Architektur und Ablaufe](./docs/02_ARCHITECTURE_AND_FLOWS.md)
 4. [Referenzen](./docs/03_REFERENCES.md)
-5. [DIN-orientierte Spezifikation](./docs/DIN_SPECIFICATION_DE.md)
-6. [Detection-Details](./Detection/README.md)
-7. [Infrastructure-Details](./Infrastructure/README.md)
-8. [Configuration-Details](./Configuration/README.md)
-9. [Abstractions-Details](./Abstractions/README.md)
+5. [Production Readiness Checklist](./docs/PRODUCTION_READINESS_CHECKLIST.md)
+6. [DIN-orientierte Spezifikation](./docs/DIN_SPECIFICATION_DE.md)
+7. [Detection-Details](./Detection/README.md)
+8. [Infrastructure-Details](./Infrastructure/README.md)
+9. [Configuration-Details](./Configuration/README.md)
+10. [Abstractions-Details](./Abstractions/README.md)
 
 ## 2.1 Empfohlene Lesepfade
 - API-Nutzung zuerst: [docs/01_FUNCTIONS.md](./docs/01_FUNCTIONS.md) -> [docs/02_ARCHITECTURE_AND_FLOWS.md](./docs/02_ARCHITECTURE_AND_FLOWS.md) -> [docs/03_REFERENCES.md](./docs/03_REFERENCES.md)
