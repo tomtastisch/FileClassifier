@@ -95,6 +95,7 @@ Funktionalität: Dateityp-Erkennung über Inhaltsanalyse (fail-closed)
   Szenario: MIME-Provider folgt dem Build-Toggle
     Dann ist der MIME-Provider build-konform aktiv
 
+  @materializer
   Szenario: ZIP-Entries werden extrahiert, als Bytes uebernommen und via FileMaterializer gespeichert
     Angenommen ein leeres temporäres Zielverzeichnis
     Und die Datei "sample.zip"
@@ -105,6 +106,7 @@ Funktionalität: Dateityp-Erkennung über Inhaltsanalyse (fail-closed)
     Und existiert die gespeicherte Datei "zip-entry-note.txt"
     Und entspricht die gespeicherte Datei "zip-entry-note.txt" den aktuellen Bytes
 
+  @materializer
   Szenario: Originaldatei-Bytes werden iterativ gespeichert und als letzter Stand weiterverwendet
     Angenommen ein leeres temporäres Zielverzeichnis
     Und ich lese die Datei "sample.pdf" als aktuelle Bytes
@@ -115,6 +117,7 @@ Funktionalität: Dateityp-Erkennung über Inhaltsanalyse (fail-closed)
     Und existiert die gespeicherte Datei "chain-original-step2.bin"
     Und entspricht die gespeicherte Datei "chain-original-step2.bin" den aktuellen Bytes
 
+  @materializer
   Szenario: Extrahierte ZIP-Entry-Bytes werden iterativ gespeichert und als letzter Stand weiterverwendet
     Angenommen ein leeres temporäres Zielverzeichnis
     Und die Datei "sample.zip"
@@ -128,6 +131,7 @@ Funktionalität: Dateityp-Erkennung über Inhaltsanalyse (fail-closed)
     Und existiert die gespeicherte Datei "chain-zip-step2.bin"
     Und entspricht die gespeicherte Datei "chain-zip-step2.bin" den aktuellen Bytes
 
+  @materializer @negative
   Szenario: Materializer lehnt Speichern ohne overwrite bei bestehender Datei ab
     Angenommen ein leeres temporäres Zielverzeichnis
     Und es existiert bereits eine gespeicherte Datei "conflict.bin"
@@ -136,12 +140,14 @@ Funktionalität: Dateityp-Erkennung über Inhaltsanalyse (fail-closed)
     Dann ist der letzte Speicherversuch fehlgeschlagen
     Und bleibt die bestehende Datei "conflict.bin" unveraendert
 
+  @materializer @negative
   Szenario: Materializer lehnt ungueltigen Zielpfad ab
     Angenommen ich lese die Datei "sample.pdf" als aktuelle Bytes
     Wenn ich versuche die aktuellen Bytes in den Zielpfad "   " zu speichern
     Dann ist der letzte Speicherversuch fehlgeschlagen
     Und existiert keine Datei im Zielpfad "   "
 
+  @materializer @negative
   Szenario: Materializer lehnt zu grosse Payload gegen MaxBytes ab
     Angenommen ein leeres temporäres Zielverzeichnis
     Und die maximale Dateigroesse ist 16 Bytes

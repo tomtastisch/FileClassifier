@@ -118,6 +118,27 @@ public sealed class FileMaterializerUnitTests
     }
 
     [Fact]
+    public void Persist_Fails_WithoutOverwrite_WhenDestinationAlreadyExists_AndPreservesOriginalBytes()
+    {
+        var tempRoot = CreateTempRoot();
+        var destination = Path.Combine(tempRoot, "conflict.bin");
+        var original = new byte[] { 0xAA, 0xBB, 0xCC };
+
+        try
+        {
+            File.WriteAllBytes(destination, original);
+            var ok = FileMaterializer.Persist(new byte[] { 0x10, 0x20 }, destination, overwrite: false, secureExtract: false);
+
+            Assert.False(ok);
+            Assert.Equal(original, File.ReadAllBytes(destination));
+        }
+        finally
+        {
+            CleanupTempRoot(tempRoot);
+        }
+    }
+
+    [Fact]
     public void Persist_AllowsOverloadWithOverwriteOnly()
     {
         var tempRoot = CreateTempRoot();
@@ -184,6 +205,45 @@ public sealed class FileMaterializerUnitTests
 
         var ok = FileMaterializer.Persist(payload, rootPath!, overwrite: true, secureExtract: false);
         Assert.False(ok);
+    }
+
+    [Fact]
+    public void Persist_Fails_ForWhitespaceDestinationPath()
+    {
+        var payload = new byte[] { 0x41 };
+        var ok = FileMaterializer.Persist(payload, "   ", overwrite: false, secureExtract: false);
+        Assert.False(ok);
+    }
+
+    [Fact]
+    public void Persist_Fails_WhenPayloadExceedsConfiguredMaxBytes_WithPdfFixture()
+    {
+        var original = FileTypeOptions.GetSnapshot();
+        var options = FileTypeOptions.GetSnapshot();
+        options.MaxBytes = 16;
+        FileTypeOptions.SetSnapshot(options);
+
+        try
+        {
+            var payload = File.ReadAllBytes(TestResources.Resolve("sample.pdf"));
+            var tempRoot = CreateTempRoot();
+            var destination = Path.Combine(tempRoot, "too-large.bin");
+
+            try
+            {
+                var ok = FileMaterializer.Persist(payload, destination, overwrite: false, secureExtract: false);
+                Assert.False(ok);
+                Assert.False(File.Exists(destination));
+            }
+            finally
+            {
+                CleanupTempRoot(tempRoot);
+            }
+        }
+        finally
+        {
+            FileTypeOptions.SetSnapshot(original);
+        }
     }
 
     private static string CreateTempRoot()
