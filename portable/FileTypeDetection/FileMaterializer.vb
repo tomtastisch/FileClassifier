@@ -26,6 +26,10 @@ Namespace FileTypeDetection
         Public Shared Function Persist(data As Byte(), destinationPath As String, overwrite As Boolean, secureExtract As Boolean) As Boolean
             Dim opt = FileTypeOptions.GetSnapshot()
             If data Is Nothing Then Return False
+            If CLng(data.Length) > opt.MaxBytes Then
+                LogGuard.Warn(opt.Logger, $"[Materialize] Daten zu gross ({data.Length} > {opt.MaxBytes}).")
+                Return False
+            End If
             If String.IsNullOrWhiteSpace(destinationPath) Then Return False
 
             Dim destinationFull As String
@@ -55,13 +59,7 @@ Namespace FileTypeDetection
 
         Private Shared Function MaterializeRawBytes(data As Byte(), destinationFull As String, overwrite As Boolean, opt As FileTypeDetectorOptions) As Boolean
             Try
-                If File.Exists(destinationFull) Then
-                    If Not overwrite Then Return False
-                    File.Delete(destinationFull)
-                ElseIf Directory.Exists(destinationFull) Then
-                    If Not overwrite Then Return False
-                    Directory.Delete(destinationFull, recursive:=True)
-                End If
+                If Not PrepareDestination(destinationFull, overwrite, opt) Then Return False
 
                 Dim parent = Path.GetDirectoryName(destinationFull)
                 If String.IsNullOrWhiteSpace(parent) Then Return False
@@ -80,13 +78,7 @@ Namespace FileTypeDetection
 
         Private Shared Function MaterializeZipBytes(data As Byte(), destinationFull As String, overwrite As Boolean, opt As FileTypeDetectorOptions) As Boolean
             Try
-                If File.Exists(destinationFull) Then
-                    If Not overwrite Then Return False
-                    File.Delete(destinationFull)
-                ElseIf Directory.Exists(destinationFull) Then
-                    If Not overwrite Then Return False
-                    Directory.Delete(destinationFull, recursive:=True)
-                End If
+                If Not PrepareDestination(destinationFull, overwrite, opt) Then Return False
 
                 Using ms As New MemoryStream(data, writable:=False)
                     Return ZipExtractor.TryExtractZipStream(ms, destinationFull, opt)
@@ -110,6 +102,29 @@ Namespace FileTypeDetection
                 LogGuard.Debug(opt.Logger, $"[Materialize] SharpCompress ZIP-Check fehlgeschlagen: {ex.Message}")
                 Return False
             End Try
+        End Function
+
+        Private Shared Function PrepareDestination(destinationFull As String, overwrite As Boolean, opt As FileTypeDetectorOptions) As Boolean
+            Dim rootPath As String = Nothing
+            Try
+                rootPath = Path.GetPathRoot(destinationFull)
+            Catch
+            End Try
+
+            If Not String.IsNullOrWhiteSpace(rootPath) AndAlso String.Equals(destinationFull.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), rootPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), StringComparison.OrdinalIgnoreCase) Then
+                LogGuard.Warn(opt.Logger, "[Materialize] Ziel darf kein Root-Verzeichnis sein.")
+                Return False
+            End If
+
+            If File.Exists(destinationFull) Then
+                If Not overwrite Then Return False
+                File.Delete(destinationFull)
+            ElseIf Directory.Exists(destinationFull) Then
+                If Not overwrite Then Return False
+                Directory.Delete(destinationFull, recursive:=True)
+            End If
+
+            Return True
         End Function
     End Class
 

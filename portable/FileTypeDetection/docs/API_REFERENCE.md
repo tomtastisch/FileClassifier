@@ -46,12 +46,12 @@ Ergaenzende normorientierte Spezifikation: [DIN_SPECIFICATION_DE.md](./DIN_SPECI
 |---|---|---|---|---|---|
 | Persist (Default) | `Persist(data, destinationPath)` | Payload + Zielpfad | `Boolean` | Standardfall fuer Byte->Datei | schreibt fail-closed direkt auf Disk |
 | Persist (Overwrite) | `Persist(data, destinationPath, overwrite)` | Payload + Zielpfad + Bool | `Boolean` | explizite Overwrite-Policy | `overwrite=False` verhindert Ueberschreiben |
-| Persist (Full) | `Persist(data, destinationPath, overwrite, secureExtract)` | Payload + Zielpfad + 2 Bool | `Boolean` | ZIP-Bytes optional sicher entpacken | bei `secureExtract=True` + ZIP: Validierung und sichere Extraktion statt Raw-Write |
+| Persist (Full) | `Persist(data, destinationPath, overwrite, secureExtract)` | Payload + Zielpfad + 2 Bool | `Boolean` | ZIP-Bytes optional sicher entpacken | bei `secureExtract=True` + ZIP: Validierung und sichere Extraktion statt Raw-Write; `MaxBytes` und Root-Pfadschutz sind aktiv |
 
 ### 3.4 `FileTypeOptions` (statische Fassade)
 | Symbol | Signatur | Input | Output | Einsatzzeitpunkt | Verhalten/Trigger |
 |---|---|---|---|---|---|
-| Optionen laden | `LoadOptions(json)` | JSON-String | `Boolean` | Startup/Runtime-Rekonfiguration | partielle JSON-Werte ueberschreiben Defaults; unbekannte Keys werden ignoriert |
+| Optionen laden | `LoadOptions(json)` | JSON-String | `Boolean` | Startup/Runtime-Rekonfiguration | partielle JSON-Werte ueberschreiben Defaults; unbekannte Keys werden ignoriert; ungueltige Grenzwerte fallen auf Defaults zurueck |
 | Optionen lesen | `GetOptions()` | - | `String` (JSON) | Audit/Diagnose/API-Ausgabe | liefert aktuellen globalen Snapshot als JSON |
 
 ### 3.5 `FileTypeSecurityBaseline`

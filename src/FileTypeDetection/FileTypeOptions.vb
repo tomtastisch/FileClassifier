@@ -3,6 +3,7 @@ Option Explicit On
 
 Imports System
 Imports System.Collections.Generic
+Imports System.IO
 Imports System.Text.Json
 
 Namespace FileTypeDetection
@@ -28,16 +29,21 @@ Namespace FileTypeDetection
 
             Try
                 Using doc = JsonDocument.Parse(json, New JsonDocumentOptions With {.AllowTrailingCommas = True})
+                    If doc.RootElement.ValueKind <> JsonValueKind.Object Then
+                        LogGuard.Warn(nextOptions.Logger, "[Config] Root muss ein JSON-Objekt sein.")
+                        Return False
+                    End If
+
                     For Each p In doc.RootElement.EnumerateObject()
                         Select Case p.Name.ToLowerInvariant()
-                            Case "maxbytes" : nextOptions.MaxBytes = SafeLong(p.Value, nextOptions.MaxBytes)
-                            Case "sniffbytes" : nextOptions.SniffBytes = SafeInt(p.Value, nextOptions.SniffBytes)
-                            Case "maxzipentries" : nextOptions.MaxZipEntries = SafeInt(p.Value, nextOptions.MaxZipEntries)
-                            Case "maxziptotaluncompressedbytes" : nextOptions.MaxZipTotalUncompressedBytes = SafeLong(p.Value, nextOptions.MaxZipTotalUncompressedBytes)
-                            Case "maxzipentryuncompressedbytes" : nextOptions.MaxZipEntryUncompressedBytes = SafeLong(p.Value, nextOptions.MaxZipEntryUncompressedBytes)
-                            Case "maxzipcompressionratio" : nextOptions.MaxZipCompressionRatio = SafeInt(p.Value, nextOptions.MaxZipCompressionRatio)
-                            Case "maxzipnestingdepth" : nextOptions.MaxZipNestingDepth = SafeInt(p.Value, nextOptions.MaxZipNestingDepth)
-                            Case "maxzipnestedbytes" : nextOptions.MaxZipNestedBytes = SafeLong(p.Value, nextOptions.MaxZipNestedBytes)
+                            Case "maxbytes" : nextOptions.MaxBytes = ParsePositiveLong(p.Value, nextOptions.MaxBytes, p.Name, nextOptions.Logger)
+                            Case "sniffbytes" : nextOptions.SniffBytes = ParsePositiveInt(p.Value, nextOptions.SniffBytes, p.Name, nextOptions.Logger)
+                            Case "maxzipentries" : nextOptions.MaxZipEntries = ParsePositiveInt(p.Value, nextOptions.MaxZipEntries, p.Name, nextOptions.Logger)
+                            Case "maxziptotaluncompressedbytes" : nextOptions.MaxZipTotalUncompressedBytes = ParsePositiveLong(p.Value, nextOptions.MaxZipTotalUncompressedBytes, p.Name, nextOptions.Logger)
+                            Case "maxzipentryuncompressedbytes" : nextOptions.MaxZipEntryUncompressedBytes = ParsePositiveLong(p.Value, nextOptions.MaxZipEntryUncompressedBytes, p.Name, nextOptions.Logger)
+                            Case "maxzipcompressionratio" : nextOptions.MaxZipCompressionRatio = ParseNonNegativeInt(p.Value, nextOptions.MaxZipCompressionRatio, p.Name, nextOptions.Logger)
+                            Case "maxzipnestingdepth" : nextOptions.MaxZipNestingDepth = ParseNonNegativeInt(p.Value, nextOptions.MaxZipNestingDepth, p.Name, nextOptions.Logger)
+                            Case "maxzipnestedbytes" : nextOptions.MaxZipNestedBytes = ParsePositiveLong(p.Value, nextOptions.MaxZipNestedBytes, p.Name, nextOptions.Logger)
                             Case Else
                                 LogGuard.Warn(nextOptions.Logger, $"[Config] Unbekannter Schluessel '{p.Name}' ignoriert.")
                         End Select
@@ -71,6 +77,17 @@ Namespace FileTypeDetection
             Return JsonSerializer.Serialize(dto)
         End Function
 
+        Friend Shared Function LoadOptionsFromPath(path As String) As Boolean
+            If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then Return False
+            If Not path.EndsWith(".json", StringComparison.OrdinalIgnoreCase) Then Return False
+
+            Try
+                Return LoadOptions(File.ReadAllText(path))
+            Catch
+                Return False
+            End Try
+        End Function
+
         Friend Shared Function GetSnapshot() As FileTypeDetectorOptions
             SyncLock _optionsLock
                 Return Snapshot(_currentOptions)
@@ -92,6 +109,27 @@ Namespace FileTypeDetection
         Private Shared Function SafeLong(el As JsonElement, fallback As Long) As Long
             Dim v As Long
             If el.ValueKind = JsonValueKind.Number AndAlso el.TryGetInt64(v) Then Return v
+            Return fallback
+        End Function
+
+        Private Shared Function ParsePositiveInt(el As JsonElement, fallback As Integer, name As String, logger As Microsoft.Extensions.Logging.ILogger) As Integer
+            Dim v = SafeInt(el, fallback)
+            If v > 0 Then Return v
+            LogGuard.Warn(logger, $"[Config] Ungueltiger Wert fuer '{name}', fallback={fallback}.")
+            Return fallback
+        End Function
+
+        Private Shared Function ParseNonNegativeInt(el As JsonElement, fallback As Integer, name As String, logger As Microsoft.Extensions.Logging.ILogger) As Integer
+            Dim v = SafeInt(el, fallback)
+            If v >= 0 Then Return v
+            LogGuard.Warn(logger, $"[Config] Ungueltiger Wert fuer '{name}', fallback={fallback}.")
+            Return fallback
+        End Function
+
+        Private Shared Function ParsePositiveLong(el As JsonElement, fallback As Long, name As String, logger As Microsoft.Extensions.Logging.ILogger) As Long
+            Dim v = SafeLong(el, fallback)
+            If v > 0 Then Return v
+            LogGuard.Warn(logger, $"[Config] Ungueltiger Wert fuer '{name}', fallback={fallback}.")
             Return fallback
         End Function
 

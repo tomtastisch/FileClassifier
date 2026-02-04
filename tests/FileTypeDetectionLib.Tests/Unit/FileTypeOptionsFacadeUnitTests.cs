@@ -48,4 +48,25 @@ public sealed class FileTypeOptionsFacadeUnitTests
             FileTypeOptions.SetSnapshot(original);
         }
     }
+
+    [Fact]
+    public void LoadOptions_KeepsDefaults_ForInvalidNumericValues()
+    {
+        var original = FileTypeOptions.GetSnapshot();
+        try
+        {
+            var defaults = FileTypeDetectorOptions.DefaultOptions();
+            var ok = FileTypeOptions.LoadOptions("{\"maxBytes\":0,\"maxZipEntries\":-1,\"maxZipNestingDepth\":-2}");
+            var snapshot = FileTypeOptions.GetSnapshot();
+
+            Assert.True(ok);
+            Assert.Equal(defaults.MaxBytes, snapshot.MaxBytes);
+            Assert.Equal(defaults.MaxZipEntries, snapshot.MaxZipEntries);
+            Assert.Equal(defaults.MaxZipNestingDepth, snapshot.MaxZipNestingDepth);
+        }
+        finally
+        {
+            FileTypeOptions.SetSnapshot(original);
+        }
+    }
 }

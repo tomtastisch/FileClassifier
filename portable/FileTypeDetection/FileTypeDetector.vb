@@ -55,8 +55,7 @@ Namespace FileTypeDetection
             End If
 
             Try
-                Dim json = File.ReadAllText(path)
-                If Not FileTypeOptions.LoadOptions(json) Then Return defaults
+                If Not FileTypeOptions.LoadOptionsFromPath(path) Then Return defaults
                 Return FileTypeOptions.GetSnapshot()
             Catch ex As Exception
                 LogGuard.Warn(defaults.Logger, $"[Config] Parse/IO-Fehler: {ex.Message}, Defaults.")

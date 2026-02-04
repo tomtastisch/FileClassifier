@@ -9,6 +9,31 @@ namespace FileTypeDetectionLib.Tests.Unit;
 public sealed class FileMaterializerUnitTests
 {
     [Fact]
+    public void Persist_Fails_WhenPayloadExceedsConfiguredMaxBytes()
+    {
+        var original = FileTypeOptions.GetSnapshot();
+        var options = FileTypeOptions.GetSnapshot();
+        options.MaxBytes = 4;
+        FileTypeOptions.SetSnapshot(options);
+
+        var tempRoot = CreateTempRoot();
+        var destination = Path.Combine(tempRoot, "raw.bin");
+        var payload = new byte[] { 1, 2, 3, 4, 5 };
+
+        try
+        {
+            var ok = FileMaterializer.Persist(payload, destination);
+            Assert.False(ok);
+            Assert.False(File.Exists(destination));
+        }
+        finally
+        {
+            FileTypeOptions.SetSnapshot(original);
+            CleanupTempRoot(tempRoot);
+        }
+    }
+
+    [Fact]
     public void Persist_WritesRawBytes_ByDefault()
     {
         var tempRoot = CreateTempRoot();
@@ -148,6 +173,17 @@ public sealed class FileMaterializerUnitTests
         {
             CleanupTempRoot(tempRoot);
         }
+    }
+
+    [Fact]
+    public void Persist_Fails_ForRootDestinationPath()
+    {
+        var payload = new byte[] { 0x41 };
+        var rootPath = Path.GetPathRoot(Path.GetTempPath());
+        Assert.False(string.IsNullOrWhiteSpace(rootPath));
+
+        var ok = FileMaterializer.Persist(payload, rootPath!, overwrite: true, secureExtract: false);
+        Assert.False(ok);
     }
 
     private static string CreateTempRoot()
