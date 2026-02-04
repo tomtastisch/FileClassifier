@@ -60,7 +60,7 @@ bash tools/sync-doc-conventions.sh
 ## 8. Rueckverfolgbarkeit
 Diese Spezifikation ist rueckverfolgbar auf:
 - API-Referenz: `src/FileTypeDetection/docs/API_REFERENCE.md`
-- Modulindex: `src/FileTypeDetection/INDEX.md`
+- Modulindex: `src/FileTypeDetection/README.md`
 - Unit-/Property-Tests: `tests/FileTypeDetectionLib.Tests`
 
 ## 9. Pflegeentscheidung

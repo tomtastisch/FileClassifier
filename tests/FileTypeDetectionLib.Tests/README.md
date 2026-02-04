@@ -6,10 +6,10 @@ Nachweis fuer Sicherheit, Determinismus, Korrektheit und API-Klarheit.
 ## 2. Testkategorien
 | Kategorie | Fokus | Referenz |
 |---|---|---|
-| Unit | API- und Regelverhalten | [Unit/INDEX.md](./Unit/INDEX.md) |
-| Property | Grenz-/Invarianztests fuer ZIP-Gate, Optionen und Materializer | [Property/INDEX.md](./Property/INDEX.md) |
-| Features (BDD) | fachliche Lesbarkeit und Akzeptanz | [Features/INDEX.md](./Features/INDEX.md) |
-| Benchmarks | smoke-basierte Laufzeittrends | [Benchmarks/INDEX.md](./Benchmarks/INDEX.md) |
+| Unit | API- und Regelverhalten | [Unit/README.md](./Unit/README.md) |
+| Property | Grenz-/Invarianztests fuer ZIP-Gate, Optionen und Materializer | [Property/README.md](./Property/README.md) |
+| Features (BDD) | fachliche Lesbarkeit und Akzeptanz | [Features/README.md](./Features/README.md) |
+| Benchmarks | smoke-basierte Laufzeittrends | [Benchmarks/README.md](./Benchmarks/README.md) |
 
 ## 3. Nachweismatrix
 | Qualitaetsziel | Testdatei |

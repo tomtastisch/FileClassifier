@@ -4,13 +4,13 @@
 Einstiegspunkt fuer die Source-Variante des Moduls.
 
 ## Inhalt
-- [FileTypeDetection/INDEX.md](./FileTypeDetection/INDEX.md)
+- [FileTypeDetection/README.md](./FileTypeDetection/README.md)
 - [FileTypeDetection/docs/API_REFERENCE.md](./FileTypeDetection/docs/API_REFERENCE.md)
 - [FileTypeDetection/docs/DIN_SPECIFICATION_DE.md](./FileTypeDetection/docs/DIN_SPECIFICATION_DE.md)
-- [FileTypeDetection/Abstractions/INDEX.md](./FileTypeDetection/Abstractions/INDEX.md)
-- [FileTypeDetection/Configuration/INDEX.md](./FileTypeDetection/Configuration/INDEX.md)
-- [FileTypeDetection/Detection/INDEX.md](./FileTypeDetection/Detection/INDEX.md)
-- [FileTypeDetection/Infrastructure/INDEX.md](./FileTypeDetection/Infrastructure/INDEX.md)
+- [FileTypeDetection/Abstractions/README.md](./FileTypeDetection/Abstractions/README.md)
+- [FileTypeDetection/Configuration/README.md](./FileTypeDetection/Configuration/README.md)
+- [FileTypeDetection/Detection/README.md](./FileTypeDetection/Detection/README.md)
+- [FileTypeDetection/Infrastructure/README.md](./FileTypeDetection/Infrastructure/README.md)
 
 ## Strukturregel
 Im Root von `FileTypeDetection` liegen nur:

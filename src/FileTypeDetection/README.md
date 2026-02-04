@@ -6,8 +6,8 @@ Deterministische Dateityp-Erkennung und sichere ZIP-Verarbeitung mit fail-closed
 ## 2. Schnellstart fuer Leser
 1. [API-Referenz](./docs/API_REFERENCE.md)
 2. [DIN-orientierte Spezifikation](./docs/DIN_SPECIFICATION_DE.md)
-3. [Detection-Details](./Detection/INDEX.md)
-4. [Infrastructure-Details](./Infrastructure/INDEX.md)
+3. [Detection-Details](./Detection/README.md)
+4. [Infrastructure-Details](./Infrastructure/README.md)
 
 ## 3. Strukturregel (wichtig)
 Im Modul-Root liegen nur oeffentliche API-Einstiegspunkte:
@@ -21,10 +21,10 @@ Alle Low-Level-Implementierungen liegen in Unterordnern.
 ## 4. Ordner und Verantwortungen
 | Pfad | Verantwortung | Typische Leser |
 |---|---|---|
-| [Abstractions/](./Abstractions/INDEX.md) | Immutable Rueckgabemodelle | API-Consumer |
-| [Configuration/](./Configuration/INDEX.md) | Optionen, Security-Baseline | Ops, Security, Entwickler |
-| [Detection/](./Detection/INDEX.md) | SSOT fuer Typen, Aliase, Header-Magic | Maintainer Detection |
-| [Infrastructure/](./Infrastructure/INDEX.md) | ZIP-Gate, Refiner, Extractor, Bounds | Maintainer Security/IO |
+| [Abstractions/](./Abstractions/README.md) | Immutable Rueckgabemodelle | API-Consumer |
+| [Configuration/](./Configuration/README.md) | Optionen, Security-Baseline | Ops, Security, Entwickler |
+| [Detection/](./Detection/README.md) | SSOT fuer Typen, Aliase, Header-Magic | Maintainer Detection |
+| [Infrastructure/](./Infrastructure/README.md) | ZIP-Gate, Refiner, Extractor, Bounds | Maintainer Security/IO |
 
 ## 5. Architekturdiagramm
 ```mermaid
@@ -43,7 +43,7 @@ flowchart LR
 | `ZipProcessing` | statische ZIP-Fassade (Path/Bytes) | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md) |
 | `FileMaterializer` | einheitliche Persistenz fuer Byte-Payloads (optional ZIP->Disk) | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md) |
 | `FileTypeOptions` | zentrale JSON-Optionsschnittstelle (laden/lesen) | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md) |
-| `FileTypeSecurityBaseline` | konservative Security-Defaults | [Configuration/INDEX.md](./Configuration/INDEX.md) |
+| `FileTypeSecurityBaseline` | konservative Security-Defaults | [Configuration/README.md](./Configuration/README.md) |
 
 ## 7. Qualitaetsziele (ISO/IEC 25010)
 - Functional suitability: korrektes Mapping Header/Container -> `FileKind`.
