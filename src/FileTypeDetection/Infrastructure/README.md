@@ -38,3 +38,8 @@ sequenceDiagram
 - [ZipAdversarialTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/ZipAdversarialTests.cs)
 - [ZipExtractionUnitTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/ZipExtractionUnitTests.cs)
 - [ZipGatePropertyTests.cs](../../../tests/FileTypeDetectionLib.Tests/Property/ZipGatePropertyTests.cs)
+
+## 6. Siehe auch
+- [Modulindex](../README.md)
+- [Architektur und Ablaufe](../docs/02_ARCHITECTURE_AND_FLOWS.md)
+- [Referenzen](../docs/03_REFERENCES.md)

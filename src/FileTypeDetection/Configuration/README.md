@@ -34,3 +34,8 @@ flowchart LR
 
 ## 6. Testverknuepfung
 - [FileTypeSecurityBaselineUnitTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeSecurityBaselineUnitTests.cs)
+
+## 7. Siehe auch
+- [Modulindex](../README.md)
+- [Funktionsreferenz](../docs/01_FUNCTIONS.md)
+- [Architektur und Ablaufe](../docs/02_ARCHITECTURE_AND_FLOWS.md)

@@ -9,7 +9,7 @@
 ## 2. Zweck und Anwendungsbereich
 Diese Spezifikation beschreibt Anforderungen und Nachweise fuer die oeffentliche API des Moduls nach einem normorientierten Aufbau (Anforderungen, Architektur, Verifikation, Rueckverfolgbarkeit).
 Dieses Dokument dient als normativer Nachweis fuer Freigabe-, Audit- und Compliance-Prozesse.
-Die technische Detailbeschreibung der oeffentlichen Schnittstellen ist in `API_REFERENCE.md` dokumentiert.
+Die technische Detailbeschreibung der oeffentlichen Schnittstellen ist in `01_FUNCTIONS.md`, `02_ARCHITECTURE_AND_FLOWS.md` und `03_REFERENCES.md` dokumentiert.
 
 ## 3. Begriffe und Definitionen
 - `fail-closed`: Fehlerpfad liefert nur sichere Standardwerte.
@@ -57,6 +57,8 @@ bash tools/sync-doc-conventions.sh
 
 ## 8. Rueckverfolgbarkeit
 Diese Spezifikation ist rueckverfolgbar auf:
-- API-Referenz: `src/FileTypeDetection/docs/API_REFERENCE.md`
+- Funktionsreferenz: `src/FileTypeDetection/docs/01_FUNCTIONS.md`
+- Architektur- und Ablaufreferenz: `src/FileTypeDetection/docs/02_ARCHITECTURE_AND_FLOWS.md`
+- Referenzdokument: `src/FileTypeDetection/docs/03_REFERENCES.md`
 - Modulindex: `src/FileTypeDetection/README.md`
 - Unit-/Property-Tests: `tests/FileTypeDetectionLib.Tests`

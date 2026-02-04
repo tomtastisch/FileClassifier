@@ -4,10 +4,20 @@
 Deterministische Dateityp-Erkennung und sichere ZIP-Verarbeitung mit fail-closed Verhalten.
 
 ## 2. Schnellstart fuer Leser
-1. [API-Referenz](./docs/API_REFERENCE.md)
-2. [DIN-orientierte Spezifikation](./docs/DIN_SPECIFICATION_DE.md)
-3. [Detection-Details](./Detection/README.md)
-4. [Infrastructure-Details](./Infrastructure/README.md)
+1. [Doku-Index](./docs/README.md)
+2. [Funktionen](./docs/01_FUNCTIONS.md)
+3. [Architektur und Ablaufe](./docs/02_ARCHITECTURE_AND_FLOWS.md)
+4. [Referenzen](./docs/03_REFERENCES.md)
+5. [DIN-orientierte Spezifikation](./docs/DIN_SPECIFICATION_DE.md)
+6. [Detection-Details](./Detection/README.md)
+7. [Infrastructure-Details](./Infrastructure/README.md)
+8. [Configuration-Details](./Configuration/README.md)
+9. [Abstractions-Details](./Abstractions/README.md)
+
+## 2.1 Empfohlene Lesepfade
+- API-Nutzung zuerst: [docs/01_FUNCTIONS.md](./docs/01_FUNCTIONS.md) -> [docs/02_ARCHITECTURE_AND_FLOWS.md](./docs/02_ARCHITECTURE_AND_FLOWS.md) -> [docs/03_REFERENCES.md](./docs/03_REFERENCES.md)
+- Implementierungsdetails zu Flows: [Detection/README.md](./Detection/README.md) + [Infrastructure/README.md](./Infrastructure/README.md)
+- Konfigurations- und Modellsicht: [Configuration/README.md](./Configuration/README.md) + [Abstractions/README.md](./Abstractions/README.md)
 
 ## 3. Strukturregel (wichtig)
 Im Modul-Root liegen nur oeffentliche API-Einstiegspunkte:
@@ -39,10 +49,10 @@ flowchart LR
 ## 6. Oeffentliche Funktionen (Uebersicht)
 | Klasse | Funktionale Rolle | Detailtabelle |
 |---|---|---|
-| `FileTypeDetector` | Erkennung, Policy, ZIP-Path-Operationen | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md) |
-| `ZipProcessing` | statische ZIP-Fassade (Path/Bytes) | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md) |
-| `FileMaterializer` | einheitliche Persistenz fuer Byte-Payloads (optional ZIP->Disk) | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md) |
-| `FileTypeOptions` | zentrale JSON-Optionsschnittstelle (laden/lesen) | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md) |
+| `FileTypeDetector` | Erkennung, Policy, ZIP-Path-Operationen | [docs/01_FUNCTIONS.md](./docs/01_FUNCTIONS.md) |
+| `ZipProcessing` | statische ZIP-Fassade (Path/Bytes) | [docs/01_FUNCTIONS.md](./docs/01_FUNCTIONS.md) |
+| `FileMaterializer` | einheitliche Persistenz fuer Byte-Payloads (optional ZIP->Disk) | [docs/01_FUNCTIONS.md](./docs/01_FUNCTIONS.md) |
+| `FileTypeOptions` | zentrale JSON-Optionsschnittstelle (laden/lesen) | [docs/01_FUNCTIONS.md](./docs/01_FUNCTIONS.md) |
 | `FileTypeSecurityBaseline` | konservative Security-Defaults | [Configuration/README.md](./Configuration/README.md) |
 
 ## 7. Qualitaetsziele (ISO/IEC 25010)

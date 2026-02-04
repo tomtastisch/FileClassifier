@@ -14,3 +14,8 @@ Immutable Rueckgabemodelle fuer stabile API-Vertraege.
 ## 3. Garantie
 - Keine Seiteneffekte oder I/O in Modellen.
 - `Unknown` bleibt fail-closed Fallback.
+
+## 4. Siehe auch
+- [Modulindex](../README.md)
+- [Funktionsreferenz](../docs/01_FUNCTIONS.md)
+- [Referenzen](../docs/03_REFERENCES.md)
