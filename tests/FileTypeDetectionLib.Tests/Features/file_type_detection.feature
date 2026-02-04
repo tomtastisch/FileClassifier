@@ -94,3 +94,36 @@ Funktionalität: Dateityp-Erkennung über Inhaltsanalyse (fail-closed)
 
   Szenario: MIME-Provider folgt dem Build-Toggle
     Dann ist der MIME-Provider build-konform aktiv
+
+  Szenario: ZIP-Entries werden extrahiert, als Bytes uebernommen und via FileMaterializer gespeichert
+    Angenommen ein leeres temporäres Zielverzeichnis
+    Und die Datei "sample.zip"
+    Wenn ich extrahiere die ZIP-Datei sicher in Memory
+    Und ich übernehme den ersten extrahierten Eintrag als aktuelle Bytes
+    Und ich speichere die aktuellen Bytes als "zip-entry-note.txt"
+    Dann ist der extrahierte Eintragssatz nicht leer
+    Und existiert die gespeicherte Datei "zip-entry-note.txt"
+    Und entspricht die gespeicherte Datei "zip-entry-note.txt" den aktuellen Bytes
+
+  Szenario: Originaldatei-Bytes werden iterativ gespeichert und als letzter Stand weiterverwendet
+    Angenommen ein leeres temporäres Zielverzeichnis
+    Und ich lese die Datei "sample.pdf" als aktuelle Bytes
+    Wenn ich speichere die aktuellen Bytes als "chain-original-step1.bin"
+    Und ich lade die zuletzt gespeicherten Bytes als aktuelle Bytes
+    Und ich speichere die aktuellen Bytes als "chain-original-step2.bin"
+    Dann existiert die gespeicherte Datei "chain-original-step1.bin"
+    Und existiert die gespeicherte Datei "chain-original-step2.bin"
+    Und entspricht die gespeicherte Datei "chain-original-step2.bin" den aktuellen Bytes
+
+  Szenario: Extrahierte ZIP-Entry-Bytes werden iterativ gespeichert und als letzter Stand weiterverwendet
+    Angenommen ein leeres temporäres Zielverzeichnis
+    Und die Datei "sample.zip"
+    Wenn ich extrahiere die ZIP-Datei sicher in Memory
+    Und ich übernehme den ersten extrahierten Eintrag als aktuelle Bytes
+    Und ich speichere die aktuellen Bytes als "chain-zip-step1.bin"
+    Und ich lade die zuletzt gespeicherten Bytes als aktuelle Bytes
+    Und ich speichere die aktuellen Bytes als "chain-zip-step2.bin"
+    Dann ist der extrahierte Eintragssatz nicht leer
+    Und existiert die gespeicherte Datei "chain-zip-step1.bin"
+    Und existiert die gespeicherte Datei "chain-zip-step2.bin"
+    Und entspricht die gespeicherte Datei "chain-zip-step2.bin" den aktuellen Bytes

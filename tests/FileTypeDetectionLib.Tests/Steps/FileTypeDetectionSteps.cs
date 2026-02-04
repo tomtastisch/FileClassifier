@@ -29,6 +29,10 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         FileTypeDetector.SetDefaultOptions(state.OriginalOptions);
+        if (!string.IsNullOrWhiteSpace(state.TempRoot) && Directory.Exists(state.TempRoot))
+        {
+            Directory.Delete(state.TempRoot, recursive: true);
+        }
     }
 
     [Given("die Ressource {string} existiert")]
@@ -44,6 +48,23 @@ public sealed class FileTypeDetectionSteps
         var path = TestResources.Resolve(name);
         Assert.True(File.Exists(path), $"Test resource missing: {path}");
         State().CurrentPath = path;
+    }
+
+    [Given("ein leeres temporäres Zielverzeichnis")]
+    public void GivenAnEmptyTemporaryTargetDirectory()
+    {
+        var state = State();
+        var tempRoot = Path.Combine(Path.GetTempPath(), "ftd-bdd-materialize-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempRoot);
+        state.TempRoot = tempRoot;
+    }
+
+    [Given("ich lese die Datei {string} als aktuelle Bytes")]
+    public void GivenIReadFileAsCurrentBytes(string name)
+    {
+        var path = TestResources.Resolve(name);
+        Assert.True(File.Exists(path), $"Test resource missing: {path}");
+        State().CurrentPayload = File.ReadAllBytes(path);
     }
 
     [Given("die maximale Dateigroesse ist {long} Bytes")]
@@ -62,6 +83,46 @@ public sealed class FileTypeDetectionSteps
 
         var detector = new FileTypeDetector();
         state.LastResult = detector.Detect(state.CurrentPath!);
+    }
+
+    [When("ich extrahiere die ZIP-Datei sicher in Memory")]
+    public void WhenIExtractZipFileSafelyToMemory()
+    {
+        var state = State();
+        Assert.False(string.IsNullOrWhiteSpace(state.CurrentPath));
+        var entries = ZipProcessing.ExtractToMemory(state.CurrentPath!, verifyBeforeExtract: true);
+        state.LastExtractedEntries = entries;
+    }
+
+    [When("ich übernehme den ersten extrahierten Eintrag als aktuelle Bytes")]
+    public void WhenIUseFirstExtractedEntryAsCurrentBytes()
+    {
+        var state = State();
+        Assert.NotNull(state.LastExtractedEntries);
+        Assert.NotEmpty(state.LastExtractedEntries!);
+        state.CurrentPayload = state.LastExtractedEntries![0].Content.ToArray();
+    }
+
+    [When("ich speichere die aktuellen Bytes als {string}")]
+    public void WhenIPersistCurrentBytesAs(string fileName)
+    {
+        var state = State();
+        Assert.NotNull(state.CurrentPayload);
+        Assert.False(string.IsNullOrWhiteSpace(state.TempRoot));
+
+        var destination = Path.Combine(state.TempRoot!, fileName);
+        var ok = FileMaterializer.Persist(state.CurrentPayload!, destination, overwrite: false, secureExtract: false);
+        Assert.True(ok);
+        state.LastMaterializedPath = destination;
+    }
+
+    [When("ich lade die zuletzt gespeicherten Bytes als aktuelle Bytes")]
+    public void WhenILoadLastMaterializedBytesAsCurrentBytes()
+    {
+        var state = State();
+        Assert.False(string.IsNullOrWhiteSpace(state.LastMaterializedPath));
+        Assert.True(File.Exists(state.LastMaterializedPath), $"File missing: {state.LastMaterializedPath}");
+        state.CurrentPayload = File.ReadAllBytes(state.LastMaterializedPath!);
     }
 
     [When("ich den Dateityp mit Endungspruefung ermittle")]
@@ -115,6 +176,35 @@ public sealed class FileTypeDetectionSteps
         const string expectedBackend = "HeyRedMime";
 #endif
         Assert.Equal(expectedBackend, MimeProviderDiagnostics.ActiveBackendName);
+    }
+
+    [Then("ist der extrahierte Eintragssatz nicht leer")]
+    public void ThenExtractedEntrySetIsNotEmpty()
+    {
+        var state = State();
+        Assert.NotNull(state.LastExtractedEntries);
+        Assert.NotEmpty(state.LastExtractedEntries!);
+    }
+
+    [Then("existiert die gespeicherte Datei {string}")]
+    public void ThenMaterializedFileExists(string fileName)
+    {
+        var state = State();
+        Assert.False(string.IsNullOrWhiteSpace(state.TempRoot));
+        var path = Path.Combine(state.TempRoot!, fileName);
+        Assert.True(File.Exists(path), $"File missing: {path}");
+    }
+
+    [Then("entspricht die gespeicherte Datei {string} den aktuellen Bytes")]
+    public void ThenMaterializedFileEqualsCurrentBytes(string fileName)
+    {
+        var state = State();
+        Assert.NotNull(state.CurrentPayload);
+        Assert.False(string.IsNullOrWhiteSpace(state.TempRoot));
+
+        var path = Path.Combine(state.TempRoot!, fileName);
+        Assert.True(File.Exists(path), $"File missing: {path}");
+        Assert.Equal(state.CurrentPayload!, File.ReadAllBytes(path));
     }
 
     private DetectionScenarioState State() => _scenarioContext.Get<DetectionScenarioState>(StateKey);

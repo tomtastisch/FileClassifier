@@ -30,17 +30,6 @@ Namespace FileTypeDetection
         End Function
 
         ''' <summary>
-        ''' Disk-Extraktion ist in dieser Fassade absichtlich deaktiviert.
-        ''' Schreiben darf nur ueber FileMaterializer erfolgen.
-        ''' </summary>
-        <Obsolete("ZipProcessing does not write to disk. Use FileMaterializer.Persist(bytes, destinationPath, overwrite, secureExtract:=True).")>
-        Public Shared Function ExtractToDirectory(path As String, destinationDirectory As String, verifyBeforeExtract As Boolean) As Boolean
-            Dim opt = FileTypeOptions.GetSnapshot()
-            LogGuard.Warn(opt.Logger, "[ZipProcessing] Disk-Extraktion ist deaktiviert. Verwende FileMaterializer.")
-            Return False
-        End Function
-
-        ''' <summary>
         ''' Extrahiert eine ZIP-Datei sicher in Memory.
         ''' </summary>
         Public Shared Function ExtractToMemory(path As String, verifyBeforeExtract As Boolean) As IReadOnlyList(Of ZipExtractedEntry)
