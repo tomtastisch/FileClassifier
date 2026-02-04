@@ -234,7 +234,7 @@ Namespace FileTypeDetection
 
             Try
                 Using source = entry.Open()
-                    Using target As New FileStream(targetPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 81920, FileOptions.SequentialScan)
+                    Using target As New FileStream(targetPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
                         StreamBounds.CopyBounded(source, target, opt.MaxZipEntryUncompressedBytes)
                     End Using
                 End Using

@@ -65,7 +65,7 @@ Namespace FileTypeDetection
                 If String.IsNullOrWhiteSpace(parent) Then Return False
                 Directory.CreateDirectory(parent)
 
-                Using fs As New FileStream(destinationFull, FileMode.CreateNew, FileAccess.Write, FileShare.None, 81920, FileOptions.SequentialScan)
+                Using fs As New FileStream(destinationFull, FileMode.CreateNew, FileAccess.Write, FileShare.None, InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
                     fs.Write(data, 0, data.Length)
                 End Using
 
