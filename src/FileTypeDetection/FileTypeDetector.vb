@@ -19,6 +19,18 @@ Namespace FileTypeDetection
     ''' </remarks>
     ''' </summary>
     Public NotInheritable Class FileTypeDetector
+        Private Const ReasonUnknown As String = "Unknown"
+        Private Const ReasonFileNotFound As String = "FileNotFound"
+        Private Const ReasonInvalidLength As String = "InvalidLength"
+        Private Const ReasonFileTooLarge As String = "FileTooLarge"
+        Private Const ReasonException As String = "Exception"
+        Private Const ReasonExtensionMismatch As String = "ExtensionMismatch"
+        Private Const ReasonHeaderUnknown As String = "HeaderUnknown"
+        Private Const ReasonHeaderMatch As String = "HeaderMatch"
+        Private Const ReasonZipGateFailed As String = "ZipGateFailed"
+        Private Const ReasonZipStructuredRefined As String = "ZipStructuredRefined"
+        Private Const ReasonZipRefined As String = "ZipRefined"
+        Private Const ReasonZipGeneric As String = "ZipGeneric"
 
         ''' <summary>
         ''' Setzt globale Default-Optionen als Snapshot.
@@ -137,8 +149,8 @@ Namespace FileTypeDetection
             If verifyExtension Then
                 extensionOk = ExtensionMatchesKind(path, detected.Kind)
                 If Not extensionOk Then
-                    detected = FileTypeRegistry.Resolve(FileKind.Unknown)
-                    trace.ReasonCode = "ExtensionMismatch"
+                    detected = UnknownType()
+                    trace.ReasonCode = ReasonExtensionMismatch
                 End If
             End If
 
@@ -188,20 +200,20 @@ Namespace FileTypeDetection
         Private Function DetectPathCoreWithTrace(path As String, opt As FileTypeDetectorOptions, ByRef trace As DetectionTrace) As FileType
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(opt.Logger, "[Detect] Datei nicht gefunden.")
-                trace.ReasonCode = "FileNotFound"
-                Return FileTypeRegistry.Resolve(FileKind.Unknown)
+                trace.ReasonCode = ReasonFileNotFound
+                Return UnknownType()
             End If
 
             Try
                 Dim fi As New FileInfo(path)
                 If fi.Length < 0 Then
-                    trace.ReasonCode = "InvalidLength"
-                    Return FileTypeRegistry.Resolve(FileKind.Unknown)
+                    trace.ReasonCode = ReasonInvalidLength
+                    Return UnknownType()
                 End If
                 If fi.Length > opt.MaxBytes Then
                     LogGuard.Warn(opt.Logger, $"[Detect] Datei zu gross ({fi.Length} > {opt.MaxBytes}).")
-                    trace.ReasonCode = "FileTooLarge"
-                    Return FileTypeRegistry.Resolve(FileKind.Unknown)
+                    trace.ReasonCode = ReasonFileTooLarge
+                    Return UnknownType()
                 End If
 
                 Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, FileOptions.SequentialScan)
@@ -220,8 +232,8 @@ Namespace FileTypeDetection
                 End Using
             Catch ex As Exception
                 LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
-                trace.ReasonCode = "Exception"
-                Return FileTypeRegistry.Resolve(FileKind.Unknown)
+                trace.ReasonCode = ReasonException
+                Return UnknownType()
             End Try
         End Function
 
@@ -291,10 +303,10 @@ Namespace FileTypeDetection
         End Function
 
         Private Function DetectInternalBytes(data As Byte(), opt As FileTypeDetectorOptions) As FileType
-            If data Is Nothing OrElse data.Length = 0 Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
+            If data Is Nothing OrElse data.Length = 0 Then Return UnknownType()
             If CLng(data.Length) > opt.MaxBytes Then
                 LogGuard.Warn(opt.Logger, $"[Detect] Daten zu gross ({data.Length} > {opt.MaxBytes}).")
-                Return FileTypeRegistry.Resolve(FileKind.Unknown)
+                Return UnknownType()
             End If
 
             Try
@@ -309,12 +321,12 @@ Namespace FileTypeDetection
                     Function()
                         Return OpenXmlRefiner.TryRefine(
                             Function()
-                                Return CType(New MemoryStream(data, 0, data.Length, writable:=False, publiclyVisible:=False), Stream)
+                                Return CType(CreateReadOnlyMemoryStream(data), Stream)
                             End Function)
                     End Function)
             Catch ex As Exception
                 LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
-                Return FileTypeRegistry.Resolve(FileKind.Unknown)
+                Return UnknownType()
             End Try
         End Function
 
@@ -329,13 +341,13 @@ Namespace FileTypeDetection
             tryRefine As Func(Of FileType)
         ) As FileType
             If header Is Nothing OrElse header.Length = 0 Then
-                trace.ReasonCode = "HeaderUnknown"
-                Return FileTypeRegistry.Resolve(FileKind.Unknown)
+                trace.ReasonCode = ReasonHeaderUnknown
+                Return UnknownType()
             End If
 
             Dim magicKind = FileTypeRegistry.DetectByMagic(header)
             If magicKind <> FileKind.Unknown AndAlso magicKind <> FileKind.Zip Then
-                trace.ReasonCode = "HeaderMatch"
+                trace.ReasonCode = ReasonHeaderMatch
                 Return FileTypeRegistry.Resolve(magicKind)
             End If
 
@@ -345,11 +357,11 @@ Namespace FileTypeDetection
                 trace.UsedZipContentCheck = True
                 If zipSafetyCheck Is Nothing OrElse Not zipSafetyCheck() Then
                     LogGuard.Warn(opt.Logger, "[Detect] ZIP-Gate verletzt.")
-                    trace.ReasonCode = "ZipGateFailed"
-                    Return FileTypeRegistry.Resolve(FileKind.Unknown)
+                    trace.ReasonCode = ReasonZipGateFailed
+                    Return UnknownType()
                 End If
 
-                Dim refined = FileTypeRegistry.Resolve(FileKind.Unknown)
+                Dim refined = UnknownType()
                 If tryRefine IsNot Nothing Then
                     refined = tryRefine()
                 End If
@@ -357,16 +369,16 @@ Namespace FileTypeDetection
                 If refined.Kind <> FileKind.Unknown Then
                     WarnIfNoDirectContentDetection(refined.Kind, opt)
                     trace.UsedStructuredRefinement = (refined.Kind = FileKind.Docx OrElse refined.Kind = FileKind.Xlsx OrElse refined.Kind = FileKind.Pptx)
-                    trace.ReasonCode = If(trace.UsedStructuredRefinement, "ZipStructuredRefined", "ZipRefined")
+                    trace.ReasonCode = If(trace.UsedStructuredRefinement, ReasonZipStructuredRefined, ReasonZipRefined)
                     Return refined
                 End If
 
-                trace.ReasonCode = "ZipGeneric"
+                trace.ReasonCode = ReasonZipGeneric
                 Return FileTypeRegistry.Resolve(FileKind.Zip)
             End If
 
-            trace.ReasonCode = "HeaderUnknown"
-            Return FileTypeRegistry.Resolve(FileKind.Unknown)
+            trace.ReasonCode = ReasonHeaderUnknown
+            Return UnknownType()
         End Function
 
         Private Function CanExtractZipPath(path As String, verifyBeforeExtract As Boolean, opt As FileTypeDetectorOptions) As Boolean
@@ -389,7 +401,7 @@ Namespace FileTypeDetection
         Private Shared Function ApplyExtensionPolicy(path As String, detected As FileType, verifyExtension As Boolean) As FileType
             If Not verifyExtension Then Return detected
             If ExtensionMatchesKind(path, detected.Kind) Then Return detected
-            Return FileTypeRegistry.Resolve(FileKind.Unknown)
+            Return UnknownType()
         End Function
 
         Private Shared Function IsZipContainerKind(kind As FileKind) As Boolean
@@ -467,6 +479,14 @@ Namespace FileTypeDetection
             End Try
         End Function
 
+        Private Shared Function UnknownType() As FileType
+            Return FileTypeRegistry.Resolve(FileKind.Unknown)
+        End Function
+
+        Private Shared Function CreateReadOnlyMemoryStream(data As Byte()) As MemoryStream
+            Return New MemoryStream(data, 0, data.Length, writable:=False, publiclyVisible:=False)
+        End Function
+
         Private Structure DetectionTrace
             Friend ReasonCode As String
             Friend UsedZipContentCheck As Boolean
@@ -474,7 +494,7 @@ Namespace FileTypeDetection
 
             Friend Shared ReadOnly Property Empty As DetectionTrace
                 Get
-                    Return New DetectionTrace With {.ReasonCode = "Unknown"}
+                    Return New DetectionTrace With {.ReasonCode = ReasonUnknown}
                 End Get
             End Property
         End Structure
