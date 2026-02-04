@@ -69,4 +69,27 @@ public sealed class FileTypeOptionsFacadeUnitTests
             FileTypeOptions.SetSnapshot(original);
         }
     }
+
+    [Fact]
+    public void LoadOptions_Applies_HeaderOnlyNonZip_Boolean()
+    {
+        var original = FileTypeOptions.GetSnapshot();
+        try
+        {
+            var ok = FileTypeOptions.LoadOptions("{\"headerOnlyNonZip\":false,\"maxBytes\":2048}");
+            var snapshot = FileTypeOptions.GetSnapshot();
+
+            Assert.True(ok);
+            Assert.False(snapshot.HeaderOnlyNonZip);
+            Assert.Equal(2048, snapshot.MaxBytes);
+
+            var json = FileTypeOptions.GetOptions();
+            using var doc = JsonDocument.Parse(json);
+            Assert.False(doc.RootElement.GetProperty("headerOnlyNonZip").GetBoolean());
+        }
+        finally
+        {
+            FileTypeOptions.SetSnapshot(original);
+        }
+    }
 }

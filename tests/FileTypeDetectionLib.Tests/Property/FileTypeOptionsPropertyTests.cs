@@ -23,13 +23,16 @@ public sealed class FileTypeOptionsPropertyTests
                 var maxZipRatio = rng.Next(-100, 100);
                 var maxZipDepth = rng.Next(-10, 10);
                 var maxZipNestedBytes = rng.NextInt64(-2_000_000, 2_000_000);
+                var headerOnlyNonZip = rng.Next(0, 2) == 0 ? "true" : "false";
 
                 var json = $$"""
-                             {"maxBytes":{{maxBytes}},"sniffBytes":{{sniffBytes}},"maxZipEntries":{{maxZipEntries}},"maxZipEntryUncompressedBytes":{{maxZipEntryBytes}},"maxZipTotalUncompressedBytes":{{maxZipTotalBytes}},"maxZipCompressionRatio":{{maxZipRatio}},"maxZipNestingDepth":{{maxZipDepth}},"maxZipNestedBytes":{{maxZipNestedBytes}}}
+                             {"headerOnlyNonZip":{{headerOnlyNonZip}},"maxBytes":{{maxBytes}},"sniffBytes":{{sniffBytes}},"maxZipEntries":{{maxZipEntries}},"maxZipEntryUncompressedBytes":{{maxZipEntryBytes}},"maxZipTotalUncompressedBytes":{{maxZipTotalBytes}},"maxZipCompressionRatio":{{maxZipRatio}},"maxZipNestingDepth":{{maxZipDepth}},"maxZipNestedBytes":{{maxZipNestedBytes}}}
                              """;
                 Assert.True(FileTypeOptions.LoadOptions(json));
 
                 var snapshot = FileTypeOptions.GetSnapshot();
+                var expectedHeaderOnly = string.Equals(headerOnlyNonZip, "true", StringComparison.Ordinal);
+                Assert.Equal(expectedHeaderOnly, snapshot.HeaderOnlyNonZip);
                 Assert.True(snapshot.MaxBytes > 0);
                 Assert.True(snapshot.SniffBytes > 0);
                 Assert.True(snapshot.MaxZipEntries > 0);
