@@ -131,14 +131,14 @@ Namespace FileTypeDetection
         End Function
 
         ''' <summary>
-        ''' Liefert ein detailiertes, auditierbares Detektionsergebnis.
+        ''' Liefert ein detailliertes, auditierbares Detektionsergebnis.
         ''' </summary>
         Public Function DetectDetailed(path As String) As DetectionDetail
             Return DetectDetailed(path, verifyExtension:=False)
         End Function
 
         ''' <summary>
-        ''' Liefert ein detailiertes, auditierbares Detektionsergebnis inkl. Endungs-Policy.
+        ''' Liefert ein detailliertes, auditierbares Detektionsergebnis inkl. Endungs-Policy.
         ''' </summary>
         Public Function DetectDetailed(path As String, verifyExtension As Boolean) As DetectionDetail
             Dim opt = GetDefaultOptions()
@@ -218,17 +218,7 @@ Namespace FileTypeDetection
 
                 Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
                     Dim header = ReadHeader(fs, opt.SniffBytes, opt.MaxBytes)
-                    Return ResolveByHeaderAndFallback(
-                        header,
-                        opt,
-                        trace,
-                        Function()
-                            If fs.CanSeek Then fs.Position = 0
-                            Return ZipSafetyGate.IsZipSafeStream(fs, opt, depth:=0)
-                        End Function,
-                        Function()
-                            Return OpenXmlRefiner.TryRefineStream(fs)
-                        End Function)
+                    Return ResolveByHeaderForPath(header, opt, trace, fs)
                 End Using
             Catch ex As Exception
                 LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
@@ -311,19 +301,7 @@ Namespace FileTypeDetection
 
             Try
                 Dim trace As DetectionTrace = DetectionTrace.Empty
-                Return ResolveByHeaderAndFallback(
-                    data,
-                    opt,
-                    trace,
-                    Function()
-                        Return ZipSafetyGate.IsZipSafeBytes(data, opt)
-                    End Function,
-                    Function()
-                        Return OpenXmlRefiner.TryRefine(
-                            Function()
-                                Return CType(CreateReadOnlyMemoryStream(data), Stream)
-                            End Function)
-                    End Function)
+                Return ResolveByHeaderForBytes(data, opt, trace, data)
             Catch ex As Exception
                 LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
                 Return UnknownType()
@@ -331,14 +309,13 @@ Namespace FileTypeDetection
         End Function
 
         ''' <summary>
-        ''' Gemeinsame Entscheidungslogik fuer Path- und Byte-Variante.
+        ''' Entscheidungslogik fuer die Pfad-Variante.
         ''' </summary>
-        Private Function ResolveByHeaderAndFallback(
+        Private Function ResolveByHeaderForPath(
             header As Byte(),
             opt As FileTypeDetectorOptions,
             ByRef trace As DetectionTrace,
-            zipSafetyCheck As Func(Of Boolean),
-            tryRefine As Func(Of FileType)
+            fs As FileStream
         ) As FileType
             If header Is Nothing OrElse header.Length = 0 Then
                 trace.ReasonCode = ReasonHeaderUnknown
@@ -351,34 +328,77 @@ Namespace FileTypeDetection
                 Return FileTypeRegistry.Resolve(magicKind)
             End If
 
-            Dim zipLike As Boolean = (magicKind = FileKind.Zip)
-
-            If zipLike Then
-                trace.UsedZipContentCheck = True
-                If zipSafetyCheck Is Nothing OrElse Not zipSafetyCheck() Then
-                    LogGuard.Warn(opt.Logger, "[Detect] ZIP-Gate verletzt.")
-                    trace.ReasonCode = ReasonZipGateFailed
-                    Return UnknownType()
-                End If
-
-                Dim refined = UnknownType()
-                If tryRefine IsNot Nothing Then
-                    refined = tryRefine()
-                End If
-
-                If refined.Kind <> FileKind.Unknown Then
-                    WarnIfNoDirectContentDetection(refined.Kind, opt)
-                    trace.UsedStructuredRefinement = (refined.Kind = FileKind.Docx OrElse refined.Kind = FileKind.Xlsx OrElse refined.Kind = FileKind.Pptx)
-                    trace.ReasonCode = If(trace.UsedStructuredRefinement, ReasonZipStructuredRefined, ReasonZipRefined)
-                    Return refined
-                End If
-
-                trace.ReasonCode = ReasonZipGeneric
-                Return FileTypeRegistry.Resolve(FileKind.Zip)
+            If magicKind <> FileKind.Zip Then
+                trace.ReasonCode = ReasonHeaderUnknown
+                Return UnknownType()
             End If
 
-            trace.ReasonCode = ReasonHeaderUnknown
-            Return UnknownType()
+            trace.UsedZipContentCheck = True
+            If fs Is Nothing OrElse Not fs.CanRead Then
+                trace.ReasonCode = ReasonZipGateFailed
+                Return UnknownType()
+            End If
+
+            If fs.CanSeek Then fs.Position = 0
+            If Not ZipSafetyGate.IsZipSafeStream(fs, opt, depth:=0) Then
+                LogGuard.Warn(opt.Logger, "[Detect] ZIP-Gate verletzt.")
+                trace.ReasonCode = ReasonZipGateFailed
+                Return UnknownType()
+            End If
+
+            Dim refined = OpenXmlRefiner.TryRefineStream(fs)
+            Return FinalizeZipDetection(refined, opt, trace)
+        End Function
+
+        ''' <summary>
+        ''' Entscheidungslogik fuer die Byte-Variante.
+        ''' </summary>
+        Private Function ResolveByHeaderForBytes(
+            header As Byte(),
+            opt As FileTypeDetectorOptions,
+            ByRef trace As DetectionTrace,
+            data As Byte()
+        ) As FileType
+            If header Is Nothing OrElse header.Length = 0 Then
+                trace.ReasonCode = ReasonHeaderUnknown
+                Return UnknownType()
+            End If
+
+            Dim magicKind = FileTypeRegistry.DetectByMagic(header)
+            If magicKind <> FileKind.Unknown AndAlso magicKind <> FileKind.Zip Then
+                trace.ReasonCode = ReasonHeaderMatch
+                Return FileTypeRegistry.Resolve(magicKind)
+            End If
+
+            If magicKind <> FileKind.Zip Then
+                trace.ReasonCode = ReasonHeaderUnknown
+                Return UnknownType()
+            End If
+
+            trace.UsedZipContentCheck = True
+            If Not ZipSafetyGate.IsZipSafeBytes(data, opt) Then
+                LogGuard.Warn(opt.Logger, "[Detect] ZIP-Gate verletzt.")
+                trace.ReasonCode = ReasonZipGateFailed
+                Return UnknownType()
+            End If
+
+            Dim refined As FileType
+            Using ms = CreateReadOnlyMemoryStream(data)
+                refined = OpenXmlRefiner.TryRefineStream(ms)
+            End Using
+            Return FinalizeZipDetection(refined, opt, trace)
+        End Function
+
+        Private Function FinalizeZipDetection(refined As FileType, opt As FileTypeDetectorOptions, ByRef trace As DetectionTrace) As FileType
+            If refined.Kind <> FileKind.Unknown Then
+                WarnIfNoDirectContentDetection(refined.Kind, opt)
+                trace.UsedStructuredRefinement = (refined.Kind = FileKind.Docx OrElse refined.Kind = FileKind.Xlsx OrElse refined.Kind = FileKind.Pptx)
+                trace.ReasonCode = If(trace.UsedStructuredRefinement, ReasonZipStructuredRefined, ReasonZipRefined)
+                Return refined
+            End If
+
+            trace.ReasonCode = ReasonZipGeneric
+            Return FileTypeRegistry.Resolve(FileKind.Zip)
         End Function
 
         Private Function CanExtractZipPath(path As String, verifyBeforeExtract As Boolean, opt As FileTypeDetectorOptions) As Boolean
@@ -418,7 +438,7 @@ Namespace FileTypeDetection
         End Sub
 
         Private Shared Function ExtensionMatchesKind(path As String, detectedKind As FileKind) As Boolean
-            Dim ext = System.IO.Path.GetExtension(If(path, String.Empty))
+            Dim ext = Global.System.IO.Path.GetExtension(If(path, String.Empty))
             If String.IsNullOrWhiteSpace(ext) Then Return True
 
             If detectedKind = FileKind.Unknown Then Return False
