@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\FileTypeDetectionLib\FileTypeDetectionLib.vbproj" />
+    <ProjectReference Include="..\..\src\FileTypeDetection\FileTypeDetectionLib.vbproj" />
   </ItemGroup>
 
   <ItemGroup>

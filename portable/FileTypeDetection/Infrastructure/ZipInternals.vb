@@ -2,11 +2,11 @@ Option Strict On
 Option Explicit On
 
 Imports System
+Imports System.Collections.Generic
 Imports System.IO
 Imports System.IO.Compression
 Imports System.Linq
 Imports Microsoft.IO
-Imports System.Collections.Generic
 
 Namespace FileTypeDetection
 

@@ -1,24 +1,18 @@
 # Index - Unit
 
-## 1. Purpose
-Direkte Sicherheits-/Policy-/API-Verifikation.
+## Zweck
+Direkter Nachweis von API-Korrektheit, Security-Regeln und Determinismus.
 
-## 2. Inputs
-- API-Aufrufe, kontrollierte Payloads
-
-## 3. Outputs
-- deterministische Assertions auf Methodenebene
-
-## 4. Failure Modes / Guarantees
-- Policy-Verletzungen werden sofort als Testfehler gemeldet.
-
-## 5. Verification & Evidence
-- `ExtensionCheckUnitTests.cs`
-- `DetectionDetailAndZipValidationUnitTests.cs`
-- `HeaderCoveragePolicyUnitTests.cs`
-- `HeaderDetectionWarningUnitTests.cs`
-- `HeaderOnlyPolicyUnitTests.cs`
-- `FileTypeRegistryUnitTests.cs`
-- `FileTypeSecurityBaselineUnitTests.cs`
-- `ZipAdversarialTests.cs`
-- `ZipExtractionUnitTests.cs`
+## Testabdeckung
+| Testdatei | Fokus |
+|---|---|
+| `FileTypeRegistryUnitTests.cs` | deterministisches Typ-/Alias-Mapping |
+| `HeaderCoveragePolicyUnitTests.cs` | Header-/Content-Coverage-Policy |
+| `HeaderOnlyPolicyUnitTests.cs` | Policy-Verhalten fuer Non-ZIP/ZIP |
+| `HeaderDetectionWarningUnitTests.cs` | Logging-/Warnpfade |
+| `ExtensionCheckUnitTests.cs` | Endungsregeln und fail-closed |
+| `FileTypeSecurityBaselineUnitTests.cs` | Baseline-Defaults |
+| `DetectionDetailAndZipValidationUnitTests.cs` | `DetectDetailed` + `TryValidateZip` |
+| `ZipProcessingFacadeUnitTests.cs` | statische ZIP-Fassade |
+| `ZipAdversarialTests.cs` | adversarial ZIP-Faelle |
+| `ZipExtractionUnitTests.cs` | sichere Disk-/Memory-Extraktion |

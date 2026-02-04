@@ -1,19 +1,25 @@
 # Index - tests/FileTypeDetectionLib.Tests
 
-## 1. Purpose
-Deterministische Verifikation von Sicherheit, Korrektheit und Regressionen.
+## 1. Zweck
+Nachweis fuer Sicherheit, Determinismus, Korrektheit und API-Klarheit.
 
-## 2. Inputs
-- Testressourcen (`resources/`)
-- oeffentliche API der Library
+## 2. Testkategorien
+| Kategorie | Fokus | Referenz |
+|---|---|---|
+| Unit | API- und Regelverhalten | [Unit/INDEX.md](./Unit/INDEX.md) |
+| Property | Grenz-/Invarianztests fuer ZIP-Gate | [Property/INDEX.md](./Property/INDEX.md) |
+| Features (BDD) | fachliche Lesbarkeit und Akzeptanz | [Features/INDEX.md](./Features/INDEX.md) |
+| Benchmarks | smoke-basierte Laufzeittrends | [Benchmarks/INDEX.md](./Benchmarks/INDEX.md) |
 
-## 3. Outputs
-- Teststatus, BDD-Ausgabe, Regressionsevidenz
+## 3. Nachweismatrix
+| Qualitaetsziel | Testdatei |
+|---|---|
+| Fail-closed ZIP-Grenzen | [Unit/ZipAdversarialTests.cs](./Unit/ZipAdversarialTests.cs) |
+| Sichere ZIP-Extraktion | [Unit/ZipExtractionUnitTests.cs](./Unit/ZipExtractionUnitTests.cs) |
+| Deterministische Registry | [Unit/FileTypeRegistryUnitTests.cs](./Unit/FileTypeRegistryUnitTests.cs) |
+| API Detail-/ZIP-Fassade | [Unit/DetectionDetailAndZipValidationUnitTests.cs](./Unit/DetectionDetailAndZipValidationUnitTests.cs), [Unit/ZipProcessingFacadeUnitTests.cs](./Unit/ZipProcessingFacadeUnitTests.cs) |
 
-## 4. Failure Modes / Guarantees
-- Fehlverhalten blockiert Pipeline direkt.
-- Sicherheitsregeln werden als automatisierte Assertions erzwungen.
-
-## 5. Verification & Evidence
-- `dotnet test FileClassifier.sln -v minimal`
-- `bash tools/test-bdd-readable.sh`
+## 4. Ausfuehrung
+```bash
+dotnet test FileClassifier.sln --no-build -v minimal
+```
