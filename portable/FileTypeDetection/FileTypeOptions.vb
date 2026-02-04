@@ -25,31 +25,53 @@ Namespace FileTypeDetection
         Public Shared Function LoadOptions(json As String) As Boolean
             If String.IsNullOrWhiteSpace(json) Then Return False
 
-            Dim nextOptions = FileTypeDetectorOptions.DefaultOptions()
+            Dim defaults = FileTypeDetectorOptions.DefaultOptions()
+            Dim headerOnlyNonZip = defaults.HeaderOnlyNonZip
+            Dim maxBytes = defaults.MaxBytes
+            Dim sniffBytes = defaults.SniffBytes
+            Dim maxZipEntries = defaults.MaxZipEntries
+            Dim maxZipTotalUncompressedBytes = defaults.MaxZipTotalUncompressedBytes
+            Dim maxZipEntryUncompressedBytes = defaults.MaxZipEntryUncompressedBytes
+            Dim maxZipCompressionRatio = defaults.MaxZipCompressionRatio
+            Dim maxZipNestingDepth = defaults.MaxZipNestingDepth
+            Dim maxZipNestedBytes = defaults.MaxZipNestedBytes
+            Dim logger = defaults.Logger
 
             Try
                 Using doc = JsonDocument.Parse(json, New JsonDocumentOptions With {.AllowTrailingCommas = True})
                     If doc.RootElement.ValueKind <> JsonValueKind.Object Then
-                        LogGuard.Warn(nextOptions.Logger, "[Config] Root muss ein JSON-Objekt sein.")
+                        LogGuard.Warn(logger, "[Config] Root muss ein JSON-Objekt sein.")
                         Return False
                     End If
 
                     For Each p In doc.RootElement.EnumerateObject()
                         Select Case p.Name.ToLowerInvariant()
-                            Case "maxbytes" : nextOptions.MaxBytes = ParsePositiveLong(p.Value, nextOptions.MaxBytes, p.Name, nextOptions.Logger)
-                            Case "sniffbytes" : nextOptions.SniffBytes = ParsePositiveInt(p.Value, nextOptions.SniffBytes, p.Name, nextOptions.Logger)
-                            Case "maxzipentries" : nextOptions.MaxZipEntries = ParsePositiveInt(p.Value, nextOptions.MaxZipEntries, p.Name, nextOptions.Logger)
-                            Case "maxziptotaluncompressedbytes" : nextOptions.MaxZipTotalUncompressedBytes = ParsePositiveLong(p.Value, nextOptions.MaxZipTotalUncompressedBytes, p.Name, nextOptions.Logger)
-                            Case "maxzipentryuncompressedbytes" : nextOptions.MaxZipEntryUncompressedBytes = ParsePositiveLong(p.Value, nextOptions.MaxZipEntryUncompressedBytes, p.Name, nextOptions.Logger)
-                            Case "maxzipcompressionratio" : nextOptions.MaxZipCompressionRatio = ParseNonNegativeInt(p.Value, nextOptions.MaxZipCompressionRatio, p.Name, nextOptions.Logger)
-                            Case "maxzipnestingdepth" : nextOptions.MaxZipNestingDepth = ParseNonNegativeInt(p.Value, nextOptions.MaxZipNestingDepth, p.Name, nextOptions.Logger)
-                            Case "maxzipnestedbytes" : nextOptions.MaxZipNestedBytes = ParsePositiveLong(p.Value, nextOptions.MaxZipNestedBytes, p.Name, nextOptions.Logger)
+                            Case "headeronlynonzip" : headerOnlyNonZip = ParseBoolean(p.Value, headerOnlyNonZip, p.Name, logger)
+                            Case "maxbytes" : maxBytes = ParsePositiveLong(p.Value, maxBytes, p.Name, logger)
+                            Case "sniffbytes" : sniffBytes = ParsePositiveInt(p.Value, sniffBytes, p.Name, logger)
+                            Case "maxzipentries" : maxZipEntries = ParsePositiveInt(p.Value, maxZipEntries, p.Name, logger)
+                            Case "maxziptotaluncompressedbytes" : maxZipTotalUncompressedBytes = ParsePositiveLong(p.Value, maxZipTotalUncompressedBytes, p.Name, logger)
+                            Case "maxzipentryuncompressedbytes" : maxZipEntryUncompressedBytes = ParsePositiveLong(p.Value, maxZipEntryUncompressedBytes, p.Name, logger)
+                            Case "maxzipcompressionratio" : maxZipCompressionRatio = ParseNonNegativeInt(p.Value, maxZipCompressionRatio, p.Name, logger)
+                            Case "maxzipnestingdepth" : maxZipNestingDepth = ParseNonNegativeInt(p.Value, maxZipNestingDepth, p.Name, logger)
+                            Case "maxzipnestedbytes" : maxZipNestedBytes = ParsePositiveLong(p.Value, maxZipNestedBytes, p.Name, logger)
                             Case Else
-                                LogGuard.Warn(nextOptions.Logger, $"[Config] Unbekannter Schluessel '{p.Name}' ignoriert.")
+                                LogGuard.Warn(logger, $"[Config] Unbekannter Schluessel '{p.Name}' ignoriert.")
                         End Select
                     Next
                 End Using
 
+                Dim nextOptions = New FileTypeDetectorOptions(headerOnlyNonZip) With {
+                    .MaxBytes = maxBytes,
+                    .SniffBytes = sniffBytes,
+                    .MaxZipEntries = maxZipEntries,
+                    .MaxZipTotalUncompressedBytes = maxZipTotalUncompressedBytes,
+                    .MaxZipEntryUncompressedBytes = maxZipEntryUncompressedBytes,
+                    .MaxZipCompressionRatio = maxZipCompressionRatio,
+                    .MaxZipNestingDepth = maxZipNestingDepth,
+                    .MaxZipNestedBytes = maxZipNestedBytes,
+                    .Logger = logger
+                }
                 SetSnapshot(nextOptions)
                 Return True
             Catch ex As Exception
@@ -129,6 +151,13 @@ Namespace FileTypeDetection
         Private Shared Function ParsePositiveLong(el As JsonElement, fallback As Long, name As String, logger As Microsoft.Extensions.Logging.ILogger) As Long
             Dim v = SafeLong(el, fallback)
             If v > 0 Then Return v
+            LogGuard.Warn(logger, $"[Config] Ungueltiger Wert fuer '{name}', fallback={fallback}.")
+            Return fallback
+        End Function
+
+        Private Shared Function ParseBoolean(el As JsonElement, fallback As Boolean, name As String, logger As Microsoft.Extensions.Logging.ILogger) As Boolean
+            If el.ValueKind = JsonValueKind.True Then Return True
+            If el.ValueKind = JsonValueKind.False Then Return False
             LogGuard.Warn(logger, $"[Config] Ungueltiger Wert fuer '{name}', fallback={fallback}.")
             Return fallback
         End Function

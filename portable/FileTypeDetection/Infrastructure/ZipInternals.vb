@@ -56,8 +56,7 @@ Namespace FileTypeDetection
                             If ratio > opt.MaxZipCompressionRatio Then Return False
                         End If
 
-                        Dim name = If(e.FullName, String.Empty)
-                        If name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) Then
+                        If IsNestedZipEntry(e) Then
                             If depth >= opt.MaxZipNestingDepth Then Return False
                             If u <= 0 OrElse u > opt.MaxZipNestedBytes Then Return False
 
@@ -87,6 +86,28 @@ Namespace FileTypeDetection
                 Return True
             Catch ex As Exception
                 LogGuard.Debug(opt.Logger, $"[ZipGate] Stream-Fehler: {ex.Message}")
+                Return False
+            End Try
+        End Function
+
+        Private Shared Function IsNestedZipEntry(entry As ZipArchiveEntry) As Boolean
+            If entry Is Nothing Then Return False
+
+            Try
+                Using entryStream = entry.Open()
+                    Dim header(15) As Byte
+                    Dim read = entryStream.Read(header, 0, header.Length)
+                    If read < 4 Then Return False
+
+                    If read = header.Length Then
+                        Return FileTypeRegistry.DetectByMagic(header) = FileKind.Zip
+                    End If
+
+                    Dim exact(read - 1) As Byte
+                    Buffer.BlockCopy(header, 0, exact, 0, read)
+                    Return FileTypeRegistry.DetectByMagic(exact) = FileKind.Zip
+                End Using
+            Catch
                 Return False
             End Try
         End Function
@@ -213,7 +234,7 @@ Namespace FileTypeDetection
 
             Try
                 Using source = entry.Open()
-                    Using target As New FileStream(targetPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 81920, FileOptions.SequentialScan)
+                    Using target As New FileStream(targetPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
                         StreamBounds.CopyBounded(source, target, opt.MaxZipEntryUncompressedBytes)
                     End Using
                 End Using

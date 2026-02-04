@@ -2,12 +2,16 @@
 
 ## 1. Dokumentenlenkung
 - Dokument-ID: `FTD-DIN-SPEC-DE`
-- Version: `1.0`
+- Version: `1.1`
 - Sprache: Deutsch
 - Geltungsbereich: `src/FileTypeDetection`
 
 ## 2. Zweck und Anwendungsbereich
 Diese Spezifikation beschreibt Anforderungen und Nachweise fuer die oeffentliche API des Moduls nach einem normorientierten Aufbau (Anforderungen, Architektur, Verifikation, Rueckverfolgbarkeit).
+
+Hinweis zur Notwendigkeit:
+- sinnvoll/notwendig fuer Audit-, Freigabe- oder Compliance-getriebene Umgebungen,
+- optional in reinen Entwickler-Setups ohne formale Nachweispflicht.
 
 ## 3. Begriffe und Definitionen
 - `fail-closed`: Fehlerpfad liefert nur sichere Standardwerte.
@@ -30,7 +34,7 @@ Diese Spezifikation beschreibt Anforderungen und Nachweise fuer die oeffentliche
 | Klasse | Verantwortung | Nicht-Ziel |
 |---|---|---|
 | `FileTypeDetector` | Dateitypen erkennen und Sicherheitspruefung durchfuehren | keine Persistenz |
-| `ZipProcessing` | sichere ZIP-Validierung und ZIP-Extraktion | keine allgemeine Byte-Persistenz |
+| `ZipProcessing` | sichere ZIP-Validierung und In-Memory-Extraktion | keine allgemeine Byte-Persistenz und kein Disk-Write |
 | `FileMaterializer` | Byte-Persistenz auf Datei/Verzeichnis mit optionalem ZIP-Extract | keine neue ZIP-Policy |
 | `FileTypeOptions` | zentrale globale Optionsschnittstelle (`LoadOptions`, `GetOptions`) | keine Typdetektion |
 
@@ -58,3 +62,7 @@ Diese Spezifikation ist rueckverfolgbar auf:
 - API-Referenz: `src/FileTypeDetection/docs/API_REFERENCE.md`
 - Modulindex: `src/FileTypeDetection/INDEX.md`
 - Unit-/Property-Tests: `tests/FileTypeDetectionLib.Tests`
+
+## 9. Pflegeentscheidung
+- Wenn kein formaler Audit-Nachweis benoetigt wird, reicht `API_REFERENCE.md` als zentrale Entwicklerdokumentation.
+- Wenn formale Nachweise benoetigt werden, bleibt dieses Dokument verpflichtend und referenziert die API-Referenz als technische Quelle.

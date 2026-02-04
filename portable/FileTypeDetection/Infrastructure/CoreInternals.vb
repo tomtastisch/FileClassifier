@@ -8,6 +8,15 @@ Imports Microsoft.Extensions.Logging
 
 Namespace FileTypeDetection
 
+    Friend NotInheritable Class InternalIoDefaults
+        Friend Const CopyBufferSize As Integer = 8192
+        Friend Const FileStreamBufferSize As Integer = 81920
+        Friend Const DefaultSniffBytes As Integer = 4096
+
+        Private Sub New()
+        End Sub
+    End Class
+
     ''' <summary>
     ''' Zentrale IO-Helfer fuer harte Grenzen.
     ''' SSOT-Regel: bounded copy wird nur hier gepflegt.
@@ -17,7 +26,7 @@ Namespace FileTypeDetection
         End Sub
 
         Friend Shared Sub CopyBounded(input As Stream, output As Stream, maxBytes As Long)
-            Dim buf(8191) As Byte
+            Dim buf(InternalIoDefaults.CopyBufferSize - 1) As Byte
             Dim total As Long = 0
 
             While True

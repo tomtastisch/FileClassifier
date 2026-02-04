@@ -30,13 +30,6 @@ Namespace FileTypeDetection
         End Function
 
         ''' <summary>
-        ''' Extrahiert eine ZIP-Datei sicher in ein neues Zielverzeichnis.
-        ''' </summary>
-        Public Shared Function ExtractToDirectory(path As String, destinationDirectory As String, verifyBeforeExtract As Boolean) As Boolean
-            Return New FileTypeDetector().ExtractZipSafe(path, destinationDirectory, verifyBeforeExtract)
-        End Function
-
-        ''' <summary>
         ''' Extrahiert eine ZIP-Datei sicher in Memory.
         ''' </summary>
         Public Shared Function ExtractToMemory(path As String, verifyBeforeExtract As Boolean) As IReadOnlyList(Of ZipExtractedEntry)

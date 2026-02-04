@@ -10,7 +10,7 @@ Deterministische Dateityp-Erkennung und sichere ZIP-Verarbeitung mit fail-closed
 4. [Infrastructure-Details](./Infrastructure/INDEX.md)
 
 ## 3. Strukturregel (wichtig)
-Im Modul-Root liegen **nur** oeffentliche API-Einstiegspunkte:
+Im Modul-Root liegen nur oeffentliche API-Einstiegspunkte:
 - [FileTypeDetector.vb](./FileTypeDetector.vb)
 - [ZipProcessing.vb](./ZipProcessing.vb)
 - [FileMaterializer.vb](./FileMaterializer.vb)
@@ -39,19 +39,37 @@ flowchart LR
 ## 6. Oeffentliche Funktionen (Uebersicht)
 | Klasse | Funktionale Rolle | Detailtabelle |
 |---|---|---|
-| `FileTypeDetector` | Erkennung, Policy, ZIP-Path-Operationen | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md#31-filetypedetector-instanz--shared) |
-| `ZipProcessing` | statische ZIP-Fassade (Path/Bytes) | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md#32-zipprocessing-statische-fassade) |
-| `FileMaterializer` | einheitliche Persistenz fuer Byte-Payloads (optional ZIP->Disk) | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md#33-filematerializer-statische-fassade) |
-| `FileTypeOptions` | zentrale JSON-Optionsschnittstelle (laden/lesen) | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md#34-filetypeoptions-statische-fassade) |
+| `FileTypeDetector` | Erkennung, Policy, ZIP-Path-Operationen | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md) |
+| `ZipProcessing` | statische ZIP-Fassade (Path/Bytes) | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md) |
+| `FileMaterializer` | einheitliche Persistenz fuer Byte-Payloads (optional ZIP->Disk) | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md) |
+| `FileTypeOptions` | zentrale JSON-Optionsschnittstelle (laden/lesen) | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md) |
 | `FileTypeSecurityBaseline` | konservative Security-Defaults | [Configuration/INDEX.md](./Configuration/INDEX.md) |
 
 ## 7. Qualitaetsziele (ISO/IEC 25010)
-- **Functional suitability:** korrektes Mapping Header/Container -> `FileKind`.
-- **Reliability:** fail-closed bei Fehlerpfaden und Grenzverletzungen.
-- **Security:** ZIP-Traversal/Bomb-Schutz, kein Endungsvertrauen.
-- **Maintainability:** Root-API klein, interne Verantwortungen getrennt.
+- Functional suitability: korrektes Mapping Header/Container -> `FileKind`.
+- Reliability: fail-closed bei Fehlerpfaden und Grenzverletzungen.
+- Security: ZIP-Traversal/Bomb-Schutz, kein Endungsvertrauen.
+- Maintainability: Root-API klein, interne Verantwortungen getrennt.
 
-## 8. Nachweise
+## 8. Pflichtdiagramme fuer Entwickler
+```mermaid
+flowchart TD
+    A[Architekturueberblick] --> B[Sicherheitsfluss ZIP-Gate]
+    B --> C[Kritischer Sequenzpfad: Validate/Extract]
+```
+
+## 9. NuGet-/Framework-Abhaengigkeiten (Uebersicht)
+```mermaid
+flowchart LR
+    API[Public APIs] --> CORE[Infrastructure]
+    CORE --> ZIP[System.IO.Compression]
+    CORE --> MIME[Mime]
+    CORE --> RMS[Microsoft.IO.RecyclableMemoryStream]
+    API --> SHARP[SharpCompress]
+    API --> LOG[Microsoft.AspNetCore.App -> Logging]
+```
+
+## 10. Nachweise
 - Build: `dotnet build FileClassifier.sln --no-restore -v minimal`
 - Test: `dotnet test FileClassifier.sln --no-build -v minimal`
 - Portable Check: `bash tools/check-portable-filetypedetection.sh --clean`

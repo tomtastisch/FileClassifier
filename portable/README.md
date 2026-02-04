@@ -1,7 +1,7 @@
-# Source-Artefakte - FileClassifier
+# Portable-Artefakte - FileClassifier
 
 ## Zweck
-Einstiegspunkt fuer die Source-Variante des Moduls.
+Einstiegspunkt fuer die portable Variante des Moduls.
 
 ## Inhalt
 - [FileTypeDetection/INDEX.md](./FileTypeDetection/INDEX.md)

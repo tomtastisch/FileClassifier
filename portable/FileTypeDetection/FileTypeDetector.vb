@@ -94,7 +94,7 @@ Namespace FileTypeDetection
                     Return Array.Empty(Of Byte)()
                 End If
 
-                Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, FileOptions.SequentialScan)
+                Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
                     Using ms As New MemoryStream(CInt(Math.Min(fi.Length, Integer.MaxValue)))
                         StreamBounds.CopyBounded(fs, ms, opt.MaxBytes)
                         Return ms.ToArray()
@@ -180,7 +180,7 @@ Namespace FileTypeDetection
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then Return False
 
             Try
-                Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, FileOptions.SequentialScan)
+                Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
                     Dim header = ReadHeader(fs, opt.SniffBytes, opt.MaxBytes)
                     If FileTypeRegistry.DetectByMagic(header) <> FileKind.Zip Then Return False
                     If fs.CanSeek Then fs.Position = 0
@@ -216,7 +216,7 @@ Namespace FileTypeDetection
                     Return UnknownType()
                 End If
 
-                Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, FileOptions.SequentialScan)
+                Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
                     Dim header = ReadHeader(fs, opt.SniffBytes, opt.MaxBytes)
                     Return ResolveByHeaderAndFallback(
                         header,
@@ -270,9 +270,9 @@ Namespace FileTypeDetection
             If Not CanExtractZipPath(path, verifyBeforeExtract, opt) Then Return False
 
             Try
-                Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, FileOptions.SequentialScan)
-                    Return ZipExtractor.TryExtractZipStream(fs, destinationDirectory, opt)
-                End Using
+                Dim payload = ReadFileSafe(path)
+                If payload.Length = 0 Then Return False
+                Return FileMaterializer.Persist(payload, destinationDirectory, overwrite:=False, secureExtract:=True)
             Catch ex As Exception
                 LogGuard.Error(opt.Logger, "[ZipExtract] Ausnahme, fail-closed.", ex)
                 Return False
@@ -293,7 +293,7 @@ Namespace FileTypeDetection
             If Not CanExtractZipPath(path, verifyBeforeExtract, opt) Then Return emptyResult
 
             Try
-                Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, FileOptions.SequentialScan)
+                Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
                     Return ZipExtractor.TryExtractZipStreamToMemory(fs, opt)
                 End Using
             Catch ex As Exception
@@ -451,7 +451,7 @@ Namespace FileTypeDetection
                 End If
 
                 Dim want As Integer = sniffBytes
-                If want <= 0 Then want = 4096
+                If want <= 0 Then want = InternalIoDefaults.DefaultSniffBytes
                 Dim take As Integer = want
                 If input.CanSeek Then
                     take = CInt(Math.Min(input.Length, want))

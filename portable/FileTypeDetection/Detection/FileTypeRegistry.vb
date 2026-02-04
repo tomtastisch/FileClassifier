@@ -3,6 +3,7 @@ Option Explicit On
 
 Imports System.Collections.Generic
 Imports System.Collections.Immutable
+Imports System.Linq
 
 Namespace FileTypeDetection
 
@@ -94,7 +95,9 @@ Namespace FileTypeDetection
                 Next
             End If
 
-            Return aliases.ToArray()
+            Dim orderedAliases = aliases.ToList()
+            orderedAliases.Sort(StringComparer.Ordinal)
+            Return orderedAliases.ToArray()
         End Function
 
         Private Shared Function GetMagicPatterns(kind As FileKind) As ImmutableArray(Of MagicPattern)
