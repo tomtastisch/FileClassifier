@@ -4,10 +4,9 @@
 Deterministische Dateityp-Erkennung und sichere ZIP-Verarbeitung mit fail-closed Verhalten.
 
 ## 2. Schnellstart fuer Leser
-1. [API-Referenz](./API_REFERENCE.md)
-2. [Ablauf- und UML-Diagramme](./README.md#ablauf--prozess--und-uml-dokumentation)
-3. [Detection-Details](./Detection/INDEX.md)
-4. [Infrastructure-Details](./Infrastructure/INDEX.md)
+1. [API-Referenz](./docs/API_REFERENCE.md)
+2. [Detection-Details](./Detection/INDEX.md)
+3. [Infrastructure-Details](./Infrastructure/INDEX.md)
 
 ## 3. Strukturregel (wichtig)
 Im Modul-Root liegen **nur** oeffentliche API-Einstiegspunkte:
@@ -37,8 +36,8 @@ flowchart LR
 ## 6. Oeffentliche Funktionen (Uebersicht)
 | Klasse | Funktionale Rolle | Detailtabelle |
 |---|---|---|
-| `FileTypeDetector` | Erkennung, Policy, ZIP-Path-Operationen | [API_REFERENCE.md](./API_REFERENCE.md#31-filetypedetector-instanz--shared) |
-| `ZipProcessing` | statische ZIP-Fassade (Path/Bytes) | [API_REFERENCE.md](./API_REFERENCE.md#32-zipprocessing-statische-fassade) |
+| `FileTypeDetector` | Erkennung, Policy, ZIP-Path-Operationen | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md#31-filetypedetector-instanz--shared) |
+| `ZipProcessing` | statische ZIP-Fassade (Path/Bytes) | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md#32-zipprocessing-statische-fassade) |
 | `FileTypeSecurityBaseline` | konservative Security-Defaults | [Configuration/INDEX.md](./Configuration/INDEX.md) |
 
 ## 7. Qualitaetsziele (ISO/IEC 25010)

@@ -29,6 +29,9 @@ while IFS=$'\t' read -r rel _hash; do
   cp "${SRC_DIR}/${rel}" "${OUT_DIR}/${rel}"
 done < "${TMP_SRC_MANIFEST}"
 
+# Keep top-level portable README as a strict mirror of repository README.
+cp "${ROOT_DIR}/README.md" "${ROOT_DIR}/portable/README.md"
+
 cd "${OUT_DIR}"
 while IFS= read -r -d '' rel; do
   hash="$(shasum -a 256 "${rel}" | awk '{print $1}')"

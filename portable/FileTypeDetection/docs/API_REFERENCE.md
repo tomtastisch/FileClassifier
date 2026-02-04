@@ -51,7 +51,7 @@ Diese Referenz beschreibt die **vollstaendige oeffentliche API** sowie den empfo
 | Interner Pfad | Datei | Bedeutung |
 |---|---|---|
 | Header/Typ-SSOT | `Detection/FileTypeRegistry.vb` | Aliase, Canonical Extensions, Magic-Patterns |
-| ZIP-Gate/Bounds/Refiner | `Infrastructure/Internals.vb` | sicherheitskritische Guards |
+| ZIP-Gate/Bounds/Refiner | `Infrastructure/CoreInternals.vb` | sicherheitskritische Guards |
 | ZIP-Engine/Extractor | `Infrastructure/ZipInternals.vb` | deterministische ZIP-Iteration + Extraktion |
 
 ## 5. Verwendungsbeispiele (C#)
