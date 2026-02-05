@@ -19,5 +19,6 @@ Direkter Nachweis von API-Korrektheit, Security-Regeln und Determinismus.
 | `FileTypeOptionsFacadeUnitTests.cs` | zentrale JSON-Optionsschnittstelle |
 | `ArchiveAdversarialTests.cs` | adversarial Archiv-Faelle |
 | `ArchiveExtractionUnitTests.cs` | sichere Disk-/Memory-Extraktion |
+| `CoreAndArchiveInternalsFailClosedUnitTests.cs` | gezielte Fail-closed/Guard-Branches in `CoreInternals` und `ArchiveInternals` |
 | `DeterministicHashingUnitTests.cs` | deterministische Physical/Logical Hash-Evidence inkl. fail-closed Pfade |
 | `DeterministicHashingApiContractUnitTests.cs` | eingefrorener Public API-Contract von `DeterministicHashing` |

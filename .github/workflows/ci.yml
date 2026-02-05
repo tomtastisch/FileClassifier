@@ -39,7 +39,7 @@ jobs:
           /p:CollectCoverage=true
           /p:Include="[FileTypeDetectionLib]*"
           /p:CoverletOutputFormat=cobertura
-          /p:Threshold=75%2c60
+          /p:Threshold=85%2c69
           /p:ThresholdType=line%2cbranch
           /p:ThresholdStat=total
 
