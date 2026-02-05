@@ -42,7 +42,7 @@ Alle Low-Level-Implementierungen liegen in Unterordnern.
 ## 4. Ordner und Verantwortungen
 | Pfad | Verantwortung | Typische Leser |
 |---|---|---|
-| [Abstractions/](./Abstractions/README.md) | Immutable Rueckgabemodelle | API-Consumer |
+| [Abstractions/](./Abstractions/README.md) | Immutable Rueckgabemodelle (Detection/Archive/Hashing) | API-Consumer |
 | [Configuration/](./Configuration/README.md) | Optionen, Security-Baseline | Ops, Security, Entwickler |
 | [Detection/](./Detection/README.md) | SSOT fuer Typen, Aliase, Header-Magic | Maintainer Detection |
 | [Infrastructure/](./Infrastructure/README.md) | Archiv-Gate, Refiner, Extractor, Bounds | Maintainer Security/IO |

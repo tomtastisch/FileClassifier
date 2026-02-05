@@ -12,6 +12,13 @@ Dieses Dokument sammelt die statischen Referenzen zur API: interne Dateipfade, e
 | `ZipExtractedEntry` | `RelativePath`, `Content`, `Size`, `OpenReadOnlyStream()` | sicherer In-Memory-Extrakteintrag |
 | `FileTypeProjectOptions` | `HeaderOnlyNonZip`, `MaxBytes`, `SniffBytes`, `MaxZipEntries`, `MaxZipTotalUncompressedBytes`, `MaxZipEntryUncompressedBytes`, `MaxZipCompressionRatio`, `MaxZipNestingDepth`, `MaxZipNestedBytes`, `RejectArchiveLinks`, `AllowUnknownArchiveEntrySize`, `DeterministicHash`, `Logger` | globales Optionsmodell |
 
+## 2.1 Modellpfade im Repository (abstractions split)
+| Bereich | Datei(en) |
+|---|---|
+| Detection | `src/FileTypeDetection/Abstractions/Detection/FileKind.vb`, `src/FileTypeDetection/Abstractions/Detection/FileType.vb`, `src/FileTypeDetection/Abstractions/Detection/DetectionDetail.vb` |
+| Archive | `src/FileTypeDetection/Abstractions/Archive/ZipExtractedEntry.vb` |
+| Hashing | `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashSourceType.vb`, `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashDigestSet.vb`, `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashEvidence.vb`, `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashRoundTripReport.vb`, `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashOptions.vb` |
+
 ## 3. ReasonCode-Referenz (DetectDetailed)
 Quelle: `FileTypeDetector.vb`.
 

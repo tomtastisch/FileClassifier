@@ -3,6 +3,11 @@
 ## 1. Zweck
 Immutable Rueckgabemodelle fuer stabile API-Vertraege.
 
+## 1.1 Ordnerstruktur (kanonisch)
+- `Detection/` -> Detektions-Rueckgabemodelle (`FileKind`, `FileType`, `DetectionDetail`)
+- `Archive/` -> Archiv-Eintragsmodell (`ZipExtractedEntry`, Typname historisch)
+- `Hashing/` -> deterministische Hash-Evidence-Modelle (`DeterministicHash*`)
+
 ## 2. Dateien und Rollen
 | Datei | Rolle | Typische Verwendung |
 |---|---|---|
