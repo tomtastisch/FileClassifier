@@ -64,7 +64,7 @@ flowchart LR
 | `ArchiveProcessing` | statische Archiv-Fassade (Path/Bytes) | [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) |
 | `FileMaterializer` | einheitliche Persistenz fuer Byte-Payloads (optional Archiv->Disk) | [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) |
 | `FileTypeOptions` | zentrale JSON-Optionsschnittstelle (laden/lesen) | [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) |
-| `FileTypeSecurityBaseline` | konservative Security-Defaults | [Configuration/README.md](./Configuration/README.md) |
+| `FileTypeProjectBaseline` | konservative Security-Defaults | [Configuration/README.md](./Configuration/README.md) |
 | `DeterministicHashing` | deterministische Physical/Logical Hash-Nachweise und h1-h4 RoundTrip-Report | [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) |
 
 ## 7. Qualitaetsziele (ISO/IEC 25010)

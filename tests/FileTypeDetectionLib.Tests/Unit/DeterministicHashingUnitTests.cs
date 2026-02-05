@@ -109,6 +109,28 @@ public sealed class DeterministicHashingUnitTests
     }
 
     [Fact]
+    public void HashBytes_UsesGlobalDeterministicHashOptions_WhenNoOptionsProvided()
+    {
+        using var scope = new DetectorOptionsScope();
+        var global = FileTypeDetector.GetDefaultOptions();
+        global.DeterministicHash = new DeterministicHashOptions
+        {
+            IncludeFastHash = false,
+            IncludePayloadCopies = false,
+            MaterializedFileName = "../global-evidence.bin"
+        };
+        scope.Set(global);
+
+        var payload = File.ReadAllBytes(TestResources.Resolve("sample.pdf"));
+        var evidence = DeterministicHashing.HashBytes(payload, "sample.pdf");
+        var overrideEvidence = DeterministicHashing.HashBytes(payload, "sample.pdf", new DeterministicHashOptions { IncludeFastHash = true });
+
+        Assert.True(string.IsNullOrWhiteSpace(evidence.Digests.FastPhysicalXxHash3));
+        Assert.True(string.IsNullOrWhiteSpace(evidence.Digests.FastLogicalXxHash3));
+        Assert.False(string.IsNullOrWhiteSpace(overrideEvidence.Digests.FastPhysicalXxHash3));
+    }
+
+    [Fact]
     public void HashBytes_FallsBackToRawMode_WhenArchivePayloadIsUnsafe()
     {
         var payload = ArchiveEntryPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8);

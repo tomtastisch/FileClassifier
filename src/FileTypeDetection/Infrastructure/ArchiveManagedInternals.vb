@@ -19,13 +19,13 @@ Namespace FileTypeDetection
         Private Sub New()
         End Sub
 
-        Friend Shared Function ValidateArchiveStream(stream As Stream, opt As FileTypeDetectorOptions, depth As Integer) As Boolean
+        Friend Shared Function ValidateArchiveStream(stream As Stream, opt As FileTypeProjectOptions, depth As Integer) As Boolean
             Return ProcessArchiveStream(stream, opt, depth, Nothing)
         End Function
 
         Friend Shared Function ProcessArchiveStream(
             stream As Stream,
-            opt As FileTypeDetectorOptions,
+            opt As FileTypeProjectOptions,
             depth As Integer,
             extractEntry As Func(Of ZipArchiveEntry, Boolean)
         ) As Boolean
@@ -123,7 +123,7 @@ Namespace FileTypeDetection
 
         Public Function Process(
             stream As Stream,
-            opt As FileTypeDetectorOptions,
+            opt As FileTypeProjectOptions,
             depth As Integer,
             containerType As ArchiveContainerType,
             extractEntry As Func(Of IArchiveEntryModel, Boolean)

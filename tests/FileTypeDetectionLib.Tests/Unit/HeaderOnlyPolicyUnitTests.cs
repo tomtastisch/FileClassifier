@@ -17,7 +17,7 @@ public sealed class HeaderOnlyPolicyUnitTests
     public void Detect_StillRefines_ArchiveContainers_WhenHeaderOnlyNonZipIsTrue()
     {
         using var scope = new DetectorOptionsScope();
-        scope.Set(new FileTypeDetectorOptions());
+        scope.Set(new FileTypeProjectOptions());
 
         var source = TestResources.Resolve("sample.docx");
         var detected = new FileTypeDetector().Detect(source);
@@ -29,7 +29,7 @@ public sealed class HeaderOnlyPolicyUnitTests
     public void Detect_ReturnsArchive_ForPlainArchiveWithoutOoxmlMarkers_WhenHeaderOnlyNonZipIsTrue()
     {
         using var scope = new DetectorOptionsScope();
-        scope.Set(new FileTypeDetectorOptions());
+        scope.Set(new FileTypeProjectOptions());
 
         var source = TestResources.Resolve("sample.zip");
         var detected = new FileTypeDetector().Detect(source);

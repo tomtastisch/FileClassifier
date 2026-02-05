@@ -11,6 +11,7 @@ Es dient als Freigabebasis vor Merge und als Guard gegen unabsichtliche API-Drif
   - `PhysicalSha256` = Rohbytes
   - `LogicalSha256` = kanonisierter Inhalt
 - `Fast*XxHash3` ist optional und nicht-kryptografisch.
+- Overloads ohne `options` verwenden `FileTypeOptions.GetSnapshot().DeterministicHash` als globale Default-Policy.
 
 ## 3. Public Surface (freigegeben)
 | Methode | Rueckgabe | Vertrag |

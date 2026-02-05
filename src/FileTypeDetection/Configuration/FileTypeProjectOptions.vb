@@ -12,7 +12,7 @@ Namespace FileTypeDetection
     ''' - Grenzen sind konservativ, um Memory-/CPU-DoS (z. B. Zip-Bomb) zu reduzieren.
     ''' - Logger darf Beobachtbarkeit liefern, aber niemals das Ergebnis beeinflussen.
     ''' </summary>
-    Public NotInheritable Class FileTypeDetectorOptions
+    Public NotInheritable Class FileTypeProjectOptions
         Private Const MinPositiveLong As Long = 1
         Private Const MinPositiveInt As Integer = 1
         Private Const MinNonNegativeInt As Integer = 0
@@ -74,6 +74,11 @@ Namespace FileTypeDetection
         ''' <summary>Optionaler Logger fuer Diagnosezwecke.</summary>
         Public Property Logger As ILogger = Nothing
 
+        ''' <summary>
+        ''' Optionen fuer deterministische Hash-/Evidence-Funktionen.
+        ''' </summary>
+        Public Property DeterministicHash As DeterministicHashOptions = New DeterministicHashOptions()
+
         Public Sub New()
             Me.New(True)
         End Sub
@@ -82,8 +87,8 @@ Namespace FileTypeDetection
             Me.HeaderOnlyNonZip = headerOnlyNonZip
         End Sub
 
-        Friend Function Clone() As FileTypeDetectorOptions
-            Dim cloned = New FileTypeDetectorOptions(Me.HeaderOnlyNonZip) With {
+        Friend Function Clone() As FileTypeProjectOptions
+            Dim cloned = New FileTypeProjectOptions(Me.HeaderOnlyNonZip) With {
                 .MaxBytes = Me.MaxBytes,
                 .SniffBytes = Me.SniffBytes,
                 .MaxZipEntries = Me.MaxZipEntries,
@@ -94,7 +99,8 @@ Namespace FileTypeDetection
                 .MaxZipNestedBytes = Me.MaxZipNestedBytes,
                 .RejectArchiveLinks = Me.RejectArchiveLinks,
                 .AllowUnknownArchiveEntrySize = Me.AllowUnknownArchiveEntrySize,
-                .Logger = Me.Logger
+                .Logger = Me.Logger,
+                .DeterministicHash = DeterministicHashOptions.Normalize(Me.DeterministicHash)
             }
             cloned.NormalizeInPlace()
             Return cloned
@@ -109,6 +115,7 @@ Namespace FileTypeDetection
             MaxZipCompressionRatio = Max(MinNonNegativeInt, MaxZipCompressionRatio)
             MaxZipNestingDepth = Max(MinNonNegativeInt, MaxZipNestingDepth)
             MaxZipNestedBytes = Max(MinPositiveLong, MaxZipNestedBytes)
+            DeterministicHash = DeterministicHashOptions.Normalize(DeterministicHash)
         End Sub
 
         Private Shared Function Max(minimum As Integer, value As Integer) As Integer
@@ -121,8 +128,8 @@ Namespace FileTypeDetection
             Return value
         End Function
 
-        Friend Shared Function DefaultOptions() As FileTypeDetectorOptions
-            Dim options = New FileTypeDetectorOptions()
+        Friend Shared Function DefaultOptions() As FileTypeProjectOptions
+            Dim options = New FileTypeProjectOptions()
             options.NormalizeInPlace()
             Return options
         End Function

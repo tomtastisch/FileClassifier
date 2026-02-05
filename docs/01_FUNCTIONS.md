@@ -19,7 +19,7 @@ Dieses Dokument beschreibt alle oeffentlichen Einstiegspunkte der API mit Signat
 |---|---|---|
 | `FileTypeDetector` / `ArchiveProcessing` | [`../src/FileTypeDetection/Detection/README.md`](../src/FileTypeDetection/Detection/README.md) | SSOT-Detektion, Header-Magic, Aliaslogik |
 | `FileTypeDetector` / `ArchiveProcessing` / `FileMaterializer` | [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md) | Archive-Gate, Guards, Extraktions-Engine |
-| `FileTypeOptions` / `FileTypeSecurityBaseline` | [`../src/FileTypeDetection/Configuration/README.md`](../src/FileTypeDetection/Configuration/README.md) | globale Optionen und Baseline |
+| `FileTypeOptions` / `FileTypeProjectBaseline` | [`../src/FileTypeDetection/Configuration/README.md`](../src/FileTypeDetection/Configuration/README.md) | globale Optionen und Baseline |
 | Rueckgabemodelle (`FileType`, `DetectionDetail`, `ZipExtractedEntry`, `DeterministicHash*`) | [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md) | Modellvertraege der Public API |
 | Modulnavigation | [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md) | Uebersicht und Einstieg je Leserrolle |
 
@@ -56,7 +56,7 @@ Dieses Dokument beschreibt alle oeffentlichen Einstiegspunkte der API mit Signat
 | `DeterministicHashing` | `VerifyRoundTrip(path, options)` | Datei-Pfad + Optionen | `DeterministicHashRoundTripReport` | schreibt temp-Datei intern und raeumt auf | `F9` |
 | `FileTypeOptions` | `LoadOptions(json)` | JSON | `Boolean` | aendert globale Optionen | `F7` |
 | `FileTypeOptions` | `GetOptions()` | - | `String` (JSON) | keine | `F7` |
-| `FileTypeSecurityBaseline` | `ApplyDeterministicDefaults()` | - | `Void` | aendert globale Optionen | `F7` |
+| `FileTypeProjectBaseline` | `ApplyDeterministicDefaults()` | - | `Void` | aendert globale Optionen | `F7` |
 
 ## 4. Methodenfamilien
 ### 4.1 FileTypeDetector
@@ -142,7 +142,7 @@ bool rawOk = FileMaterializer.Persist(payload, "/data/out/input.bin", overwrite:
 bool archiveExtractOk = FileMaterializer.Persist(archivePayload, "/data/out/unpacked", overwrite: false, secureExtract: true);
 ```
 
-### 4.4 FileTypeOptions + FileTypeSecurityBaseline
+### 4.4 FileTypeOptions + FileTypeProjectBaseline
 Details: [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md), [`../src/FileTypeDetection/Configuration/README.md`](../src/FileTypeDetection/Configuration/README.md).
 
 ```mermaid
@@ -161,7 +161,7 @@ flowchart LR
 ```csharp
 using FileTypeDetection;
 
-FileTypeSecurityBaseline.ApplyDeterministicDefaults();
+FileTypeProjectBaseline.ApplyDeterministicDefaults();
 bool loaded = FileTypeOptions.LoadOptions("{\"maxBytes\":134217728}");
 string snapshot = FileTypeOptions.GetOptions();
 Console.WriteLine($"Loaded={loaded}; Snapshot={snapshot}");
@@ -198,6 +198,7 @@ Console.WriteLine($"LogicalConsistent={report.LogicalConsistent}");
 Hinweis:
 - `PhysicalSha256` und `LogicalSha256` sind Security-SSOT.
 - `Fast*XxHash3` ist optionaler Performance-Digest und kein kryptografischer Integritaetsnachweis.
+- Overloads ohne `options` verwenden die globale Policy `FileTypeOptions.GetSnapshot().DeterministicHash`.
 
 ## 5. Nicht-Ziele
 - Keine interne Low-Level-Implementierung im Detail (siehe `03_REFERENCES.md`).

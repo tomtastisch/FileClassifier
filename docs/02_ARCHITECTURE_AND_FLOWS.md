@@ -339,11 +339,11 @@ flowchart TD
 | `ExtractArchiveSafeToMemory(path, ...)` / `ArchiveProcessing.ExtractToMemory(...)` / `ArchiveProcessing.TryExtractToMemory(data)` | `F4` |
 | `ExtractArchiveSafe(path, destination, ...)` | `F5` |
 | `FileMaterializer.Persist(..., secureExtract:=False)` | `F6` |
-| `FileTypeOptions.LoadOptions/GetOptions` / `FileTypeSecurityBaseline.ApplyDeterministicDefaults` | `F7` |
+| `FileTypeOptions.LoadOptions/GetOptions` / `FileTypeProjectBaseline.ApplyDeterministicDefaults` | `F7` |
 | `DetectAndVerifyExtension(path)` / `Detect(..., verifyExtension)` | `F8` |
 | `DeterministicHashing.HashFile/HashBytes/HashEntries/VerifyRoundTrip` | `F9` |
 
 ## 8. Grenzen und Nicht-Ziele
 - Kein Ersatz fuer Quellcode-Reviews interner Guards (z. B. Payload-/Path-Guards).
-- Keine Policy-Festlegung fuer konkrete Grenzwerte; diese kommen aus `FileTypeDetectorOptions` und der Baseline.
+- Keine Policy-Festlegung fuer konkrete Grenzwerte; diese kommen aus `FileTypeProjectOptions` und der Baseline.
 - Keine Aussage ueber konkrete Threat-Model-Abdeckung ausserhalb der beschriebenen fail-closed-Semantik.

@@ -47,7 +47,7 @@ Namespace FileTypeDetection
         Private Sub New()
         End Sub
 
-        Friend Shared Function IsArchiveSafeBytes(data As Byte(), opt As FileTypeDetectorOptions, descriptor As ArchiveDescriptor) As Boolean
+        Friend Shared Function IsArchiveSafeBytes(data As Byte(), opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor) As Boolean
             If data Is Nothing OrElse data.Length = 0 Then Return False
             If opt Is Nothing Then Return False
             If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then Return False
@@ -62,7 +62,7 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Friend Shared Function IsArchiveSafeStream(stream As Stream, opt As FileTypeDetectorOptions, descriptor As ArchiveDescriptor, depth As Integer) As Boolean
+        Friend Shared Function IsArchiveSafeStream(stream As Stream, opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor, depth As Integer) As Boolean
             If stream Is Nothing OrElse Not stream.CanRead Then Return False
             If opt Is Nothing Then Return False
             Return ArchiveProcessingEngine.ValidateArchiveStream(stream, opt, depth, descriptor)
@@ -90,7 +90,7 @@ Namespace FileTypeDetection
         Private Sub New()
         End Sub
 
-        Friend Shared Function IsSafeArchivePayload(data As Byte(), opt As FileTypeDetectorOptions) As Boolean
+        Friend Shared Function IsSafeArchivePayload(data As Byte(), opt As FileTypeProjectOptions) As Boolean
             If data Is Nothing OrElse data.Length = 0 Then Return False
             If opt Is Nothing Then Return False
             If CLng(data.Length) > opt.MaxBytes Then Return False
@@ -108,7 +108,7 @@ Namespace FileTypeDetection
         Private Sub New()
         End Sub
 
-        Friend Shared Function PrepareMaterializationTarget(destinationFull As String, overwrite As Boolean, opt As FileTypeDetectorOptions) As Boolean
+        Friend Shared Function PrepareMaterializationTarget(destinationFull As String, overwrite As Boolean, opt As FileTypeProjectOptions) As Boolean
             If IsRootPath(destinationFull) Then
                 LogGuard.Warn(opt.Logger, "[PathGuard] Ziel darf kein Root-Verzeichnis sein.")
                 Return False
@@ -125,7 +125,7 @@ Namespace FileTypeDetection
             Return True
         End Function
 
-        Friend Shared Function ValidateNewExtractionTarget(destinationFull As String, opt As FileTypeDetectorOptions) As Boolean
+        Friend Shared Function ValidateNewExtractionTarget(destinationFull As String, opt As FileTypeProjectOptions) As Boolean
             If IsRootPath(destinationFull) Then
                 LogGuard.Warn(opt.Logger, "[PathGuard] Ziel darf kein Root-Verzeichnis sein.")
                 Return False

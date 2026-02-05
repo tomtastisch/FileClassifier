@@ -9,7 +9,7 @@
 - [ ] BDD-Tag-Filter pruefen (z. B. `Category=e2e`, `Category=materializer`)
 
 ## 2. Security and Limits
-- [ ] `FileTypeSecurityBaseline.ApplyDeterministicDefaults()` beim Start setzen
+- [ ] `FileTypeProjectBaseline.ApplyDeterministicDefaults()` beim Start setzen
 - [ ] Falls noetig: `FileTypeOptions.LoadOptions(json)` fuer Umgebungslimits
 - [ ] ZIP-Grenzen (`MaxZipEntries`, `MaxZipCompressionRatio`, `MaxZipNestingDepth`) mit Ops abstimmen
 - [ ] Root-/Traversal-Schutz im Zielsystem validieren (Dateisystemrechte, Container-Mounts)

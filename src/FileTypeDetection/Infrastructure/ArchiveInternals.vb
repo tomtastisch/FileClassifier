@@ -60,7 +60,7 @@ Namespace FileTypeDetection
 
         Function Process(
             stream As Stream,
-            opt As FileTypeDetectorOptions,
+            opt As FileTypeProjectOptions,
             depth As Integer,
             containerType As ArchiveContainerType,
             extractEntry As Func(Of IArchiveEntryModel, Boolean)
@@ -90,7 +90,7 @@ Namespace FileTypeDetection
         Private Sub New()
         End Sub
 
-        Friend Shared Function TryDescribeBytes(data As Byte(), opt As FileTypeDetectorOptions, ByRef descriptor As ArchiveDescriptor) As Boolean
+        Friend Shared Function TryDescribeBytes(data As Byte(), opt As FileTypeProjectOptions, ByRef descriptor As ArchiveDescriptor) As Boolean
             descriptor = ArchiveDescriptor.UnknownDescriptor()
             If data Is Nothing OrElse data.Length = 0 Then Return False
 
@@ -105,7 +105,7 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Friend Shared Function TryDescribeStream(stream As Stream, opt As FileTypeDetectorOptions, ByRef descriptor As ArchiveDescriptor) As Boolean
+        Friend Shared Function TryDescribeStream(stream As Stream, opt As FileTypeProjectOptions, ByRef descriptor As ArchiveDescriptor) As Boolean
             descriptor = ArchiveDescriptor.UnknownDescriptor()
             If stream Is Nothing OrElse Not stream.CanRead Then Return False
 
@@ -156,13 +156,13 @@ Namespace FileTypeDetection
         Private Sub New()
         End Sub
 
-        Friend Shared Function ValidateArchiveStream(stream As Stream, opt As FileTypeDetectorOptions, depth As Integer, descriptor As ArchiveDescriptor) As Boolean
+        Friend Shared Function ValidateArchiveStream(stream As Stream, opt As FileTypeProjectOptions, depth As Integer, descriptor As ArchiveDescriptor) As Boolean
             Return ProcessArchiveStream(stream, opt, depth, descriptor, Nothing)
         End Function
 
         Friend Shared Function ProcessArchiveStream(
             stream As Stream,
-            opt As FileTypeDetectorOptions,
+            opt As FileTypeProjectOptions,
             depth As Integer,
             descriptor As ArchiveDescriptor,
             extractEntry As Func(Of IArchiveEntryModel, Boolean)
@@ -183,14 +183,14 @@ Namespace FileTypeDetection
         Private Sub New()
         End Sub
 
-        Friend Shared Function TryExtractArchiveStreamToMemory(stream As Stream, opt As FileTypeDetectorOptions) As IReadOnlyList(Of ZipExtractedEntry)
+        Friend Shared Function TryExtractArchiveStreamToMemory(stream As Stream, opt As FileTypeProjectOptions) As IReadOnlyList(Of ZipExtractedEntry)
             Dim descriptor As ArchiveDescriptor = Nothing
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             If Not ArchiveTypeResolver.TryDescribeStream(stream, opt, descriptor) Then Return emptyResult
             Return TryExtractArchiveStreamToMemory(stream, opt, descriptor)
         End Function
 
-        Friend Shared Function TryExtractArchiveStreamToMemory(stream As Stream, opt As FileTypeDetectorOptions, descriptor As ArchiveDescriptor) As IReadOnlyList(Of ZipExtractedEntry)
+        Friend Shared Function TryExtractArchiveStreamToMemory(stream As Stream, opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor) As IReadOnlyList(Of ZipExtractedEntry)
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             If stream Is Nothing OrElse Not stream.CanRead Then Return emptyResult
             If opt Is Nothing Then Return emptyResult
@@ -220,13 +220,13 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Friend Shared Function TryExtractArchiveStream(stream As Stream, destinationDirectory As String, opt As FileTypeDetectorOptions) As Boolean
+        Friend Shared Function TryExtractArchiveStream(stream As Stream, destinationDirectory As String, opt As FileTypeProjectOptions) As Boolean
             Dim descriptor As ArchiveDescriptor = Nothing
             If Not ArchiveTypeResolver.TryDescribeStream(stream, opt, descriptor) Then Return False
             Return TryExtractArchiveStream(stream, destinationDirectory, opt, descriptor)
         End Function
 
-        Friend Shared Function TryExtractArchiveStream(stream As Stream, destinationDirectory As String, opt As FileTypeDetectorOptions, descriptor As ArchiveDescriptor) As Boolean
+        Friend Shared Function TryExtractArchiveStream(stream As Stream, destinationDirectory As String, opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor) As Boolean
             If stream Is Nothing OrElse Not stream.CanRead Then Return False
             If opt Is Nothing Then Return False
             If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then Return False
@@ -278,7 +278,7 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Private Shared Function ExtractEntryToDirectory(entry As IArchiveEntryModel, destinationPrefix As String, opt As FileTypeDetectorOptions) As Boolean
+        Private Shared Function ExtractEntryToDirectory(entry As IArchiveEntryModel, destinationPrefix As String, opt As FileTypeProjectOptions) As Boolean
             If entry Is Nothing Then Return False
             If opt Is Nothing Then Return False
 
@@ -328,7 +328,7 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Private Shared Function ExtractEntryToMemory(entry As IArchiveEntryModel, entries As List(Of ZipExtractedEntry), opt As FileTypeDetectorOptions) As Boolean
+        Private Shared Function ExtractEntryToMemory(entry As IArchiveEntryModel, entries As List(Of ZipExtractedEntry), opt As FileTypeProjectOptions) As Boolean
             If entry Is Nothing OrElse entries Is Nothing Then Return False
             If opt Is Nothing Then Return False
 
@@ -359,7 +359,7 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Private Shared Function TryGetSafeEntryName(entry As IArchiveEntryModel, opt As FileTypeDetectorOptions, ByRef safeEntryName As String, ByRef isDirectory As Boolean) As Boolean
+        Private Shared Function TryGetSafeEntryName(entry As IArchiveEntryModel, opt As FileTypeProjectOptions, ByRef safeEntryName As String, ByRef isDirectory As Boolean) As Boolean
             safeEntryName = Nothing
             isDirectory = False
             If entry Is Nothing Then Return False
@@ -381,7 +381,7 @@ Namespace FileTypeDetection
             Return True
         End Function
 
-        Private Shared Function ValidateEntrySize(entry As IArchiveEntryModel, opt As FileTypeDetectorOptions) As Boolean
+        Private Shared Function ValidateEntrySize(entry As IArchiveEntryModel, opt As FileTypeProjectOptions) As Boolean
             If entry Is Nothing OrElse opt Is Nothing Then Return False
             If entry.IsDirectory Then Return True
 
@@ -411,7 +411,7 @@ Namespace FileTypeDetection
         Private Sub New()
         End Sub
 
-        Friend Shared Function TryCollectFromFile(path As String, opt As FileTypeDetectorOptions, ByRef entries As IReadOnlyList(Of ZipExtractedEntry)) As Boolean
+        Friend Shared Function TryCollectFromFile(path As String, opt As FileTypeProjectOptions, ByRef entries As IReadOnlyList(Of ZipExtractedEntry)) As Boolean
             entries = Array.Empty(Of ZipExtractedEntry)()
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then Return False
             If opt Is Nothing Then Return False
@@ -432,7 +432,7 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Friend Shared Function TryCollectFromBytes(data As Byte(), opt As FileTypeDetectorOptions, ByRef entries As IReadOnlyList(Of ZipExtractedEntry)) As Boolean
+        Friend Shared Function TryCollectFromBytes(data As Byte(), opt As FileTypeProjectOptions, ByRef entries As IReadOnlyList(Of ZipExtractedEntry)) As Boolean
             entries = Array.Empty(Of ZipExtractedEntry)()
             If data Is Nothing OrElse data.Length = 0 Then Return False
             If opt Is Nothing Then Return False
@@ -463,7 +463,7 @@ Namespace FileTypeDetection
 
         Public Function Process(
             stream As Stream,
-            opt As FileTypeDetectorOptions,
+            opt As FileTypeProjectOptions,
             depth As Integer,
             containerType As ArchiveContainerType,
             extractEntry As Func(Of IArchiveEntryModel, Boolean)
@@ -526,7 +526,7 @@ Namespace FileTypeDetection
 
         Private Shared Function TryProcessNestedGArchive(
             entries As List(Of SharpCompress.Archives.IArchiveEntry),
-            opt As FileTypeDetectorOptions,
+            opt As FileTypeProjectOptions,
             depth As Integer,
             containerType As ArchiveContainerType,
             extractEntry As Func(Of IArchiveEntryModel, Boolean),
@@ -589,7 +589,7 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Private Shared Function TryGetValidatedSize(entry As IArchiveEntryModel, opt As FileTypeDetectorOptions, ByRef knownSize As Long, requireKnownForTotal As Boolean) As Boolean
+        Private Shared Function TryGetValidatedSize(entry As IArchiveEntryModel, opt As FileTypeProjectOptions, ByRef knownSize As Long, requireKnownForTotal As Boolean) As Boolean
             knownSize = 0
             If entry Is Nothing Then Return False
             If opt Is Nothing Then Return False
@@ -610,7 +610,7 @@ Namespace FileTypeDetection
             Return TryMeasureEntrySize(entry, opt, knownSize)
         End Function
 
-        Private Shared Function TryMeasureEntrySize(entry As IArchiveEntryModel, opt As FileTypeDetectorOptions, ByRef measured As Long) As Boolean
+        Private Shared Function TryMeasureEntrySize(entry As IArchiveEntryModel, opt As FileTypeProjectOptions, ByRef measured As Long) As Boolean
             measured = 0
             If entry Is Nothing OrElse opt Is Nothing Then Return False
 

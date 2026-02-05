@@ -5,9 +5,9 @@ namespace FileTypeDetectionLib.Tests.Support;
 
 internal sealed class DetectorOptionsScope : IDisposable
 {
-    private readonly FileTypeDetectorOptions _original = FileTypeDetector.GetDefaultOptions();
+    private readonly FileTypeProjectOptions _original = FileTypeDetector.GetDefaultOptions();
 
-    internal void Set(FileTypeDetectorOptions options)
+    internal void Set(FileTypeProjectOptions options)
     {
         FileTypeDetector.SetDefaultOptions(options);
     }

@@ -11,7 +11,7 @@ Direkter Nachweis von API-Korrektheit, Security-Regeln und Determinismus.
 | `HeaderOnlyPolicyUnitTests.cs` | Policy-Verhalten fuer Non-ZIP/ZIP |
 | `HeaderDetectionWarningUnitTests.cs` | Logging-/Warnpfade |
 | `ExtensionCheckUnitTests.cs` | Endungsregeln und fail-closed |
-| `FileTypeSecurityBaselineUnitTests.cs` | Baseline-Defaults |
+| `FileTypeProjectBaselineUnitTests.cs` | Baseline-Defaults |
 | `FileTypeDetectorFacadeUnitTests.cs` | Root-API fuer Typdetektion und Endungspruefung |
 | `DetectionDetailAndArchiveValidationUnitTests.cs` | `DetectDetailed` + `TryValidateArchive` |
 | `ArchiveProcessingFacadeUnitTests.cs` | statische Archiv-Fassade |

@@ -23,12 +23,12 @@ Namespace FileTypeDetection
         End Sub
 
         Public Shared Function HashFile(path As String) As DeterministicHashEvidence
-            Return HashFile(path, New DeterministicHashOptions())
+            Return HashFile(path, options:=Nothing)
         End Function
 
         Public Shared Function HashFile(path As String, options As DeterministicHashOptions) As DeterministicHashEvidence
-            Dim normalizedOptions = DeterministicHashOptions.Normalize(options)
             Dim detectorOptions = FileTypeOptions.GetSnapshot()
+            Dim normalizedOptions = ResolveHashOptions(detectorOptions, options)
 
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 Return DeterministicHashEvidence.CreateFailure(DeterministicHashSourceType.FilePath, path, "Datei nicht gefunden.")
@@ -63,16 +63,16 @@ Namespace FileTypeDetection
         End Function
 
         Public Shared Function HashBytes(data As Byte()) As DeterministicHashEvidence
-            Return HashBytes(data, DefaultPayloadLabel, New DeterministicHashOptions())
+            Return HashBytes(data, DefaultPayloadLabel, options:=Nothing)
         End Function
 
         Public Shared Function HashBytes(data As Byte(), label As String) As DeterministicHashEvidence
-            Return HashBytes(data, label, New DeterministicHashOptions())
+            Return HashBytes(data, label, options:=Nothing)
         End Function
 
         Public Shared Function HashBytes(data As Byte(), label As String, options As DeterministicHashOptions) As DeterministicHashEvidence
-            Dim normalizedOptions = DeterministicHashOptions.Normalize(options)
             Dim detectorOptions = FileTypeOptions.GetSnapshot()
+            Dim normalizedOptions = ResolveHashOptions(detectorOptions, options)
 
             If data Is Nothing Then
                 Return DeterministicHashEvidence.CreateFailure(DeterministicHashSourceType.RawBytes, label, "Payload ist null.")
@@ -105,15 +105,16 @@ Namespace FileTypeDetection
         End Function
 
         Public Shared Function HashEntries(entries As IReadOnlyList(Of ZipExtractedEntry)) As DeterministicHashEvidence
-            Return HashEntries(entries, "archive-entries", New DeterministicHashOptions())
+            Return HashEntries(entries, "archive-entries", options:=Nothing)
         End Function
 
         Public Shared Function HashEntries(entries As IReadOnlyList(Of ZipExtractedEntry), label As String) As DeterministicHashEvidence
-            Return HashEntries(entries, label, New DeterministicHashOptions())
+            Return HashEntries(entries, label, options:=Nothing)
         End Function
 
         Public Shared Function HashEntries(entries As IReadOnlyList(Of ZipExtractedEntry), label As String, options As DeterministicHashOptions) As DeterministicHashEvidence
-            Dim normalizedOptions = DeterministicHashOptions.Normalize(options)
+            Dim projectOptions = FileTypeOptions.GetSnapshot()
+            Dim normalizedOptions = ResolveHashOptions(projectOptions, options)
             Return BuildEvidenceFromEntries(
                 sourceType:=DeterministicHashSourceType.ArchiveEntries,
                 label:=NormalizeLabel(label),
@@ -125,12 +126,12 @@ Namespace FileTypeDetection
         End Function
 
         Public Shared Function VerifyRoundTrip(path As String) As DeterministicHashRoundTripReport
-            Return VerifyRoundTrip(path, New DeterministicHashOptions())
+            Return VerifyRoundTrip(path, options:=Nothing)
         End Function
 
         Public Shared Function VerifyRoundTrip(path As String, options As DeterministicHashOptions) As DeterministicHashRoundTripReport
-            Dim normalizedOptions = DeterministicHashOptions.Normalize(options)
             Dim detectorOptions = FileTypeOptions.GetSnapshot()
+            Dim normalizedOptions = ResolveHashOptions(detectorOptions, options)
 
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 Dim failed = DeterministicHashEvidence.CreateFailure(DeterministicHashSourceType.FilePath, path, "Datei nicht gefunden.")
@@ -389,7 +390,13 @@ Namespace FileTypeDetection
             Return copy
         End Function
 
-        Private Shared Function TryReadFileBounded(path As String, detectorOptions As FileTypeDetectorOptions, ByRef bytes As Byte(), ByRef errorMessage As String) As Boolean
+        Private Shared Function ResolveHashOptions(projectOptions As FileTypeProjectOptions, options As DeterministicHashOptions) As DeterministicHashOptions
+            If options IsNot Nothing Then Return DeterministicHashOptions.Normalize(options)
+            If projectOptions IsNot Nothing Then Return DeterministicHashOptions.Normalize(projectOptions.DeterministicHash)
+            Return DeterministicHashOptions.Normalize(Nothing)
+        End Function
+
+        Private Shared Function TryReadFileBounded(path As String, detectorOptions As FileTypeProjectOptions, ByRef bytes As Byte(), ByRef errorMessage As String) As Boolean
             bytes = Array.Empty(Of Byte)()
             errorMessage = String.Empty
             If String.IsNullOrWhiteSpace(path) Then

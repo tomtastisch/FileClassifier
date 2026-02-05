@@ -58,7 +58,7 @@ Namespace FileTypeDetection
             Return MaterializeRawBytes(data, destinationFull, overwrite, opt)
         End Function
 
-        Private Shared Function MaterializeRawBytes(data As Byte(), destinationFull As String, overwrite As Boolean, opt As FileTypeDetectorOptions) As Boolean
+        Private Shared Function MaterializeRawBytes(data As Byte(), destinationFull As String, overwrite As Boolean, opt As FileTypeProjectOptions) As Boolean
             Try
                 If Not DestinationPathGuard.PrepareMaterializationTarget(destinationFull, overwrite, opt) Then Return False
 
@@ -77,7 +77,7 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Private Shared Function MaterializeArchiveBytes(data As Byte(), destinationFull As String, overwrite As Boolean, opt As FileTypeDetectorOptions, descriptor As ArchiveDescriptor) As Boolean
+        Private Shared Function MaterializeArchiveBytes(data As Byte(), destinationFull As String, overwrite As Boolean, opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor) As Boolean
             Try
                 If Not DestinationPathGuard.PrepareMaterializationTarget(destinationFull, overwrite, opt) Then Return False
 

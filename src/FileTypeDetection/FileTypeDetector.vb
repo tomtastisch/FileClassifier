@@ -36,7 +36,7 @@ Namespace FileTypeDetection
         ''' Setzt globale Default-Optionen als Snapshot.
         ''' </summary>
         ''' <param name="opt">Quelloptionen fuer den globalen Snapshot.</param>
-        Friend Shared Sub SetDefaultOptions(opt As FileTypeDetectorOptions)
+        Friend Shared Sub SetDefaultOptions(opt As FileTypeProjectOptions)
             FileTypeOptions.SetSnapshot(opt)
         End Sub
 
@@ -44,7 +44,7 @@ Namespace FileTypeDetection
         ''' Liefert einen Snapshot der aktuellen Default-Optionen.
         ''' </summary>
         ''' <returns>Unabhaengige Kopie der globalen Optionen.</returns>
-        Friend Shared Function GetDefaultOptions() As FileTypeDetectorOptions
+        Friend Shared Function GetDefaultOptions() As FileTypeProjectOptions
             Return FileTypeOptions.GetSnapshot()
         End Function
 
@@ -54,8 +54,8 @@ Namespace FileTypeDetection
         ''' </summary>
         ''' <param name="path">Pfad zur JSON-Konfigurationsdatei.</param>
         ''' <returns>Geparste Optionen oder Defaults.</returns>
-        Friend Shared Function LoadOptions(path As String) As FileTypeDetectorOptions
-            Dim defaults = FileTypeDetectorOptions.DefaultOptions()
+        Friend Shared Function LoadOptions(path As String) As FileTypeProjectOptions
+            Dim defaults = FileTypeProjectOptions.DefaultOptions()
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(defaults.Logger, "[Config] Datei nicht gefunden, Defaults.")
                 Return defaults
@@ -197,7 +197,7 @@ Namespace FileTypeDetection
             Return DetectPathCoreWithTrace(path, opt, trace)
         End Function
 
-        Private Function DetectPathCoreWithTrace(path As String, opt As FileTypeDetectorOptions, ByRef trace As DetectionTrace) As FileType
+        Private Function DetectPathCoreWithTrace(path As String, opt As FileTypeProjectOptions, ByRef trace As DetectionTrace) As FileType
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(opt.Logger, "[Detect] Datei nicht gefunden.")
                 trace.ReasonCode = ReasonFileNotFound
@@ -292,7 +292,7 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Private Function DetectInternalBytes(data As Byte(), opt As FileTypeDetectorOptions) As FileType
+        Private Function DetectInternalBytes(data As Byte(), opt As FileTypeProjectOptions) As FileType
             If data Is Nothing OrElse data.Length = 0 Then Return UnknownType()
             If CLng(data.Length) > opt.MaxBytes Then
                 LogGuard.Warn(opt.Logger, $"[Detect] Daten zu gross ({data.Length} > {opt.MaxBytes}).")
@@ -313,7 +313,7 @@ Namespace FileTypeDetection
         ''' </summary>
         Private Function ResolveByHeaderForPath(
             header As Byte(),
-            opt As FileTypeDetectorOptions,
+            opt As FileTypeProjectOptions,
             ByRef trace As DetectionTrace,
             fs As FileStream
         ) As FileType
@@ -339,7 +339,7 @@ Namespace FileTypeDetection
         ''' </summary>
         Private Function ResolveByHeaderForBytes(
             header As Byte(),
-            opt As FileTypeDetectorOptions,
+            opt As FileTypeProjectOptions,
             ByRef trace As DetectionTrace,
             data As Byte()
         ) As FileType
@@ -364,7 +364,7 @@ Namespace FileTypeDetection
 
         Private Function ResolveByHeaderCommon(
             header As Byte(),
-            opt As FileTypeDetectorOptions,
+            opt As FileTypeProjectOptions,
             ByRef trace As DetectionTrace,
             tryDescribe As Func(Of ArchiveDescriptor),
             tryValidate As Func(Of ArchiveDescriptor, Boolean),
@@ -404,7 +404,7 @@ Namespace FileTypeDetection
 
         Private Function ValidateArchiveStreamRaw(
             fs As FileStream,
-            opt As FileTypeDetectorOptions,
+            opt As FileTypeProjectOptions,
             descriptor As ArchiveDescriptor
         ) As Boolean
             If fs Is Nothing OrElse Not fs.CanRead Then Return False
@@ -414,7 +414,7 @@ Namespace FileTypeDetection
 
         Private Function ValidateArchiveBytesRaw(
             data As Byte(),
-            opt As FileTypeDetectorOptions,
+            opt As FileTypeProjectOptions,
             descriptor As ArchiveDescriptor
         ) As Boolean
             Return ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor)
@@ -422,7 +422,7 @@ Namespace FileTypeDetection
 
         Private Function ResolveAfterArchiveGate(
             magicKind As FileKind,
-            opt As FileTypeDetectorOptions,
+            opt As FileTypeProjectOptions,
             ByRef trace As DetectionTrace,
             tryRefine As Func(Of FileType)
         ) As FileType
@@ -435,7 +435,7 @@ Namespace FileTypeDetection
             Return FinalizeArchiveDetection(refined, opt, trace)
         End Function
 
-        Private Function FinalizeArchiveDetection(refined As FileType, opt As FileTypeDetectorOptions, ByRef trace As DetectionTrace) As FileType
+        Private Function FinalizeArchiveDetection(refined As FileType, opt As FileTypeProjectOptions, ByRef trace As DetectionTrace) As FileType
             If refined.Kind <> FileKind.Unknown Then
                 WarnIfNoDirectContentDetection(refined.Kind, opt)
                 trace.UsedStructuredRefinement = (refined.Kind = FileKind.Docx OrElse refined.Kind = FileKind.Xlsx OrElse refined.Kind = FileKind.Pptx)
@@ -447,7 +447,7 @@ Namespace FileTypeDetection
             Return FileTypeRegistry.Resolve(FileKind.Zip)
         End Function
 
-        Private Function CanExtractArchivePath(path As String, verifyBeforeExtract As Boolean, opt As FileTypeDetectorOptions) As Boolean
+        Private Function CanExtractArchivePath(path As String, verifyBeforeExtract As Boolean, opt As FileTypeProjectOptions) As Boolean
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(opt.Logger, "[ArchiveExtract] Quelldatei fehlt.")
                 Return False
@@ -477,7 +477,7 @@ Namespace FileTypeDetection
                 kind = FileKind.Pptx
         End Function
 
-        Private Shared Sub WarnIfNoDirectContentDetection(kind As FileKind, opt As FileTypeDetectorOptions)
+        Private Shared Sub WarnIfNoDirectContentDetection(kind As FileKind, opt As FileTypeProjectOptions)
             If kind = FileKind.Unknown Then Return
             If FileTypeRegistry.HasDirectContentDetection(kind) Then Return
             LogGuard.Warn(opt.Logger, $"[Detect] Keine direkte Content-Erkennung fuer Typ '{kind}'. Ergebnis stammt aus Fallback/Refinement.")
