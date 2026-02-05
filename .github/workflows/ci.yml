@@ -11,8 +11,19 @@ permissions:
   contents: read
 
 jobs:
+  docs-linkcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Markdown Link Check
+        run: python3 tools/check-markdown-links.py
+
   build-test:
     runs-on: ubuntu-latest
+    needs: docs-linkcheck
 
     steps:
       - name: Checkout

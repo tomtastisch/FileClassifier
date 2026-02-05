@@ -31,6 +31,7 @@ Professionelle, auditierbare und deterministische Dateityp-Erkennung mit sichere
 
 ## 6. Runbook (reproduzierbar)
 ```bash
+python3 tools/check-markdown-links.py
 dotnet restore FileClassifier.sln -v minimal
 dotnet build FileClassifier.sln --no-restore -v minimal
 dotnet test FileClassifier.sln --no-build -v minimal
