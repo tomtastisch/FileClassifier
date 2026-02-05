@@ -87,7 +87,7 @@ Die aktuelle Version ergibt sich deterministisch aus der Historie.
 - GitHub-Label-Setup ist in `tools/versioning/labels.json` dokumentiert.
 
 ## 8.2 Quodana (Baseline-only)
-- Konfiguration: `quodana.yaml`
+- Konfiguration: `qodana.yaml`
 - Baseline: `.quodana.baseline.json` (im Repo versioniert)
 - CI failt nur bei neuen Findings.
 
