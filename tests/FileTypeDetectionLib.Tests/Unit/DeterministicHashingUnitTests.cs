@@ -57,7 +57,7 @@ public sealed class DeterministicHashingUnitTests
         var zipBytes = ArchivePayloadFactory.CreateZipWithSingleEntry("inner/note.txt", "hello");
 
         var fromArchiveBytes = DeterministicHashing.HashBytes(zipBytes, "sample.zip");
-        var entries = ZipProcessing.TryExtractToMemory(zipBytes);
+        var entries = ArchiveProcessing.TryExtractToMemory(zipBytes);
         var fromEntries = DeterministicHashing.HashEntries(entries, "entries");
 
         Assert.True(fromArchiveBytes.Digests.HasLogicalHash);
@@ -111,7 +111,7 @@ public sealed class DeterministicHashingUnitTests
     [Fact]
     public void HashBytes_FallsBackToRawMode_WhenArchivePayloadIsUnsafe()
     {
-        var payload = ZipPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8);
+        var payload = ArchiveEntryPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8);
         var evidence = DeterministicHashing.HashBytes(payload, "traversal.zip");
 
         Assert.True(evidence.Digests.HasPhysicalHash);

@@ -5,24 +5,24 @@ using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
-public sealed class ZipProcessingFacadeUnitTests
+public sealed class ArchiveProcessingFacadeUnitTests
 {
     [Fact]
-    public void TryValidate_ReturnsTrue_ForZipBytes_AndFalse_ForPdfBytes()
+    public void TryValidate_ReturnsTrue_ForArchiveBytes_AndFalse_ForPdfBytes()
     {
         var zipBytes = File.ReadAllBytes(TestResources.Resolve("sample.zip"));
         var pdfBytes = File.ReadAllBytes(TestResources.Resolve("sample.pdf"));
 
-        Assert.True(ZipProcessing.TryValidate(zipBytes));
-        Assert.False(ZipProcessing.TryValidate(pdfBytes));
+        Assert.True(ArchiveProcessing.TryValidate(zipBytes));
+        Assert.False(ArchiveProcessing.TryValidate(pdfBytes));
     }
 
     [Fact]
-    public void TryExtractToMemory_ReturnsEntries_ForValidZipBytes()
+    public void TryExtractToMemory_ReturnsEntries_ForValidArchiveBytes()
     {
         var zipBytes = File.ReadAllBytes(TestResources.Resolve("sample.zip"));
 
-        var entries = ZipProcessing.TryExtractToMemory(zipBytes);
+        var entries = ArchiveProcessing.TryExtractToMemory(zipBytes);
 
         Assert.Single(entries);
         Assert.Equal("note.txt", entries[0].RelativePath);

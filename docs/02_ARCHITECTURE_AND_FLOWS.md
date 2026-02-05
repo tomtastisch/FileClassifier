@@ -1,7 +1,7 @@
 # 02 - Gesamtarchitektur und Ablauffluesse
 
 ## 1. Zweck und Scope
-Dieses Dokument beschreibt die oeffentliche API (Use-Cases), die interne Kernpipeline sowie die wesentlichen Laufzeitfluesse (Detektion, ZIP-Validierung, Extraktion, Persistenz).
+Dieses Dokument beschreibt die oeffentliche API (Use-Cases), die interne Kernpipeline sowie die wesentlichen Laufzeitfluesse (Detektion, Archiv-Validierung, Extraktion, Persistenz).
 Es dient als Architektur- und Ablaufreferenz auf Dokumentationsebene und ersetzt keine Code-Reviews der Guards.
 
 ## 2. Begriffe und Notation
@@ -14,9 +14,9 @@ Es dient als Architektur- und Ablaufreferenz auf Dokumentationsebene und ersetzt
 - `F0`: ReadFileSafe Utility
 - `F1`: Detect (Path)
 - `F2`: Detect (Bytes)
-- `F3`: ZIP Validate
-- `F4`: ZIP Extract to Memory
-- `F5`: ZIP Extract to Disk
+- `F3`: Archive Validate
+- `F4`: Archive Extract to Memory
+- `F5`: Archive Extract to Disk
 - `F6`: Raw Byte Materialize (Persist)
 - `F7`: Global Options/Baseline
 - `F8`: Extension Policy Check
@@ -34,7 +34,7 @@ flowchart LR
 
 ### 2.4 Detailquellen fuer tieferes Drill-Down
 - Detection-Details: [`../src/FileTypeDetection/Detection/README.md`](../src/FileTypeDetection/Detection/README.md)
-- Infrastructure-Details (Guards/ZIP internals): [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md)
+- Infrastructure-Details (Guards/Archive internals): [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md)
 - Konfigurationsdetails: [`../src/FileTypeDetection/Configuration/README.md`](../src/FileTypeDetection/Configuration/README.md)
 - Rueckgabemodelle: [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md)
 - Funktionskatalog mit Beispielen: [`./01_FUNCTIONS.md`](./01_FUNCTIONS.md)
@@ -57,7 +57,7 @@ flowchart LR
   subgraph API["Public API"]
     direction TB
     A1["FileTypeDetector"]
-    A2["ZipProcessing"]
+    A2["ArchiveProcessing"]
     A3["FileMaterializer"]
     A4["FileTypeOptions / Baseline"]
   end
@@ -66,9 +66,9 @@ flowchart LR
     direction TB
     C1["ReadHeader"]
     C1B["DetectByMagic"]
-    C2["ZipSafetyGate"]
+    C2["ArchiveSignatureSafetyGate"]
     C3["OpenXmlRefiner"]
-    C4["ZipExtractor"]
+    C4["ArchiveManagedExtractor"]
   end
 
   subgraph OUT["Outputs"]
@@ -100,11 +100,11 @@ flowchart LR
 
 Kurzlesehilfe:
 - `FileTypeOptions/Baseline` ist Konfigurationskontext (gestrichelt), kein Datenfluss.
-- `ZipSafetyGate` ist das zentrale fail-closed-Gate fuer ZIP-bezogene Pfade.
+- `ArchiveSignatureSafetyGate` ist das zentrale fail-closed-Gate fuer ZIP-bezogene Pfade.
 
 ## 4. Flussdiagramme (entscheidungsrelevante Ablaeufe)
 ### 4.1 Ablauf A: Detektion und ZIP-Validierung
-Dieses Diagramm zeigt die Kernentscheidung: `Magic == ZIP?` sowie die fail-closed-Kaskade ueber `ZipSafetyGate`.
+Dieses Diagramm zeigt die Kernentscheidung: `Magic == ZIP?` sowie die fail-closed-Kaskade ueber `ArchiveSignatureSafetyGate`.
 Oben: Typdetektion (`FileType`/`DetectionDetail`).
 Unten: reine ZIP-Validierung (`bool`) ueber denselben Gate-Knoten.
 
@@ -117,18 +117,18 @@ flowchart TD
   M1 --> Q1{"Magic == ZIP?"}
 
   Q1 -->|"No"| T1["Resolve(kind) -> Type Output"]
-  Q1 -->|"Yes"| G1["ZipSafetyGate"] --> Q2{"ZIP safe?"}
+  Q1 -->|"Yes"| G1["ArchiveSignatureSafetyGate"] --> Q2{"ZIP safe?"}
 
   Q2 -->|"No"| U1["Unknown (fail-closed)"]
   Q2 -->|"Yes"| R1["OpenXmlRefiner"] --> T2["Refined or Generic ZIP -> Type Output"]
 
-  I1 --> V1["TryValidateZip / ZipProcessing.TryValidate(...)"]
+  I1 --> V1["TryValidateArchive / ArchiveProcessing.TryValidate(...)"]
   V1 --> G1
   Q2 --> V2["Validate Output: Bool"]
 ```
 
 Kurzlesehilfe:
-- `ZipSafetyGate` ist SSOT fuer ZIP-Sicherheit in den gezeigten Pfaden.
+- `ArchiveSignatureSafetyGate` ist SSOT fuer ZIP-Sicherheit in den gezeigten Pfaden.
 - `OpenXmlRefiner` laeuft nur im ZIP-OK-Fall.
 
 ### 4.2 Ablauf B: Extraktion (Memory) vs. Persistenz (Disk)
@@ -149,15 +149,15 @@ flowchart LR
 %% --- USE CASES ---
     subgraph UC["Public Use-Cases"]
         direction TB
-        UC2["ExtractZipEntries<br/>(ZipProcessing)"]
+        UC2["ExtractArchiveEntries<br/>(ArchiveProcessing)"]
         UC3["PersistBytes<br/>(FileMaterializer)"]
     end
 
 %% --- ZIP CORE (SSOT) ---
     subgraph CORE["ZIP Core (SSOT)"]
         direction TB
-        G["ZipSafetyGate"]
-        X["ZipExtractor"]
+        G["ArchiveSignatureSafetyGate"]
+        X["ArchiveManagedExtractor"]
         G --> X
     end
 
@@ -206,7 +206,7 @@ sequenceDiagram
   participant Caller as Consumer
   participant API as FileTypeDetector
   participant REG as FileTypeRegistry
-  participant GATE as ZipSafetyGate
+  participant GATE as ArchiveSignatureSafetyGate
   participant REF as OpenXmlRefiner
 
   Caller->>API: Detect(path, verifyExtension)
@@ -217,7 +217,7 @@ sequenceDiagram
     REG-->>API: FileKind
     API-->>Caller: FileType
   else zip
-    API->>GATE: IsZipSafeStream(...)
+    API->>GATE: IsArchiveSignatureSafeStream(...)
     GATE-->>API: pass/fail
 
     alt pass
@@ -231,24 +231,24 @@ sequenceDiagram
 ```
 
 ### 5.2 Validate + Extract (Memory)
-Fokus: Byte-Pfad ueber `ZipProcessing`.
+Fokus: Byte-Pfad ueber `ArchiveProcessing`.
 Fail-closed endet mit leerer Liste.
 
 ```mermaid
 sequenceDiagram
   participant Caller as Consumer
-  participant ZP as ZipProcessing
-  participant Guard as ZipPayloadGuard
-  participant Gate as ZipSafetyGate
-  participant Extract as ZipExtractor
+  participant ZP as ArchiveProcessing
+  participant Guard as ArchiveSignaturePayloadGuard
+  participant Gate as ArchiveSignatureSafetyGate
+  participant Extract as ArchiveManagedExtractor
 
   Caller->>ZP: TryExtractToMemory(data)
-  ZP->>Guard: IsSafeZipPayload(data)
-  Guard->>Gate: IsZipSafeBytes(data)
+  ZP->>Guard: IsSafeArchiveSignaturePayload(data)
+  Guard->>Gate: IsArchiveSignatureSafeBytes(data)
   Gate-->>Guard: pass/fail
 
   alt pass
-    ZP->>Extract: TryExtractZipStreamToMemory(...)
+    ZP->>Extract: TryExtractArchiveStreamToMemory(...)
     Extract-->>Caller: entries list
   else fail
     ZP-->>Caller: empty list
@@ -264,8 +264,8 @@ sequenceDiagram
   participant Caller as Consumer
   participant MAT as FileMaterializer
   participant Guard as DestinationPathGuard
-  participant Gate as ZipSafetyGate
-  participant Extract as ZipExtractor
+  participant Gate as ArchiveSignatureSafetyGate
+  participant Extract as ArchiveManagedExtractor
   participant FS as FileSystem
 
   Caller->>MAT: Persist(data, destination, overwrite, secureExtract)
@@ -275,11 +275,11 @@ sequenceDiagram
     MAT-->>Caller: false
   else valid target
     alt secureExtract and zip
-      MAT->>Gate: IsZipSafeBytes(data)
+      MAT->>Gate: IsArchiveSignatureSafeBytes(data)
       Gate-->>MAT: pass/fail
 
       alt pass
-        MAT->>Extract: TryExtractZipStream(...)
+        MAT->>Extract: TryExtractArchiveStream(...)
         Extract-->>Caller: true/false
       else fail
         MAT-->>Caller: false
@@ -307,7 +307,7 @@ flowchart TD
   S2 -->|"Yes"| S3{"Readable ZIP?"}
 
   S3 -->|"No"| E2["Return false"]
-  S3 -->|"Yes"| S4{"ZipSafetyGate pass?"}
+  S3 -->|"Yes"| S4{"ArchiveSignatureSafetyGate pass?"}
 
   S4 -->|"No"| E3["Return false"]
   S4 -->|"Yes"| A2["MaterializeZipBytes(...)"] --> R2["Return bool"]
@@ -336,9 +336,9 @@ flowchart TD
 | `ReadFileSafe(path)` | `F0` |
 | `Detect(path)` / `DetectDetailed(path)` | `F1` |
 | `Detect(data)` / `IsOfType(data, kind)` | `F2` |
-| `TryValidateZip(path)` / `ZipProcessing.TryValidate(path|data)` | `F3` |
-| `ExtractZipSafeToMemory(path, ...)` / `ZipProcessing.ExtractToMemory(...)` / `ZipProcessing.TryExtractToMemory(data)` | `F4` |
-| `ExtractZipSafe(path, destination, ...)` | `F5` |
+| `TryValidateArchive(path)` / `ArchiveProcessing.TryValidate(path|data)` | `F3` |
+| `ExtractArchiveSafeToMemory(path, ...)` / `ArchiveProcessing.ExtractToMemory(...)` / `ArchiveProcessing.TryExtractToMemory(data)` | `F4` |
+| `ExtractArchiveSafe(path, destination, ...)` | `F5` |
 | `FileMaterializer.Persist(..., secureExtract:=False)` | `F6` |
 | `FileTypeOptions.LoadOptions/GetOptions` / `FileTypeSecurityBaseline.ApplyDeterministicDefaults` | `F7` |
 | `DetectAndVerifyExtension(path)` / `Detect(..., verifyExtension)` | `F8` |

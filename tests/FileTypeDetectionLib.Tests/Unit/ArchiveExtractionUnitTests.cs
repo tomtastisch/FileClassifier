@@ -5,30 +5,30 @@ using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
-public sealed class ZipExtractionUnitTests
+public sealed class ArchiveExtractionUnitTests
 {
     [Fact]
-    public void ExtractZipSafe_Succeeds_ForValidZip_WithVerification()
+    public void ExtractArchiveSafe_Succeeds_ForValidArchive_WithVerification()
     {
         var source = TestResources.Resolve("sample.zip");
         using var tempRoot = TestTempPaths.CreateScope("ftd-extract-test");
         var destination = Path.Combine(tempRoot.RootPath, "out");
 
-        var ok = new FileTypeDetector().ExtractZipSafe(source, destination, verifyBeforeExtract: true);
+        var ok = new FileTypeDetector().ExtractArchiveSafe(source, destination, verifyBeforeExtract: true);
 
         Assert.True(ok);
         Assert.True(File.Exists(Path.Combine(destination, "note.txt")));
     }
 
     [Fact]
-    public void ExtractZipSafe_FailsClosed_ForTraversalEntry()
+    public void ExtractArchiveSafe_FailsClosed_ForTraversalEntry()
     {
         using var tempRoot = TestTempPaths.CreateScope("ftd-extract-test");
         var zipPath = Path.Combine(tempRoot.RootPath, "traversal.zip");
         var destination = Path.Combine(tempRoot.RootPath, "out");
-        File.WriteAllBytes(zipPath, ZipPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8));
+        File.WriteAllBytes(zipPath, ArchiveEntryPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8));
 
-        var ok = new FileTypeDetector().ExtractZipSafe(zipPath, destination, verifyBeforeExtract: false);
+        var ok = new FileTypeDetector().ExtractArchiveSafe(zipPath, destination, verifyBeforeExtract: false);
 
         Assert.False(ok);
         Assert.False(Directory.Exists(destination));
@@ -36,47 +36,47 @@ public sealed class ZipExtractionUnitTests
     }
 
     [Fact]
-    public void ExtractZipSafe_Fails_WhenDestinationAlreadyExists()
+    public void ExtractArchiveSafe_Fails_WhenDestinationAlreadyExists()
     {
         var source = TestResources.Resolve("sample.zip");
         using var tempRoot = TestTempPaths.CreateScope("ftd-extract-test");
         var destination = Path.Combine(tempRoot.RootPath, "out");
         Directory.CreateDirectory(destination);
 
-        var ok = new FileTypeDetector().ExtractZipSafe(source, destination, verifyBeforeExtract: false);
+        var ok = new FileTypeDetector().ExtractArchiveSafe(source, destination, verifyBeforeExtract: false);
 
         Assert.False(ok);
     }
 
     [Fact]
-    public void ExtractZipSafe_Fails_PreVerification_ForNonZipInput()
+    public void ExtractArchiveSafe_Fails_PreVerification_ForNonArchiveInput()
     {
         var source = TestResources.Resolve("sample.pdf");
         using var tempRoot = TestTempPaths.CreateScope("ftd-extract-test");
         var destination = Path.Combine(tempRoot.RootPath, "out");
 
-        var ok = new FileTypeDetector().ExtractZipSafe(source, destination, verifyBeforeExtract: true);
+        var ok = new FileTypeDetector().ExtractArchiveSafe(source, destination, verifyBeforeExtract: true);
 
         Assert.False(ok);
         Assert.False(Directory.Exists(destination));
     }
 
     [Fact]
-    public void ExtractZipSafe_Fails_ForRootDestinationPath()
+    public void ExtractArchiveSafe_Fails_ForRootDestinationPath()
     {
         var source = TestResources.Resolve("sample.zip");
         var rootPath = Path.GetPathRoot(Path.GetTempPath());
         Assert.False(string.IsNullOrWhiteSpace(rootPath));
 
-        var ok = new FileTypeDetector().ExtractZipSafe(source, rootPath!, verifyBeforeExtract: false);
+        var ok = new FileTypeDetector().ExtractArchiveSafe(source, rootPath!, verifyBeforeExtract: false);
         Assert.False(ok);
     }
 
     [Fact]
-    public void ExtractZipSafeToMemory_Succeeds_ForValidZip_WithVerification()
+    public void ExtractArchiveSafeToMemory_Succeeds_ForValidArchive_WithVerification()
     {
         var source = TestResources.Resolve("sample.zip");
-        var entries = new FileTypeDetector().ExtractZipSafeToMemory(source, verifyBeforeExtract: true);
+        var entries = new FileTypeDetector().ExtractArchiveSafeToMemory(source, verifyBeforeExtract: true);
 
         Assert.NotNull(entries);
         Assert.Single(entries);
@@ -85,13 +85,13 @@ public sealed class ZipExtractionUnitTests
     }
 
     [Fact]
-    public void ExtractZipSafeToMemory_FailsClosed_ForTraversalEntry()
+    public void ExtractArchiveSafeToMemory_FailsClosed_ForTraversalEntry()
     {
         using var tempRoot = TestTempPaths.CreateScope("ftd-extract-test");
         var zipPath = Path.Combine(tempRoot.RootPath, "traversal.zip");
-        File.WriteAllBytes(zipPath, ZipPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8));
+        File.WriteAllBytes(zipPath, ArchiveEntryPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8));
 
-        var entries = new FileTypeDetector().ExtractZipSafeToMemory(zipPath, verifyBeforeExtract: false);
+        var entries = new FileTypeDetector().ExtractArchiveSafeToMemory(zipPath, verifyBeforeExtract: false);
         Assert.NotNull(entries);
         Assert.Empty(entries);
         Assert.False(File.Exists(Path.Combine(tempRoot.RootPath, "evil.txt")));

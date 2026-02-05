@@ -68,7 +68,7 @@ Namespace FileTypeDetection
     End Interface
 
     Friend NotInheritable Class ArchiveBackendRegistry
-        Private Shared ReadOnly _zipBackend As New ZipArchiveBackend()
+        Private Shared ReadOnly _managedArchiveBackend As New ArchiveManagedBackend()
         Private Shared ReadOnly _sharpCompressBackend As New SharpCompressArchiveBackend()
 
         Private Sub New()
@@ -77,7 +77,7 @@ Namespace FileTypeDetection
         Friend Shared Function Resolve(containerType As ArchiveContainerType) As IArchiveBackend
             Select Case containerType
                 Case ArchiveContainerType.Zip
-                    Return _zipBackend
+                    Return _managedArchiveBackend
                 Case ArchiveContainerType.Tar, ArchiveContainerType.GZip, ArchiveContainerType.SevenZip, ArchiveContainerType.Rar
                     Return _sharpCompressBackend
                 Case Else
@@ -458,7 +458,7 @@ Namespace FileTypeDetection
                         ToList()
 
                     Dim nestedResult As Boolean
-                    Dim nestedHandled = TryProcessNestedGZip(entries, opt, depth, containerType, extractEntry, nestedResult)
+                    Dim nestedHandled = TryProcessNestedGArchive(entries, opt, depth, containerType, extractEntry, nestedResult)
                     If nestedHandled Then Return nestedResult
 
                     If entries.Count > opt.MaxZipEntries Then Return False
@@ -496,7 +496,7 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Private Shared Function TryProcessNestedGZip(
+        Private Shared Function TryProcessNestedGArchive(
             entries As List(Of SharpCompress.Archives.IArchiveEntry),
             opt As FileTypeDetectorOptions,
             depth As Integer,

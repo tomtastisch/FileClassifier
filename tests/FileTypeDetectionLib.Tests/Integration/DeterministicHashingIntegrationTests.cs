@@ -9,7 +9,7 @@ namespace FileTypeDetectionLib.Tests.Integration;
 public sealed class DeterministicHashingIntegrationTests
 {
     [Fact]
-    public void LogicalHash_IsStableAcrossZipTarAndTarGz_ForSameContent()
+    public void LogicalHash_IsStableAcrossArchiveTarAndTarGz_ForSameContent()
     {
         var zip = ArchivePayloadFactory.CreateZipWithSingleEntry("inner/note.txt", "hello");
         var tar = ArchivePayloadFactory.CreateTarWithSingleEntry("inner/note.txt", "hello");

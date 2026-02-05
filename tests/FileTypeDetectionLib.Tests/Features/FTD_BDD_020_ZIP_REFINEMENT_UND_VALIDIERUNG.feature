@@ -1,6 +1,6 @@
 # language: de
 @integration @zip @refinement @detector @processing
-Funktionalität: Integration von ZIP-Gate, strukturellem Refinement und ZIP-Fassade
+Funktionalität: Integration von ZIP-Gate, strukturellem Refinement und Archiv-Fassade
 
   Hintergrund:
     Angenommen die folgenden Ressourcen existieren

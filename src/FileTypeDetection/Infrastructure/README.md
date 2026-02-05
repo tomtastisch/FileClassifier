@@ -6,8 +6,8 @@ Interne, sicherheitskritische Implementierung (kein Public Surface).
 ## 2. Dateien und Verantwortungen
 | Datei | Verantwortungsbereich | Wichtige Funktionen |
 |---|---|---|
-| [CoreInternals.vb](./CoreInternals.vb) | Bounds, Gate, Payload-/Path-Guards, Refiner, Logging-Schutz | `CopyBounded`, `IsZipSafe*`, `IsArchiveSafe*`, `IsSafeZipPayload`, `IsSafeArchivePayload`, `PrepareMaterializationTarget`, `ValidateNewExtractionTarget`, `TryRefine*`, `LogGuard.*` |
-| [ZipInternals.vb](./ZipInternals.vb) | ZIP-Iteration, sichere Extraktion, Pfadschutz | `ProcessZipStream`, `TryExtractZipStream*` |
+| [CoreInternals.vb](./CoreInternals.vb) | Bounds, Gate, Payload-/Path-Guards, Refiner, Logging-Schutz | `CopyBounded`, `IsArchiveSignatureSafe*`, `IsArchiveSafe*`, `IsSafeArchiveSignaturePayload`, `IsSafeArchivePayload`, `PrepareMaterializationTarget`, `ValidateNewExtractionTarget`, `TryRefine*`, `LogGuard.*` |
+| [ArchiveManagedInternals.vb](./ArchiveManagedInternals.vb) | managed Archiv-Iteration, sichere Extraktion, Pfadschutz | `ProcessArchiveStream`, `TryExtractArchiveStream*` |
 | [ArchiveInternals.vb](./ArchiveInternals.vb) | Unified Archive Backend, Entry-Adapter, Archiv-Dispatch | `ArchiveTypeResolver`, `ArchiveBackendRegistry`, `ArchiveProcessingEngine`, `ArchiveExtractor` |
 | [MimeProvider.vb](./MimeProvider.vb) | MIME-Map aus Extension | `GetMime` |
 
@@ -22,10 +22,12 @@ Interne, sicherheitskritische Implementierung (kein Public Surface).
 | Refiner-Fehler | `OpenXmlRefiner.TryRefine*` | `Unknown` |
 | Logger wirft Exception | `LogGuard` | Fehler wird geschluckt |
 
+Hinweis zur Terminologie: `ContainerType` in der Codebasis beschreibt das physische Archivformat (ZIP/TAR/GZIP/7z/RAR). Die oeffentliche Typausgabe bleibt kompatibel bei `FileKind.Zip`.
+
 ## 4. Sequenz: Archiv-Extraktion intern
 ```mermaid
 sequenceDiagram
-    participant API as FileTypeDetector/ZipProcessing
+    participant API as FileTypeDetector/ArchiveProcessing
     participant Gate as ArchiveSafetyGate
     participant Engine as ArchiveProcessingEngine
     participant Extractor as ArchiveExtractor
@@ -38,9 +40,9 @@ sequenceDiagram
 ```
 
 ## 5. Testverknuepfungen
-- [ZipAdversarialTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/ZipAdversarialTests.cs)
-- [ZipExtractionUnitTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/ZipExtractionUnitTests.cs)
-- [ZipGatePropertyTests.cs](../../../tests/FileTypeDetectionLib.Tests/Property/ZipGatePropertyTests.cs)
+- [ArchiveAdversarialTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/ArchiveAdversarialTests.cs)
+- [ArchiveExtractionUnitTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/ArchiveExtractionUnitTests.cs)
+- [ArchiveGatePropertyTests.cs](../../../tests/FileTypeDetectionLib.Tests/Property/ArchiveGatePropertyTests.cs)
 
 ## 6. Siehe auch
 - [Modulindex](../README.md)

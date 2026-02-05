@@ -20,7 +20,7 @@ Einstiegspunkt fuer die Source-Variante des Moduls.
 ## Strukturregel
 Im Root von `FileTypeDetection` liegen nur:
 - `FileTypeDetector.vb`
-- `ZipProcessing.vb`
+- `ArchiveProcessing.vb`
 - `FileMaterializer.vb`
 - `FileTypeOptions.vb`
 

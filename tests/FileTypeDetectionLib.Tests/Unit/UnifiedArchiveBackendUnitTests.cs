@@ -11,7 +11,7 @@ namespace FileTypeDetectionLib.Tests.Unit;
 public sealed class UnifiedArchiveBackendUnitTests
 {
     [Fact]
-    public void Detect_ReturnsZip_ForTarPayload()
+    public void Detect_ReturnsArchive_ForTarPayload()
     {
         var tar = ArchivePayloadFactory.CreateTarWithSingleEntry("note.txt", "hello");
         var detected = new FileTypeDetector().Detect(tar);
@@ -19,7 +19,7 @@ public sealed class UnifiedArchiveBackendUnitTests
     }
 
     [Fact]
-    public void Detect_ReturnsZip_ForTarGzPayload()
+    public void Detect_ReturnsArchive_ForTarGzPayload()
     {
         var tarGz = ArchivePayloadFactory.CreateTarGzWithSingleEntry("note.txt", "hello");
         var detected = new FileTypeDetector().Detect(tarGz);
@@ -27,10 +27,10 @@ public sealed class UnifiedArchiveBackendUnitTests
     }
 
     [Fact]
-    public void ZipProcessing_TryExtractToMemory_ReadsTarGzInnerEntries()
+    public void ArchiveProcessing_TryExtractToMemory_ReadsTarGzInnerEntries()
     {
         var tarGz = ArchivePayloadFactory.CreateTarGzWithSingleEntry("inner/note.txt", "hello");
-        var entries = ZipProcessing.TryExtractToMemory(tarGz);
+        var entries = ArchiveProcessing.TryExtractToMemory(tarGz);
 
         Assert.NotNull(entries);
         Assert.Single(entries);

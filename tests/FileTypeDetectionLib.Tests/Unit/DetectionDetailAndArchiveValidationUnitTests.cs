@@ -6,10 +6,10 @@ using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
-public sealed class DetectionDetailAndZipValidationUnitTests
+public sealed class DetectionDetailAndArchiveValidationUnitTests
 {
     [Fact]
-    public void DetectDetailed_ReturnsStructuredZipTrace_ForDocx()
+    public void DetectDetailed_ReturnsStructuredArchiveTrace_ForDocx()
     {
         var path = TestResources.Resolve("sample.docx");
         var detail = new FileTypeDetector().DetectDetailed(path);
@@ -33,19 +33,19 @@ public sealed class DetectionDetailAndZipValidationUnitTests
     }
 
     [Fact]
-    public void TryValidateZip_ReturnsExpectedResult_ForKnownInputs()
+    public void TryValidateArchive_ReturnsExpectedResult_ForKnownInputs()
     {
         var detector = new FileTypeDetector();
 
-        Assert.True(detector.TryValidateZip(TestResources.Resolve("sample.zip")));
-        Assert.True(detector.TryValidateZip(TestResources.Resolve("sample.docx")));
-        Assert.False(detector.TryValidateZip(TestResources.Resolve("sample.pdf")));
+        Assert.True(detector.TryValidateArchive(TestResources.Resolve("sample.zip")));
+        Assert.True(detector.TryValidateArchive(TestResources.Resolve("sample.docx")));
+        Assert.False(detector.TryValidateArchive(TestResources.Resolve("sample.pdf")));
     }
 
     [Fact]
-    public void TryValidateZip_ReturnsFalse_ForMissingFile()
+    public void TryValidateArchive_ReturnsFalse_ForMissingFile()
     {
         var missingPath = Path.Combine(Path.GetTempPath(), "ftd-missing-" + Guid.NewGuid().ToString("N") + ".zip");
-        Assert.False(new FileTypeDetector().TryValidateZip(missingPath));
+        Assert.False(new FileTypeDetector().TryValidateArchive(missingPath));
     }
 }

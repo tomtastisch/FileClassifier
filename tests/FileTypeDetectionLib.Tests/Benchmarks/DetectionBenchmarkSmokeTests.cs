@@ -11,7 +11,7 @@ public sealed class DetectionBenchmarkSmokeTests
 {
     [Fact]
     [Trait("Category", "Benchmark")]
-    public void Detect_Logs_HeaderOnly_Vs_ZipHeavy_Duration()
+    public void Detect_Logs_HeaderOnly_Vs_ArchiveHeavy_Duration()
     {
         var detector = new FileTypeDetector();
         var pdf = File.ReadAllBytes(TestResources.Resolve("sample.pdf"));

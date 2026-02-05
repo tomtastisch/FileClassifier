@@ -15,6 +15,6 @@ Eigenschaftsbasierte Verifikation von ZIP-Limits, Options-Invarianten und Materi
 - Limit-/Invarianz-Regressionen werden frueh erkannt.
 
 ## 5. Verification & Evidence
-- `ZipGatePropertyTests.cs`
+- `ArchiveGatePropertyTests.cs`
 - `FileTypeOptionsPropertyTests.cs`
 - `FileMaterializerPropertyTests.cs`

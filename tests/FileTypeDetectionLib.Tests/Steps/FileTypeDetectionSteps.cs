@@ -144,16 +144,16 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         Assert.NotNull(state.CurrentPayload);
-        state.LastArchiveValidateResult = ZipProcessing.TryValidate(state.CurrentPayload!);
+        state.LastArchiveValidateResult = ArchiveProcessing.TryValidate(state.CurrentPayload!);
     }
 
     [When("ich extrahiere die ZIP-Datei sicher in Memory")]
     [When("ich die ZIP-Datei sicher in den Speicher extrahiere")]
-    public void WhenIExtractZipFileSafelyToMemory()
+    public void WhenIExtractArchiveFileSafelyToMemory()
     {
         var state = State();
         Assert.False(string.IsNullOrWhiteSpace(state.CurrentPath));
-        var entries = ZipProcessing.ExtractToMemory(state.CurrentPath!, verifyBeforeExtract: true);
+        var entries = ArchiveProcessing.ExtractToMemory(state.CurrentPath!, verifyBeforeExtract: true);
         state.LastExtractedEntries = entries;
     }
 
@@ -162,7 +162,7 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         Assert.NotNull(state.CurrentPayload);
-        state.LastExtractedEntries = ZipProcessing.TryExtractToMemory(state.CurrentPayload!);
+        state.LastExtractedEntries = ArchiveProcessing.TryExtractToMemory(state.CurrentPayload!);
     }
 
     [When("ich übernehme den ersten extrahierten Eintrag als aktuelle Bytes")]

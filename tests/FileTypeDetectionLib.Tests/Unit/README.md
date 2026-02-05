@@ -13,11 +13,11 @@ Direkter Nachweis von API-Korrektheit, Security-Regeln und Determinismus.
 | `ExtensionCheckUnitTests.cs` | Endungsregeln und fail-closed |
 | `FileTypeSecurityBaselineUnitTests.cs` | Baseline-Defaults |
 | `FileTypeDetectorFacadeUnitTests.cs` | Root-API fuer Typdetektion und Endungspruefung |
-| `DetectionDetailAndZipValidationUnitTests.cs` | `DetectDetailed` + `TryValidateZip` |
-| `ZipProcessingFacadeUnitTests.cs` | statische ZIP-Fassade |
+| `DetectionDetailAndArchiveValidationUnitTests.cs` | `DetectDetailed` + `TryValidateArchive` |
+| `ArchiveProcessingFacadeUnitTests.cs` | statische Archiv-Fassade |
 | `FileMaterializerUnitTests.cs` | Byte-basierte Persistenz + optional sichere ZIP-Extraktion |
 | `FileTypeOptionsFacadeUnitTests.cs` | zentrale JSON-Optionsschnittstelle |
-| `ZipAdversarialTests.cs` | adversarial ZIP-Faelle |
-| `ZipExtractionUnitTests.cs` | sichere Disk-/Memory-Extraktion |
+| `ArchiveAdversarialTests.cs` | adversarial ZIP-Faelle |
+| `ArchiveExtractionUnitTests.cs` | sichere Disk-/Memory-Extraktion |
 | `DeterministicHashingUnitTests.cs` | deterministische Physical/Logical Hash-Evidence inkl. fail-closed Pfade |
 | `DeterministicHashingApiContractUnitTests.cs` | eingefrorener Public API-Contract von `DeterministicHashing` |

@@ -14,7 +14,7 @@ public sealed class HeaderOnlyPolicyUnitTests
     }
 
     [Fact]
-    public void Detect_StillRefines_ZipContainers_WhenHeaderOnlyNonZipIsTrue()
+    public void Detect_StillRefines_ArchiveContainers_WhenHeaderOnlyNonZipIsTrue()
     {
         using var scope = new DetectorOptionsScope();
         scope.Set(new FileTypeDetectorOptions());
@@ -26,7 +26,7 @@ public sealed class HeaderOnlyPolicyUnitTests
     }
 
     [Fact]
-    public void Detect_ReturnsZip_ForPlainZipWithoutOoxmlMarkers_WhenHeaderOnlyNonZipIsTrue()
+    public void Detect_ReturnsArchive_ForPlainArchiveWithoutOoxmlMarkers_WhenHeaderOnlyNonZipIsTrue()
     {
         using var scope = new DetectorOptionsScope();
         scope.Set(new FileTypeDetectorOptions());

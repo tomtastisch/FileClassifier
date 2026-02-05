@@ -17,7 +17,7 @@ Professionelle, auditierbare und deterministische Dateityp-Erkennung mit sichere
 
 ## 4. API-Einstiegspunkte
 - [src/FileTypeDetection/FileTypeDetector.vb](src/FileTypeDetection/FileTypeDetector.vb)
-- [src/FileTypeDetection/ZipProcessing.vb](src/FileTypeDetection/ZipProcessing.vb)
+- [src/FileTypeDetection/ArchiveProcessing.vb](src/FileTypeDetection/ArchiveProcessing.vb)
 - [src/FileTypeDetection/FileMaterializer.vb](src/FileTypeDetection/FileMaterializer.vb)
 - [src/FileTypeDetection/FileTypeOptions.vb](src/FileTypeDetection/FileTypeOptions.vb)
 
@@ -25,9 +25,9 @@ Professionelle, auditierbare und deterministische Dateityp-Erkennung mit sichere
 | Ziel | Check | Evidenz |
 |---|---|---|
 | Determinismus | Typ-/Alias-Mapping stabil | [FileTypeRegistryUnitTests.cs](tests/FileTypeDetectionLib.Tests/Unit/FileTypeRegistryUnitTests.cs) |
-| Fail-closed | Adversarial ZIPs werden abgewiesen | [ZipAdversarialTests.cs](tests/FileTypeDetectionLib.Tests/Unit/ZipAdversarialTests.cs) |
-| Sichere Extraktion | Traversal/Kollision/Nesting abgefangen | [ZipExtractionUnitTests.cs](tests/FileTypeDetectionLib.Tests/Unit/ZipExtractionUnitTests.cs) |
-| API-Klarheit | Audit-Details + ZIP-Fassade | [DetectionDetailAndZipValidationUnitTests.cs](tests/FileTypeDetectionLib.Tests/Unit/DetectionDetailAndZipValidationUnitTests.cs), [ZipProcessingFacadeUnitTests.cs](tests/FileTypeDetectionLib.Tests/Unit/ZipProcessingFacadeUnitTests.cs) |
+| Fail-closed | Adversarial ZIPs werden abgewiesen | [ArchiveAdversarialTests.cs](tests/FileTypeDetectionLib.Tests/Unit/ArchiveAdversarialTests.cs) |
+| Sichere Extraktion | Traversal/Kollision/Nesting abgefangen | [ArchiveExtractionUnitTests.cs](tests/FileTypeDetectionLib.Tests/Unit/ArchiveExtractionUnitTests.cs) |
+| API-Klarheit | Audit-Details + Archiv-Fassade | [DetectionDetailAndArchiveValidationUnitTests.cs](tests/FileTypeDetectionLib.Tests/Unit/DetectionDetailAndArchiveValidationUnitTests.cs), [ArchiveProcessingFacadeUnitTests.cs](tests/FileTypeDetectionLib.Tests/Unit/ArchiveProcessingFacadeUnitTests.cs) |
 
 ## 6. Runbook (reproduzierbar)
 ```bash

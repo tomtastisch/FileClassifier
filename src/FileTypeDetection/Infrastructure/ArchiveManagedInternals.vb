@@ -11,20 +11,20 @@ Imports Microsoft.IO
 Namespace FileTypeDetection
 
     ''' <summary>
-    ''' Zentrale SSOT-Engine fuer ZIP-Verarbeitung.
+    ''' Zentrale SSOT-Engine fuer archivbasierte Verarbeitung.
     ''' Eine Iterationslogik fuer Validierung und sichere Extraktion.
     ''' </summary>
-    Friend NotInheritable Class ZipProcessingEngine
+    Friend NotInheritable Class ArchiveStreamEngine
         Private Shared ReadOnly _recyclableStreams As New RecyclableMemoryStreamManager()
 
         Private Sub New()
         End Sub
 
-        Friend Shared Function ValidateZipStream(stream As Stream, opt As FileTypeDetectorOptions, depth As Integer) As Boolean
-            Return ProcessZipStream(stream, opt, depth, Nothing)
+        Friend Shared Function ValidateArchiveStream(stream As Stream, opt As FileTypeDetectorOptions, depth As Integer) As Boolean
+            Return ProcessArchiveStream(stream, opt, depth, Nothing)
         End Function
 
-        Friend Shared Function ProcessZipStream(
+        Friend Shared Function ProcessArchiveStream(
             stream As Stream,
             opt As FileTypeDetectorOptions,
             depth As Integer,
@@ -56,23 +56,23 @@ Namespace FileTypeDetection
                             If ratio > opt.MaxZipCompressionRatio Then Return False
                         End If
 
-                        If IsNestedZipEntry(e) Then
+                        If IsNestedArchiveEntry(e) Then
                             If depth >= opt.MaxZipNestingDepth Then Return False
                             If u <= 0 OrElse u > opt.MaxZipNestedBytes Then Return False
 
                             Try
                                 Using es = e.Open()
-                                    Using nestedMs = _recyclableStreams.GetStream("ZipProcessingEngine.Nested")
+                                    Using nestedMs = _recyclableStreams.GetStream("ArchiveStreamEngine.Nested")
                                         StreamBounds.CopyBounded(es, nestedMs, opt.MaxZipNestedBytes)
                                         nestedMs.Position = 0
 
-                                        If Not ProcessZipStream(nestedMs, opt, depth + 1, Nothing) Then
+                                        If Not ProcessArchiveStream(nestedMs, opt, depth + 1, Nothing) Then
                                             Return False
                                         End If
                                     End Using
                                 End Using
                             Catch ex As Exception
-                                LogGuard.Debug(opt.Logger, $"[ZipGate] Nested-Fehler: {ex.Message}")
+                                LogGuard.Debug(opt.Logger, $"[ArchiveGate] Nested-Fehler: {ex.Message}")
                                 Return False
                             End Try
                         End If
@@ -85,12 +85,12 @@ Namespace FileTypeDetection
 
                 Return True
             Catch ex As Exception
-                LogGuard.Debug(opt.Logger, $"[ZipGate] Stream-Fehler: {ex.Message}")
+                LogGuard.Debug(opt.Logger, $"[ArchiveGate] Stream-Fehler: {ex.Message}")
                 Return False
             End Try
         End Function
 
-        Private Shared Function IsNestedZipEntry(entry As ZipArchiveEntry) As Boolean
+        Private Shared Function IsNestedArchiveEntry(entry As ZipArchiveEntry) As Boolean
             If entry Is Nothing Then Return False
 
             Try
@@ -113,7 +113,7 @@ Namespace FileTypeDetection
         End Function
     End Class
 
-    Friend NotInheritable Class ZipArchiveBackend
+    Friend NotInheritable Class ArchiveManagedBackend
         Implements IArchiveBackend
 
         Public ReadOnly Property ContainerType As ArchiveContainerType Implements IArchiveBackend.ContainerType
@@ -132,20 +132,20 @@ Namespace FileTypeDetection
             If containerType <> ArchiveContainerType.Zip Then Return False
 
             If extractEntry Is Nothing Then
-                Return ZipProcessingEngine.ProcessZipStream(stream, opt, depth, Nothing)
+                Return ArchiveStreamEngine.ProcessArchiveStream(stream, opt, depth, Nothing)
             End If
 
-            Return ZipProcessingEngine.ProcessZipStream(
+            Return ArchiveStreamEngine.ProcessArchiveStream(
                 stream,
                 opt,
                 depth,
                 Function(entry)
-                    Return extractEntry(New ZipArchiveEntryModel(entry))
+                    Return extractEntry(New ArchiveManagedEntryModel(entry))
                 End Function)
         End Function
     End Class
 
-    Friend NotInheritable Class ZipArchiveEntryModel
+    Friend NotInheritable Class ArchiveManagedEntryModel
         Implements IArchiveEntryModel
 
         Private ReadOnly _entry As ZipArchiveEntry
@@ -196,15 +196,15 @@ Namespace FileTypeDetection
     End Class
 
     ''' <summary>
-    ''' Sicherer ZIP-Extraktionsadapter auf Basis der zentralen ZIP-SSOT-Engine.
+    ''' Sicherer Archiv-Extraktionsadapter auf Basis der zentralen Archiv-SSOT-Engine.
     ''' </summary>
-    Friend NotInheritable Class ZipExtractor
+    Friend NotInheritable Class ArchiveManagedExtractor
         Private Shared ReadOnly _recyclableStreams As New RecyclableMemoryStreamManager()
 
         Private Sub New()
         End Sub
 
-        Friend Shared Function TryExtractZipStreamToMemory(stream As Stream, opt As FileTypeDetectorOptions) As IReadOnlyList(Of ZipExtractedEntry)
+        Friend Shared Function TryExtractArchiveStreamToMemory(stream As Stream, opt As FileTypeDetectorOptions) As IReadOnlyList(Of ZipExtractedEntry)
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             If stream Is Nothing OrElse Not stream.CanRead Then Return emptyResult
 
@@ -212,7 +212,7 @@ Namespace FileTypeDetection
             Try
                 If stream.CanSeek Then stream.Position = 0
 
-                Dim ok = ZipProcessingEngine.ProcessZipStream(
+                Dim ok = ArchiveStreamEngine.ProcessArchiveStream(
                     stream,
                     opt,
                     depth:=0,
@@ -226,13 +226,13 @@ Namespace FileTypeDetection
 
                 Return entries.AsReadOnly()
             Catch ex As Exception
-                LogGuard.Debug(opt.Logger, $"[ZipExtract] InMemory-Fehler: {ex.Message}")
+                LogGuard.Debug(opt.Logger, $"[ArchiveExtract] InMemory-Fehler: {ex.Message}")
                 entries.Clear()
                 Return emptyResult
             End Try
         End Function
 
-        Friend Shared Function TryExtractZipStream(stream As Stream, destinationDirectory As String, opt As FileTypeDetectorOptions) As Boolean
+        Friend Shared Function TryExtractArchiveStream(stream As Stream, destinationDirectory As String, opt As FileTypeDetectorOptions) As Boolean
             If stream Is Nothing OrElse Not stream.CanRead Then Return False
             If String.IsNullOrWhiteSpace(destinationDirectory) Then Return False
 
@@ -240,7 +240,7 @@ Namespace FileTypeDetection
             Try
                 destinationFull = Path.GetFullPath(destinationDirectory)
             Catch ex As Exception
-                LogGuard.Debug(opt.Logger, $"[ZipExtract] Ungueltiger Zielpfad: {ex.Message}")
+                LogGuard.Debug(opt.Logger, $"[ArchiveExtract] Ungueltiger Zielpfad: {ex.Message}")
                 Return False
             End Try
 
@@ -258,7 +258,7 @@ Namespace FileTypeDetection
                 If stream.CanSeek Then stream.Position = 0
 
                 Dim stagePrefix = EnsureTrailingSeparator(Path.GetFullPath(stageDir))
-                Dim ok = ZipProcessingEngine.ProcessZipStream(
+                Dim ok = ArchiveStreamEngine.ProcessArchiveStream(
                     stream,
                     opt,
                     depth:=0,
@@ -270,7 +270,7 @@ Namespace FileTypeDetection
                 Directory.Move(stageDir, destinationFull)
                 Return True
             Catch ex As Exception
-                LogGuard.Debug(opt.Logger, $"[ZipExtract] Fehler: {ex.Message}")
+                LogGuard.Debug(opt.Logger, $"[ArchiveExtract] Fehler: {ex.Message}")
                 Return False
             Finally
                 If Directory.Exists(stageDir) Then
@@ -296,7 +296,7 @@ Namespace FileTypeDetection
             End Try
 
             If Not targetPath.StartsWith(destinationPrefix, StringComparison.Ordinal) Then
-                LogGuard.Warn(opt.Logger, "[ZipExtract] Path traversal erkannt.")
+                LogGuard.Warn(opt.Logger, "[ArchiveExtract] Path traversal erkannt.")
                 Return False
             End If
 
@@ -310,7 +310,7 @@ Namespace FileTypeDetection
             Directory.CreateDirectory(targetDir)
 
             If File.Exists(targetPath) OrElse Directory.Exists(targetPath) Then
-                LogGuard.Warn(opt.Logger, "[ZipExtract] Kollision bei Zielpfad.")
+                LogGuard.Warn(opt.Logger, "[ArchiveExtract] Kollision bei Zielpfad.")
                 Return False
             End If
 
@@ -322,7 +322,7 @@ Namespace FileTypeDetection
                 End Using
                 Return True
             Catch ex As Exception
-                LogGuard.Debug(opt.Logger, $"[ZipExtract] Entry-Fehler: {ex.Message}")
+                LogGuard.Debug(opt.Logger, $"[ArchiveExtract] Entry-Fehler: {ex.Message}")
                 Return False
             End Try
         End Function
@@ -339,7 +339,7 @@ Namespace FileTypeDetection
 
             Try
                 Using source = entry.Open()
-                    Using ms = _recyclableStreams.GetStream("ZipExtractor.MemoryEntry")
+                    Using ms = _recyclableStreams.GetStream("ArchiveManagedExtractor.MemoryEntry")
                         StreamBounds.CopyBounded(source, ms, opt.MaxZipEntryUncompressedBytes)
                         Dim payload As Byte() = Array.Empty(Of Byte)()
                         If ms.Length > 0 Then
@@ -351,7 +351,7 @@ Namespace FileTypeDetection
                 End Using
                 Return True
             Catch ex As Exception
-                LogGuard.Debug(opt.Logger, $"[ZipExtract] InMemory-Entry-Fehler: {ex.Message}")
+                LogGuard.Debug(opt.Logger, $"[ArchiveExtract] InMemory-Entry-Fehler: {ex.Message}")
                 Return False
             End Try
         End Function

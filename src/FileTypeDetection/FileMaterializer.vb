@@ -49,8 +49,8 @@ Namespace FileTypeDetection
                     Return MaterializeArchiveBytes(data, destinationFull, overwrite, opt, descriptor)
                 End If
 
-                If ZipPayloadGuard.IsZipByMagic(data) Then
-                    LogGuard.Warn(opt.Logger, "[Materialize] ZIP kann nicht gelesen werden.")
+                If ArchiveSignaturePayloadGuard.IsArchiveSignatureCandidate(data) Then
+                    LogGuard.Warn(opt.Logger, "[Materialize] Archiv kann nicht gelesen werden.")
                     Return False
                 End If
             End If

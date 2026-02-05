@@ -15,13 +15,13 @@ Nachweis fuer Sicherheit, Determinismus, Korrektheit und API-Klarheit.
 ## 3. Nachweismatrix
 | Qualitaetsziel | Testdatei |
 |---|---|
-| Fail-closed ZIP-Grenzen | [Unit/ZipAdversarialTests.cs](./Unit/ZipAdversarialTests.cs) |
-| Sichere ZIP-Extraktion | [Unit/ZipExtractionUnitTests.cs](./Unit/ZipExtractionUnitTests.cs) |
+| Fail-closed ZIP-Grenzen | [Unit/ArchiveAdversarialTests.cs](./Unit/ArchiveAdversarialTests.cs) |
+| Sichere ZIP-Extraktion | [Unit/ArchiveExtractionUnitTests.cs](./Unit/ArchiveExtractionUnitTests.cs) |
 | Unified-Archive-Flows (ZIP/TAR/TAR.GZ/7z/RAR fuer Byte-Array Detect/Validate/Extract/Materialize) | [Features/FTD_BDD_040_ARCHIVE_TYPEN_BYTEARRAY_UND_MATERIALISIERUNG.feature](./Features/FTD_BDD_040_ARCHIVE_TYPEN_BYTEARRAY_UND_MATERIALISIERUNG.feature), [Unit/UnifiedArchiveBackendUnitTests.cs](./Unit/UnifiedArchiveBackendUnitTests.cs) |
 | Deterministische Hash-Evidence + h1-h4 RoundTrip (Physical/Logical) | [Unit/DeterministicHashingUnitTests.cs](./Unit/DeterministicHashingUnitTests.cs), [Integration/DeterministicHashingIntegrationTests.cs](./Integration/DeterministicHashingIntegrationTests.cs), [Features/FTD_BDD_050_DETERMINISTISCHES_HASHING_UND_ROUNDTRIP.feature](./Features/FTD_BDD_050_DETERMINISTISCHES_HASHING_UND_ROUNDTRIP.feature) |
 | API-Contract-Freeze fuer `DeterministicHashing` | [Unit/DeterministicHashingApiContractUnitTests.cs](./Unit/DeterministicHashingApiContractUnitTests.cs), [../docs/04_DETERMINISTIC_HASHING_API_CONTRACT.md](../docs/04_DETERMINISTIC_HASHING_API_CONTRACT.md) |
 | Deterministische Registry | [Unit/FileTypeRegistryUnitTests.cs](./Unit/FileTypeRegistryUnitTests.cs) |
-| API Detail-/ZIP-Fassade | [Unit/DetectionDetailAndZipValidationUnitTests.cs](./Unit/DetectionDetailAndZipValidationUnitTests.cs), [Unit/ZipProcessingFacadeUnitTests.cs](./Unit/ZipProcessingFacadeUnitTests.cs) |
+| API Detail-/Archiv-Fassade | [Unit/DetectionDetailAndArchiveValidationUnitTests.cs](./Unit/DetectionDetailAndArchiveValidationUnitTests.cs), [Unit/ArchiveProcessingFacadeUnitTests.cs](./Unit/ArchiveProcessingFacadeUnitTests.cs) |
 | Options-/Materializer-Invarianten | [Property/FileTypeOptionsPropertyTests.cs](./Property/FileTypeOptionsPropertyTests.cs), [Property/FileMaterializerPropertyTests.cs](./Property/FileMaterializerPropertyTests.cs) |
 
 ## 3.1 Formatbezogene Testabdeckung (Stand)
@@ -78,7 +78,7 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 |---|---|---|
 | `@detector` | Faelle um `FileTypeDetector` | `--filter "Category=detector"` |
 | `@materializer` | Faelle um `FileMaterializer` | `--filter "Category=materializer"` |
-| `@processing` | Faelle um Pipeline/Fassaden (`ZipProcessing`) | `--filter "Category=processing"` |
+| `@processing` | Faelle um Pipeline/Fassaden (`ArchiveProcessing`) | `--filter "Category=processing"` |
 | `@zip` | ZIP-bezogene Pfade (Validate/Refine/Extract) | `--filter "Category=zip"` |
 | `@api` | API-orientierte BDD-Faelle | `--filter "Category=api"` |
 
