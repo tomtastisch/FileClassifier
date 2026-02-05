@@ -2,7 +2,7 @@
 
 ## 1. Build and Test Gate
 - [ ] `dotnet restore FileClassifier.sln -v minimal`
-- [ ] `python3 tools/check-markdown-links.py`
+- [ ] `python3 tools/check-markdown-links.py` (prueft lokale Markdown-Dateilinks und Heading-Anker fail-closed)
 - [ ] `dotnet format FileClassifier.sln --verify-no-changes`
 - [ ] `dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal`
 - [ ] `dotnet test FileClassifier.sln -v minimal`
