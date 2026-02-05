@@ -1,0 +1,51 @@
+name: Issue Labeler
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply labels from keywords
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = (context.payload.issue.title || '').toLowerCase();
+            const body = (context.payload.issue.body || '').toLowerCase();
+            const text = `${title}\n${body}`;
+
+            const labels = new Set();
+
+            const addIf = (cond, label) => { if (cond) labels.add(label); };
+
+            addIf(text.includes('breaking') || text.includes('major'), 'breaking');
+            addIf(text.includes('feature') || text.includes('minor'), 'feature');
+            addIf(text.includes('fix') || text.includes('bug'), 'fix');
+            addIf(text.includes('refactor'), 'refactor');
+            addIf(text.includes('docs') || text.includes('documentation'), 'docs');
+            addIf(text.includes('test') || text.includes('testing'), 'test');
+            addIf(text.includes('ci') || text.includes('workflow'), 'ci');
+            addIf(text.includes('tool') || text.includes('script'), 'tooling');
+            addIf(text.includes('chore') || text.includes('cleanup'), 'chore');
+
+            // SemVer labels by explicit hints
+            addIf(text.includes('version:major') || text.includes('major'), 'version:major');
+            addIf(text.includes('version:minor') || text.includes('minor'), 'version:minor');
+            addIf(text.includes('version:patch') || text.includes('patch'), 'version:patch');
+            addIf(text.includes('version:none') || text.includes('no version'), 'version:none');
+
+            if (labels.size === 0) {
+              labels.add('version:none');
+            }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              labels: Array.from(labels)
+            });

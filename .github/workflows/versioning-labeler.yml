@@ -1,0 +1,60 @@
+name: Versioning Labeler
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  label-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout base
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch PR head
+        run: git fetch --no-tags --prune --depth=1 origin ${{ github.event.pull_request.head.sha }}
+
+      - name: Compute required bump
+        id: bump
+        run: |
+          required=$(MODE=required BASE_REF=origin/main HEAD_REF=${{ github.event.pull_request.head.sha }} tools/versioning/check-versioning.sh)
+          echo "required=${required}" >> "$GITHUB_OUTPUT"
+
+      - name: Apply version label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const required = '${{ steps.bump.outputs.required }}';
+            const versionLabels = ['version:major','version:minor','version:patch','version:none'];
+
+            // remove existing version labels
+            for (const label of versionLabels) {
+              try {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.payload.pull_request.number,
+                  name: label
+                });
+              } catch (e) {
+                // ignore if not present
+              }
+            }
+
+            const target = required === 'major' ? 'version:major'
+              : required === 'minor' ? 'version:minor'
+              : required === 'patch' ? 'version:patch'
+              : 'version:none';
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              labels: [target]
+            });

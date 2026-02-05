@@ -1,0 +1,16 @@
+{
+  "version:major": {"color": "B60205", "description": "Breaking change; requires MAJOR bump"},
+  "version:minor": {"color": "0E8A16", "description": "New compatible functionality; requires MINOR bump"},
+  "version:patch": {"color": "1D76DB", "description": "Fix/Refactor/Docs/CI/Tooling; requires PATCH bump"},
+  "version:none": {"color": "D4C5F9", "description": "No version bump required (meta-only change)"},
+
+  "breaking": {"color": "B60205", "description": "Public API/behavior breaking change"},
+  "feature": {"color": "0E8A16", "description": "New compatible feature or datatype"},
+  "fix": {"color": "1D76DB", "description": "Bugfix"},
+  "refactor": {"color": "FBCA04", "description": "Refactoring without behavior change"},
+  "docs": {"color": "0075CA", "description": "Documentation change"},
+  "test": {"color": "C2E0C6", "description": "Test change"},
+  "ci": {"color": "5319E7", "description": "CI/workflow change"},
+  "tooling": {"color": "F9D0C4", "description": "Tooling/scripts change"},
+  "chore": {"color": "C5DEF5", "description": "Maintenance chore"}
+}
