@@ -38,3 +38,13 @@ benchmark_detect_ms.txt
 *.sln.docstates
 .idea/
 *.iml
+
+# Quodana
+qodana-results/
+.quodana/
+
+# local-only tools
+tools/*
+!tools/versioning/
+!tools/versioning/check-versioning.sh
+!tools/versioning/labels.json

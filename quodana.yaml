@@ -1,0 +1,13 @@
+version: 1.0
+linter: jetbrains/qodana-dotnet:2024.3
+profile:
+  name: qodana.recommended
+exclude:
+  - name: All
+    paths:
+      - portable
+      - tests
+      - docs
+      - tools
+baseline:
+  path: .quodana.baseline.json
