@@ -15,6 +15,9 @@ Diese Doku ist in drei Ebenen getrennt:
 6. [PRODUCTION_READINESS_CHECKLIST.md](./PRODUCTION_READINESS_CHECKLIST.md)
 7. [DIN_SPECIFICATION_DE.md](./DIN_SPECIFICATION_DE.md)
 8. [guides/README.md](./guides/README.md)
+9. [versioning/POLICY.md](./versioning/POLICY.md)
+10. [versioning/VERSIONS.md](./versioning/VERSIONS.md)
+11. [versioning/CHANGELOG.md](./versioning/CHANGELOG.md)
 
 ## 2.1 Change Playbooks (neu)
 - [Guides Index](./guides/README.md)

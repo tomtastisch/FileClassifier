@@ -41,9 +41,10 @@ bash tools/check-portable-filetypedetection.sh --clean
 
 ## 6.1 Versionierung (zentral)
 - Zentrale Versionsquelle: `Directory.Build.props`.
-- Aktueller Baseline-Stand: `1.0.0`.
+ - Aktueller Baseline-Stand: `3.0.24`.
 - Gilt konsistent für `FileTypeDetectionLib`, `FileClassifier.App` und `FileTypeDetectionLib.Tests`.
 - Semantik: `Version` (NuGet/Produkt), `AssemblyVersion`, `FileVersion`, `InformationalVersion`.
+- Policy und Historie: [docs/versioning/POLICY.md](docs/versioning/POLICY.md), [docs/versioning/VERSIONS.md](docs/versioning/VERSIONS.md), [docs/versioning/CHANGELOG.md](docs/versioning/CHANGELOG.md)
 
 ## 7. Aktueller Strukturzustand
 ### 7.1 Source

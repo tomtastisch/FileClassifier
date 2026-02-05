@@ -1,10 +1,10 @@
 <Project>
   <PropertyGroup>
     <!-- Central, deterministic project versioning (SemVer baseline). -->
-    <Version>1.0.0</Version>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <InformationalVersion>1.0.0</InformationalVersion>
+    <Version>3.0.24</Version>
+    <AssemblyVersion>3.0.24.0</AssemblyVersion>
+    <FileVersion>3.0.24.0</FileVersion>
+    <InformationalVersion>3.0.24</InformationalVersion>
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
