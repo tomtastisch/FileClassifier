@@ -11,8 +11,9 @@ Diese Doku ist in drei Ebenen getrennt:
 2. [02_ARCHITECTURE_AND_FLOWS.md](./02_ARCHITECTURE_AND_FLOWS.md)
 3. [03_REFERENCES.md](./03_REFERENCES.md)
 4. [04_DETERMINISTIC_HASHING_API_CONTRACT.md](./04_DETERMINISTIC_HASHING_API_CONTRACT.md)
-5. [PRODUCTION_READINESS_CHECKLIST.md](./PRODUCTION_READINESS_CHECKLIST.md)
-6. [DIN_SPECIFICATION_DE.md](./DIN_SPECIFICATION_DE.md)
+5. [test-matrix-hashing.md](./test-matrix-hashing.md)
+6. [PRODUCTION_READINESS_CHECKLIST.md](./PRODUCTION_READINESS_CHECKLIST.md)
+7. [DIN_SPECIFICATION_DE.md](./DIN_SPECIFICATION_DE.md)
 
 ## 2.1 Vertiefende Implementierungsquellen
 - [../src/FileTypeDetection/Detection/README.md](../src/FileTypeDetection/Detection/README.md)
