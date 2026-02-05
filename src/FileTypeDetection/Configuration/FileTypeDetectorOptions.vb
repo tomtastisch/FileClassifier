@@ -12,7 +12,7 @@ Namespace FileTypeDetection
     ''' - Grenzen sind konservativ, um Memory-/CPU-DoS (z. B. Zip-Bomb) zu reduzieren.
     ''' - Logger darf Beobachtbarkeit liefern, aber niemals das Ergebnis beeinflussen.
     ''' </summary>
-Public NotInheritable Class FileTypeDetectorOptions
+    Public NotInheritable Class FileTypeDetectorOptions
         Private Const MinPositiveLong As Long = 1
         Private Const MinPositiveInt As Integer = 1
         Private Const MinNonNegativeInt As Integer = 0

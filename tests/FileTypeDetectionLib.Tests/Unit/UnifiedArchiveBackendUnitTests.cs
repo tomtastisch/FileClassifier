@@ -41,21 +41,14 @@ public sealed class UnifiedArchiveBackendUnitTests
     [Fact]
     public void FileMaterializer_Persist_ExtractsTarGz_WhenSecureExtractEnabled()
     {
-        var tempRoot = TestTempPaths.CreateTempRoot("ftd-unified-archive");
-        var destination = Path.Combine(tempRoot, "out");
+        using var tempRoot = TestTempPaths.CreateScope("ftd-unified-archive");
+        var destination = Path.Combine(tempRoot.RootPath, "out");
         var tarGz = ArchivePayloadFactory.CreateTarGzWithSingleEntry("inner/note.txt", "hello");
 
-        try
-        {
-            var ok = FileMaterializer.Persist(tarGz, destination, overwrite: false, secureExtract: true);
-            Assert.True(ok);
-            Assert.True(File.Exists(Path.Combine(destination, "inner", "note.txt")));
-            Assert.Equal("hello", File.ReadAllText(Path.Combine(destination, "inner", "note.txt")));
-        }
-        finally
-        {
-            TestTempPaths.CleanupTempRoot(tempRoot);
-        }
+        var ok = FileMaterializer.Persist(tarGz, destination, overwrite: false, secureExtract: true);
+        Assert.True(ok);
+        Assert.True(File.Exists(Path.Combine(destination, "inner", "note.txt")));
+        Assert.Equal("hello", File.ReadAllText(Path.Combine(destination, "inner", "note.txt")));
     }
 
     [Fact]
@@ -66,8 +59,8 @@ public sealed class UnifiedArchiveBackendUnitTests
         options.RejectArchiveLinks = true;
         FileTypeOptions.SetSnapshot(options);
 
-        var tempRoot = TestTempPaths.CreateTempRoot("ftd-unified-archive");
-        var destination = Path.Combine(tempRoot, "out");
+        using var tempRoot = TestTempPaths.CreateScope("ftd-unified-archive");
+        var destination = Path.Combine(tempRoot.RootPath, "out");
         var tarWithLink = ArchivePayloadFactory.CreateTarWithSymlink("safe.txt", "ok", "ln.txt", "safe.txt");
 
         try
@@ -79,7 +72,6 @@ public sealed class UnifiedArchiveBackendUnitTests
         finally
         {
             FileTypeOptions.SetSnapshot(original);
-            TestTempPaths.CleanupTempRoot(tempRoot);
         }
     }
 }
