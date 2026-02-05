@@ -18,5 +18,9 @@ internal sealed class DetectionScenarioState
     internal byte[]? LastSafeReadBytes { get; set; }
     internal bool? LastIsOfTypeResult { get; set; }
     internal bool? LastArchiveValidateResult { get; set; }
-    internal FileTypeDetectorOptions OriginalOptions { get; } = FileTypeDetector.GetDefaultOptions();
+    internal DeterministicHashEvidence? LastHashEvidence { get; set; }
+    internal DeterministicHashRoundTripReport? LastRoundTripReport { get; set; }
+    internal string? LogicalHashReference { get; set; }
+    internal string? PhysicalHashReference { get; set; }
+    internal FileTypeProjectOptions OriginalOptions { get; } = FileTypeDetector.GetDefaultOptions();
 }

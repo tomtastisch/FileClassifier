@@ -1,5 +1,5 @@
 # language: de
-@integration @processing @materializer @zip @archive
+@integration @processing @materializer @archive
 Funktionalität: Einheitliches Verhalten fuer Archivtypen aus Byte-Arrays
 
   Hintergrund:

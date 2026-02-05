@@ -113,6 +113,40 @@ public sealed class FileTypeDetectionSteps
         state.LastResult = detector.Detect(state.CurrentPath!);
     }
 
+    [When("ich den deterministischen Hashbericht der aktuellen Datei berechne")]
+    public void WhenICalculateDeterministicHashReportForCurrentFile()
+    {
+        var state = State();
+        Assert.False(string.IsNullOrWhiteSpace(state.CurrentPath));
+        state.LastRoundTripReport = DeterministicHashing.VerifyRoundTrip(state.CurrentPath!);
+    }
+
+    [When("ich den deterministischen Hash der aktuellen Bytes berechne")]
+    public void WhenICalculateDeterministicHashForCurrentBytes()
+    {
+        var state = State();
+        Assert.NotNull(state.CurrentPayload);
+        state.LastHashEvidence = DeterministicHashing.HashBytes(state.CurrentPayload!, "bdd-current-bytes");
+    }
+
+    [When("ich den letzten logischen Hash als Referenz speichere")]
+    public void WhenIStoreLastLogicalHashAsReference()
+    {
+        var state = State();
+        Assert.NotNull(state.LastHashEvidence);
+        Assert.True(state.LastHashEvidence!.Digests.HasLogicalHash);
+        state.LogicalHashReference = state.LastHashEvidence.Digests.LogicalSha256;
+    }
+
+    [When("ich den letzten physischen Hash als Referenz speichere")]
+    public void WhenIStoreLastPhysicalHashAsReference()
+    {
+        var state = State();
+        Assert.NotNull(state.LastHashEvidence);
+        Assert.True(state.LastHashEvidence!.Digests.HasPhysicalHash);
+        state.PhysicalHashReference = state.LastHashEvidence.Digests.PhysicalSha256;
+    }
+
     [When("ich den Dateityp der aktuellen Bytes ermittle")]
     public void WhenIDetectTheCurrentPayloadType()
     {
@@ -128,16 +162,16 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         Assert.NotNull(state.CurrentPayload);
-        state.LastArchiveValidateResult = ZipProcessing.TryValidate(state.CurrentPayload!);
+        state.LastArchiveValidateResult = ArchiveProcessing.TryValidate(state.CurrentPayload!);
     }
 
-    [When("ich extrahiere die ZIP-Datei sicher in Memory")]
-    [When("ich die ZIP-Datei sicher in den Speicher extrahiere")]
-    public void WhenIExtractZipFileSafelyToMemory()
+    [When("ich extrahiere die Archiv-Datei sicher in Memory")]
+    [When("ich die Archiv-Datei sicher in den Speicher extrahiere")]
+    public void WhenIExtractArchiveFileSafelyToMemory()
     {
         var state = State();
         Assert.False(string.IsNullOrWhiteSpace(state.CurrentPath));
-        var entries = ZipProcessing.ExtractToMemory(state.CurrentPath!, verifyBeforeExtract: true);
+        var entries = ArchiveProcessing.ExtractToMemory(state.CurrentPath!, verifyBeforeExtract: true);
         state.LastExtractedEntries = entries;
     }
 
@@ -146,7 +180,7 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         Assert.NotNull(state.CurrentPayload);
-        state.LastExtractedEntries = ZipProcessing.TryExtractToMemory(state.CurrentPayload!);
+        state.LastExtractedEntries = ArchiveProcessing.TryExtractToMemory(state.CurrentPayload!);
     }
 
     [When("ich übernehme den ersten extrahierten Eintrag als aktuelle Bytes")]
@@ -326,6 +360,14 @@ public sealed class FileTypeDetectionSteps
         Assert.NotEmpty(state.LastExtractedEntries!);
     }
 
+    [Then("ist der extrahierte Eintragssatz leer")]
+    public void ThenExtractedEntrySetIsEmpty()
+    {
+        var state = State();
+        Assert.NotNull(state.LastExtractedEntries);
+        Assert.Empty(state.LastExtractedEntries!);
+    }
+
     [Then("existiert die gespeicherte Datei {string}")]
     public void ThenMaterializedFileExists(string fileName)
     {
@@ -371,6 +413,78 @@ public sealed class FileTypeDetectionSteps
         var state = State();
         Assert.NotNull(state.LastPersistResult);
         Assert.True(state.LastPersistResult!.Value);
+    }
+
+    [Then("ist der Hashbericht logisch konsistent")]
+    public void ThenHashReportIsLogicallyConsistent()
+    {
+        var state = State();
+        Assert.NotNull(state.LastRoundTripReport);
+        Assert.True(state.LastRoundTripReport!.LogicalConsistent);
+        Assert.True(state.LastRoundTripReport.LogicalH1EqualsH2);
+        Assert.True(state.LastRoundTripReport.LogicalH1EqualsH3);
+        Assert.True(state.LastRoundTripReport.LogicalH1EqualsH4);
+    }
+
+    [Then("ist der Hashbericht als Archiv klassifiziert {string}")]
+    public void ThenHashReportArchiveClassificationIs(string expectedBoolean)
+    {
+        var state = State();
+        Assert.NotNull(state.LastRoundTripReport);
+        Assert.True(bool.TryParse(expectedBoolean, out var expected), $"Expected boolean literal but got: {expectedBoolean}");
+        Assert.Equal(expected, state.LastRoundTripReport!.IsArchiveInput);
+    }
+
+    [Then("ist im letzten Hashnachweis ein logischer Hash vorhanden")]
+    public void ThenLastHashEvidenceContainsLogicalDigest()
+    {
+        var state = State();
+        Assert.NotNull(state.LastHashEvidence);
+        Assert.True(state.LastHashEvidence!.Digests.HasLogicalHash);
+        Assert.False(string.IsNullOrWhiteSpace(state.LastHashEvidence.Digests.LogicalSha256));
+    }
+
+    [Then("ist im letzten Hashnachweis ein physischer Hash vorhanden")]
+    public void ThenLastHashEvidenceContainsPhysicalDigest()
+    {
+        var state = State();
+        Assert.NotNull(state.LastHashEvidence);
+        Assert.True(state.LastHashEvidence!.Digests.HasPhysicalHash);
+        Assert.False(string.IsNullOrWhiteSpace(state.LastHashEvidence.Digests.PhysicalSha256));
+    }
+
+    [Then("entsprechen sich logischer und physischer Hash im letzten Nachweis {string}")]
+    public void ThenLogicalAndPhysicalDigestEqualityIs(string expectedBoolean)
+    {
+        var state = State();
+        Assert.NotNull(state.LastHashEvidence);
+        var evidence = state.LastHashEvidence!;
+        Assert.True(bool.TryParse(expectedBoolean, out var expected), $"Expected boolean literal but got: {expectedBoolean}");
+
+        var actual = evidence.Digests.HasLogicalHash &&
+                     evidence.Digests.HasPhysicalHash &&
+                     string.Equals(evidence.Digests.LogicalSha256, evidence.Digests.PhysicalSha256, StringComparison.Ordinal);
+        Assert.Equal(expected, actual);
+    }
+
+    [Then("entspricht der letzte logische Hash der gespeicherten Referenz")]
+    public void ThenLastLogicalHashMatchesStoredReference()
+    {
+        var state = State();
+        Assert.NotNull(state.LastHashEvidence);
+        Assert.False(string.IsNullOrWhiteSpace(state.LogicalHashReference));
+        Assert.True(state.LastHashEvidence!.Digests.HasLogicalHash);
+        Assert.Equal(state.LogicalHashReference, state.LastHashEvidence.Digests.LogicalSha256);
+    }
+
+    [Then("entspricht der letzte physische Hash der gespeicherten Referenz")]
+    public void ThenLastPhysicalHashMatchesStoredReference()
+    {
+        var state = State();
+        Assert.NotNull(state.LastHashEvidence);
+        Assert.False(string.IsNullOrWhiteSpace(state.PhysicalHashReference));
+        Assert.True(state.LastHashEvidence!.Digests.HasPhysicalHash);
+        Assert.Equal(state.PhysicalHashReference, state.LastHashEvidence.Digests.PhysicalSha256);
     }
 
     [Then("bleibt die bestehende Datei {string} unveraendert")]

@@ -8,20 +8,37 @@ Dieses Dokument beschreibt alle oeffentlichen Einstiegspunkte der API mit Signat
 - Side-Effects: Dateisystemschreibvorgaenge oder globale Optionsaenderungen.
 - Flow-ID: Verweis auf Architekturablaeufe in `02_ARCHITECTURE_AND_FLOWS.md`.
 
-## 2.1 API-Wahrheit vs. historischer Name (prominent)
-- `TryValidateZip(...)` ist ein **historischer Kompatibilitaetsname**; die Signatur bleibt stabil.
-- Heutige Semantik: Die Methode validiert **alle intern unterstuetzten Archivcontainer** fail-closed (ZIP/TAR/GZIP/7z/RAR), nicht nur PKZIP.
-- Warum historisch: Das Public Surface blieb absichtlich unveraendert, um API-Breaks zu vermeiden.
-- Technisch passiert die Typfeststellung ueber `ArchiveTypeResolver` + `ArchiveSafetyGate`; nur OOXML-Refinement bleibt ZIP-spezifisch.
+## 2.1 API-Semantik (prominent)
+- `TryValidateArchive(...)` ist die kanonische Validierungs-API.
+- Die Methode validiert **alle intern unterstuetzten Archivformate** fail-closed (u. a. ZIP/TAR/GZIP/7z/RAR).
+- Technisch passiert die Typfeststellung ueber `ArchiveTypeResolver` + `ArchiveSafetyGate`; OOXML-Refinement bleibt container-spezifisch fuer ZIP-basierte OOXML-Dateien.
+- Begriffsklaerung: `ContainerType` bezeichnet das **physische Archivformat** (z. B. ZIP/TAR/GZIP/7z/RAR), waehrend `FileKind.Zip` aus Kompatibilitaetsgruenden der logische Archiv-Rueckgabetyp bleibt.
 
 ## 2.2 Weiterfuehrende Detailquellen pro Familie
 | API-Familie | Detailquelle | Zweck |
 |---|---|---|
-| `FileTypeDetector` / `ZipProcessing` | [`../src/FileTypeDetection/Detection/README.md`](../src/FileTypeDetection/Detection/README.md) | SSOT-Detektion, Header-Magic, Aliaslogik |
-| `FileTypeDetector` / `ZipProcessing` / `FileMaterializer` | [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md) | Archive-Gate, Guards, Extraktions-Engine |
-| `FileTypeOptions` / `FileTypeSecurityBaseline` | [`../src/FileTypeDetection/Configuration/README.md`](../src/FileTypeDetection/Configuration/README.md) | globale Optionen und Baseline |
-| Rueckgabemodelle (`FileType`, `DetectionDetail`, `ZipExtractedEntry`) | [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md) | Modellvertraege der Public API |
+| `FileTypeDetector` / `ArchiveProcessing` | [`../src/FileTypeDetection/Detection/README.md`](../src/FileTypeDetection/Detection/README.md) | SSOT-Detektion, Header-Magic, Aliaslogik |
+| `FileTypeDetector` / `ArchiveProcessing` / `FileMaterializer` | [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md) | Archive-Gate, Guards, Extraktions-Engine |
+| `FileTypeOptions` / `FileTypeProjectBaseline` | [`../src/FileTypeDetection/Configuration/README.md`](../src/FileTypeDetection/Configuration/README.md) | globale Optionen und Baseline |
+| Rueckgabemodelle (`FileType`, `DetectionDetail`, `ZipExtractedEntry`, `DeterministicHash*`) | [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md) | Modellvertraege der Public API |
 | Modulnavigation | [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md) | Uebersicht und Einstieg je Leserrolle |
+
+## 2.2.1 Physische Modellablage (ohne Funktionsaenderung)
+Die Rueckgabemodelle sind rein organisatorisch in Unterordner aufgeteilt; die API-Semantik bleibt unveraendert:
+- Detection-Modelle: [`../src/FileTypeDetection/Abstractions/Detection/README.md`](../src/FileTypeDetection/Abstractions/Detection/README.md)
+- Archive-Modelle: [`../src/FileTypeDetection/Abstractions/Archive/README.md`](../src/FileTypeDetection/Abstractions/Archive/README.md)
+- Hashing-Modelle: [`../src/FileTypeDetection/Abstractions/Hashing/README.md`](../src/FileTypeDetection/Abstractions/Hashing/README.md)
+
+## 2.3 Glossar (kanonische Begriffe)
+| Begriff | Bedeutung |
+|---|---|
+| Archivformat | Physischer Container wie ZIP, TAR, TAR.GZ, 7z oder RAR. |
+| ContainerType | Interner technischer Typ fuer das physische Archivformat. |
+| FileKind.Zip | Oeffentlicher, kompatibler logischer Rueckgabetyp fuer erkannte Archive. |
+| PhysicalHash | SHA-256 ueber die unveraenderten Rohbytes einer Datei oder eines Byte-Arrays. |
+| LogicalHash | SHA-256 ueber kanonisierten Inhaltszustand (Entry-Pfad + Inhalt), unabhaengig von Containerdetails. |
+| FastHash | Optionaler, nicht-kryptografischer Vergleichsdigest (`XxHash3`) fuer Performance-Shortcuts. |
+| Fail-closed | Unsichere oder ungueltige Eingaben liefern nur sichere Rueckgaben (`Unknown`, `False`, leere Liste). |
 
 ## 3. Vollstaendige Methodenmatrix (Public API)
 | Familie | Methode | Input | Output | Side-Effects | Primarer Flow |
@@ -32,35 +49,45 @@ Dieses Dokument beschreibt alle oeffentlichen Einstiegspunkte der API mit Signat
 | `FileTypeDetector` | `DetectDetailed(path)` | Datei-Pfad | `DetectionDetail` | keine | `F1` |
 | `FileTypeDetector` | `DetectDetailed(path, verifyExtension)` | Datei-Pfad + Bool | `DetectionDetail` | keine | `F1` |
 | `FileTypeDetector` | `DetectAndVerifyExtension(path)` | Datei-Pfad | `Boolean` | keine | `F8` |
-| `FileTypeDetector` | `TryValidateZip(path)` | Datei-Pfad | `Boolean` | keine | `F3` |
+| `FileTypeDetector` | `TryValidateArchive(path)` | Datei-Pfad | `Boolean` | keine | `F3` |
 | `FileTypeDetector` | `Detect(data)` | `Byte()` | `FileType` | keine | `F2` |
 | `FileTypeDetector` | `IsOfType(data, kind)` | `Byte()` + `FileKind` | `Boolean` | keine | `F2` |
-| `FileTypeDetector` | `ExtractZipSafe(path, destination, verifyBeforeExtract)` | Pfad + Ziel + Bool | `Boolean` | schreibt auf Disk | `F5` |
-| `FileTypeDetector` | `ExtractZipSafeToMemory(path, verifyBeforeExtract)` | Pfad + Bool | `IReadOnlyList(Of ZipExtractedEntry)` | keine | `F4` |
-| `ZipProcessing` | `TryValidate(path)` | Datei-Pfad | `Boolean` | keine | `F3` |
-| `ZipProcessing` | `TryValidate(data)` | `Byte()` | `Boolean` | keine | `F3` |
-| `ZipProcessing` | `ExtractToMemory(path, verifyBeforeExtract)` | Pfad + Bool | `IReadOnlyList(Of ZipExtractedEntry)` | keine | `F4` |
-| `ZipProcessing` | `TryExtractToMemory(data)` | `Byte()` | `IReadOnlyList(Of ZipExtractedEntry)` | keine | `F4` |
+| `FileTypeDetector` | `ExtractArchiveSafe(path, destination, verifyBeforeExtract)` | Pfad + Ziel + Bool | `Boolean` | schreibt auf Disk | `F5` |
+| `FileTypeDetector` | `ExtractArchiveSafeToMemory(path, verifyBeforeExtract)` | Pfad + Bool | `IReadOnlyList(Of ZipExtractedEntry)` | keine | `F4` |
+| `ArchiveProcessing` | `TryValidate(path)` | Datei-Pfad | `Boolean` | keine | `F3` |
+| `ArchiveProcessing` | `TryValidate(data)` | `Byte()` | `Boolean` | keine | `F3` |
+| `ArchiveProcessing` | `ExtractToMemory(path, verifyBeforeExtract)` | Pfad + Bool | `IReadOnlyList(Of ZipExtractedEntry)` | keine | `F4` |
+| `ArchiveProcessing` | `TryExtractToMemory(data)` | `Byte()` | `IReadOnlyList(Of ZipExtractedEntry)` | keine | `F4` |
 | `FileMaterializer` | `Persist(data, destinationPath)` | `Byte()` + Zielpfad | `Boolean` | schreibt auf Disk | `F6` |
 | `FileMaterializer` | `Persist(data, destinationPath, overwrite)` | `Byte()` + Zielpfad + Bool | `Boolean` | schreibt auf Disk | `F6` |
 | `FileMaterializer` | `Persist(data, destinationPath, overwrite, secureExtract)` | `Byte()` + Zielpfad + 2 Bool | `Boolean` | schreibt auf Disk | `F5`/`F6` |
+| `DeterministicHashing` | `HashFile(path)` | Datei-Pfad | `DeterministicHashEvidence` | keine | `F9` |
+| `DeterministicHashing` | `HashFile(path, options)` | Datei-Pfad + Optionen | `DeterministicHashEvidence` | keine | `F9` |
+| `DeterministicHashing` | `HashBytes(data)` | `Byte()` | `DeterministicHashEvidence` | keine | `F9` |
+| `DeterministicHashing` | `HashBytes(data, label)` | `Byte()` + Label | `DeterministicHashEvidence` | keine | `F9` |
+| `DeterministicHashing` | `HashBytes(data, label, options)` | `Byte()` + Label + Optionen | `DeterministicHashEvidence` | keine | `F9` |
+| `DeterministicHashing` | `HashEntries(entries)` | `IReadOnlyList(Of ZipExtractedEntry)` | `DeterministicHashEvidence` | keine | `F9` |
+| `DeterministicHashing` | `HashEntries(entries, label)` | Entries + Label | `DeterministicHashEvidence` | keine | `F9` |
+| `DeterministicHashing` | `HashEntries(entries, label, options)` | Entries + Label + Optionen | `DeterministicHashEvidence` | keine | `F9` |
+| `DeterministicHashing` | `VerifyRoundTrip(path)` | Datei-Pfad | `DeterministicHashRoundTripReport` | schreibt temp-Datei intern und raeumt auf | `F9` |
+| `DeterministicHashing` | `VerifyRoundTrip(path, options)` | Datei-Pfad + Optionen | `DeterministicHashRoundTripReport` | schreibt temp-Datei intern und raeumt auf | `F9` |
 | `FileTypeOptions` | `LoadOptions(json)` | JSON | `Boolean` | aendert globale Optionen | `F7` |
 | `FileTypeOptions` | `GetOptions()` | - | `String` (JSON) | keine | `F7` |
-| `FileTypeSecurityBaseline` | `ApplyDeterministicDefaults()` | - | `Void` | aendert globale Optionen | `F7` |
+| `FileTypeProjectBaseline` | `ApplyDeterministicDefaults()` | - | `Void` | aendert globale Optionen | `F7` |
 
 ## 4. Methodenfamilien
 ### 4.1 FileTypeDetector
 Details: [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md), [`../src/FileTypeDetection/Detection/README.md`](../src/FileTypeDetection/Detection/README.md), [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md).
 
-**Wichtiger Semantikhinweis:** `TryValidateZip(path)` validiert heute generische Archivcontainer (historischer Methodenname bleibt aus Kompatibilitaetsgruenden bestehen).
+**Wichtiger Semantikhinweis:** `TryValidateArchive(path)` validiert generische Archivcontainer ueber dieselbe fail-closed Pipeline wie Extraktion und Materialisierung.
 
 ```mermaid
 flowchart TD
     I0["Input: Path or Bytes"]
     D1["Detect / DetectDetailed"]
     D2["DetectAndVerifyExtension"]
-    V1["TryValidateZip"]
-    X1["ExtractZipSafe / ExtractZipSafeToMemory"]
+    V1["TryValidateArchive"]
+    X1["ExtractArchiveSafe / ExtractArchiveSafeToMemory"]
     O0["Output: Type / Detail / Bool / Entries"]
 
     I0 --> D1 --> O0
@@ -75,13 +102,13 @@ using FileTypeDetection;
 var detector = new FileTypeDetector();
 var t = detector.Detect("/data/invoice.pdf", verifyExtension: true);
 var d = detector.DetectDetailed("/data/archive.docx", verifyExtension: true);
-bool zipOk = detector.TryValidateZip("/data/archive.zip");
-var entries = detector.ExtractZipSafeToMemory("/data/archive.zip", verifyBeforeExtract: true);
+bool archiveOk = detector.TryValidateArchive("/data/archive.zip");
+var entries = detector.ExtractArchiveSafeToMemory("/data/archive.zip", verifyBeforeExtract: true);
 
-Console.WriteLine($"{t.Kind} / {d.ReasonCode} / {zipOk} / {entries.Count}");
+Console.WriteLine($"{t.Kind} / {d.ReasonCode} / {archiveOk} / {entries.Count}");
 ```
 
-### 4.2 ZipProcessing
+### 4.2 ArchiveProcessing
 API-Name bleibt aus Kompatibilitaetsgruenden erhalten; intern werden Archivcontainer einheitlich behandelt.
 Details: [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md), [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md).
 
@@ -99,10 +126,10 @@ flowchart LR
 ```csharp
 using FileTypeDetection;
 
-bool okPath = ZipProcessing.TryValidate("/data/archive.zip");
-bool okBytes = ZipProcessing.TryValidate(File.ReadAllBytes("/data/archive.zip"));
-var entriesPath = ZipProcessing.ExtractToMemory("/data/archive.zip", verifyBeforeExtract: true);
-var entriesBytes = ZipProcessing.TryExtractToMemory(File.ReadAllBytes("/data/archive.zip"));
+bool okPath = ArchiveProcessing.TryValidate("/data/archive.zip");
+bool okBytes = ArchiveProcessing.TryValidate(File.ReadAllBytes("/data/archive.zip"));
+var entriesPath = ArchiveProcessing.ExtractToMemory("/data/archive.zip", verifyBeforeExtract: true);
+var entriesBytes = ArchiveProcessing.TryExtractToMemory(File.ReadAllBytes("/data/archive.zip"));
 ```
 
 ### 4.3 FileMaterializer
@@ -126,13 +153,13 @@ flowchart TD
 using FileTypeDetection;
 
 byte[] payload = File.ReadAllBytes("/data/input.bin");
-byte[] zipPayload = File.ReadAllBytes("/data/archive.zip");
+byte[] archivePayload = File.ReadAllBytes("/data/archive.zip");
 
 bool rawOk = FileMaterializer.Persist(payload, "/data/out/input.bin", overwrite: false, secureExtract: false);
-bool zipOk = FileMaterializer.Persist(zipPayload, "/data/out/unpacked", overwrite: false, secureExtract: true);
+bool archiveExtractOk = FileMaterializer.Persist(archivePayload, "/data/out/unpacked", overwrite: false, secureExtract: true);
 ```
 
-### 4.4 FileTypeOptions + FileTypeSecurityBaseline
+### 4.4 FileTypeOptions + FileTypeProjectBaseline
 Details: [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md), [`../src/FileTypeDetection/Configuration/README.md`](../src/FileTypeDetection/Configuration/README.md).
 
 ```mermaid
@@ -151,11 +178,44 @@ flowchart LR
 ```csharp
 using FileTypeDetection;
 
-FileTypeSecurityBaseline.ApplyDeterministicDefaults();
+FileTypeProjectBaseline.ApplyDeterministicDefaults();
 bool loaded = FileTypeOptions.LoadOptions("{\"maxBytes\":134217728}");
 string snapshot = FileTypeOptions.GetOptions();
 Console.WriteLine($"Loaded={loaded}; Snapshot={snapshot}");
 ```
+
+### 4.5 DeterministicHashing
+Details: [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md), [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md).
+Formaler API-Contract: [`./04_DETERMINISTIC_HASHING_API_CONTRACT.md`](./04_DETERMINISTIC_HASHING_API_CONTRACT.md).
+
+```mermaid
+flowchart LR
+    HI["Input: File/Bytes/Entries"]
+    H1["Physical SHA-256 (raw bytes)"]
+    H2["Logical SHA-256 (canonical content)"]
+    H3["optional Fast XxHash3"]
+    HR["RoundTrip h1-h4 report"]
+
+    HI --> H1
+    HI --> H2
+    HI --> H3
+    HI --> HR
+```
+
+```csharp
+using FileTypeDetection;
+
+var evidence = DeterministicHashing.HashFile("/data/archive.zip");
+var report = DeterministicHashing.VerifyRoundTrip("/data/archive.zip");
+
+Console.WriteLine($"{evidence.Digests.PhysicalSha256} / {evidence.Digests.LogicalSha256}");
+Console.WriteLine($"LogicalConsistent={report.LogicalConsistent}");
+```
+
+Hinweis:
+- `PhysicalSha256` und `LogicalSha256` sind Security-SSOT.
+- `Fast*XxHash3` ist optionaler Performance-Digest und kein kryptografischer Integritaetsnachweis.
+- Overloads ohne `options` verwenden die globale Policy `FileTypeOptions.GetSnapshot().DeterministicHash`.
 
 ## 5. Nicht-Ziele
 - Keine interne Low-Level-Implementierung im Detail (siehe `03_REFERENCES.md`).
@@ -169,12 +229,12 @@ Die folgenden Regeln gelten fuer `ArchiveSafetyGate` + `ArchiveExtractor`:
 | Link-Entries (`symlink`/`hardlink`) | `RejectArchiveLinks = true` | Link-Targets werden fail-closed verworfen. Override nur per explizitem Opt-In (`false`) und eigener Risikoentscheidung des Consumers. |
 | Unknown Entry Size | `AllowUnknownArchiveEntrySize = false` | "Unknown" bedeutet `Size` nicht vorhanden oder negativ. Dann wird fail-closed geblockt bzw. per bounded Streaming gemessen; bei Grenzverletzung -> `False`. |
 | Path-Sicherheit | aktiv | Entry-Name wird normalisiert (`\\` -> `/`), root/traversal/leer werden verworfen, Zielpfad muss Prefix-Check bestehen. |
-| Grenzen | aktiv | Entry-Anzahl, per-Entry-Bytes, Gesamtbytes, Rekursionstiefe und (ZIP-spezifisch) Ratio/Nested-Regeln bleiben fail-closed. |
+| Grenzen | aktiv | Entry-Anzahl, per-Entry-Bytes, Gesamtbytes, Rekursionstiefe und archivformat-spezifische Ratio/Nested-Regeln bleiben fail-closed. |
 
 ## 7. Formatmatrix (implementierte Semantik)
-Implementiert bedeutet hier: Container wird geoeffnet, Gate angewendet und Extraktion ueber dieselbe Pipeline ausgefuehrt.
+Implementiert bedeutet hier: Archivformat wird geoeffnet, Gate angewendet und Extraktion ueber dieselbe Pipeline ausgefuehrt.
 
-| Format | Detection (`Detect`) | Validate (`TryValidateZip` / `ZipProcessing.TryValidate`) | Extract-to-Memory (`ZipProcessing.TryExtractToMemory`) | Extract-to-Disk (`FileMaterializer.Persist(..., secureExtract:=True)`) |
+| Format | Detection (`Detect`) | Validate (`TryValidateArchive` / `ArchiveProcessing.TryValidate`) | Extract-to-Memory (`ArchiveProcessing.TryExtractToMemory`) | Extract-to-Disk (`FileMaterializer.Persist(..., secureExtract:=True)`) |
 |---|---|---|---|---|
 | ZIP | Ja (Magic + Gate + optional OOXML-Refinement) | Ja | Ja | Ja |
 | TAR | Ja (Container-Erkennung + Gate, logisches `FileKind.Zip`) | Ja | Ja | Ja |
@@ -189,7 +249,7 @@ Die Byte-Pfade (Detect/Validate/Extract/Persist) sind auf die gleiche Gate-Pipel
 
 | Format | Detection | Validate | Extract Memory | Extract Disk | Testnachweis |
 |---|---|---|---|---|---|
-| ZIP | abgedeckt | abgedeckt | abgedeckt | abgedeckt | `tests/FileTypeDetectionLib.Tests/Unit/ZipProcessingFacadeUnitTests.cs`, `tests/FileTypeDetectionLib.Tests/Unit/ZipExtractionUnitTests.cs`, `tests/FileTypeDetectionLib.Tests/Unit/FileMaterializerUnitTests.cs` |
+| ZIP | abgedeckt | abgedeckt | abgedeckt | abgedeckt | `tests/FileTypeDetectionLib.Tests/Unit/ArchiveProcessingFacadeUnitTests.cs`, `tests/FileTypeDetectionLib.Tests/Unit/ArchiveExtractionUnitTests.cs`, `tests/FileTypeDetectionLib.Tests/Unit/FileMaterializerUnitTests.cs` |
 | TAR | abgedeckt | indirekt ueber unified validate | implizit ueber Backend-Pfad | implizit ueber Backend-Pfad | `tests/FileTypeDetectionLib.Tests/Unit/UnifiedArchiveBackendUnitTests.cs` |
 | TAR.GZ | abgedeckt | abgedeckt | abgedeckt | abgedeckt | `tests/FileTypeDetectionLib.Tests/Unit/UnifiedArchiveBackendUnitTests.cs` |
 | 7z | abgedeckt | abgedeckt | abgedeckt | abgedeckt | `tests/FileTypeDetectionLib.Tests/Features/FTD_BDD_040_ARCHIVE_TYPEN_BYTEARRAY_UND_MATERIALISIERUNG.feature` |
@@ -197,7 +257,7 @@ Die Byte-Pfade (Detect/Validate/Extract/Persist) sind auf die gleiche Gate-Pipel
 
 Zusatznachweis Security:
 - Link-Entry fail-closed (`RejectArchiveLinks=true`): `tests/FileTypeDetectionLib.Tests/Unit/UnifiedArchiveBackendUnitTests.cs`.
-- ZIP-Fail-closed Regressionen (Traversal, malformed Header, Overwrite/Target-Guards): `tests/FileTypeDetectionLib.Tests/Unit/FileMaterializerUnitTests.cs`.
+- Archiv-Fail-closed Regressionen (Traversal, malformed Header, Overwrite/Target-Guards): `tests/FileTypeDetectionLib.Tests/Unit/FileMaterializerUnitTests.cs`.
 
 Portabilitaet/Struktur:
 - Public API bleibt stabil; interne Verantwortungen sind getrennt (`Detection` SSOT, `Infrastructure` Gate/Backend/Extractor, `Configuration` Policies, `Abstractions` Rueckgabemodelle).

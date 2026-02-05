@@ -1,7 +1,7 @@
 # 02 - Gesamtarchitektur und Ablauffluesse
 
 ## 1. Zweck und Scope
-Dieses Dokument beschreibt die oeffentliche API (Use-Cases), die interne Kernpipeline sowie die wesentlichen Laufzeitfluesse (Detektion, ZIP-Validierung, Extraktion, Persistenz).
+Dieses Dokument beschreibt die oeffentliche API (Use-Cases), die interne Kernpipeline sowie die wesentlichen Laufzeitfluesse (Detektion, Archiv-Validierung, Extraktion, Persistenz).
 Es dient als Architektur- und Ablaufreferenz auf Dokumentationsebene und ersetzt keine Code-Reviews der Guards.
 
 ## 2. Begriffe und Notation
@@ -14,12 +14,13 @@ Es dient als Architektur- und Ablaufreferenz auf Dokumentationsebene und ersetzt
 - `F0`: ReadFileSafe Utility
 - `F1`: Detect (Path)
 - `F2`: Detect (Bytes)
-- `F3`: ZIP Validate
-- `F4`: ZIP Extract to Memory
-- `F5`: ZIP Extract to Disk
+- `F3`: Archive Validate
+- `F4`: Archive Extract to Memory
+- `F5`: Archive Extract to Disk
 - `F6`: Raw Byte Materialize (Persist)
 - `F7`: Global Options/Baseline
 - `F8`: Extension Policy Check
+- `F9`: Deterministic Hashing / h1-h4 RoundTrip
 
 ### 2.3 Mermaid-Layout (global)
 Hinweis: Diese `init`-Konfiguration reduziert Kreuzungen und erhoeht Lesbarkeit.
@@ -33,16 +34,19 @@ flowchart LR
 
 ### 2.4 Detailquellen fuer tieferes Drill-Down
 - Detection-Details: [`../src/FileTypeDetection/Detection/README.md`](../src/FileTypeDetection/Detection/README.md)
-- Infrastructure-Details (Guards/ZIP internals): [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md)
+- Infrastructure-Details (Guards/Archive internals): [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md)
 - Konfigurationsdetails: [`../src/FileTypeDetection/Configuration/README.md`](../src/FileTypeDetection/Configuration/README.md)
 - Rueckgabemodelle: [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md)
+- Rueckgabemodelle Detection: [`../src/FileTypeDetection/Abstractions/Detection/README.md`](../src/FileTypeDetection/Abstractions/Detection/README.md)
+- Rueckgabemodelle Archive: [`../src/FileTypeDetection/Abstractions/Archive/README.md`](../src/FileTypeDetection/Abstractions/Archive/README.md)
+- Rueckgabemodelle Hashing: [`../src/FileTypeDetection/Abstractions/Hashing/README.md`](../src/FileTypeDetection/Abstractions/Hashing/README.md)
 - Funktionskatalog mit Beispielen: [`./01_FUNCTIONS.md`](./01_FUNCTIONS.md)
 
 ## 3. Architekturuebersicht (Systemkontext)
 ### 3.1 E2E-Systemkontext (kompakt)
 Dieses Diagramm zeigt nur Verantwortungsbereiche und Hauptdatenfluesse:
 Input -> Public API -> Core Pipeline -> Outputs.
-Detailentscheidungen (ZIP-Fall, Refinement, Persistenzzweig) folgen in Abschnitt 4.
+Detailentscheidungen (Archivfall, Refinement, Persistenzzweig) folgen in Abschnitt 4.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 80, "rankSpacing": 90}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -56,7 +60,7 @@ flowchart LR
   subgraph API["Public API"]
     direction TB
     A1["FileTypeDetector"]
-    A2["ZipProcessing"]
+    A2["ArchiveProcessing"]
     A3["FileMaterializer"]
     A4["FileTypeOptions / Baseline"]
   end
@@ -65,9 +69,9 @@ flowchart LR
     direction TB
     C1["ReadHeader"]
     C1B["DetectByMagic"]
-    C2["ZipSafetyGate"]
+    C2["ArchiveSafetyGate"]
     C3["OpenXmlRefiner"]
-    C4["ZipExtractor"]
+    C4["ArchiveExtractor"]
   end
 
   subgraph OUT["Outputs"]
@@ -99,13 +103,13 @@ flowchart LR
 
 Kurzlesehilfe:
 - `FileTypeOptions/Baseline` ist Konfigurationskontext (gestrichelt), kein Datenfluss.
-- `ZipSafetyGate` ist das zentrale fail-closed-Gate fuer ZIP-bezogene Pfade.
+- `ArchiveSafetyGate` ist das zentrale fail-closed-Gate fuer archivbezogene Pfade.
 
 ## 4. Flussdiagramme (entscheidungsrelevante Ablaeufe)
-### 4.1 Ablauf A: Detektion und ZIP-Validierung
-Dieses Diagramm zeigt die Kernentscheidung: `Magic == ZIP?` sowie die fail-closed-Kaskade ueber `ZipSafetyGate`.
+### 4.1 Ablauf A: Detektion und Archiv-Validierung
+Dieses Diagramm zeigt die Kernentscheidung: `Magic == Archiv?` sowie die fail-closed-Kaskade ueber `ArchiveSafetyGate`.
 Oben: Typdetektion (`FileType`/`DetectionDetail`).
-Unten: reine ZIP-Validierung (`bool`) ueber denselben Gate-Knoten.
+Unten: reine Archiv-Validierung (`bool`) ueber denselben Gate-Knoten.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 70, "rankSpacing": 80}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -113,27 +117,27 @@ flowchart TD
   I1["Input: path or bytes"] --> D1["Detect(...) / DetectDetailed(...)"]
   D1 --> H1["ReadHeader"]
   H1 --> M1["DetectByMagic"]
-  M1 --> Q1{"Magic == ZIP?"}
+  M1 --> Q1{"Magic == Archiv?"}
 
   Q1 -->|"No"| T1["Resolve(kind) -> Type Output"]
-  Q1 -->|"Yes"| G1["ZipSafetyGate"] --> Q2{"ZIP safe?"}
+  Q1 -->|"Yes"| G1["ArchiveSafetyGate"] --> Q2{"Archiv safe?"}
 
   Q2 -->|"No"| U1["Unknown (fail-closed)"]
-  Q2 -->|"Yes"| R1["OpenXmlRefiner"] --> T2["Refined or Generic ZIP -> Type Output"]
+  Q2 -->|"Yes"| R1["OpenXmlRefiner"] --> T2["Refined or Generic Archive -> Type Output"]
 
-  I1 --> V1["TryValidateZip / ZipProcessing.TryValidate(...)"]
+  I1 --> V1["TryValidateArchive / ArchiveProcessing.TryValidate(...)"]
   V1 --> G1
   Q2 --> V2["Validate Output: Bool"]
 ```
 
 Kurzlesehilfe:
-- `ZipSafetyGate` ist SSOT fuer ZIP-Sicherheit in den gezeigten Pfaden.
-- `OpenXmlRefiner` laeuft nur im ZIP-OK-Fall.
+- `ArchiveSafetyGate` ist SSOT fuer Archiv-Sicherheit in den gezeigten Pfaden.
+- `OpenXmlRefiner` laeuft nur im Archiv-OK-Fall.
 
 ### 4.2 Ablauf B: Extraktion (Memory) vs. Persistenz (Disk)
-Dieses Diagramm zeigt zwei ZIP-Use-Cases:
+Dieses Diagramm zeigt zwei Archiv-Use-Cases:
 (1) sichere In-Memory-Extraktion (Entries-Liste)
-(2) Persistenz auf Disk (Raw Write oder ZIP-Extract), jeweils mit fail-closed Ergebnissen.
+(2) Persistenz auf Disk (Raw Write oder Archiv-Extract), jeweils mit fail-closed Ergebnissen.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 80, "rankSpacing": 90}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -148,15 +152,15 @@ flowchart LR
 %% --- USE CASES ---
     subgraph UC["Public Use-Cases"]
         direction TB
-        UC2["ExtractZipEntries<br/>(ZipProcessing)"]
+        UC2["ExtractArchiveEntries<br/>(ArchiveProcessing)"]
         UC3["PersistBytes<br/>(FileMaterializer)"]
     end
 
-%% --- ZIP CORE (SSOT) ---
-    subgraph CORE["ZIP Core (SSOT)"]
+%% --- ARCHIVE CORE (SSOT) ---
+    subgraph CORE["Archive Core (SSOT)"]
         direction TB
-        G["ZipSafetyGate"]
-        X["ZipExtractor"]
+        G["ArchiveSafetyGate"]
+        X["ArchiveExtractor"]
         G --> X
     end
 
@@ -195,8 +199,8 @@ Kurzlesehilfe:
 - Persistenz liefert immer `Bool` als Rueckgabekontrakt.
 
 ## 5. Sequenzfluesse (Runtime-Interaktionen)
-### 5.1 Detect(path) mit ZIP-Fall
-Dieser Sequenzfluss zeigt den ZIP-Fall im Detektor:
+### 5.1 Detect(path) mit Archivfall
+Dieser Sequenzfluss zeigt den Archivfall im Detektor:
 Detektion -> Gate -> optionales Refinement -> Rueckgabe.
 Der fail-closed-Pfad liefert `Unknown`.
 
@@ -205,18 +209,18 @@ sequenceDiagram
   participant Caller as Consumer
   participant API as FileTypeDetector
   participant REG as FileTypeRegistry
-  participant GATE as ZipSafetyGate
+  participant GATE as ArchiveSafetyGate
   participant REF as OpenXmlRefiner
 
   Caller->>API: Detect(path, verifyExtension)
   API->>API: ReadHeader(path)
   API->>REG: DetectByMagic(header)
 
-  alt non-zip
+  alt non-archive
     REG-->>API: FileKind
     API-->>Caller: FileType
-  else zip
-    API->>GATE: IsZipSafeStream(...)
+  else archive
+    API->>GATE: IsArchiveSafeStream(...)
     GATE-->>API: pass/fail
 
     alt pass
@@ -230,32 +234,28 @@ sequenceDiagram
 ```
 
 ### 5.2 Validate + Extract (Memory)
-Fokus: Byte-Pfad ueber `ZipProcessing`.
+Fokus: Byte-Pfad ueber `ArchiveProcessing`.
 Fail-closed endet mit leerer Liste.
 
 ```mermaid
 sequenceDiagram
   participant Caller as Consumer
-  participant ZP as ZipProcessing
-  participant Guard as ZipPayloadGuard
-  participant Gate as ZipSafetyGate
-  participant Extract as ZipExtractor
+  participant ZP as ArchiveProcessing
+  participant Collect as ArchiveEntryCollector
 
   Caller->>ZP: TryExtractToMemory(data)
-  ZP->>Guard: IsSafeZipPayload(data)
-  Guard->>Gate: IsZipSafeBytes(data)
-  Gate-->>Guard: pass/fail
+  ZP->>Collect: TryCollectFromBytes(data, opt, entries)
+  Collect-->>ZP: pass/fail + entries
 
   alt pass
-    ZP->>Extract: TryExtractZipStreamToMemory(...)
-    Extract-->>Caller: entries list
+    ZP-->>Caller: entries list
   else fail
     ZP-->>Caller: empty list
   end
 ```
 
 ### 5.3 Materializer: Branching (Persist)
-Fokus: Zielpfadpruefung, danach entweder sicherer ZIP-Zweig oder Raw-Write.
+Fokus: Zielpfadpruefung, danach entweder sicherer Archiv-Zweig oder Raw-Write.
 Rueckgabe ist immer boolesch.
 
 ```mermaid
@@ -263,8 +263,9 @@ sequenceDiagram
   participant Caller as Consumer
   participant MAT as FileMaterializer
   participant Guard as DestinationPathGuard
-  participant Gate as ZipSafetyGate
-  participant Extract as ZipExtractor
+  participant Resolver as ArchiveTypeResolver
+  participant Gate as ArchiveSafetyGate
+  participant Extract as ArchiveExtractor
   participant FS as FileSystem
 
   Caller->>MAT: Persist(data, destination, overwrite, secureExtract)
@@ -273,12 +274,14 @@ sequenceDiagram
   alt invalid target
     MAT-->>Caller: false
   else valid target
-    alt secureExtract and zip
-      MAT->>Gate: IsZipSafeBytes(data)
+    alt secureExtract and archive
+      MAT->>Resolver: TryDescribeBytes(data)
+      Resolver-->>MAT: descriptor/none
+      MAT->>Gate: IsArchiveSafeBytes(data, descriptor)
       Gate-->>MAT: pass/fail
 
       alt pass
-        MAT->>Extract: TryExtractZipStream(...)
+        MAT->>Extract: TryExtractArchiveStream(...)
         Extract-->>Caller: true/false
       else fail
         MAT-->>Caller: false
@@ -300,16 +303,16 @@ Jeder negative Pruefpfad endet sofort fail-closed mit `false`.
 flowchart TD
   S0["Start Persist(...)"] --> S1{"Input valid?<br/>(data, size, destination)"}
   S1 -->|"No"| E1["Return false"]
-  S1 -->|"Yes"| S2{"secureExtract and ZIP?"}
+  S1 -->|"Yes"| S2{"secureExtract and archive?"}
 
   S2 -->|"No"| A1["MaterializeRawBytes(...)"] --> R1["Return bool"]
-  S2 -->|"Yes"| S3{"Readable ZIP?"}
+  S2 -->|"Yes"| S3{"Readable archive?"}
 
   S3 -->|"No"| E2["Return false"]
-  S3 -->|"Yes"| S4{"ZipSafetyGate pass?"}
+  S3 -->|"Yes"| S4{"ArchiveSafetyGate pass?"}
 
   S4 -->|"No"| E3["Return false"]
-  S4 -->|"Yes"| A2["MaterializeZipBytes(...)"] --> R2["Return bool"]
+  S4 -->|"Yes"| A2["MaterializeArchiveBytes(...)"] --> R2["Return bool"]
 ```
 
 ### 6.2 NSD: FileTypeDetector.Detect(path, verifyExtension)
@@ -335,14 +338,15 @@ flowchart TD
 | `ReadFileSafe(path)` | `F0` |
 | `Detect(path)` / `DetectDetailed(path)` | `F1` |
 | `Detect(data)` / `IsOfType(data, kind)` | `F2` |
-| `TryValidateZip(path)` / `ZipProcessing.TryValidate(path|data)` | `F3` |
-| `ExtractZipSafeToMemory(path, ...)` / `ZipProcessing.ExtractToMemory(...)` / `ZipProcessing.TryExtractToMemory(data)` | `F4` |
-| `ExtractZipSafe(path, destination, ...)` | `F5` |
+| `TryValidateArchive(path)` / `ArchiveProcessing.TryValidate(path|data)` | `F3` |
+| `ExtractArchiveSafeToMemory(path, ...)` / `ArchiveProcessing.ExtractToMemory(...)` / `ArchiveProcessing.TryExtractToMemory(data)` | `F4` |
+| `ExtractArchiveSafe(path, destination, ...)` | `F5` |
 | `FileMaterializer.Persist(..., secureExtract:=False)` | `F6` |
-| `FileTypeOptions.LoadOptions/GetOptions` / `FileTypeSecurityBaseline.ApplyDeterministicDefaults` | `F7` |
+| `FileTypeOptions.LoadOptions/GetOptions` / `FileTypeProjectBaseline.ApplyDeterministicDefaults` | `F7` |
 | `DetectAndVerifyExtension(path)` / `Detect(..., verifyExtension)` | `F8` |
+| `DeterministicHashing.HashFile/HashBytes/HashEntries/VerifyRoundTrip` | `F9` |
 
 ## 8. Grenzen und Nicht-Ziele
 - Kein Ersatz fuer Quellcode-Reviews interner Guards (z. B. Payload-/Path-Guards).
-- Keine Policy-Festlegung fuer konkrete Grenzwerte; diese kommen aus `FileTypeDetectorOptions` und der Baseline.
+- Keine Policy-Festlegung fuer konkrete Grenzwerte; diese kommen aus `FileTypeProjectOptions` und der Baseline.
 - Keine Aussage ueber konkrete Threat-Model-Abdeckung ausserhalb der beschriebenen fail-closed-Semantik.

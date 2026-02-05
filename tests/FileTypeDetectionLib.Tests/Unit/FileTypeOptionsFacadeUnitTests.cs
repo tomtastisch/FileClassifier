@@ -14,7 +14,7 @@ public sealed class FileTypeOptionsFacadeUnitTests
         {
             var ok = FileTypeOptions.LoadOptions("{\"maxZipEntries\":1234}");
             var snapshot = FileTypeOptions.GetSnapshot();
-            var defaults = FileTypeDetectorOptions.DefaultOptions();
+            var defaults = FileTypeProjectOptions.DefaultOptions();
 
             Assert.True(ok);
             Assert.Equal(1234, snapshot.MaxZipEntries);
@@ -44,6 +44,10 @@ public sealed class FileTypeOptionsFacadeUnitTests
             Assert.True(root.TryGetProperty("headerOnlyNonZip", out _));
             Assert.True(root.TryGetProperty("rejectArchiveLinks", out _));
             Assert.True(root.TryGetProperty("allowUnknownArchiveEntrySize", out _));
+            Assert.True(root.TryGetProperty("deterministicHash", out var deterministicHash));
+            Assert.True(deterministicHash.TryGetProperty("includeFastHash", out _));
+            Assert.True(deterministicHash.TryGetProperty("includePayloadCopies", out _));
+            Assert.True(deterministicHash.TryGetProperty("materializedFileName", out _));
         }
         finally
         {
@@ -57,7 +61,7 @@ public sealed class FileTypeOptionsFacadeUnitTests
         var original = FileTypeOptions.GetSnapshot();
         try
         {
-            var defaults = FileTypeDetectorOptions.DefaultOptions();
+            var defaults = FileTypeProjectOptions.DefaultOptions();
             var ok = FileTypeOptions.LoadOptions("{\"maxBytes\":0,\"maxZipEntries\":-1,\"maxZipNestingDepth\":-2}");
             var snapshot = FileTypeOptions.GetSnapshot();
 
@@ -115,12 +119,33 @@ public sealed class FileTypeOptionsFacadeUnitTests
     }
 
     [Fact]
+    public void LoadOptions_Applies_DeterministicHashObject()
+    {
+        var original = FileTypeOptions.GetSnapshot();
+        try
+        {
+            var ok = FileTypeOptions.LoadOptions(
+                "{\"deterministicHash\":{\"includePayloadCopies\":true,\"includeFastHash\":false,\"materializedFileName\":\"reports/evidence.bin\"}}");
+            var snapshot = FileTypeOptions.GetSnapshot();
+
+            Assert.True(ok);
+            Assert.True(snapshot.DeterministicHash.IncludePayloadCopies);
+            Assert.False(snapshot.DeterministicHash.IncludeFastHash);
+            Assert.Equal("evidence.bin", snapshot.DeterministicHash.MaterializedFileName);
+        }
+        finally
+        {
+            FileTypeOptions.SetSnapshot(original);
+        }
+    }
+
+    [Fact]
     public void SetSnapshot_NormalizesInvalidNumericValues()
     {
         var original = FileTypeOptions.GetSnapshot();
         try
         {
-            var invalid = new FileTypeDetectorOptions
+            var invalid = new FileTypeProjectOptions
             {
                 MaxBytes = 0,
                 SniffBytes = -1,
@@ -129,7 +154,8 @@ public sealed class FileTypeOptionsFacadeUnitTests
                 MaxZipEntryUncompressedBytes = 0,
                 MaxZipCompressionRatio = -5,
                 MaxZipNestingDepth = -3,
-                MaxZipNestedBytes = 0
+                MaxZipNestedBytes = 0,
+                DeterministicHash = new DeterministicHashOptions { MaterializedFileName = "   " }
             };
 
             FileTypeOptions.SetSnapshot(invalid);
@@ -143,6 +169,7 @@ public sealed class FileTypeOptionsFacadeUnitTests
             Assert.Equal(0, snapshot.MaxZipCompressionRatio);
             Assert.Equal(0, snapshot.MaxZipNestingDepth);
             Assert.Equal(1, snapshot.MaxZipNestedBytes);
+            Assert.Equal("deterministic-roundtrip.bin", snapshot.DeterministicHash.MaterializedFileName);
         }
         finally
         {

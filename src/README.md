@@ -6,6 +6,7 @@ Einstiegspunkt fuer die Source-Variante des Moduls.
 ## Inhalt
 - [FileClassifier.App/Program.cs](./FileClassifier.App/Program.cs)
 - [FileClassifier.App/FileClassifier.App.csproj](./FileClassifier.App/FileClassifier.App.csproj)
+- [FileClassifier.App/README.md](./FileClassifier.App/README.md)
 - [FileTypeDetection/README.md](./FileTypeDetection/README.md)
 - [docs/README.md](../docs/README.md)
 - [docs/01_FUNCTIONS.md](../docs/01_FUNCTIONS.md)
@@ -13,6 +14,9 @@ Einstiegspunkt fuer die Source-Variante des Moduls.
 - [docs/03_REFERENCES.md](../docs/03_REFERENCES.md)
 - [docs/DIN_SPECIFICATION_DE.md](../docs/DIN_SPECIFICATION_DE.md)
 - [FileTypeDetection/Abstractions/README.md](./FileTypeDetection/Abstractions/README.md)
+- [FileTypeDetection/Abstractions/Detection/README.md](./FileTypeDetection/Abstractions/Detection/README.md)
+- [FileTypeDetection/Abstractions/Archive/README.md](./FileTypeDetection/Abstractions/Archive/README.md)
+- [FileTypeDetection/Abstractions/Hashing/README.md](./FileTypeDetection/Abstractions/Hashing/README.md)
 - [FileTypeDetection/Configuration/README.md](./FileTypeDetection/Configuration/README.md)
 - [FileTypeDetection/Detection/README.md](./FileTypeDetection/Detection/README.md)
 - [FileTypeDetection/Infrastructure/README.md](./FileTypeDetection/Infrastructure/README.md)
@@ -20,9 +24,12 @@ Einstiegspunkt fuer die Source-Variante des Moduls.
 ## Strukturregel
 Im Root von `FileTypeDetection` liegen nur:
 - `FileTypeDetector.vb`
-- `ZipProcessing.vb`
+- `ArchiveProcessing.vb`
 - `FileMaterializer.vb`
 - `FileTypeOptions.vb`
+
+## README-Regel
+Jeder versionierte Quellordner unter `src/*` besitzt eine eigene `README.md` mit Verantwortungen und Verweisen.
 
 ## Synchronisation
 - `bash tools/sync-portable-filetypedetection.sh`

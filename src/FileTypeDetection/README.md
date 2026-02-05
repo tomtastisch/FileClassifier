@@ -1,7 +1,7 @@
 # Index - src/FileTypeDetection
 
 ## 1. Ziel dieses Moduls
-Deterministische Dateityp-Erkennung und sichere Archiv-Verarbeitung (u. a. ZIP/TAR/GZIP/7z/RAR) mit fail-closed Verhalten.
+Deterministische Dateityp-Erkennung und sichere Archiv-Verarbeitung (u. a. fuer ZIP/TAR/GZIP/7z/RAR) mit fail-closed Verhalten.
 
 ## 2. Schnellstart fuer Leser
 1. [Doku-Index](../../docs/README.md)
@@ -14,37 +14,42 @@ Deterministische Dateityp-Erkennung und sichere Archiv-Verarbeitung (u. a. ZIP/T
 8. [Infrastructure-Details](./Infrastructure/README.md)
 9. [Configuration-Details](./Configuration/README.md)
 10. [Abstractions-Details](./Abstractions/README.md)
+11. [Abstractions/Detection-Details](./Abstractions/Detection/README.md)
+12. [Abstractions/Archive-Details](./Abstractions/Archive/README.md)
+13. [Abstractions/Hashing-Details](./Abstractions/Hashing/README.md)
 
 ## 2.1 Empfohlene Lesepfade
 - API-Nutzung zuerst: [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) -> [docs/02_ARCHITECTURE_AND_FLOWS.md](../../docs/02_ARCHITECTURE_AND_FLOWS.md) -> [docs/03_REFERENCES.md](../../docs/03_REFERENCES.md)
 - Implementierungsdetails zu Flows: [Detection/README.md](./Detection/README.md) + [Infrastructure/README.md](./Infrastructure/README.md)
 - Konfigurations- und Modellsicht: [Configuration/README.md](./Configuration/README.md) + [Abstractions/README.md](./Abstractions/README.md)
+- Modell-Drill-Down: [Abstractions/Detection/README.md](./Abstractions/Detection/README.md), [Abstractions/Archive/README.md](./Abstractions/Archive/README.md), [Abstractions/Hashing/README.md](./Abstractions/Hashing/README.md)
 
 ## 2.2 API-Semantikhinweis (wichtig)
-- `TryValidateZip(...)` und `ZipProcessing.*` sind **historische API-Namen**.
-- Die aktuelle Semantik ist container-generisch: validiert/extrahiert werden intern alle unterstuetzten Archive (ZIP/TAR/GZIP/7z/RAR) fail-closed.
-- Grund: Public API bleibt stabil (kein Signaturbruch), interne Pipeline wurde auf Unified-Backend umgestellt.
+- `TryValidateArchive(...)` und `ArchiveProcessing.*` sind die kanonischen Archiv-APIs.
+- Die aktuelle Semantik ist archivformat-generisch: validiert/extrahiert werden intern alle unterstuetzten Archivformate (z. B. ZIP/TAR/GZIP/7z/RAR) fail-closed.
+- Begriffsklaerung: `ContainerType` bezeichnet das physische Archivformat; der logische Rueckgabetyp bleibt aus Kompatibilitaetsgruenden `FileKind.Zip`.
 - Verbindliche Details stehen in `docs/01_FUNCTIONS.md`:
-  - Abschnitt "API-Wahrheit vs. historischer Name"
+  - Abschnitt "API-Semantik"
   - Abschnitt "Security-Gate Mini-Contract (neutral)"
   - Abschnitt "Formatmatrix (implementierte Semantik)"
 
 ## 3. Strukturregel (wichtig)
 Im Modul-Root liegen nur oeffentliche API-Einstiegspunkte:
 - [FileTypeDetector.vb](./FileTypeDetector.vb)
-- [ZipProcessing.vb](./ZipProcessing.vb)
+- [ArchiveProcessing.vb](./ArchiveProcessing.vb)
 - [FileMaterializer.vb](./FileMaterializer.vb)
 - [FileTypeOptions.vb](./FileTypeOptions.vb)
+- [DeterministicHashing.vb](./DeterministicHashing.vb)
 
 Alle Low-Level-Implementierungen liegen in Unterordnern.
 
 ## 4. Ordner und Verantwortungen
 | Pfad | Verantwortung | Typische Leser |
 |---|---|---|
-| [Abstractions/](./Abstractions/README.md) | Immutable Rueckgabemodelle | API-Consumer |
+| [Abstractions/](./Abstractions/README.md) | Immutable Rueckgabemodelle (Detection/Archive/Hashing) | API-Consumer |
 | [Configuration/](./Configuration/README.md) | Optionen, Security-Baseline | Ops, Security, Entwickler |
 | [Detection/](./Detection/README.md) | SSOT fuer Typen, Aliase, Header-Magic | Maintainer Detection |
-| [Infrastructure/](./Infrastructure/README.md) | ZIP-Gate, Refiner, Extractor, Bounds | Maintainer Security/IO |
+| [Infrastructure/](./Infrastructure/README.md) | Archiv-Gate, Refiner, Extractor, Bounds | Maintainer Security/IO |
 
 ## 5. Architekturdiagramm
 ```mermaid
@@ -59,14 +64,15 @@ flowchart LR
 ## 6. Oeffentliche Funktionen (Uebersicht)
 | Klasse | Funktionale Rolle | Detailtabelle |
 |---|---|---|
-| `FileTypeDetector` | Erkennung, Policy, ZIP-Path-Operationen | [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) |
-| `ZipProcessing` | statische Archiv-Fassade (Path/Bytes), historisch als ZIP benannt | [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) |
-| `FileMaterializer` | einheitliche Persistenz fuer Byte-Payloads (optional ZIP->Disk) | [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) |
+| `FileTypeDetector` | Erkennung, Policy, Archiv-Path-Operationen | [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) |
+| `ArchiveProcessing` | statische Archiv-Fassade (Path/Bytes) | [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) |
+| `FileMaterializer` | einheitliche Persistenz fuer Byte-Payloads (optional Archiv->Disk) | [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) |
 | `FileTypeOptions` | zentrale JSON-Optionsschnittstelle (laden/lesen) | [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) |
-| `FileTypeSecurityBaseline` | konservative Security-Defaults | [Configuration/README.md](./Configuration/README.md) |
+| `FileTypeProjectBaseline` | konservative Security-Defaults | [Configuration/README.md](./Configuration/README.md) |
+| `DeterministicHashing` | deterministische Physical/Logical Hash-Nachweise und h1-h4 RoundTrip-Report | [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) |
 
 ## 7. Qualitaetsziele (ISO/IEC 25010)
-- Functional suitability: korrektes Mapping Header/Container -> `FileKind`.
+- Functional suitability: korrektes Mapping Header/Archivformat -> `FileKind`.
 - Reliability: fail-closed bei Fehlerpfaden und Grenzverletzungen.
 - Security: Archiv-Traversal/Bomb-Schutz, kein Endungsvertrauen.
 - Maintainability: Root-API klein, interne Verantwortungen getrennt.
@@ -74,7 +80,7 @@ flowchart LR
 ## 8. Pflichtdiagramme fuer Entwickler
 ```mermaid
 flowchart TD
-    A[Architekturueberblick] --> B[Sicherheitsfluss ZIP-Gate]
+    A[Architekturueberblick] --> B[Sicherheitsfluss Archiv-Gate]
     B --> C[Kritischer Sequenzpfad: Validate/Extract]
 ```
 
@@ -82,10 +88,11 @@ flowchart TD
 ```mermaid
 flowchart LR
     API[Public APIs] --> CORE[Infrastructure]
-    CORE --> ZIP[System.IO.Compression]
+    CORE --> COMPR[System.IO.Compression (managed archive backend)]
     CORE --> SHARP[SharpCompress]
     CORE --> MIME[Mime]
     CORE --> RMS[Microsoft.IO.RecyclableMemoryStream]
+    CORE --> HASH[System.IO.Hashing]
     API --> LOG[Microsoft.AspNetCore.App -> Logging]
 ```
 

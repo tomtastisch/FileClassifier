@@ -7,18 +7,22 @@ Nachweis fuer Sicherheit, Determinismus, Korrektheit und API-Klarheit.
 | Kategorie | Fokus | Referenz |
 |---|---|---|
 | Unit | API- und Regelverhalten | [Unit/README.md](./Unit/README.md) |
-| Property | Grenz-/Invarianztests fuer ZIP-Gate, Optionen und Materializer | [Property/README.md](./Property/README.md) |
+| Integration | format- und pipelineuebergreifende Nachweise mit echten Archiv-Pfaden | [Integration/README.md](./Integration/README.md) |
+| Property | Grenz-/Invarianztests fuer Archiv-Gate, Optionen und Materializer | [Property/README.md](./Property/README.md) |
 | Features (BDD Unit/Integration/E2E) | fachliche Lesbarkeit und End-to-End-Flows | [Features/README.md](./Features/README.md) |
 | Benchmarks | regressionsorientierte Laufzeittrends | [Benchmarks/README.md](./Benchmarks/README.md) |
 
 ## 3. Nachweismatrix
 | Qualitaetsziel | Testdatei |
 |---|---|
-| Fail-closed ZIP-Grenzen | [Unit/ZipAdversarialTests.cs](./Unit/ZipAdversarialTests.cs) |
-| Sichere ZIP-Extraktion | [Unit/ZipExtractionUnitTests.cs](./Unit/ZipExtractionUnitTests.cs) |
-| Unified-Archive-Flows (ZIP/TAR/TAR.GZ/7z/RAR fuer Byte-Array Detect/Validate/Extract/Materialize) | [Features/FTD_BDD_040_ARCHIVE_TYPEN_BYTEARRAY_UND_MATERIALISIERUNG.feature](./Features/FTD_BDD_040_ARCHIVE_TYPEN_BYTEARRAY_UND_MATERIALISIERUNG.feature), [Unit/UnifiedArchiveBackendUnitTests.cs](./Unit/UnifiedArchiveBackendUnitTests.cs) |
+| Fail-closed Archiv-Grenzen | [Unit/ArchiveAdversarialTests.cs](./Unit/ArchiveAdversarialTests.cs) |
+| Sichere Archiv-Extraktion | [Unit/ArchiveExtractionUnitTests.cs](./Unit/ArchiveExtractionUnitTests.cs) |
+| Unified-Archive-Flows (mehrere Archivformate fuer Byte-Array Detect/Validate/Extract/Materialize) | [Features/FTD_BDD_040_ARCHIVE_TYPEN_BYTEARRAY_UND_MATERIALISIERUNG.feature](./Features/FTD_BDD_040_ARCHIVE_TYPEN_BYTEARRAY_UND_MATERIALISIERUNG.feature), [Unit/UnifiedArchiveBackendUnitTests.cs](./Unit/UnifiedArchiveBackendUnitTests.cs) |
+| Deterministische Hash-Evidence + h1-h4 RoundTrip + Extract->Bytes->Materialize Invarianz (Physical/Logical, positiv/negativ) | [Unit/DeterministicHashingUnitTests.cs](./Unit/DeterministicHashingUnitTests.cs), [Integration/DeterministicHashingIntegrationTests.cs](./Integration/DeterministicHashingIntegrationTests.cs), [Features/FTD_BDD_050_DETERMINISTISCHES_HASHING_UND_ROUNDTRIP.feature](./Features/FTD_BDD_050_DETERMINISTISCHES_HASHING_UND_ROUNDTRIP.feature) |
+| API-Contract-Freeze fuer `DeterministicHashing` | [Unit/DeterministicHashingApiContractUnitTests.cs](./Unit/DeterministicHashingApiContractUnitTests.cs), [../../docs/04_DETERMINISTIC_HASHING_API_CONTRACT.md](../../docs/04_DETERMINISTIC_HASHING_API_CONTRACT.md) |
+| Hashing-Pipeline Traceability (Stage-by-Stage Matrix) | [../../docs/test-matrix-hashing.md](../../docs/test-matrix-hashing.md) |
 | Deterministische Registry | [Unit/FileTypeRegistryUnitTests.cs](./Unit/FileTypeRegistryUnitTests.cs) |
-| API Detail-/ZIP-Fassade | [Unit/DetectionDetailAndZipValidationUnitTests.cs](./Unit/DetectionDetailAndZipValidationUnitTests.cs), [Unit/ZipProcessingFacadeUnitTests.cs](./Unit/ZipProcessingFacadeUnitTests.cs) |
+| API Detail-/Archiv-Fassade | [Unit/DetectionDetailAndArchiveValidationUnitTests.cs](./Unit/DetectionDetailAndArchiveValidationUnitTests.cs), [Unit/ArchiveProcessingFacadeUnitTests.cs](./Unit/ArchiveProcessingFacadeUnitTests.cs) |
 | Options-/Materializer-Invarianten | [Property/FileTypeOptionsPropertyTests.cs](./Property/FileTypeOptionsPropertyTests.cs), [Property/FileMaterializerPropertyTests.cs](./Property/FileMaterializerPropertyTests.cs) |
 
 ## 3.1 Formatbezogene Testabdeckung (Stand)
@@ -75,8 +79,8 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 |---|---|---|
 | `@detector` | Faelle um `FileTypeDetector` | `--filter "Category=detector"` |
 | `@materializer` | Faelle um `FileMaterializer` | `--filter "Category=materializer"` |
-| `@processing` | Faelle um Pipeline/Fassaden (`ZipProcessing`) | `--filter "Category=processing"` |
-| `@zip` | ZIP-bezogene Pfade (Validate/Refine/Extract) | `--filter "Category=zip"` |
+| `@processing` | Faelle um Pipeline/Fassaden (`ArchiveProcessing`) | `--filter "Category=processing"` |
+| `@archive` | Archiv-bezogene Pfade (Validate/Refine/Extract) | `--filter "Category=archive"` |
 | `@api` | API-orientierte BDD-Faelle | `--filter "Category=api"` |
 
 ### 5.3 Annotationen nach Fachthema
@@ -88,4 +92,4 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 | `@typpruefung` | `IsOfType`-Pruefpfade | `--filter "Category=typpruefung"` |
 | `@grenzen` | MaxBytes-/Grenzwertpfade | `--filter "Category=grenzen"` |
 | `@konfiguration` | Build-/Konfigurationspfade | `--filter "Category=konfiguration"` |
-| `@refinement` | OOXML/ZIP-Refinement-Faelle | `--filter "Category=refinement"` |
+| `@refinement` | OOXML/Archiv-Refinement-Faelle | `--filter "Category=refinement"` |

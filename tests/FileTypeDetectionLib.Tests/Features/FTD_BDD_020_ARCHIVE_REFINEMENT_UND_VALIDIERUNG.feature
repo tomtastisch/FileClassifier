@@ -1,6 +1,6 @@
 # language: de
-@integration @zip @refinement @detector @processing
-Funktionalität: Integration von ZIP-Gate, strukturellem Refinement und ZIP-Fassade
+@integration @archive @refinement @detector @processing
+Funktionalität: Integration von Archiv-Gate, strukturellem Refinement und Archiv-Fassade
 
   Hintergrund:
     Angenommen die folgenden Ressourcen existieren
@@ -13,14 +13,14 @@ Funktionalität: Integration von ZIP-Gate, strukturellem Refinement und ZIP-Fass
       | invalid_xlsx_marker_only.zip |
       | invalid_pptx_marker_only.zip |
 
-  @positiv @detector @zip
-  Szenario: ZIP bleibt ZIP, wenn kein OOXML erkannt wird
+  @positiv @detector @archive
+  Szenario: Archiv bleibt beim generischen Archivtyp, wenn kein OOXML erkannt wird
     Angenommen die Datei "sample.zip"
     Wenn ich den Dateityp ermittle
     Dann ist der erkannte Typ "Zip"
 
-  @positiv @detector @zip
-  Szenariogrundriss: OOXML-ZIP wird auf den konkreten Typ verfeinert
+  @positiv @detector @archive
+  Szenariogrundriss: OOXML-Archiv wird auf den konkreten Typ verfeinert
     Angenommen die Datei "<datei>"
     Wenn ich den Dateityp ermittle
     Dann ist der erkannte Typ "<typ>"
@@ -31,8 +31,8 @@ Funktionalität: Integration von ZIP-Gate, strukturellem Refinement und ZIP-Fass
       | sample.xlsx | Xlsx |
       | sample.pptx | Pptx |
 
-  @negativ @detector @zip
-  Szenariogrundriss: Marker-only-ZIP wird nicht als OOXML verfeinert
+  @negativ @detector @archive
+  Szenariogrundriss: Marker-only-Archiv wird nicht als OOXML verfeinert
     Angenommen die Datei "<datei>"
     Wenn ich den Dateityp ermittle
     Dann ist der erkannte Typ "Zip"

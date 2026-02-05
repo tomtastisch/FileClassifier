@@ -2,14 +2,18 @@
 
 ## 1. Build and Test Gate
 - [ ] `dotnet restore FileClassifier.sln -v minimal`
-- [ ] `dotnet build FileClassifier.sln --no-restore -v minimal`
-- [ ] `dotnet test FileClassifier.sln --no-build -v minimal`
+- [ ] `python3 tools/check-markdown-links.py` (prueft lokale Markdown-Dateilinks und Heading-Anker fail-closed)
+- [ ] `dotnet format FileClassifier.sln --verify-no-changes`
+- [ ] `dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal`
+- [ ] `dotnet test FileClassifier.sln -v minimal`
+- [ ] Coverage-Gate: `dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -v minimal /p:CollectCoverage=true /p:Include="[FileTypeDetectionLib]*" /p:CoverletOutputFormat=cobertura /p:Threshold=85%2c69 /p:ThresholdType=line%2cbranch /p:ThresholdStat=total`
+- [ ] Coverage-Roadmap stufenweise erhoehen (z. B. `85/69 -> 88/72 -> 90/75`) statt sprunghaft.
 - [ ] BDD-Tag-Filter pruefen (z. B. `Category=e2e`, `Category=materializer`)
 
 ## 2. Security and Limits
-- [ ] `FileTypeSecurityBaseline.ApplyDeterministicDefaults()` beim Start setzen
+- [ ] `FileTypeProjectBaseline.ApplyDeterministicDefaults()` beim Start setzen
 - [ ] Falls noetig: `FileTypeOptions.LoadOptions(json)` fuer Umgebungslimits
-- [ ] ZIP-Grenzen (`MaxZipEntries`, `MaxZipCompressionRatio`, `MaxZipNestingDepth`) mit Ops abstimmen
+- [ ] Archiv-Grenzen (`MaxZipEntries`, `MaxZipCompressionRatio`, `MaxZipNestingDepth`) mit Ops abstimmen
 - [ ] Root-/Traversal-Schutz im Zielsystem validieren (Dateisystemrechte, Container-Mounts)
 
 ## 3. Runtime Configuration
@@ -21,7 +25,7 @@
 - [ ] Logging-Level und Ziel (stdout/file/collector) festlegen
 - [ ] Alarmierung auf fail-closed-Haeufung einrichten (Unknown/False/empty spikes)
 - [ ] Durchsatz-/Latenz-Baseline erfassen (z. B. Benchmark-Smoke in CI)
-- [ ] Incident-Runbook fuer ZIP-Angriffsfaelle (Bomb/Traversal) verfuegbar machen
+- [ ] Incident-Runbook fuer Archiv-Angriffsfaelle (Bomb/Traversal) verfuegbar machen
 
 ## 5. Integration Contract
 - [ ] Aufrufervertrag klarstellen: keine Ausnahme als Kontrollfluss erwarten
@@ -40,8 +44,11 @@
 ## 7. Quick Commands
 ```bash
 dotnet restore FileClassifier.sln -v minimal
-dotnet build FileClassifier.sln --no-restore -v minimal
-dotnet test FileClassifier.sln --no-build -v minimal
+python3 tools/check-markdown-links.py
+dotnet format FileClassifier.sln --verify-no-changes
+dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal
+dotnet test FileClassifier.sln -v minimal
+dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -v minimal /p:CollectCoverage=true /p:Include="[FileTypeDetectionLib]*" /p:CoverletOutputFormat=cobertura /p:Threshold=85%2c69 /p:ThresholdType=line%2cbranch /p:ThresholdStat=total
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj --filter "Category=e2e" -v minimal
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj --filter "Category=materializer" -v minimal
 ```
