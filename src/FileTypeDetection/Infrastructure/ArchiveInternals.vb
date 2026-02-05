@@ -370,25 +370,14 @@ Namespace FileTypeDetection
                 Return False
             End If
 
-            Dim entryName = NormalizeEntryName(entry.RelativePath)
-            If String.IsNullOrWhiteSpace(entryName) Then Return False
-            If Path.IsPathRooted(entryName) Then Return False
-
-            Dim trimmed = entryName.TrimEnd("/"c)
-            If trimmed.Length = 0 Then
-                safeEntryName = entryName
-                isDirectory = True
-                Return True
+            Dim entryName As String = Nothing
+            Dim normalizedDirectoryFlag As Boolean = False
+            If Not ArchiveEntryPathPolicy.TryNormalizeRelativePath(entry.RelativePath, allowDirectoryMarker:=True, entryName, normalizedDirectoryFlag) Then
+                Return False
             End If
 
-            Dim segments = trimmed.Split("/"c)
-            For Each seg In segments
-                If seg.Length = 0 Then Return False
-                If seg = "." OrElse seg = ".." Then Return False
-            Next
-
             safeEntryName = entryName
-            isDirectory = entry.IsDirectory OrElse entryName.EndsWith("/", StringComparison.Ordinal)
+            isDirectory = entry.IsDirectory OrElse normalizedDirectoryFlag OrElse entryName.EndsWith("/", StringComparison.Ordinal)
             Return True
         End Function
 
@@ -409,18 +398,57 @@ Namespace FileTypeDetection
             Return opt.AllowUnknownArchiveEntrySize
         End Function
 
-        Private Shared Function NormalizeEntryName(entryName As String) As String
-            Dim normalized = If(entryName, String.Empty).Replace("\"c, "/"c)
-            normalized = normalized.TrimStart("/"c)
-            Return normalized
-        End Function
-
         Private Shared Function EnsureTrailingSeparator(dirPath As String) As String
             If String.IsNullOrEmpty(dirPath) Then Return System.IO.Path.DirectorySeparatorChar.ToString()
             If dirPath.EndsWith(System.IO.Path.DirectorySeparatorChar) OrElse dirPath.EndsWith(System.IO.Path.AltDirectorySeparatorChar) Then
                 Return dirPath
             End If
             Return dirPath & System.IO.Path.DirectorySeparatorChar
+        End Function
+    End Class
+
+    Friend NotInheritable Class ArchiveEntryCollector
+        Private Sub New()
+        End Sub
+
+        Friend Shared Function TryCollectFromFile(path As String, opt As FileTypeDetectorOptions, ByRef entries As IReadOnlyList(Of ZipExtractedEntry)) As Boolean
+            entries = Array.Empty(Of ZipExtractedEntry)()
+            If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then Return False
+            If opt Is Nothing Then Return False
+
+            Try
+                Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
+                    Dim descriptor As ArchiveDescriptor = Nothing
+                    If Not ArchiveTypeResolver.TryDescribeStream(fs, opt, descriptor) Then Return False
+                    If fs.CanSeek Then fs.Position = 0
+                    If Not ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, descriptor, depth:=0) Then Return False
+                    If fs.CanSeek Then fs.Position = 0
+                    entries = ArchiveExtractor.TryExtractArchiveStreamToMemory(fs, opt, descriptor)
+                    Return entries IsNot Nothing AndAlso entries.Count > 0
+                End Using
+            Catch
+                entries = Array.Empty(Of ZipExtractedEntry)()
+                Return False
+            End Try
+        End Function
+
+        Friend Shared Function TryCollectFromBytes(data As Byte(), opt As FileTypeDetectorOptions, ByRef entries As IReadOnlyList(Of ZipExtractedEntry)) As Boolean
+            entries = Array.Empty(Of ZipExtractedEntry)()
+            If data Is Nothing OrElse data.Length = 0 Then Return False
+            If opt Is Nothing Then Return False
+
+            Try
+                Dim descriptor As ArchiveDescriptor = Nothing
+                If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then Return False
+                If Not ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor) Then Return False
+                Using ms As New MemoryStream(data, writable:=False)
+                    entries = ArchiveExtractor.TryExtractArchiveStreamToMemory(ms, opt, descriptor)
+                    Return entries IsNot Nothing AndAlso entries.Count > 0
+                End Using
+            Catch
+                entries = Array.Empty(Of ZipExtractedEntry)()
+                Return False
+            End Try
         End Function
     End Class
 

@@ -43,7 +43,7 @@ flowchart LR
 ### 3.1 E2E-Systemkontext (kompakt)
 Dieses Diagramm zeigt nur Verantwortungsbereiche und Hauptdatenfluesse:
 Input -> Public API -> Core Pipeline -> Outputs.
-Detailentscheidungen (ZIP-Fall, Refinement, Persistenzzweig) folgen in Abschnitt 4.
+Detailentscheidungen (Archivfall, Refinement, Persistenzzweig) folgen in Abschnitt 4.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 80, "rankSpacing": 90}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -66,9 +66,9 @@ flowchart LR
     direction TB
     C1["ReadHeader"]
     C1B["DetectByMagic"]
-    C2["ArchiveSignatureSafetyGate"]
+    C2["ArchiveSafetyGate"]
     C3["OpenXmlRefiner"]
-    C4["ArchiveManagedExtractor"]
+    C4["ArchiveExtractor"]
   end
 
   subgraph OUT["Outputs"]
@@ -100,13 +100,13 @@ flowchart LR
 
 Kurzlesehilfe:
 - `FileTypeOptions/Baseline` ist Konfigurationskontext (gestrichelt), kein Datenfluss.
-- `ArchiveSignatureSafetyGate` ist das zentrale fail-closed-Gate fuer ZIP-bezogene Pfade.
+- `ArchiveSafetyGate` ist das zentrale fail-closed-Gate fuer archivbezogene Pfade.
 
 ## 4. Flussdiagramme (entscheidungsrelevante Ablaeufe)
-### 4.1 Ablauf A: Detektion und ZIP-Validierung
-Dieses Diagramm zeigt die Kernentscheidung: `Magic == ZIP?` sowie die fail-closed-Kaskade ueber `ArchiveSignatureSafetyGate`.
+### 4.1 Ablauf A: Detektion und Archiv-Validierung
+Dieses Diagramm zeigt die Kernentscheidung: `Magic == Archiv?` sowie die fail-closed-Kaskade ueber `ArchiveSafetyGate`.
 Oben: Typdetektion (`FileType`/`DetectionDetail`).
-Unten: reine ZIP-Validierung (`bool`) ueber denselben Gate-Knoten.
+Unten: reine Archiv-Validierung (`bool`) ueber denselben Gate-Knoten.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 70, "rankSpacing": 80}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -114,13 +114,13 @@ flowchart TD
   I1["Input: path or bytes"] --> D1["Detect(...) / DetectDetailed(...)"]
   D1 --> H1["ReadHeader"]
   H1 --> M1["DetectByMagic"]
-  M1 --> Q1{"Magic == ZIP?"}
+  M1 --> Q1{"Magic == Archiv?"}
 
   Q1 -->|"No"| T1["Resolve(kind) -> Type Output"]
-  Q1 -->|"Yes"| G1["ArchiveSignatureSafetyGate"] --> Q2{"ZIP safe?"}
+  Q1 -->|"Yes"| G1["ArchiveSafetyGate"] --> Q2{"Archiv safe?"}
 
   Q2 -->|"No"| U1["Unknown (fail-closed)"]
-  Q2 -->|"Yes"| R1["OpenXmlRefiner"] --> T2["Refined or Generic ZIP -> Type Output"]
+  Q2 -->|"Yes"| R1["OpenXmlRefiner"] --> T2["Refined or Generic Archive -> Type Output"]
 
   I1 --> V1["TryValidateArchive / ArchiveProcessing.TryValidate(...)"]
   V1 --> G1
@@ -128,13 +128,13 @@ flowchart TD
 ```
 
 Kurzlesehilfe:
-- `ArchiveSignatureSafetyGate` ist SSOT fuer ZIP-Sicherheit in den gezeigten Pfaden.
-- `OpenXmlRefiner` laeuft nur im ZIP-OK-Fall.
+- `ArchiveSafetyGate` ist SSOT fuer Archiv-Sicherheit in den gezeigten Pfaden.
+- `OpenXmlRefiner` laeuft nur im Archiv-OK-Fall.
 
 ### 4.2 Ablauf B: Extraktion (Memory) vs. Persistenz (Disk)
-Dieses Diagramm zeigt zwei ZIP-Use-Cases:
+Dieses Diagramm zeigt zwei Archiv-Use-Cases:
 (1) sichere In-Memory-Extraktion (Entries-Liste)
-(2) Persistenz auf Disk (Raw Write oder ZIP-Extract), jeweils mit fail-closed Ergebnissen.
+(2) Persistenz auf Disk (Raw Write oder Archiv-Extract), jeweils mit fail-closed Ergebnissen.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 80, "rankSpacing": 90}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -153,11 +153,11 @@ flowchart LR
         UC3["PersistBytes<br/>(FileMaterializer)"]
     end
 
-%% --- ZIP CORE (SSOT) ---
-    subgraph CORE["ZIP Core (SSOT)"]
+%% --- ARCHIVE CORE (SSOT) ---
+    subgraph CORE["Archive Core (SSOT)"]
         direction TB
-        G["ArchiveSignatureSafetyGate"]
-        X["ArchiveManagedExtractor"]
+        G["ArchiveSafetyGate"]
+        X["ArchiveExtractor"]
         G --> X
     end
 
@@ -196,8 +196,8 @@ Kurzlesehilfe:
 - Persistenz liefert immer `Bool` als Rueckgabekontrakt.
 
 ## 5. Sequenzfluesse (Runtime-Interaktionen)
-### 5.1 Detect(path) mit ZIP-Fall
-Dieser Sequenzfluss zeigt den ZIP-Fall im Detektor:
+### 5.1 Detect(path) mit Archivfall
+Dieser Sequenzfluss zeigt den Archivfall im Detektor:
 Detektion -> Gate -> optionales Refinement -> Rueckgabe.
 Der fail-closed-Pfad liefert `Unknown`.
 
@@ -206,18 +206,18 @@ sequenceDiagram
   participant Caller as Consumer
   participant API as FileTypeDetector
   participant REG as FileTypeRegistry
-  participant GATE as ArchiveSignatureSafetyGate
+  participant GATE as ArchiveSafetyGate
   participant REF as OpenXmlRefiner
 
   Caller->>API: Detect(path, verifyExtension)
   API->>API: ReadHeader(path)
   API->>REG: DetectByMagic(header)
 
-  alt non-zip
+  alt non-archive
     REG-->>API: FileKind
     API-->>Caller: FileType
-  else zip
-    API->>GATE: IsArchiveSignatureSafeStream(...)
+  else archive
+    API->>GATE: IsArchiveSafeStream(...)
     GATE-->>API: pass/fail
 
     alt pass
@@ -238,25 +238,21 @@ Fail-closed endet mit leerer Liste.
 sequenceDiagram
   participant Caller as Consumer
   participant ZP as ArchiveProcessing
-  participant Guard as ArchiveSignaturePayloadGuard
-  participant Gate as ArchiveSignatureSafetyGate
-  participant Extract as ArchiveManagedExtractor
+  participant Collect as ArchiveEntryCollector
 
   Caller->>ZP: TryExtractToMemory(data)
-  ZP->>Guard: IsSafeArchiveSignaturePayload(data)
-  Guard->>Gate: IsArchiveSignatureSafeBytes(data)
-  Gate-->>Guard: pass/fail
+  ZP->>Collect: TryCollectFromBytes(data, opt, entries)
+  Collect-->>ZP: pass/fail + entries
 
   alt pass
-    ZP->>Extract: TryExtractArchiveStreamToMemory(...)
-    Extract-->>Caller: entries list
+    ZP-->>Caller: entries list
   else fail
     ZP-->>Caller: empty list
   end
 ```
 
 ### 5.3 Materializer: Branching (Persist)
-Fokus: Zielpfadpruefung, danach entweder sicherer ZIP-Zweig oder Raw-Write.
+Fokus: Zielpfadpruefung, danach entweder sicherer Archiv-Zweig oder Raw-Write.
 Rueckgabe ist immer boolesch.
 
 ```mermaid
@@ -264,8 +260,9 @@ sequenceDiagram
   participant Caller as Consumer
   participant MAT as FileMaterializer
   participant Guard as DestinationPathGuard
-  participant Gate as ArchiveSignatureSafetyGate
-  participant Extract as ArchiveManagedExtractor
+  participant Resolver as ArchiveTypeResolver
+  participant Gate as ArchiveSafetyGate
+  participant Extract as ArchiveExtractor
   participant FS as FileSystem
 
   Caller->>MAT: Persist(data, destination, overwrite, secureExtract)
@@ -274,8 +271,10 @@ sequenceDiagram
   alt invalid target
     MAT-->>Caller: false
   else valid target
-    alt secureExtract and zip
-      MAT->>Gate: IsArchiveSignatureSafeBytes(data)
+    alt secureExtract and archive
+      MAT->>Resolver: TryDescribeBytes(data)
+      Resolver-->>MAT: descriptor/none
+      MAT->>Gate: IsArchiveSafeBytes(data, descriptor)
       Gate-->>MAT: pass/fail
 
       alt pass
@@ -301,16 +300,16 @@ Jeder negative Pruefpfad endet sofort fail-closed mit `false`.
 flowchart TD
   S0["Start Persist(...)"] --> S1{"Input valid?<br/>(data, size, destination)"}
   S1 -->|"No"| E1["Return false"]
-  S1 -->|"Yes"| S2{"secureExtract and ZIP?"}
+  S1 -->|"Yes"| S2{"secureExtract and archive?"}
 
   S2 -->|"No"| A1["MaterializeRawBytes(...)"] --> R1["Return bool"]
-  S2 -->|"Yes"| S3{"Readable ZIP?"}
+  S2 -->|"Yes"| S3{"Readable archive?"}
 
   S3 -->|"No"| E2["Return false"]
-  S3 -->|"Yes"| S4{"ArchiveSignatureSafetyGate pass?"}
+  S3 -->|"Yes"| S4{"ArchiveSafetyGate pass?"}
 
   S4 -->|"No"| E3["Return false"]
-  S4 -->|"Yes"| A2["MaterializeZipBytes(...)"] --> R2["Return bool"]
+  S4 -->|"Yes"| A2["MaterializeArchiveBytes(...)"] --> R2["Return bool"]
 ```
 
 ### 6.2 NSD: FileTypeDetector.Detect(path, verifyExtension)

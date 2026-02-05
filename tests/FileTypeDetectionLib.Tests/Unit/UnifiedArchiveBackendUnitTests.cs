@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -36,6 +37,22 @@ public sealed class UnifiedArchiveBackendUnitTests
         Assert.Single(entries);
         Assert.Equal("inner/note.txt", entries[0].RelativePath);
         Assert.Equal("hello", Encoding.UTF8.GetString(entries[0].Content.ToArray()));
+    }
+
+    [Fact]
+    public void ArchiveEntryCollector_TryCollectFromBytes_MatchesArchiveProcessingFacade()
+    {
+        var tarGz = ArchivePayloadFactory.CreateTarGzWithSingleEntry("inner/note.txt", "hello");
+        var options = FileTypeOptions.GetSnapshot();
+        IReadOnlyList<ZipExtractedEntry> collected = Array.Empty<ZipExtractedEntry>();
+
+        var ok = ArchiveEntryCollector.TryCollectFromBytes(tarGz, options, ref collected);
+        var facade = ArchiveProcessing.TryExtractToMemory(tarGz);
+
+        Assert.True(ok);
+        Assert.Equal(facade.Count, collected.Count);
+        Assert.Equal(facade[0].RelativePath, collected[0].RelativePath);
+        Assert.Equal(facade[0].Content.ToArray(), collected[0].Content.ToArray());
     }
 
     [Fact]

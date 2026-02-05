@@ -35,7 +35,7 @@ Quelle: `FileTypeDetector.vb`.
 |---|---|---|---|
 | Header/Typ-SSOT | `Detection/FileTypeRegistry.vb` | Header-Magic, Aliase, Canonical Extensions | [`../src/FileTypeDetection/Detection/README.md`](../src/FileTypeDetection/Detection/README.md) |
 | Core Guards | `Infrastructure/CoreInternals.vb` | Bounds, Security Gates, Path Guards | [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md) |
-| Managed archive internals | `Infrastructure/ArchiveManagedInternals.vb` | archivbasierte Iteration, Validierung, Extraktion | [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md) |
+| Managed archive internals | `Infrastructure/ArchiveManagedInternals.vb` | archivbasierte Iteration und ZIP-Backend-Adapter | [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md) |
 | Archive internals | `Infrastructure/ArchiveInternals.vb` | Archiv-Dispatch, Entry-Adapter, Generic Extractor | [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md) |
 | MIME Aufloesung | `Infrastructure/MimeProvider.vb` | MIME-Mapping | [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md) |
 

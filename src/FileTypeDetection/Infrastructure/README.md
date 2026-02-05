@@ -6,9 +6,9 @@ Interne, sicherheitskritische Implementierung (kein Public Surface).
 ## 2. Dateien und Verantwortungen
 | Datei | Verantwortungsbereich | Wichtige Funktionen |
 |---|---|---|
-| [CoreInternals.vb](./CoreInternals.vb) | Bounds, Gate, Payload-/Path-Guards, Refiner, Logging-Schutz | `CopyBounded`, `IsArchiveSignatureSafe*`, `IsArchiveSafe*`, `IsSafeArchiveSignaturePayload`, `IsSafeArchivePayload`, `PrepareMaterializationTarget`, `ValidateNewExtractionTarget`, `TryRefine*`, `LogGuard.*` |
-| [ArchiveManagedInternals.vb](./ArchiveManagedInternals.vb) | managed Archiv-Iteration, sichere Extraktion, Pfadschutz | `ProcessArchiveStream`, `TryExtractArchiveStream*` |
-| [ArchiveInternals.vb](./ArchiveInternals.vb) | Unified Archive Backend, Entry-Adapter, Archiv-Dispatch | `ArchiveTypeResolver`, `ArchiveBackendRegistry`, `ArchiveProcessingEngine`, `ArchiveExtractor` |
+| [CoreInternals.vb](./CoreInternals.vb) | Bounds, Gate, Payload-/Path-Guards, Refiner, Logging-Schutz | `CopyBounded`, `IsArchiveSafe*`, `IsArchiveSignatureCandidate`, `IsSafeArchivePayload`, `TryNormalizeRelativePath`, `PrepareMaterializationTarget`, `ValidateNewExtractionTarget`, `TryRefine*`, `LogGuard.*` |
+| [ArchiveManagedInternals.vb](./ArchiveManagedInternals.vb) | managed Archiv-Iteration und ZIP-Backend-Adapter | `ProcessArchiveStream`, `ArchiveManagedBackend` |
+| [ArchiveInternals.vb](./ArchiveInternals.vb) | Unified Archive Backend, Entry-Adapter, Archiv-Dispatch | `ArchiveTypeResolver`, `ArchiveBackendRegistry`, `ArchiveProcessingEngine`, `ArchiveExtractor`, `ArchiveEntryCollector` |
 | [MimeProvider.vb](./MimeProvider.vb) | MIME-Map aus Extension | `GetMime` |
 
 ## 3. Sicherheits-Trigger

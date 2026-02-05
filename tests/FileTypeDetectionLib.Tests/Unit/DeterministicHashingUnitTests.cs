@@ -119,4 +119,26 @@ public sealed class DeterministicHashingUnitTests
         Assert.Equal(evidence.Digests.PhysicalSha256, evidence.Digests.LogicalSha256);
         Assert.Equal(1, evidence.EntryCount);
     }
+
+    [Fact]
+    public void DeterministicHashOptions_Normalize_SanitizesMaterializedFileNameToFileName()
+    {
+        var normalized = DeterministicHashOptions.Normalize(new DeterministicHashOptions
+        {
+            MaterializedFileName = "../nested/../../evidence.bin"
+        });
+
+        Assert.Equal("evidence.bin", normalized.MaterializedFileName);
+    }
+
+    [Fact]
+    public void DeterministicHashOptions_Normalize_FallsBackForEmptyMaterializedFileName()
+    {
+        var normalized = DeterministicHashOptions.Normalize(new DeterministicHashOptions
+        {
+            MaterializedFileName = "   "
+        });
+
+        Assert.Equal("deterministic-roundtrip.bin", normalized.MaterializedFileName);
+    }
 }

@@ -1,6 +1,8 @@
 Option Strict On
 Option Explicit On
 
+Imports System.IO
+
 Namespace FileTypeDetection
 
     ''' <summary>
@@ -35,10 +37,29 @@ Namespace FileTypeDetection
             If options Is Nothing Then options = New DeterministicHashOptions()
 
             Dim cloned = options.Clone()
-            If String.IsNullOrWhiteSpace(cloned.MaterializedFileName) Then
-                cloned.MaterializedFileName = "deterministic-roundtrip.bin"
-            End If
+            cloned.MaterializedFileName = NormalizeMaterializedFileName(cloned.MaterializedFileName)
             Return cloned
+        End Function
+
+        Private Shared Function NormalizeMaterializedFileName(candidate As String) As String
+            Dim normalized = If(candidate, String.Empty).Trim()
+            If String.IsNullOrWhiteSpace(normalized) Then Return "deterministic-roundtrip.bin"
+
+            Try
+                normalized = Path.GetFileName(normalized)
+            Catch
+                Return "deterministic-roundtrip.bin"
+            End Try
+
+            If String.IsNullOrWhiteSpace(normalized) Then Return "deterministic-roundtrip.bin"
+
+            For Each c In Path.GetInvalidFileNameChars()
+                If normalized.IndexOf(c) >= 0 Then
+                    Return "deterministic-roundtrip.bin"
+                End If
+            Next
+
+            Return normalized
         End Function
     End Class
 

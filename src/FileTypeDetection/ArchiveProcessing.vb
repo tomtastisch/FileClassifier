@@ -3,7 +3,6 @@ Option Explicit On
 
 Imports System
 Imports System.Collections.Generic
-Imports System.IO
 
 Namespace FileTypeDetection
 
@@ -45,17 +44,9 @@ Namespace FileTypeDetection
 
             If data Is Nothing OrElse data.Length = 0 Then Return emptyResult
 
-            Dim descriptor As ArchiveDescriptor = Nothing
-            If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then Return emptyResult
-            If Not ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor) Then Return emptyResult
-
-            Try
-                Using ms As New MemoryStream(data, writable:=False)
-                    Return ArchiveExtractor.TryExtractArchiveStreamToMemory(ms, opt, descriptor)
-                End Using
-            Catch
-                Return emptyResult
-            End Try
+            Dim entries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
+            If Not ArchiveEntryCollector.TryCollectFromBytes(data, opt, entries) Then Return emptyResult
+            Return entries
         End Function
     End Class
 

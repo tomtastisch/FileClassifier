@@ -70,39 +70,6 @@ Namespace FileTypeDetection
     End Class
 
     ''' <summary>
-    ''' Sicherheits-Gate fuer signaturbasierte Archivkandidaten.
-    '''
-    ''' Sicherheitsgrenzen:
-    ''' - zu viele Entries
-    ''' - zu grosse unkomprimierte Datenmengen
-    ''' - hohe Kompressionsraten
-    ''' - tiefe/nicht begrenzte Archiv-Verschachtelung
-    ''' </summary>
-    Friend NotInheritable Class ArchiveSignatureSafetyGate
-        Private Sub New()
-        End Sub
-
-        Friend Shared Function IsArchiveSignatureSafeBytes(data As Byte(), opt As FileTypeDetectorOptions) As Boolean
-            If data Is Nothing OrElse data.Length = 0 Then Return False
-
-            Try
-                Using ms As New MemoryStream(data, writable:=False)
-                    Return IsArchiveSignatureSafeStream(ms, opt, depth:=0)
-                End Using
-            Catch ex As Exception
-                LogGuard.Debug(opt.Logger, $"[ArchiveGate] Bytes-Fehler: {ex.Message}")
-                Return False
-            End Try
-        End Function
-
-        Friend Shared Function IsArchiveSignatureSafeStream(stream As Stream, opt As FileTypeDetectorOptions, depth As Integer) As Boolean
-            If stream Is Nothing OrElse Not stream.CanRead Then Return False
-            Return ArchiveSafetyGate.IsArchiveSafeStream(stream, opt, ArchiveDescriptor.ForContainerType(ArchiveContainerType.Zip), depth)
-        End Function
-
-    End Class
-
-    ''' <summary>
     ''' Gemeinsame Guards fuer signaturbasierte Archiv-Byte-Payloads.
     ''' </summary>
     Friend NotInheritable Class ArchiveSignaturePayloadGuard
@@ -114,13 +81,6 @@ Namespace FileTypeDetection
             Return FileTypeRegistry.DetectByMagic(data) = FileKind.Zip
         End Function
 
-        Friend Shared Function IsSafeArchiveSignaturePayload(data As Byte(), opt As FileTypeDetectorOptions) As Boolean
-            If data Is Nothing OrElse data.Length = 0 Then Return False
-            If opt Is Nothing Then Return False
-            If CLng(data.Length) > opt.MaxBytes Then Return False
-            If Not IsArchiveSignatureCandidate(data) Then Return False
-            Return ArchiveSignatureSafetyGate.IsArchiveSignatureSafeBytes(data, opt)
-        End Function
     End Class
 
     ''' <summary>
@@ -201,6 +161,55 @@ Namespace FileTypeDetection
                 destinationFull.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
                 rootPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
                 StringComparison.OrdinalIgnoreCase)
+        End Function
+    End Class
+
+    ''' <summary>
+    ''' Gemeinsame Normalisierung fuer relative Archiv-Entry-Pfade.
+    ''' </summary>
+    Friend NotInheritable Class ArchiveEntryPathPolicy
+        Private Sub New()
+        End Sub
+
+        Friend Shared Function TryNormalizeRelativePath(
+            rawPath As String,
+            allowDirectoryMarker As Boolean,
+            ByRef normalizedPath As String,
+            ByRef isDirectory As Boolean
+        ) As Boolean
+            normalizedPath = String.Empty
+            isDirectory = False
+
+            Dim safe = If(rawPath, String.Empty).Trim()
+            If safe.Length = 0 Then Return False
+            If safe.Contains(ChrW(0)) Then Return False
+
+            safe = safe.Replace("\"c, "/"c)
+            If Path.IsPathRooted(safe) Then Return False
+            safe = safe.TrimStart("/"c)
+            If safe.Length = 0 Then Return False
+
+            Dim trimmed = safe.TrimEnd("/"c)
+            If trimmed.Length = 0 Then
+                If Not allowDirectoryMarker Then Return False
+                normalizedPath = safe
+                isDirectory = True
+                Return True
+            End If
+
+            Dim segments = trimmed.Split("/"c)
+            For Each seg In segments
+                If seg.Length = 0 Then Return False
+                If seg = "." OrElse seg = ".." Then Return False
+            Next
+
+            If safe.Length <> trimmed.Length AndAlso Not allowDirectoryMarker Then
+                Return False
+            End If
+
+            normalizedPath = If(allowDirectoryMarker, safe, trimmed)
+            isDirectory = allowDirectoryMarker AndAlso safe.Length <> trimmed.Length
+            Return True
         End Function
     End Class
 

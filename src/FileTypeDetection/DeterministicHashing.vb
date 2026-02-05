@@ -42,7 +42,7 @@ Namespace FileTypeDetection
 
             Dim detectedType = New FileTypeDetector().Detect(path)
             Dim entries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
-            If TryExtractArchiveEntriesFromFile(path, detectorOptions, entries) Then
+            If ArchiveEntryCollector.TryCollectFromFile(path, detectorOptions, entries) Then
                 Return BuildEvidenceFromEntries(
                     sourceType:=DeterministicHashSourceType.FilePath,
                     label:=Global.System.IO.Path.GetFileName(path),
@@ -84,7 +84,7 @@ Namespace FileTypeDetection
 
             Dim detectedType = New FileTypeDetector().Detect(data)
             Dim entries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
-            If TryExtractArchiveEntriesFromBytes(data, detectorOptions, entries) Then
+            If ArchiveEntryCollector.TryCollectFromBytes(data, detectorOptions, entries) Then
                 Return BuildEvidenceFromEntries(
                     sourceType:=DeterministicHashSourceType.RawBytes,
                     label:=NormalizeLabel(label),
@@ -151,7 +151,7 @@ Namespace FileTypeDetection
             End If
 
             Dim archiveEntries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
-            Dim isArchiveInput = TryExtractArchiveEntriesFromFile(path, detectorOptions, archiveEntries)
+            Dim isArchiveInput = ArchiveEntryCollector.TryCollectFromFile(path, detectorOptions, archiveEntries)
 
             Dim h2 As DeterministicHashEvidence
             Dim canonicalBytes As Byte()
@@ -338,23 +338,8 @@ Namespace FileTypeDetection
         End Function
 
         Private Shared Function TryNormalizeEntryPath(rawPath As String, ByRef normalizedPath As String) As Boolean
-            normalizedPath = String.Empty
-            Dim safe = If(rawPath, String.Empty).Trim()
-            If safe.Length = 0 Then Return False
-
-            safe = safe.Replace("\"c, "/"c)
-            safe = safe.TrimStart("/"c)
-            If safe.Length = 0 Then Return False
-            If safe.Contains(ChrW(0)) Then Return False
-
-            Dim segments = safe.Split("/"c)
-            For Each segment In segments
-                If segment.Length = 0 Then Return False
-                If segment = "." OrElse segment = ".." Then Return False
-            Next
-
-            normalizedPath = safe
-            Return True
+            Dim isDirectory As Boolean = False
+            Return ArchiveEntryPathPolicy.TryNormalizeRelativePath(rawPath, allowDirectoryMarker:=False, normalizedPath, isDirectory)
         End Function
 
         Private Shared Function BuildLogicalManifestBytes(entries As IReadOnlyList(Of NormalizedEntry)) As Byte()
@@ -438,48 +423,6 @@ Namespace FileTypeDetection
                 Return True
             Catch ex As Exception
                 errorMessage = $"Datei konnte nicht gelesen werden: {ex.Message}"
-                Return False
-            End Try
-        End Function
-
-        Private Shared Function TryExtractArchiveEntriesFromFile(path As String, detectorOptions As FileTypeDetectorOptions, ByRef entries As IReadOnlyList(Of ZipExtractedEntry)) As Boolean
-            entries = Array.Empty(Of ZipExtractedEntry)()
-            If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then Return False
-            If detectorOptions Is Nothing Then Return False
-
-            Try
-                Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
-                    Dim descriptor As ArchiveDescriptor = Nothing
-                    If Not ArchiveTypeResolver.TryDescribeStream(fs, detectorOptions, descriptor) Then Return False
-                    If fs.CanSeek Then fs.Position = 0
-                    If Not ArchiveSafetyGate.IsArchiveSafeStream(fs, detectorOptions, descriptor, depth:=0) Then Return False
-                    If fs.CanSeek Then fs.Position = 0
-
-                    entries = ArchiveExtractor.TryExtractArchiveStreamToMemory(fs, detectorOptions, descriptor)
-                    Return entries IsNot Nothing AndAlso entries.Count > 0
-                End Using
-            Catch
-                entries = Array.Empty(Of ZipExtractedEntry)()
-                Return False
-            End Try
-        End Function
-
-        Private Shared Function TryExtractArchiveEntriesFromBytes(data As Byte(), detectorOptions As FileTypeDetectorOptions, ByRef entries As IReadOnlyList(Of ZipExtractedEntry)) As Boolean
-            entries = Array.Empty(Of ZipExtractedEntry)()
-            If data Is Nothing OrElse data.Length = 0 Then Return False
-            If detectorOptions Is Nothing Then Return False
-
-            Try
-                Dim descriptor As ArchiveDescriptor = Nothing
-                If Not ArchiveTypeResolver.TryDescribeBytes(data, detectorOptions, descriptor) Then Return False
-                If Not ArchiveSafetyGate.IsArchiveSafeBytes(data, detectorOptions, descriptor) Then Return False
-
-                Using ms As New MemoryStream(data, writable:=False)
-                    entries = ArchiveExtractor.TryExtractArchiveStreamToMemory(ms, detectorOptions, descriptor)
-                    Return entries IsNot Nothing AndAlso entries.Count > 0
-                End Using
-            Catch
-                entries = Array.Empty(Of ZipExtractedEntry)()
                 Return False
             End Try
         End Function
