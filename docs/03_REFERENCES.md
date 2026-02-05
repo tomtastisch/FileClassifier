@@ -84,6 +84,13 @@ flowchart LR
 | Modul-Uebersicht | `../src/FileTypeDetection/README.md` |
 | Unterordner-Details | `../src/FileTypeDetection/Detection/README.md`, `../src/FileTypeDetection/Infrastructure/README.md`, `../src/FileTypeDetection/Configuration/README.md`, `../src/FileTypeDetection/Abstractions/README.md`, `../src/FileTypeDetection/Abstractions/Detection/README.md`, `../src/FileTypeDetection/Abstractions/Archive/README.md`, `../src/FileTypeDetection/Abstractions/Hashing/README.md`, `../src/FileClassifier.App/README.md` |
 
+## 6.1 Change Playbooks
+| Thema | Guide |
+|---|---|
+| Optionen anlegen/anpassen | `guides/OPTIONS_CHANGE_GUIDE.md` |
+| Neue Datatypes/API-Modelle erweitern | `guides/DATATYPE_EXTENSION_GUIDE.md` |
+| Guide-Index | `guides/README.md` |
+
 ## 7. Verifikationsreferenzen
 Empfohlene Freigabe-Checks:
 ```bash

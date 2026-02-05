@@ -14,8 +14,14 @@ Diese Doku ist in drei Ebenen getrennt:
 5. [test-matrix-hashing.md](./test-matrix-hashing.md)
 6. [PRODUCTION_READINESS_CHECKLIST.md](./PRODUCTION_READINESS_CHECKLIST.md)
 7. [DIN_SPECIFICATION_DE.md](./DIN_SPECIFICATION_DE.md)
+8. [guides/README.md](./guides/README.md)
 
-## 2.1 Vertiefende Implementierungsquellen
+## 2.1 Change Playbooks (neu)
+- [Guides Index](./guides/README.md)
+- [Playbook: Options anlegen und anpassen](./guides/OPTIONS_CHANGE_GUIDE.md)
+- [Playbook: Neue Datatypes und API-Modelle erweitern](./guides/DATATYPE_EXTENSION_GUIDE.md)
+
+## 2.2 Vertiefende Implementierungsquellen
 - [../src/FileTypeDetection/Detection/README.md](../src/FileTypeDetection/Detection/README.md)
 - [../src/FileTypeDetection/Infrastructure/README.md](../src/FileTypeDetection/Infrastructure/README.md)
 - [../src/FileTypeDetection/Configuration/README.md](../src/FileTypeDetection/Configuration/README.md)
