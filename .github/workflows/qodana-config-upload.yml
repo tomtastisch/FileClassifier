@@ -24,5 +24,5 @@ jobs:
             -w /workspace \
             -e QODANA_CONFIGURATIONS_TOKEN=$QODANA_CONFIGURATIONS_TOKEN \
             jetbrains/qodana-configuration-uploader:latest \
-            --global-configs-file qodana-global-configurations.yaml \
-            --qodana-host https://qodana.cloud
+                    --global-configs-file qodana-global-configurations.yaml \
+                    --qodana-endpoint https://qodana.cloud
