@@ -57,15 +57,6 @@ jobs:
         run: dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal
 
       - name: Test With Coverage Gates (Line + Branch)
-        run: >
-          dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj
-          -v minimal
-          /p:CollectCoverage=true
-          /p:Include="[FileTypeDetectionLib]*"
-          /p:CoverletOutputFormat=cobertura
-          /p:Threshold=85%2c69
-          /p:ThresholdType=line%2cbranch
-          /p:ThresholdStat=total
-
+        run: tools/run-coverage.sh
       - name: Vulnerability Check
         run: dotnet list FileClassifier.sln package --vulnerable --include-transitive

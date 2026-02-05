@@ -94,6 +94,9 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 | `@konfiguration` | Build-/Konfigurationspfade | `--filter "Category=konfiguration"` |
 | `@refinement` | OOXML/Archiv-Refinement-Fälle | `--filter "Category=refinement"` |
 
+
+Hinweis:
+- Coverage excludes: `*Internals.vb` (file pattern) plus `DeterministicHashing` and `FileTypeDetector` (ExcludeFromCodeCoverage).
 ## Dokumentpflege-Checkliste
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.
 - [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.

@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Text.Json;
 using FileTypeDetection;
 using Xunit;
@@ -132,6 +134,91 @@ public sealed class FileTypeOptionsFacadeUnitTests
             Assert.True(snapshot.DeterministicHash.IncludePayloadCopies);
             Assert.False(snapshot.DeterministicHash.IncludeFastHash);
             Assert.Equal("evidence.bin", snapshot.DeterministicHash.MaterializedFileName);
+        }
+        finally
+        {
+            FileTypeOptions.SetSnapshot(original);
+        }
+    }
+
+    [Fact]
+    public void LoadOptions_RejectsInvalidJsonAndRoot()
+    {
+        var original = FileTypeOptions.GetSnapshot();
+        try
+        {
+            Assert.False(FileTypeOptions.LoadOptions(null));
+            Assert.False(FileTypeOptions.LoadOptions("   "));
+            Assert.False(FileTypeOptions.LoadOptions("[1,2,3]"));
+            Assert.False(FileTypeOptions.LoadOptions("{invalid-json"));
+        }
+        finally
+        {
+            FileTypeOptions.SetSnapshot(original);
+        }
+    }
+
+    [Fact]
+    public void LoadOptions_IgnoresUnknownKeys_AndInvalidTypes()
+    {
+        var original = FileTypeOptions.GetSnapshot();
+        try
+        {
+            var defaults = FileTypeProjectOptions.DefaultOptions();
+            var ok = FileTypeOptions.LoadOptions("{\"unknownKey\":true,\"maxBytes\":\"oops\",\"deterministicHash\":false}");
+            var snapshot = FileTypeOptions.GetSnapshot();
+
+            Assert.True(ok);
+            Assert.Equal(defaults.MaxBytes, snapshot.MaxBytes);
+            Assert.Equal(defaults.DeterministicHash.MaterializedFileName, snapshot.DeterministicHash.MaterializedFileName);
+        }
+        finally
+        {
+            FileTypeOptions.SetSnapshot(original);
+        }
+    }
+
+    [Fact]
+    public void LoadOptions_Applies_DeterministicHashFlatFields()
+    {
+        var original = FileTypeOptions.GetSnapshot();
+        try
+        {
+            var ok = FileTypeOptions.LoadOptions("{\"deterministicHashIncludePayloadCopies\":true,\"deterministicHashIncludeFastHash\":false,\"deterministicHashMaterializedFileName\":\"x.bin\"}");
+            var snapshot = FileTypeOptions.GetSnapshot();
+
+            Assert.True(ok);
+            Assert.True(snapshot.DeterministicHash.IncludePayloadCopies);
+            Assert.False(snapshot.DeterministicHash.IncludeFastHash);
+            Assert.Equal("x.bin", snapshot.DeterministicHash.MaterializedFileName);
+        }
+        finally
+        {
+            FileTypeOptions.SetSnapshot(original);
+        }
+    }
+
+    [Fact]
+    public void LoadOptionsFromPath_ValidatesExtensionAndExistence()
+    {
+        var original = FileTypeOptions.GetSnapshot();
+        try
+        {
+            Assert.False(FileTypeOptions.LoadOptionsFromPath("   "));
+            Assert.False(FileTypeOptions.LoadOptionsFromPath("missing.json"));
+            Assert.False(FileTypeOptions.LoadOptionsFromPath("options.txt"));
+
+            var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
+            File.WriteAllText(path, "{\"maxZipEntries\":7}");
+            try
+            {
+                Assert.True(FileTypeOptions.LoadOptionsFromPath(path));
+                Assert.Equal(7, FileTypeOptions.GetSnapshot().MaxZipEntries);
+            }
+            finally
+            {
+                File.Delete(path);
+            }
         }
         finally
         {

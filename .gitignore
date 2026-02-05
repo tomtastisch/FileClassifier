@@ -17,6 +17,7 @@ tests/**/TestResults/
 *.trx
 *.coverage
 *.coveragexml
+*.cobertura.xml
 # benchmark output
 
 benchmark_detect_ms.txt
@@ -43,6 +44,7 @@ benchmark_detect_ms.txt
 # local-only tools
 tools/*
 !tools/versioning/
+!tools/run-coverage.sh
 !tools/versioning/check-versioning.sh
 !tools/versioning/labels.json
 
