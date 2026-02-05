@@ -7,6 +7,7 @@ Nachweis fuer Sicherheit, Determinismus, Korrektheit und API-Klarheit.
 | Kategorie | Fokus | Referenz |
 |---|---|---|
 | Unit | API- und Regelverhalten | [Unit/README.md](./Unit/README.md) |
+| Integration | format- und pipelineuebergreifende Nachweise mit echten Archiv-Pfaden | [Integration/README.md](./Integration/README.md) |
 | Property | Grenz-/Invarianztests fuer ZIP-Gate, Optionen und Materializer | [Property/README.md](./Property/README.md) |
 | Features (BDD Unit/Integration/E2E) | fachliche Lesbarkeit und End-to-End-Flows | [Features/README.md](./Features/README.md) |
 | Benchmarks | regressionsorientierte Laufzeittrends | [Benchmarks/README.md](./Benchmarks/README.md) |
@@ -17,6 +18,7 @@ Nachweis fuer Sicherheit, Determinismus, Korrektheit und API-Klarheit.
 | Fail-closed ZIP-Grenzen | [Unit/ZipAdversarialTests.cs](./Unit/ZipAdversarialTests.cs) |
 | Sichere ZIP-Extraktion | [Unit/ZipExtractionUnitTests.cs](./Unit/ZipExtractionUnitTests.cs) |
 | Unified-Archive-Flows (ZIP/TAR/TAR.GZ/7z/RAR fuer Byte-Array Detect/Validate/Extract/Materialize) | [Features/FTD_BDD_040_ARCHIVE_TYPEN_BYTEARRAY_UND_MATERIALISIERUNG.feature](./Features/FTD_BDD_040_ARCHIVE_TYPEN_BYTEARRAY_UND_MATERIALISIERUNG.feature), [Unit/UnifiedArchiveBackendUnitTests.cs](./Unit/UnifiedArchiveBackendUnitTests.cs) |
+| Deterministische Hash-Evidence + h1-h4 RoundTrip (Physical/Logical) | [Unit/DeterministicHashingUnitTests.cs](./Unit/DeterministicHashingUnitTests.cs), [Integration/DeterministicHashingIntegrationTests.cs](./Integration/DeterministicHashingIntegrationTests.cs), [Features/FTD_BDD_050_DETERMINISTISCHES_HASHING_UND_ROUNDTRIP.feature](./Features/FTD_BDD_050_DETERMINISTISCHES_HASHING_UND_ROUNDTRIP.feature) |
 | Deterministische Registry | [Unit/FileTypeRegistryUnitTests.cs](./Unit/FileTypeRegistryUnitTests.cs) |
 | API Detail-/ZIP-Fassade | [Unit/DetectionDetailAndZipValidationUnitTests.cs](./Unit/DetectionDetailAndZipValidationUnitTests.cs), [Unit/ZipProcessingFacadeUnitTests.cs](./Unit/ZipProcessingFacadeUnitTests.cs) |
 | Options-/Materializer-Invarianten | [Property/FileTypeOptionsPropertyTests.cs](./Property/FileTypeOptionsPropertyTests.cs), [Property/FileMaterializerPropertyTests.cs](./Property/FileMaterializerPropertyTests.cs) |

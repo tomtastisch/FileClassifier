@@ -20,6 +20,7 @@ Es dient als Architektur- und Ablaufreferenz auf Dokumentationsebene und ersetzt
 - `F6`: Raw Byte Materialize (Persist)
 - `F7`: Global Options/Baseline
 - `F8`: Extension Policy Check
+- `F9`: Deterministic Hashing / h1-h4 RoundTrip
 
 ### 2.3 Mermaid-Layout (global)
 Hinweis: Diese `init`-Konfiguration reduziert Kreuzungen und erhoeht Lesbarkeit.
@@ -341,6 +342,7 @@ flowchart TD
 | `FileMaterializer.Persist(..., secureExtract:=False)` | `F6` |
 | `FileTypeOptions.LoadOptions/GetOptions` / `FileTypeSecurityBaseline.ApplyDeterministicDefaults` | `F7` |
 | `DetectAndVerifyExtension(path)` / `Detect(..., verifyExtension)` | `F8` |
+| `DeterministicHashing.HashFile/HashBytes/HashEntries/VerifyRoundTrip` | `F9` |
 
 ## 8. Grenzen und Nicht-Ziele
 - Kein Ersatz fuer Quellcode-Reviews interner Guards (z. B. Payload-/Path-Guards).

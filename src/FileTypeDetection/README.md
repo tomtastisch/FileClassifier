@@ -35,6 +35,7 @@ Im Modul-Root liegen nur oeffentliche API-Einstiegspunkte:
 - [ZipProcessing.vb](./ZipProcessing.vb)
 - [FileMaterializer.vb](./FileMaterializer.vb)
 - [FileTypeOptions.vb](./FileTypeOptions.vb)
+- [DeterministicHashing.vb](./DeterministicHashing.vb)
 
 Alle Low-Level-Implementierungen liegen in Unterordnern.
 
@@ -64,6 +65,7 @@ flowchart LR
 | `FileMaterializer` | einheitliche Persistenz fuer Byte-Payloads (optional ZIP->Disk) | [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) |
 | `FileTypeOptions` | zentrale JSON-Optionsschnittstelle (laden/lesen) | [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) |
 | `FileTypeSecurityBaseline` | konservative Security-Defaults | [Configuration/README.md](./Configuration/README.md) |
+| `DeterministicHashing` | deterministische Physical/Logical Hash-Nachweise und h1-h4 RoundTrip-Report | [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) |
 
 ## 7. Qualitaetsziele (ISO/IEC 25010)
 - Functional suitability: korrektes Mapping Header/Container -> `FileKind`.
@@ -86,6 +88,7 @@ flowchart LR
     CORE --> SHARP[SharpCompress]
     CORE --> MIME[Mime]
     CORE --> RMS[Microsoft.IO.RecyclableMemoryStream]
+    CORE --> HASH[System.IO.Hashing]
     API --> LOG[Microsoft.AspNetCore.App -> Logging]
 ```
 

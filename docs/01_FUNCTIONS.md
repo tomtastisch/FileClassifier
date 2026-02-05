@@ -20,7 +20,7 @@ Dieses Dokument beschreibt alle oeffentlichen Einstiegspunkte der API mit Signat
 | `FileTypeDetector` / `ZipProcessing` | [`../src/FileTypeDetection/Detection/README.md`](../src/FileTypeDetection/Detection/README.md) | SSOT-Detektion, Header-Magic, Aliaslogik |
 | `FileTypeDetector` / `ZipProcessing` / `FileMaterializer` | [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md) | Archive-Gate, Guards, Extraktions-Engine |
 | `FileTypeOptions` / `FileTypeSecurityBaseline` | [`../src/FileTypeDetection/Configuration/README.md`](../src/FileTypeDetection/Configuration/README.md) | globale Optionen und Baseline |
-| Rueckgabemodelle (`FileType`, `DetectionDetail`, `ZipExtractedEntry`) | [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md) | Modellvertraege der Public API |
+| Rueckgabemodelle (`FileType`, `DetectionDetail`, `ZipExtractedEntry`, `DeterministicHash*`) | [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md) | Modellvertraege der Public API |
 | Modulnavigation | [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md) | Uebersicht und Einstieg je Leserrolle |
 
 ## 3. Vollstaendige Methodenmatrix (Public API)
@@ -44,6 +44,16 @@ Dieses Dokument beschreibt alle oeffentlichen Einstiegspunkte der API mit Signat
 | `FileMaterializer` | `Persist(data, destinationPath)` | `Byte()` + Zielpfad | `Boolean` | schreibt auf Disk | `F6` |
 | `FileMaterializer` | `Persist(data, destinationPath, overwrite)` | `Byte()` + Zielpfad + Bool | `Boolean` | schreibt auf Disk | `F6` |
 | `FileMaterializer` | `Persist(data, destinationPath, overwrite, secureExtract)` | `Byte()` + Zielpfad + 2 Bool | `Boolean` | schreibt auf Disk | `F5`/`F6` |
+| `DeterministicHashing` | `HashFile(path)` | Datei-Pfad | `DeterministicHashEvidence` | keine | `F9` |
+| `DeterministicHashing` | `HashFile(path, options)` | Datei-Pfad + Optionen | `DeterministicHashEvidence` | keine | `F9` |
+| `DeterministicHashing` | `HashBytes(data)` | `Byte()` | `DeterministicHashEvidence` | keine | `F9` |
+| `DeterministicHashing` | `HashBytes(data, label)` | `Byte()` + Label | `DeterministicHashEvidence` | keine | `F9` |
+| `DeterministicHashing` | `HashBytes(data, label, options)` | `Byte()` + Label + Optionen | `DeterministicHashEvidence` | keine | `F9` |
+| `DeterministicHashing` | `HashEntries(entries)` | `IReadOnlyList(Of ZipExtractedEntry)` | `DeterministicHashEvidence` | keine | `F9` |
+| `DeterministicHashing` | `HashEntries(entries, label)` | Entries + Label | `DeterministicHashEvidence` | keine | `F9` |
+| `DeterministicHashing` | `HashEntries(entries, label, options)` | Entries + Label + Optionen | `DeterministicHashEvidence` | keine | `F9` |
+| `DeterministicHashing` | `VerifyRoundTrip(path)` | Datei-Pfad | `DeterministicHashRoundTripReport` | schreibt temp-Datei intern und raeumt auf | `F9` |
+| `DeterministicHashing` | `VerifyRoundTrip(path, options)` | Datei-Pfad + Optionen | `DeterministicHashRoundTripReport` | schreibt temp-Datei intern und raeumt auf | `F9` |
 | `FileTypeOptions` | `LoadOptions(json)` | JSON | `Boolean` | aendert globale Optionen | `F7` |
 | `FileTypeOptions` | `GetOptions()` | - | `String` (JSON) | keine | `F7` |
 | `FileTypeSecurityBaseline` | `ApplyDeterministicDefaults()` | - | `Void` | aendert globale Optionen | `F7` |
@@ -156,6 +166,37 @@ bool loaded = FileTypeOptions.LoadOptions("{\"maxBytes\":134217728}");
 string snapshot = FileTypeOptions.GetOptions();
 Console.WriteLine($"Loaded={loaded}; Snapshot={snapshot}");
 ```
+
+### 4.5 DeterministicHashing
+Details: [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md), [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md).
+
+```mermaid
+flowchart LR
+    HI["Input: File/Bytes/Entries"]
+    H1["Physical SHA-256 (raw bytes)"]
+    H2["Logical SHA-256 (canonical content)"]
+    H3["optional Fast XxHash3"]
+    HR["RoundTrip h1-h4 report"]
+
+    HI --> H1
+    HI --> H2
+    HI --> H3
+    HI --> HR
+```
+
+```csharp
+using FileTypeDetection;
+
+var evidence = DeterministicHashing.HashFile("/data/archive.zip");
+var report = DeterministicHashing.VerifyRoundTrip("/data/archive.zip");
+
+Console.WriteLine($"{evidence.Digests.PhysicalSha256} / {evidence.Digests.LogicalSha256}");
+Console.WriteLine($"LogicalConsistent={report.LogicalConsistent}");
+```
+
+Hinweis:
+- `PhysicalSha256` und `LogicalSha256` sind Security-SSOT.
+- `Fast*XxHash3` ist optionaler Performance-Digest und kein kryptografischer Integritaetsnachweis.
 
 ## 5. Nicht-Ziele
 - Keine interne Low-Level-Implementierung im Detail (siehe `03_REFERENCES.md`).
