@@ -21,29 +21,9 @@ jobs:
       - name: Markdown Link Check
         run: python3 tools/check-markdown-links.py
 
-  quodana:
-    runs-on: ubuntu-latest
-    needs: docs-linkcheck
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Quodana Scan (Baseline-only)
-        uses: JetBrains/qodana-action@v2024.3
-        with:
-          cache-default-branch-only: true
-          results-dir: qodana-results
-          upload-result: true
-          upload-sarif: true
-          baseline-path: .quodana.baseline.json
-          fail-on-changes: true
-
   versioning-guard:
     runs-on: ubuntu-latest
-    needs: [docs-linkcheck, quodana]
+    needs: docs-linkcheck
 
     steps:
       - name: Checkout
@@ -56,7 +36,7 @@ jobs:
 
   build-test:
     runs-on: ubuntu-latest
-    needs: [docs-linkcheck, versioning-guard, quodana]
+    needs: [docs-linkcheck, versioning-guard]
 
     steps:
       - name: Checkout

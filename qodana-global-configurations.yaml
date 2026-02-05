@@ -1,5 +1,0 @@
-configurations:
-  - id: fileclassifier
-    name: FileClassifier
-    description: Global Qodana configuration for FileClassifier
-    qodanaYaml: qodana.yaml

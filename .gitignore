@@ -48,3 +48,6 @@ tools/*
 !tools/versioning/
 !tools/versioning/check-versioning.sh
 !tools/versioning/labels.json
+
+# local secrets
+.secrets/
