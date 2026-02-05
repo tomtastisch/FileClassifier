@@ -22,11 +22,11 @@ Namespace FileTypeDetection
         End Function
 
         ''' <summary>
-        ''' Prueft fail-closed, ob ein Byte-Array ein sicherer ZIP-Container ist.
+        ''' Prueft fail-closed, ob ein Byte-Array ein sicherer Archiv-Container ist.
         ''' </summary>
         Public Shared Function TryValidate(data As Byte()) As Boolean
             Dim opt = FileTypeOptions.GetSnapshot()
-            Return ZipPayloadGuard.IsSafeZipPayload(data, opt)
+            Return ArchivePayloadGuard.IsSafeArchivePayload(data, opt)
         End Function
 
         ''' <summary>
@@ -43,11 +43,15 @@ Namespace FileTypeDetection
             Dim opt = FileTypeOptions.GetSnapshot()
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
 
-            If Not ZipPayloadGuard.IsSafeZipPayload(data, opt) Then Return emptyResult
+            If data Is Nothing OrElse data.Length = 0 Then Return emptyResult
+
+            Dim descriptor As ArchiveDescriptor = Nothing
+            If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then Return emptyResult
+            If Not ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor) Then Return emptyResult
 
             Try
                 Using ms As New MemoryStream(data, writable:=False)
-                    Return ZipExtractor.TryExtractZipStreamToMemory(ms, opt)
+                    Return ArchiveExtractor.TryExtractArchiveStreamToMemory(ms, opt, descriptor)
                 End Using
             Catch
                 Return emptyResult

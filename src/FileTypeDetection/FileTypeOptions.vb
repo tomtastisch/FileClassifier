@@ -35,6 +35,8 @@ Namespace FileTypeDetection
             Dim maxZipCompressionRatio = defaults.MaxZipCompressionRatio
             Dim maxZipNestingDepth = defaults.MaxZipNestingDepth
             Dim maxZipNestedBytes = defaults.MaxZipNestedBytes
+            Dim rejectArchiveLinks = defaults.RejectArchiveLinks
+            Dim allowUnknownArchiveEntrySize = defaults.AllowUnknownArchiveEntrySize
             Dim logger = defaults.Logger
 
             Try
@@ -55,6 +57,8 @@ Namespace FileTypeDetection
                             Case "maxzipcompressionratio" : maxZipCompressionRatio = ParseNonNegativeInt(p.Value, maxZipCompressionRatio, p.Name, logger)
                             Case "maxzipnestingdepth" : maxZipNestingDepth = ParseNonNegativeInt(p.Value, maxZipNestingDepth, p.Name, logger)
                             Case "maxzipnestedbytes" : maxZipNestedBytes = ParsePositiveLong(p.Value, maxZipNestedBytes, p.Name, logger)
+                            Case "rejectarchivelinks" : rejectArchiveLinks = ParseBoolean(p.Value, rejectArchiveLinks, p.Name, logger)
+                            Case "allowunknownarchiveentrysize" : allowUnknownArchiveEntrySize = ParseBoolean(p.Value, allowUnknownArchiveEntrySize, p.Name, logger)
                             Case Else
                                 LogGuard.Warn(logger, $"[Config] Unbekannter Schluessel '{p.Name}' ignoriert.")
                         End Select
@@ -70,8 +74,11 @@ Namespace FileTypeDetection
                     .MaxZipCompressionRatio = maxZipCompressionRatio,
                     .MaxZipNestingDepth = maxZipNestingDepth,
                     .MaxZipNestedBytes = maxZipNestedBytes,
+                    .RejectArchiveLinks = rejectArchiveLinks,
+                    .AllowUnknownArchiveEntrySize = allowUnknownArchiveEntrySize,
                     .Logger = logger
                 }
+                nextOptions.NormalizeInPlace()
                 SetSnapshot(nextOptions)
                 Return True
             Catch ex As Exception
@@ -94,7 +101,9 @@ Namespace FileTypeDetection
                 {"maxZipEntryUncompressedBytes", opt.MaxZipEntryUncompressedBytes},
                 {"maxZipCompressionRatio", opt.MaxZipCompressionRatio},
                 {"maxZipNestingDepth", opt.MaxZipNestingDepth},
-                {"maxZipNestedBytes", opt.MaxZipNestedBytes}
+                {"maxZipNestedBytes", opt.MaxZipNestedBytes},
+                {"rejectArchiveLinks", opt.RejectArchiveLinks},
+                {"allowUnknownArchiveEntrySize", opt.AllowUnknownArchiveEntrySize}
             }
             Return JsonSerializer.Serialize(dto)
         End Function
@@ -164,7 +173,9 @@ Namespace FileTypeDetection
 
         Private Shared Function Snapshot(opt As FileTypeDetectorOptions) As FileTypeDetectorOptions
             If opt Is Nothing Then Return FileTypeDetectorOptions.DefaultOptions()
-            Return opt.Clone()
+            Dim snap = opt.Clone()
+            snap.NormalizeInPlace()
+            Return snap
         End Function
     End Class
 

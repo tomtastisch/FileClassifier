@@ -10,7 +10,7 @@ Dieses Dokument sammelt die statischen Referenzen zur API: interne Dateipfade, e
 | `FileType` | `Kind`, `CanonicalExtension`, `Mime`, `Allowed`, `Aliases` | inhaltsbasierte Typentscheidung |
 | `DetectionDetail` | `DetectedType`, `ReasonCode`, `UsedZipContentCheck`, `UsedStructuredRefinement`, `ExtensionVerified` | auditierbares Detailergebnis |
 | `ZipExtractedEntry` | `RelativePath`, `Content`, `Size`, `OpenReadOnlyStream()` | sicherer In-Memory-Extrakteintrag |
-| `FileTypeDetectorOptions` | `HeaderOnlyNonZip`, `MaxBytes`, `SniffBytes`, `MaxZipEntries`, `MaxZipTotalUncompressedBytes`, `MaxZipEntryUncompressedBytes`, `MaxZipCompressionRatio`, `MaxZipNestingDepth`, `MaxZipNestedBytes`, `Logger` | globales Optionsmodell |
+| `FileTypeDetectorOptions` | `HeaderOnlyNonZip`, `MaxBytes`, `SniffBytes`, `MaxZipEntries`, `MaxZipTotalUncompressedBytes`, `MaxZipEntryUncompressedBytes`, `MaxZipCompressionRatio`, `MaxZipNestingDepth`, `MaxZipNestedBytes`, `RejectArchiveLinks`, `AllowUnknownArchiveEntrySize`, `Logger` | globales Optionsmodell |
 
 ## 3. ReasonCode-Referenz (DetectDetailed)
 Quelle: `FileTypeDetector.vb`.
@@ -33,10 +33,11 @@ Quelle: `FileTypeDetector.vb`.
 ## 4. Interne Kernpfade (Lesefuehrung)
 | Interner Pfad | Datei | Bedeutung | Detail-README |
 |---|---|---|---|
-| Header/Typ-SSOT | `Detection/FileTypeRegistry.vb` | Header-Magic, Aliase, Canonical Extensions | [`../Detection/README.md`](../Detection/README.md) |
-| Core Guards | `Infrastructure/CoreInternals.vb` | Bounds, Security Gates, Path Guards | [`../Infrastructure/README.md`](../Infrastructure/README.md) |
-| ZIP internals | `Infrastructure/ZipInternals.vb` | ZIP-Iteration, Validierung, Extraktion | [`../Infrastructure/README.md`](../Infrastructure/README.md) |
-| MIME Aufloesung | `Infrastructure/MimeProvider.vb` | MIME-Mapping | [`../Infrastructure/README.md`](../Infrastructure/README.md) |
+| Header/Typ-SSOT | `Detection/FileTypeRegistry.vb` | Header-Magic, Aliase, Canonical Extensions | [`../src/FileTypeDetection/Detection/README.md`](../src/FileTypeDetection/Detection/README.md) |
+| Core Guards | `Infrastructure/CoreInternals.vb` | Bounds, Security Gates, Path Guards | [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md) |
+| ZIP internals | `Infrastructure/ZipInternals.vb` | ZIP-Iteration, Validierung, Extraktion | [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md) |
+| Archive internals | `Infrastructure/ArchiveInternals.vb` | Archiv-Dispatch, Entry-Adapter, Generic Extractor | [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md) |
+| MIME Aufloesung | `Infrastructure/MimeProvider.vb` | MIME-Mapping | [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md) |
 
 ## 5. Externe Abhaengigkeiten
 ### 5.1 Diagramm
@@ -54,7 +55,7 @@ flowchart LR
     INF --> ZIP
     INF --> MIME
     INF --> RMS
-    API --> SHARP
+    INF --> SHARP
     API --> LOG
 ```
 
@@ -64,7 +65,7 @@ flowchart LR
 | `System.IO.Compression` (BCL) | `Infrastructure/CoreInternals.vb`, `Infrastructure/ZipInternals.vb` | ZIP lesen/iterieren |
 | `Mime` | `Infrastructure/MimeProvider.vb` | MIME-Aufloesung aus Extension |
 | `Microsoft.IO.RecyclableMemoryStream` | `Infrastructure/ZipInternals.vb` | kontrollierte Memory-Streams |
-| `SharpCompress` | `FileMaterializer.vb` | defensiver ZIP-Lesbarkeits-Check |
+| `SharpCompress` | `Infrastructure/ArchiveInternals.vb`, `FileMaterializer.vb` | Archive-Type-Erkennung, generische Archiv-Iteration, defensiver Lesbarkeits-Check |
 | `Microsoft.AspNetCore.App` (FrameworkReference) | Logging via `Microsoft.Extensions.Logging` | optionale Diagnostik |
 
 ## 6. Referenz-Index (wo finde ich was?)
@@ -73,8 +74,8 @@ flowchart LR
 | Public Signaturen + Beispiele | `01_FUNCTIONS.md` |
 | E2E-Architektur + Sequenzen | `02_ARCHITECTURE_AND_FLOWS.md` |
 | Normative Anforderungen | `DIN_SPECIFICATION_DE.md` |
-| Modul-Uebersicht | `../README.md` |
-| Unterordner-Details | `../Detection/README.md`, `../Infrastructure/README.md`, `../Configuration/README.md`, `../Abstractions/README.md` |
+| Modul-Uebersicht | `../src/FileTypeDetection/README.md` |
+| Unterordner-Details | `../src/FileTypeDetection/Detection/README.md`, `../src/FileTypeDetection/Infrastructure/README.md`, `../src/FileTypeDetection/Configuration/README.md`, `../src/FileTypeDetection/Abstractions/README.md` |
 
 ## 7. Verifikationsreferenzen
 Empfohlene Freigabe-Checks:

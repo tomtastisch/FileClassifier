@@ -57,8 +57,8 @@ bash tools/sync-doc-conventions.sh
 
 ## 8. Rueckverfolgbarkeit
 Diese Spezifikation ist rueckverfolgbar auf:
-- Funktionsreferenz: `src/FileTypeDetection/docs/01_FUNCTIONS.md`
-- Architektur- und Ablaufreferenz: `src/FileTypeDetection/docs/02_ARCHITECTURE_AND_FLOWS.md`
-- Referenzdokument: `src/FileTypeDetection/docs/03_REFERENCES.md`
+- Funktionsreferenz: `docs/01_FUNCTIONS.md`
+- Architektur- und Ablaufreferenz: `docs/02_ARCHITECTURE_AND_FLOWS.md`
+- Referenzdokument: `docs/03_REFERENCES.md`
 - Modulindex: `src/FileTypeDetection/README.md`
 - Unit-/Property-Tests: `tests/FileTypeDetectionLib.Tests`

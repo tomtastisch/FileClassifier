@@ -6,6 +6,11 @@ namespace FileTypeDetectionLib.Tests.Support;
 
 internal static class TestTempPaths
 {
+    internal static TempRootScope CreateScope(string prefix)
+    {
+        return new TempRootScope(CreateTempRoot(prefix));
+    }
+
     internal static string CreateTempRoot(string prefix)
     {
         var safePrefix = string.IsNullOrWhiteSpace(prefix) ? "ftd-test" : prefix.Trim();
@@ -37,6 +42,21 @@ internal static class TestTempPaths
             {
                 Thread.Sleep(20);
             }
+        }
+    }
+
+    internal sealed class TempRootScope : IDisposable
+    {
+        internal TempRootScope(string rootPath)
+        {
+            RootPath = rootPath;
+        }
+
+        internal string RootPath { get; }
+
+        public void Dispose()
+        {
+            CleanupTempRoot(RootPath);
         }
     }
 }

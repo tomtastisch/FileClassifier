@@ -3,8 +3,6 @@ Option Explicit On
 
 Imports System
 Imports System.IO
-Imports SharpCompress.Archives
-Imports SharpCompress.Common
 
 Namespace FileTypeDetection
 
@@ -40,18 +38,21 @@ Namespace FileTypeDetection
                 Return False
             End Try
 
-            If secureExtract AndAlso ZipPayloadGuard.IsZipByMagic(data) Then
-                If Not IsReadableZipArchive(data, opt) Then
+            If secureExtract Then
+                Dim descriptor As ArchiveDescriptor = Nothing
+                If ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then
+                    If Not ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor) Then
+                        LogGuard.Warn(opt.Logger, "[Materialize] Archiv-Validierung fehlgeschlagen.")
+                        Return False
+                    End If
+
+                    Return MaterializeArchiveBytes(data, destinationFull, overwrite, opt, descriptor)
+                End If
+
+                If ZipPayloadGuard.IsZipByMagic(data) Then
                     LogGuard.Warn(opt.Logger, "[Materialize] ZIP kann nicht gelesen werden.")
                     Return False
                 End If
-
-                If Not ZipSafetyGate.IsZipSafeBytes(data, opt) Then
-                    LogGuard.Warn(opt.Logger, "[Materialize] ZIP-Validierung fehlgeschlagen.")
-                    Return False
-                End If
-
-                Return MaterializeZipBytes(data, destinationFull, overwrite, opt)
             End If
 
             Return MaterializeRawBytes(data, destinationFull, overwrite, opt)
@@ -76,33 +77,19 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Private Shared Function MaterializeZipBytes(data As Byte(), destinationFull As String, overwrite As Boolean, opt As FileTypeDetectorOptions) As Boolean
+        Private Shared Function MaterializeArchiveBytes(data As Byte(), destinationFull As String, overwrite As Boolean, opt As FileTypeDetectorOptions, descriptor As ArchiveDescriptor) As Boolean
             Try
                 If Not DestinationPathGuard.PrepareMaterializationTarget(destinationFull, overwrite, opt) Then Return False
 
                 Using ms As New MemoryStream(data, writable:=False)
-                    Return ZipExtractor.TryExtractZipStream(ms, destinationFull, opt)
+                    Return ArchiveExtractor.TryExtractArchiveStream(ms, destinationFull, opt, descriptor)
                 End Using
             Catch ex As Exception
-                LogGuard.Error(opt.Logger, "[Materialize] ZIP-Extraktion fehlgeschlagen.", ex)
+                LogGuard.Error(opt.Logger, "[Materialize] Archiv-Extraktion fehlgeschlagen.", ex)
                 Return False
             End Try
         End Function
 
-        Private Shared Function IsReadableZipArchive(data As Byte(), opt As FileTypeDetectorOptions) As Boolean
-            If data Is Nothing OrElse data.Length = 0 Then Return False
-
-            Try
-                Using ms As New MemoryStream(data, writable:=False)
-                    Using archive = ArchiveFactory.Open(ms)
-                        Return archive IsNot Nothing AndAlso archive.Type = ArchiveType.Zip
-                    End Using
-                End Using
-            Catch ex As Exception
-                LogGuard.Debug(opt.Logger, $"[Materialize] SharpCompress ZIP-Check fehlgeschlagen: {ex.Message}")
-                Return False
-            End Try
-        End Function
     End Class
 
 End Namespace

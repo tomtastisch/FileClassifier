@@ -31,19 +31,12 @@ public sealed class FileTypeDetectorFacadeUnitTests
     [Fact]
     public void DetectAndVerifyExtension_ReturnsFalse_ForMismatchedExtension()
     {
-        var tempRoot = TestTempPaths.CreateTempRoot("ftd-detector-facade");
-        var wrongExtensionPath = Path.Combine(tempRoot, "sample.txt");
+        using var tempRoot = TestTempPaths.CreateScope("ftd-detector-facade");
+        var wrongExtensionPath = Path.Combine(tempRoot.RootPath, "sample.txt");
 
-        try
-        {
-            File.Copy(TestResources.Resolve("sample.pdf"), wrongExtensionPath);
-            var ok = new FileTypeDetector().DetectAndVerifyExtension(wrongExtensionPath);
+        File.Copy(TestResources.Resolve("sample.pdf"), wrongExtensionPath);
+        var ok = new FileTypeDetector().DetectAndVerifyExtension(wrongExtensionPath);
 
-            Assert.False(ok);
-        }
-        finally
-        {
-            TestTempPaths.CleanupTempRoot(tempRoot);
-        }
+        Assert.False(ok);
     }
 }

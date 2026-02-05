@@ -11,8 +11,8 @@ Professionelle, auditierbare und deterministische Dateityp-Erkennung mit sichere
 
 ## 3. Architektur-Navigation
 - Modulindex: [src/FileTypeDetection/README.md](src/FileTypeDetection/README.md)
-- API-Referenz (vollstaendig): [src/FileTypeDetection/docs/API_REFERENCE.md](src/FileTypeDetection/docs/API_REFERENCE.md)
-- DIN-orientierte Spezifikation: [src/FileTypeDetection/docs/DIN_SPECIFICATION_DE.md](src/FileTypeDetection/docs/DIN_SPECIFICATION_DE.md)
+- Architektur & Flows (vollstaendig): [docs/02_ARCHITECTURE_AND_FLOWS.md](docs/02_ARCHITECTURE_AND_FLOWS.md)
+- DIN-orientierte Spezifikation: [docs/DIN_SPECIFICATION_DE.md](docs/DIN_SPECIFICATION_DE.md)
 - Ablauf/UML: [src/FileTypeDetection/README.md](src/FileTypeDetection/README.md)
 
 ## 4. API-Einstiegspunkte

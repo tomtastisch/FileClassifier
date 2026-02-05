@@ -1,0 +1,237 @@
+{
+  "version": 1,
+  "description": "Deterministic fixture manifest for FileTypeDetection tests.",
+  "fixtures": [
+    {
+      "fixtureId": "fx.broken_no_ext",
+      "fileName": "broken_no_ext",
+      "dataType": "binary/octet-stream",
+      "objectId": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.corrupt_noext",
+      "fileName": "corrupt_noext",
+      "dataType": "binary/octet-stream",
+      "objectId": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.empty_bin",
+      "fileName": "empty.bin",
+      "dataType": "binary/octet-stream",
+      "objectId": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.invalid_docx_marker_only_zip",
+      "fileName": "invalid_docx_marker_only.zip",
+      "dataType": "archive/zip",
+      "objectId": "sha256:58d7340ece3da7aa0ec4658f7de82e0877b7f9ab0dacd316477778eb36d8ee46",
+      "sha256": "58d7340ece3da7aa0ec4658f7de82e0877b7f9ab0dacd316477778eb36d8ee46",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.invalid_pptx_marker_only_zip",
+      "fileName": "invalid_pptx_marker_only.zip",
+      "dataType": "archive/zip",
+      "objectId": "sha256:2fe7309b29cbb66bf20b33c7201f132fac85054e618c912d7367a84e2438ff1d",
+      "sha256": "2fe7309b29cbb66bf20b33c7201f132fac85054e618c912d7367a84e2438ff1d",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.invalid_xlsx_marker_only_zip",
+      "fileName": "invalid_xlsx_marker_only.zip",
+      "dataType": "archive/zip",
+      "objectId": "sha256:77839dd7aa391292eb5389211e81d3386dcb3254521d9c76aa6d7bfac333429a",
+      "sha256": "77839dd7aa391292eb5389211e81d3386dcb3254521d9c76aa6d7bfac333429a",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.large_jpeg_bin",
+      "fileName": "large_jpeg.bin",
+      "dataType": "binary/octet-stream",
+      "objectId": "sha256:738fb44296a9c2ef85b013f4d13ab32460ba047d5a47cf04939e5d2d1339ae0e",
+      "sha256": "738fb44296a9c2ef85b013f4d13ab32460ba047d5a47cf04939e5d2d1339ae0e",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.sample_7z",
+      "fileName": "sample.7z",
+      "dataType": "archive/7z",
+      "objectId": "sha256:67a85f85950c4aaa524eb3f22be1fbac586e90c76de21e10fc1c2ce7685e04c2",
+      "sha256": "67a85f85950c4aaa524eb3f22be1fbac586e90c76de21e10fc1c2ce7685e04c2",
+      "sourceUrl": "https://raw.githubusercontent.com/libarchive/libarchive/master/libarchive/test/test_read_format_7zip_copy.7z.uu",
+      "sourceRef": "decoded uu fixture from libarchive test corpus",
+      "purpose": "archive backend integration fixture (7z)",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.sample_changed_pdf_txt",
+      "fileName": "sample.changed.pdf.txt",
+      "dataType": "text/plain",
+      "objectId": "sha256:92a1832656cc696dc75896a49914be633e818fbab47bf3eb4f8e369426144a8a",
+      "sha256": "92a1832656cc696dc75896a49914be633e818fbab47bf3eb4f8e369426144a8a",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.sample_docx",
+      "fileName": "sample.docx",
+      "dataType": "document/ooxml-docx",
+      "objectId": "sha256:729559217f71e995872625770e7eba86c723047b22048f8ee58089feb6fde89a",
+      "sha256": "729559217f71e995872625770e7eba86c723047b22048f8ee58089feb6fde89a",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.sample_gif",
+      "fileName": "sample.gif",
+      "dataType": "image/gif",
+      "objectId": "sha256:f602aa0eba7dd909ce5580c12c594652746210da6718b0b2a1bbaa2276c401d1",
+      "sha256": "f602aa0eba7dd909ce5580c12c594652746210da6718b0b2a1bbaa2276c401d1",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.sample_jpg",
+      "fileName": "sample.jpg",
+      "dataType": "image/jpeg",
+      "objectId": "sha256:f2acb9a0d2857085b45afa2b33e8675d426a869c539c135572383e666832b929",
+      "sha256": "f2acb9a0d2857085b45afa2b33e8675d426a869c539c135572383e666832b929",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.sample_pdf",
+      "fileName": "sample.pdf",
+      "dataType": "document/pdf",
+      "objectId": "sha256:92a1832656cc696dc75896a49914be633e818fbab47bf3eb4f8e369426144a8a",
+      "sha256": "92a1832656cc696dc75896a49914be633e818fbab47bf3eb4f8e369426144a8a",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.sample_png",
+      "fileName": "sample.png",
+      "dataType": "image/png",
+      "objectId": "sha256:0a64b890a8453691dda8c30b75b48f3d0723ceb9377ebabeba5812c034a1a2b3",
+      "sha256": "0a64b890a8453691dda8c30b75b48f3d0723ceb9377ebabeba5812c034a1a2b3",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.sample_pptx",
+      "fileName": "sample.pptx",
+      "dataType": "document/ooxml-pptx",
+      "objectId": "sha256:b4433ce251f1c2407ca0061921e4e1175bb1b13dc3500ce391dc8ad662796792",
+      "sha256": "b4433ce251f1c2407ca0061921e4e1175bb1b13dc3500ce391dc8ad662796792",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.sample_rar",
+      "fileName": "sample.rar",
+      "dataType": "archive/rar",
+      "objectId": "sha256:d421b86f6290aefad61b2a36737253b2b30fe27c156bd95abfc230f24fe0307e",
+      "sha256": "d421b86f6290aefad61b2a36737253b2b30fe27c156bd95abfc230f24fe0307e",
+      "sourceUrl": "https://raw.githubusercontent.com/libarchive/libarchive/master/libarchive/test/test_read_format_rar.rar.uu",
+      "sourceRef": "decoded uu fixture from libarchive test corpus",
+      "purpose": "archive backend integration fixture (rar)",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.sample_webp",
+      "fileName": "sample.webp",
+      "dataType": "image/webp",
+      "objectId": "sha256:dde26fc418c77375f10b9e5d44c99542d242cf60ee72e9a68bbd12b3af55ea1f",
+      "sha256": "dde26fc418c77375f10b9e5d44c99542d242cf60ee72e9a68bbd12b3af55ea1f",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.sample_xlsx",
+      "fileName": "sample.xlsx",
+      "dataType": "document/ooxml-xlsx",
+      "objectId": "sha256:c85c4edea5e6d029a7a4e4cb287cc167fa8e79f31b4f1e3395d1249cde20efda",
+      "sha256": "c85c4edea5e6d029a7a4e4cb287cc167fa8e79f31b4f1e3395d1249cde20efda",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.sample_zip",
+      "fileName": "sample.zip",
+      "dataType": "archive/zip",
+      "objectId": "sha256:6a710028efb82c03ef6e7252a52560c4e4066ef49bf177e1d056b68b71b787a5",
+      "sha256": "6a710028efb82c03ef6e7252a52560c4e4066ef49bf177e1d056b68b71b787a5",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.sample_pdf_as_txt_txt",
+      "fileName": "sample_pdf_as_txt.txt",
+      "dataType": "text/plain",
+      "objectId": "sha256:92a1832656cc696dc75896a49914be633e818fbab47bf3eb4f8e369426144a8a",
+      "sha256": "92a1832656cc696dc75896a49914be633e818fbab47bf3eb4f8e369426144a8a",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    },
+    {
+      "fixtureId": "fx.sample_pdf_no_extension",
+      "fileName": "sample_pdf_no_extension",
+      "dataType": "binary/octet-stream",
+      "objectId": "sha256:92a1832656cc696dc75896a49914be633e818fbab47bf3eb4f8e369426144a8a",
+      "sha256": "92a1832656cc696dc75896a49914be633e818fbab47bf3eb4f8e369426144a8a",
+      "sourceUrl": "repo-local-fixture",
+      "sourceRef": "legacy fixture in repository",
+      "purpose": "detection/policy/materializer regression fixture",
+      "securityNotes": "validated via manifest hash before use"
+    }
+  ]
+}
