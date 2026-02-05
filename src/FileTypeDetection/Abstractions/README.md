@@ -8,6 +8,11 @@ Immutable Rueckgabemodelle fuer stabile API-Vertraege.
 - `Archive/` -> Archiv-Eintragsmodell (`ZipExtractedEntry`, Typname historisch)
 - `Hashing/` -> deterministische Hash-Evidence-Modelle (`DeterministicHash*`)
 
+## 1.2 Unterordner-README (verpflichtend)
+- [Detection/README.md](./Detection/README.md)
+- [Archive/README.md](./Archive/README.md)
+- [Hashing/README.md](./Hashing/README.md)
+
 ## 2. Dateien und Rollen
 | Datei | Rolle | Typische Verwendung |
 |---|---|---|

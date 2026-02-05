@@ -37,6 +37,9 @@ flowchart LR
 - Infrastructure-Details (Guards/Archive internals): [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md)
 - Konfigurationsdetails: [`../src/FileTypeDetection/Configuration/README.md`](../src/FileTypeDetection/Configuration/README.md)
 - Rueckgabemodelle: [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md)
+- Rueckgabemodelle Detection: [`../src/FileTypeDetection/Abstractions/Detection/README.md`](../src/FileTypeDetection/Abstractions/Detection/README.md)
+- Rueckgabemodelle Archive: [`../src/FileTypeDetection/Abstractions/Archive/README.md`](../src/FileTypeDetection/Abstractions/Archive/README.md)
+- Rueckgabemodelle Hashing: [`../src/FileTypeDetection/Abstractions/Hashing/README.md`](../src/FileTypeDetection/Abstractions/Hashing/README.md)
 - Funktionskatalog mit Beispielen: [`./01_FUNCTIONS.md`](./01_FUNCTIONS.md)
 
 ## 3. Architekturuebersicht (Systemkontext)

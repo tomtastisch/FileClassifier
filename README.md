@@ -70,3 +70,8 @@ src/FileTypeDetection/Abstractions/
   Archive/
   Hashing/
 ```
+
+Detail-README je Unterordner:
+- [src/FileTypeDetection/Abstractions/Detection/README.md](src/FileTypeDetection/Abstractions/Detection/README.md)
+- [src/FileTypeDetection/Abstractions/Archive/README.md](src/FileTypeDetection/Abstractions/Archive/README.md)
+- [src/FileTypeDetection/Abstractions/Hashing/README.md](src/FileTypeDetection/Abstractions/Hashing/README.md)

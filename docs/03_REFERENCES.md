@@ -13,11 +13,11 @@ Dieses Dokument sammelt die statischen Referenzen zur API: interne Dateipfade, e
 | `FileTypeProjectOptions` | `HeaderOnlyNonZip`, `MaxBytes`, `SniffBytes`, `MaxZipEntries`, `MaxZipTotalUncompressedBytes`, `MaxZipEntryUncompressedBytes`, `MaxZipCompressionRatio`, `MaxZipNestingDepth`, `MaxZipNestedBytes`, `RejectArchiveLinks`, `AllowUnknownArchiveEntrySize`, `DeterministicHash`, `Logger` | globales Optionsmodell |
 
 ## 2.1 Modellpfade im Repository (abstractions split)
-| Bereich | Datei(en) |
-|---|---|
-| Detection | `src/FileTypeDetection/Abstractions/Detection/FileKind.vb`, `src/FileTypeDetection/Abstractions/Detection/FileType.vb`, `src/FileTypeDetection/Abstractions/Detection/DetectionDetail.vb` |
-| Archive | `src/FileTypeDetection/Abstractions/Archive/ZipExtractedEntry.vb` |
-| Hashing | `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashSourceType.vb`, `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashDigestSet.vb`, `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashEvidence.vb`, `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashRoundTripReport.vb`, `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashOptions.vb` |
+| Bereich | README | Datei(en) |
+|---|---|---|
+| Detection | `src/FileTypeDetection/Abstractions/Detection/README.md` | `src/FileTypeDetection/Abstractions/Detection/FileKind.vb`, `src/FileTypeDetection/Abstractions/Detection/FileType.vb`, `src/FileTypeDetection/Abstractions/Detection/DetectionDetail.vb` |
+| Archive | `src/FileTypeDetection/Abstractions/Archive/README.md` | `src/FileTypeDetection/Abstractions/Archive/ZipExtractedEntry.vb` |
+| Hashing | `src/FileTypeDetection/Abstractions/Hashing/README.md` | `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashSourceType.vb`, `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashDigestSet.vb`, `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashEvidence.vb`, `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashRoundTripReport.vb`, `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashOptions.vb` |
 
 ## 3. ReasonCode-Referenz (DetectDetailed)
 Quelle: `FileTypeDetector.vb`.
@@ -82,7 +82,7 @@ flowchart LR
 | E2E-Architektur + Sequenzen | `02_ARCHITECTURE_AND_FLOWS.md` |
 | Normative Anforderungen | `DIN_SPECIFICATION_DE.md` |
 | Modul-Uebersicht | `../src/FileTypeDetection/README.md` |
-| Unterordner-Details | `../src/FileTypeDetection/Detection/README.md`, `../src/FileTypeDetection/Infrastructure/README.md`, `../src/FileTypeDetection/Configuration/README.md`, `../src/FileTypeDetection/Abstractions/README.md` |
+| Unterordner-Details | `../src/FileTypeDetection/Detection/README.md`, `../src/FileTypeDetection/Infrastructure/README.md`, `../src/FileTypeDetection/Configuration/README.md`, `../src/FileTypeDetection/Abstractions/README.md`, `../src/FileTypeDetection/Abstractions/Detection/README.md`, `../src/FileTypeDetection/Abstractions/Archive/README.md`, `../src/FileTypeDetection/Abstractions/Hashing/README.md`, `../src/FileClassifier.App/README.md` |
 
 ## 7. Verifikationsreferenzen
 Empfohlene Freigabe-Checks:

@@ -23,6 +23,12 @@ Dieses Dokument beschreibt alle oeffentlichen Einstiegspunkte der API mit Signat
 | Rueckgabemodelle (`FileType`, `DetectionDetail`, `ZipExtractedEntry`, `DeterministicHash*`) | [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md) | Modellvertraege der Public API |
 | Modulnavigation | [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md) | Uebersicht und Einstieg je Leserrolle |
 
+## 2.2.1 Physische Modellablage (ohne Funktionsaenderung)
+Die Rueckgabemodelle sind rein organisatorisch in Unterordner aufgeteilt; die API-Semantik bleibt unveraendert:
+- Detection-Modelle: [`../src/FileTypeDetection/Abstractions/Detection/README.md`](../src/FileTypeDetection/Abstractions/Detection/README.md)
+- Archive-Modelle: [`../src/FileTypeDetection/Abstractions/Archive/README.md`](../src/FileTypeDetection/Abstractions/Archive/README.md)
+- Hashing-Modelle: [`../src/FileTypeDetection/Abstractions/Hashing/README.md`](../src/FileTypeDetection/Abstractions/Hashing/README.md)
+
 ## 2.3 Glossar (kanonische Begriffe)
 | Begriff | Bedeutung |
 |---|---|

@@ -20,6 +20,10 @@ Diese Doku ist in drei Ebenen getrennt:
 - [../src/FileTypeDetection/Infrastructure/README.md](../src/FileTypeDetection/Infrastructure/README.md)
 - [../src/FileTypeDetection/Configuration/README.md](../src/FileTypeDetection/Configuration/README.md)
 - [../src/FileTypeDetection/Abstractions/README.md](../src/FileTypeDetection/Abstractions/README.md)
+- [../src/FileTypeDetection/Abstractions/Detection/README.md](../src/FileTypeDetection/Abstractions/Detection/README.md)
+- [../src/FileTypeDetection/Abstractions/Archive/README.md](../src/FileTypeDetection/Abstractions/Archive/README.md)
+- [../src/FileTypeDetection/Abstractions/Hashing/README.md](../src/FileTypeDetection/Abstractions/Hashing/README.md)
+- [../src/FileClassifier.App/README.md](../src/FileClassifier.App/README.md)
 
 ## 3. Einheitliches Schema
 Jedes Dokument folgt demselben Muster:

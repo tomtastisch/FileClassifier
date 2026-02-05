@@ -14,11 +14,15 @@ Deterministische Dateityp-Erkennung und sichere Archiv-Verarbeitung (u. a. fuer 
 8. [Infrastructure-Details](./Infrastructure/README.md)
 9. [Configuration-Details](./Configuration/README.md)
 10. [Abstractions-Details](./Abstractions/README.md)
+11. [Abstractions/Detection-Details](./Abstractions/Detection/README.md)
+12. [Abstractions/Archive-Details](./Abstractions/Archive/README.md)
+13. [Abstractions/Hashing-Details](./Abstractions/Hashing/README.md)
 
 ## 2.1 Empfohlene Lesepfade
 - API-Nutzung zuerst: [docs/01_FUNCTIONS.md](../../docs/01_FUNCTIONS.md) -> [docs/02_ARCHITECTURE_AND_FLOWS.md](../../docs/02_ARCHITECTURE_AND_FLOWS.md) -> [docs/03_REFERENCES.md](../../docs/03_REFERENCES.md)
 - Implementierungsdetails zu Flows: [Detection/README.md](./Detection/README.md) + [Infrastructure/README.md](./Infrastructure/README.md)
 - Konfigurations- und Modellsicht: [Configuration/README.md](./Configuration/README.md) + [Abstractions/README.md](./Abstractions/README.md)
+- Modell-Drill-Down: [Abstractions/Detection/README.md](./Abstractions/Detection/README.md), [Abstractions/Archive/README.md](./Abstractions/Archive/README.md), [Abstractions/Hashing/README.md](./Abstractions/Hashing/README.md)
 
 ## 2.2 API-Semantikhinweis (wichtig)
 - `TryValidateArchive(...)` und `ArchiveProcessing.*` sind die kanonischen Archiv-APIs.
