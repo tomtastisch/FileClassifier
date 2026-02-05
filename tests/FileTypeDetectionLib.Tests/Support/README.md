@@ -1,7 +1,7 @@
 # Index - Support
 
 ## 1. Zweck
-Gemeinsame Test-Helfer fuer stabilen, deterministischen Testbetrieb.
+Gemeinsame Test-Helfer für stabilen, deterministischen Testbetrieb.
 
 ## 2. Eingaben
 - Testzustand, Ressourcen, Options-Snapshots
@@ -9,7 +9,7 @@ Gemeinsame Test-Helfer fuer stabilen, deterministischen Testbetrieb.
 ## 3. Ergebnisse
 - reproduzierbare Testkontexte und BDD-Konsolenausgabe
 
-## 4. Fehlerfaelle und Garantien
+## 4. Fehlerfälle und Garantien
 - Testisolation via Scope/State-Helfer
 
 ## 5. Verifikation und Nachweise
@@ -19,7 +19,7 @@ Gemeinsame Test-Helfer fuer stabilen, deterministischen Testbetrieb.
 - `TestResources.cs` (Lookup via `fixtureId` oder Dateiname)
 
 ## Dokumentpflege-Checkliste
-- [ ] Inhalt auf aktuellen Code-Stand geprueft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Inhalt auf aktuellen Code-Stand geprüft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

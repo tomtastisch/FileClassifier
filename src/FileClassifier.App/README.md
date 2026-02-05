@@ -1,7 +1,7 @@
 # Index - src/FileClassifier.App
 
 ## 1. Zweck
-Kompakter CLI-Einstiegspunkt fuer die Bibliothek `FileTypeDetectionLib`.
+Kompakter CLI-Einstiegspunkt für die Bibliothek `FileTypeDetectionLib`.
 
 ## 2. Dateien
 - [Program.cs](./Program.cs)
@@ -9,7 +9,7 @@ Kompakter CLI-Einstiegspunkt fuer die Bibliothek `FileTypeDetectionLib`.
 
 ## 3. Verhalten
 - Erwartet genau ein Argument: Dateipfad.
-- Ermittelt den Typ ueber `FileTypeDetector.Detect(path)`.
+- Ermittelt den Typ über `FileTypeDetector.Detect(path)`.
 - Gibt `FileKind` nach stdout aus und beendet sich mit Exit Code `0`.
 - Bei falscher Argumentanzahl: Usage auf stderr und Exit Code `2`.
 
@@ -23,7 +23,7 @@ dotnet run --project src/FileClassifier.App -- ./tests/FileTypeDetectionLib.Test
 - [Funktionsreferenz](../../docs/01_FUNCTIONS.md)
 
 ## Dokumentpflege-Checkliste
-- [ ] Inhalt auf aktuellen Code-Stand geprueft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Inhalt auf aktuellen Code-Stand geprüft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

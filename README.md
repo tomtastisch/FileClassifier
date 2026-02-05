@@ -7,11 +7,11 @@ Professionelle, auditierbare und deterministische Dateityp-Erkennung mit sichere
 - **fail-closed:** Fehlerpfade liefern `Unknown`, `False` oder leere Ergebnisse.
 - **deterministisch:** gleiche Eingabe, gleiche Entscheidung.
 - **kleine Public Surface:** nur wenige, klare Einstiegspunkte.
-- **Security first:** Archiv-Gate, Traversal-Schutz, Groessen- und Rekursionslimits.
+- **Security first:** Archiv-Gate, Traversal-Schutz, Grössen- und Rekursionslimits.
 
 ## 3. Architektur-Navigation
 - Modulindex: [src/FileTypeDetection/README.md](src/FileTypeDetection/README.md)
-- Architektur & Flows (vollstaendig): [docs/02_ARCHITECTURE_AND_FLOWS.md](docs/02_ARCHITECTURE_AND_FLOWS.md)
+- Architektur & Flows (vollständig): [docs/02_ARCHITECTURE_AND_FLOWS.md](docs/02_ARCHITECTURE_AND_FLOWS.md)
 - DIN-orientierte Spezifikation: [docs/DIN_SPECIFICATION_DE.md](docs/DIN_SPECIFICATION_DE.md)
 - Ablauf/UML: [src/FileTypeDetection/README.md](src/FileTypeDetection/README.md)
 
@@ -42,7 +42,7 @@ bash tools/check-portable-filetypedetection.sh --clean
 ## 6.1 Versionierung (zentral)
 - Zentrale Versionsquelle: `Directory.Build.props`.
 - Aktueller Baseline-Stand: `1.0.0`.
-- Gilt konsistent fuer `FileTypeDetectionLib`, `FileClassifier.App` und `FileTypeDetectionLib.Tests`.
+- Gilt konsistent für `FileTypeDetectionLib`, `FileClassifier.App` und `FileTypeDetectionLib.Tests`.
 - Semantik: `Version` (NuGet/Produkt), `AssemblyVersion`, `FileVersion`, `InformationalVersion`.
 
 ## 7. Aktueller Strukturzustand
@@ -50,7 +50,7 @@ bash tools/check-portable-filetypedetection.sh --clean
 Im Root von `src/FileTypeDetection` liegen nur die Public APIs.
 
 ### 7.2 Portable
-Die portable Spiegelstruktur wird lokal ueber die Tools erzeugt und ist nicht Teil des veroeffentlichten Repository-Inhalts.
+Die portable Spiegelstruktur wird lokal über die Tools erzeugt und ist nicht Teil des veröffentlichten Repository-Inhalts.
 
 ### 7.3 Abstractions-Ordnerhierarchie
 Die Modellschicht unter `src/FileTypeDetection/Abstractions` ist nach Verantwortlichkeiten getrennt:
@@ -78,7 +78,7 @@ Detail-README je Unterordner:
 - [src/FileTypeDetection/Abstractions/Hashing/README.md](src/FileTypeDetection/Abstractions/Hashing/README.md)
 
 ## Dokumentpflege-Checkliste
-- [ ] Inhalt auf aktuellen Code-Stand geprueft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Inhalt auf aktuellen Code-Stand geprüft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

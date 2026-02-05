@@ -1,7 +1,7 @@
-# 02 - Gesamtarchitektur und Ablauffluesse
+# 02 - Gesamtarchitektur und Ablaufflüsse
 
 ## 1. Zweck und Scope
-Dieses Dokument beschreibt die oeffentliche API (Use-Cases), die interne Kernpipeline sowie die wesentlichen Laufzeitfluesse (Detektion, Archiv-Validierung, Extraktion, Persistenz).
+Dieses Dokument beschreibt die öffentliche API (Use-Cases), die interne Kernpipeline sowie die wesentlichen Laufzeitflüsse (Detektion, Archiv-Validierung, Extraktion, Persistenz).
 Es dient als Architektur- und Ablaufreferenz auf Dokumentationsebene und ersetzt keine Code-Reviews der Guards.
 
 ## 2. Begriffe und Notation
@@ -23,8 +23,8 @@ Es dient als Architektur- und Ablaufreferenz auf Dokumentationsebene und ersetzt
 - `F9`: Deterministic Hashing / h1-h4 RoundTrip
 
 ### 2.3 Mermaid-Layout (global)
-Hinweis: Diese `init`-Konfiguration reduziert Kreuzungen und erhoeht Lesbarkeit.
-Sie kann pro Diagramm ueberschrieben werden, sollte aber konsistent bleiben.
+Hinweis: Diese `init`-Konfiguration reduziert Kreuzungen und erhöht Lesbarkeit.
+Sie kann pro Diagramm überschrieben werden, sollte aber konsistent bleiben.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 80, "rankSpacing": 90}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -32,19 +32,19 @@ flowchart LR
   A["Mermaid Init: aktiviert (Referenz)"]
 ```
 
-### 2.4 Detailquellen fuer tieferes Drill-Down
+### 2.4 Detailquellen für tieferes Drill-Down
 - Detection-Details: [`../src/FileTypeDetection/Detection/README.md`](../src/FileTypeDetection/Detection/README.md)
 - Infrastructure-Details (Guards/Archive internals): [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md)
 - Konfigurationsdetails: [`../src/FileTypeDetection/Configuration/README.md`](../src/FileTypeDetection/Configuration/README.md)
-- Rueckgabemodelle: [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md)
-- Rueckgabemodelle Detection: [`../src/FileTypeDetection/Abstractions/Detection/README.md`](../src/FileTypeDetection/Abstractions/Detection/README.md)
-- Rueckgabemodelle Archive: [`../src/FileTypeDetection/Abstractions/Archive/README.md`](../src/FileTypeDetection/Abstractions/Archive/README.md)
-- Rueckgabemodelle Hashing: [`../src/FileTypeDetection/Abstractions/Hashing/README.md`](../src/FileTypeDetection/Abstractions/Hashing/README.md)
+- Rückgabemodelle: [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md)
+- Rückgabemodelle Detection: [`../src/FileTypeDetection/Abstractions/Detection/README.md`](../src/FileTypeDetection/Abstractions/Detection/README.md)
+- Rückgabemodelle Archive: [`../src/FileTypeDetection/Abstractions/Archive/README.md`](../src/FileTypeDetection/Abstractions/Archive/README.md)
+- Rückgabemodelle Hashing: [`../src/FileTypeDetection/Abstractions/Hashing/README.md`](../src/FileTypeDetection/Abstractions/Hashing/README.md)
 - Funktionskatalog mit Beispielen: [`./01_FUNCTIONS.md`](./01_FUNCTIONS.md)
 
-## 3. Architekturuebersicht (Systemkontext)
+## 3. Architekturübersicht (Systemkontext)
 ### 3.1 E2E-Systemkontext (kompakt)
-Dieses Diagramm zeigt nur Verantwortungsbereiche und Hauptdatenfluesse:
+Dieses Diagramm zeigt nur Verantwortungsbereiche und Hauptdatenflüsse:
 Input -> Public API -> Core Pipeline -> Outputs.
 Detailentscheidungen (Archivfall, Refinement, Persistenzzweig) folgen in Abschnitt 4.
 
@@ -103,13 +103,13 @@ flowchart LR
 
 Kurzlesehilfe:
 - `FileTypeOptions/Baseline` ist Konfigurationskontext (gestrichelt), kein Datenfluss.
-- `ArchiveSafetyGate` ist das zentrale fail-closed-Gate fuer archivbezogene Pfade.
+- `ArchiveSafetyGate` ist das zentrale fail-closed-Gate für archivbezogene Pfade.
 
-## 4. Flussdiagramme (entscheidungsrelevante Ablaeufe)
+## 4. Flussdiagramme (entscheidungsrelevante Abläufe)
 ### 4.1 Ablauf A: Detektion und Archiv-Validierung
-Dieses Diagramm zeigt die Kernentscheidung: `Magic == Archiv?` sowie die fail-closed-Kaskade ueber `ArchiveSafetyGate`.
+Dieses Diagramm zeigt die Kernentscheidung: `Magic == Archiv?` sowie die fail-closed-Kaskade über `ArchiveSafetyGate`.
 Oben: Typdetektion (`FileType`/`DetectionDetail`).
-Unten: reine Archiv-Validierung (`bool`) ueber denselben Gate-Knoten.
+Unten: reine Archiv-Validierung (`bool`) über denselben Gate-Knoten.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 70, "rankSpacing": 80}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -131,8 +131,8 @@ flowchart TD
 ```
 
 Kurzlesehilfe:
-- `ArchiveSafetyGate` ist SSOT fuer Archiv-Sicherheit in den gezeigten Pfaden.
-- `OpenXmlRefiner` laeuft nur im Archiv-OK-Fall.
+- `ArchiveSafetyGate` ist SSOT für Archiv-Sicherheit in den gezeigten Pfaden.
+- `OpenXmlRefiner` läuft nur im Archiv-OK-Fall.
 
 ### 4.2 Ablauf B: Extraktion (Memory) vs. Persistenz (Disk)
 Dieses Diagramm zeigt zwei Archiv-Use-Cases:
@@ -196,12 +196,12 @@ flowchart LR
 
 Kurzlesehilfe:
 - Memory-Extraktion und Persistenz teilen sich Gate/Extractor.
-- Persistenz liefert immer `Bool` als Rueckgabekontrakt.
+- Persistenz liefert immer `Bool` als Rückgabekontrakt.
 
-## 5. Sequenzfluesse (Runtime-Interaktionen)
+## 5. Sequenzflüsse (Runtime-Interaktionen)
 ### 5.1 Detect(path) mit Archivfall
 Dieser Sequenzfluss zeigt den Archivfall im Detektor:
-Detektion -> Gate -> optionales Refinement -> Rueckgabe.
+Detektion -> Gate -> optionales Refinement -> Rückgabe.
 Der fail-closed-Pfad liefert `Unknown`.
 
 ```mermaid
@@ -234,7 +234,7 @@ sequenceDiagram
 ```
 
 ### 5.2 Validate + Extract (Memory)
-Fokus: Byte-Pfad ueber `ArchiveProcessing`.
+Fokus: Byte-Pfad über `ArchiveProcessing`.
 Fail-closed endet mit leerer Liste.
 
 ```mermaid
@@ -255,8 +255,8 @@ sequenceDiagram
 ```
 
 ### 5.3 Materializer: Branching (Persist)
-Fokus: Zielpfadpruefung, danach entweder sicherer Archiv-Zweig oder Raw-Write.
-Rueckgabe ist immer boolesch.
+Fokus: Zielpfadprüfung, danach entweder sicherer Archiv-Zweig oder Raw-Write.
+Rückgabe ist immer boolesch.
 
 ```mermaid
 sequenceDiagram
@@ -296,7 +296,7 @@ sequenceDiagram
 ## 6. NSD-Sichten (strukturierter Kontrollfluss)
 ### 6.1 NSD: FileMaterializer.Persist(...)
 Diese Sicht reduziert verschachtelte Bedingungen auf strukturierten Kontrollfluss.
-Jeder negative Pruefpfad endet sofort fail-closed mit `false`.
+Jeder negative Prüfpfad endet sofort fail-closed mit `false`.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 65, "rankSpacing": 70}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -316,8 +316,8 @@ flowchart TD
 ```
 
 ### 6.2 NSD: FileTypeDetector.Detect(path, verifyExtension)
-Die Endungspruefung ist ein nachgelagerter Policy-Filter.
-Bei Mismatch wird fail-closed `UnknownType` zurueckgegeben.
+Die Endungsprüfung ist ein nachgelagerter Policy-Filter.
+Bei Mismatch wird fail-closed `UnknownType` zurückgegeben.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 65, "rankSpacing": 70}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -347,12 +347,12 @@ flowchart TD
 | `DeterministicHashing.HashFile/HashBytes/HashEntries/VerifyRoundTrip` | `F9` |
 
 ## 8. Grenzen und Nicht-Ziele
-- Kein Ersatz fuer Quellcode-Reviews interner Guards (z. B. Payload-/Path-Guards).
-- Keine Policy-Festlegung fuer konkrete Grenzwerte; diese kommen aus `FileTypeProjectOptions` und der Baseline.
-- Keine Aussage ueber konkrete Threat-Model-Abdeckung ausserhalb der beschriebenen fail-closed-Semantik.
+- Kein Ersatz für Quellcode-Reviews interner Guards (z. B. Payload-/Path-Guards).
+- Keine Policy-Festlegung für konkrete Grenzwerte; diese kommen aus `FileTypeProjectOptions` und der Baseline.
+- Keine Aussage über konkrete Threat-Model-Abdeckung ausserhalb der beschriebenen fail-closed-Semantik.
 
 ## Dokumentpflege-Checkliste
-- [ ] Inhalt auf aktuellen Code-Stand geprueft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Inhalt auf aktuellen Code-Stand geprüft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

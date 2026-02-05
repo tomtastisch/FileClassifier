@@ -2,35 +2,35 @@
 
 ## 1. Build and Test Gate
 - [ ] `dotnet restore FileClassifier.sln -v minimal`
-- [ ] `python3 tools/check-markdown-links.py` (prueft lokale Markdown-Dateilinks und Heading-Anker fail-closed)
+- [ ] `python3 tools/check-markdown-links.py` (prüft lokale Markdown-Dateilinks und Heading-Anker fail-closed)
 - [ ] `dotnet format FileClassifier.sln --verify-no-changes`
 - [ ] `dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal`
 - [ ] `dotnet test FileClassifier.sln -v minimal`
 - [ ] Coverage-Gate: `dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -v minimal /p:CollectCoverage=true /p:Include="[FileTypeDetectionLib]*" /p:CoverletOutputFormat=cobertura /p:Threshold=85%2c69 /p:ThresholdType=line%2cbranch /p:ThresholdStat=total`
-- [ ] Coverage-Roadmap stufenweise erhoehen (z. B. `85/69 -> 88/72 -> 90/75`) statt sprunghaft.
-- [ ] BDD-Tag-Filter pruefen (z. B. `Category=e2e`, `Category=materializer`)
+- [ ] Coverage-Roadmap stufenweise erhöhen (z. B. `85/69 -> 88/72 -> 90/75`) statt sprunghaft.
+- [ ] BDD-Tag-Filter prüfen (z. B. `Category=e2e`, `Category=materializer`)
 
 ## 2. Security and Limits
 - [ ] `FileTypeProjectBaseline.ApplyDeterministicDefaults()` beim Start setzen
-- [ ] Falls noetig: `FileTypeOptions.LoadOptions(json)` fuer Umgebungslimits
+- [ ] Falls nötig: `FileTypeOptions.LoadOptions(json)` für Umgebungslimits
 - [ ] Archiv-Grenzen (`MaxZipEntries`, `MaxZipCompressionRatio`, `MaxZipNestingDepth`) mit Ops abstimmen
 - [ ] Root-/Traversal-Schutz im Zielsystem validieren (Dateisystemrechte, Container-Mounts)
 
 ## 3. Runtime Configuration
 - [ ] Konfigurationsquelle je Umgebung festlegen (embedded, file, secret/config service)
 - [ ] Snapshot der aktiven Optionen per `FileTypeOptions.GetOptions()` protokollieren
-- [ ] Aenderungsprozess fuer Grenzwerte (Review + Freigabe) dokumentieren
+- [ ] Änderungsprozess für Grenzwerte (Review + Freigabe) dokumentieren
 
 ## 4. Operational Readiness
 - [ ] Logging-Level und Ziel (stdout/file/collector) festlegen
-- [ ] Alarmierung auf fail-closed-Haeufung einrichten (Unknown/False/empty spikes)
+- [ ] Alarmierung auf fail-closed-Häufung einrichten (Unknown/False/empty spikes)
 - [ ] Durchsatz-/Latenz-Baseline erfassen (z. B. Benchmark-Smoke in CI)
-- [ ] Incident-Runbook fuer Archiv-Angriffsfaelle (Bomb/Traversal) verfuegbar machen
+- [ ] Incident-Runbook für Archiv-Angriffsfälle (Bomb/Traversal) verfügbar machen
 
 ## 5. Integration Contract
 - [ ] Aufrufervertrag klarstellen: keine Ausnahme als Kontrollfluss erwarten
-- [ ] Rueckgabe-Semantik dokumentieren:
-  - `Unknown` bei unsicherer/ungueltiger Erkennung
+- [ ] Rückgabe-Semantik dokumentieren:
+  - `Unknown` bei unsicherer/ungültiger Erkennung
   - `False` bei fehlerhaften Guard-/Persistenzpfaden
   - leere Liste bei fehlgeschlagener Memory-Extraktion
 - [ ] Consumer-Reaktion auf fail-closed im Service-Workflow definiert
@@ -39,7 +39,7 @@
 - [ ] Release-Version/Changelog erstellt
 - [ ] Canary/gestaffeltes Rollout geplant
 - [ ] Rollback-Strategie definiert (Artefakt + Konfiguration + Datenpfade)
-- [ ] Nach-Release-Checks (Smoke + kritische BDD-Filter) ausgefuehrt
+- [ ] Nach-Release-Checks (Smoke + kritische BDD-Filter) ausgeführt
 
 ## 7. Quick Commands
 ```bash
@@ -54,7 +54,7 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 ```
 
 ## Dokumentpflege-Checkliste
-- [ ] Inhalt auf aktuellen Code-Stand geprueft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Inhalt auf aktuellen Code-Stand geprüft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

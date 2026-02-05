@@ -6,13 +6,13 @@ Eigenschaftsbasierte Verifikation von Archiv-Limits, Options-Invarianten und Mat
 ## 2. Eingaben
 - generierte/grenzwertige Archiv-Payloads
 - deterministische numerische Optionswerte
-- deterministische Byte-Payload-Laengen
+- deterministische Byte-Payload-Längen
 
 ## 3. Ergebnisse
-- Aussage zur Limit- und Invarianz-Stabilitaet
+- Aussage zur Limit- und Invarianz-Stabilität
 
-## 4. Fehlerfaelle und Garantien
-- Limit-/Invarianz-Regressionen werden frueh erkannt.
+## 4. Fehlerfälle und Garantien
+- Limit-/Invarianz-Regressionen werden früh erkannt.
 
 ## 5. Verifikation und Nachweise
 - `ArchiveGatePropertyTests.cs`
@@ -20,7 +20,7 @@ Eigenschaftsbasierte Verifikation von Archiv-Limits, Options-Invarianten und Mat
 - `FileMaterializerPropertyTests.cs`
 
 ## Dokumentpflege-Checkliste
-- [ ] Inhalt auf aktuellen Code-Stand geprueft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Inhalt auf aktuellen Code-Stand geprüft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

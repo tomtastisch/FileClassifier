@@ -1,7 +1,7 @@
 # Source-Artefakte - FileClassifier
 
 ## Zweck
-Einstiegspunkt fuer die Source-Variante des Moduls.
+Einstiegspunkt für die Source-Variante des Moduls.
 
 ## Inhalt
 - [FileClassifier.App/Program.cs](./FileClassifier.App/Program.cs)
@@ -36,7 +36,7 @@ Jeder versionierte Quellordner unter `src/*` besitzt eine eigene `README.md` mit
 - `bash tools/sync-doc-conventions.sh`
 
 ## Dokumentpflege-Checkliste
-- [ ] Inhalt auf aktuellen Code-Stand geprueft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Inhalt auf aktuellen Code-Stand geprüft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

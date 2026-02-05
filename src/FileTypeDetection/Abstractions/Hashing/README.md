@@ -1,7 +1,7 @@
 # Index - Abstractions/Hashing
 
 ## 1. Zweck
-Deterministische Hash-Evidence-Modelle fuer Physical/Logical-Nachweise und RoundTrip-Reports.
+Deterministische Hash-Evidence-Modelle für Physical/Logical-Nachweise und RoundTrip-Reports.
 
 ## 2. Dateien
 - [DeterministicHashSourceType.vb](./DeterministicHashSourceType.vb)
@@ -11,9 +11,9 @@ Deterministische Hash-Evidence-Modelle fuer Physical/Logical-Nachweise und Round
 - [DeterministicHashOptions.vb](./DeterministicHashOptions.vb)
 
 ## 3. Vertragsregeln
-- `PhysicalSha256` und `LogicalSha256` sind SSOT fuer Integritaetsnachweise.
+- `PhysicalSha256` und `LogicalSha256` sind SSOT für Integritätsnachweise.
 - Fast-Hash-Felder sind optional und nicht-kryptografisch.
-- RoundTrip-Report bildet h1-h4 konsistent fuer Audit/Tests ab.
+- RoundTrip-Report bildet h1-h4 konsistent für Audit/Tests ab.
 
 ## 4. Siehe auch
 - [Abstractions-Index](../README.md)
@@ -21,7 +21,7 @@ Deterministische Hash-Evidence-Modelle fuer Physical/Logical-Nachweise und Round
 - [Test-Matrix Hashing](../../../../docs/test-matrix-hashing.md)
 
 ## Dokumentpflege-Checkliste
-- [ ] Inhalt auf aktuellen Code-Stand geprueft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Inhalt auf aktuellen Code-Stand geprüft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

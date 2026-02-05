@@ -14,15 +14,15 @@ Interne, sicherheitskritische Implementierung (kein Public Surface).
 ## 3. Sicherheits-Trigger
 | Condition | Komponente | Ergebnis |
 |---|---|---|
-| Byte-Limit ueberschritten | `StreamBounds.CopyBounded` | Exception -> fail-closed |
+| Byte-Limit überschritten | `StreamBounds.CopyBounded` | Exception -> fail-closed |
 | Archiv zu tief/zu gross/zu viele Entries | `ArchiveProcessingEngine.ProcessArchiveStream` | `False` |
 | Link-Entry (symlink/hardlink) bei `RejectArchiveLinks=true` | `ArchiveExtractor.TryGetSafeEntryName` / `SharpCompressArchiveBackend` | `False` |
-| Unbekannte Entry-Groesse bei `AllowUnknownArchiveEntrySize=false` | `SharpCompressArchiveBackend.TryMeasureEntrySize` | bounded measurement, bei Ueberschreitung `False` |
+| Unbekannte Entry-Grösse bei `AllowUnknownArchiveEntrySize=false` | `SharpCompressArchiveBackend.TryMeasureEntrySize` | bounded measurement, bei Überschreitung `False` |
 | Traversal-Versuch (`../`, root path) | `ArchiveExtractor.TryGetSafeEntryName` + Pfadprefix-Check | `False` |
 | Refiner-Fehler | `OpenXmlRefiner.TryRefine*` | `Unknown` |
 | Logger wirft Exception | `LogGuard` | Fehler wird geschluckt |
 
-Hinweis zur Terminologie: `ContainerType` in der Codebasis beschreibt das physische Archivformat (z. B. ZIP/TAR/GZIP/7z/RAR). Die oeffentliche Typausgabe bleibt aus Kompatibilitaetsgruenden bei `FileKind.Zip`.
+Hinweis zur Terminologie: `ContainerType` in der Codebasis beschreibt das physische Archivformat (z. B. ZIP/TAR/GZIP/7z/RAR). Die öffentliche Typausgabe bleibt aus Kompatibilitätsgründen bei `FileKind.Zip`.
 
 ## 4. Sequenz: Archiv-Extraktion intern
 ```mermaid
@@ -39,7 +39,7 @@ sequenceDiagram
     Engine-->>Extractor: ordered entries / fail
 ```
 
-## 5. Testverknuepfungen
+## 5. Testverknüpfungen
 - [ArchiveAdversarialTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/ArchiveAdversarialTests.cs)
 - [ArchiveExtractionUnitTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/ArchiveExtractionUnitTests.cs)
 - [ArchiveGatePropertyTests.cs](../../../tests/FileTypeDetectionLib.Tests/Property/ArchiveGatePropertyTests.cs)
@@ -50,7 +50,7 @@ sequenceDiagram
 - [Referenzen](../../../docs/03_REFERENCES.md)
 
 ## Dokumentpflege-Checkliste
-- [ ] Inhalt auf aktuellen Code-Stand geprueft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Inhalt auf aktuellen Code-Stand geprüft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

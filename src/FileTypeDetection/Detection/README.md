@@ -1,7 +1,7 @@
 # Index - Detection
 
 ## 1. Zweck
-Single Source of Truth (SSOT) fuer Dateitypen, Aliase, MIME-Metadaten und Header-Signaturen.
+Single Source of Truth (SSOT) für Dateitypen, Aliase, MIME-Metadaten und Header-Signaturen.
 
 ## 2. Datei
 - [FileTypeRegistry.vb](./FileTypeRegistry.vb)
@@ -12,10 +12,10 @@ Single Source of Truth (SSOT) fuer Dateitypen, Aliase, MIME-Metadaten und Header
 | `DetectByMagic(header)` | in jeder Detektion nach Header-Read | erste deterministische Klassifikation |
 | `Resolve(kind)` | nach erfolgreicher Klassifikation | kanonische Metadaten (Extension/MIME/Aliases) |
 | `ResolveByAlias(alias)` | bei Alias-/Endungsnormalisierung | robustes Mapping ohne Duplikatlogik |
-| `NormalizeAlias(raw)` | bei Endungs-/Aliasvergleich | case-insensitive, punkt-unabhaengige Normalisierung |
-| `HasDirectHeaderDetection(kind)` | Policy-/Coverage-Pruefungen | erkennt reine Header-Matches |
+| `NormalizeAlias(raw)` | bei Endungs-/Aliasvergleich | case-insensitive, punkt-unabhängige Normalisierung |
+| `HasDirectHeaderDetection(kind)` | Policy-/Coverage-Prüfungen | erkennt reine Header-Matches |
 | `HasStructuredContainerDetection(kind)` | OOXML-Refinement-Kontext | strukturierte Archiv-Typisierung (u. a. ZIP-basiert) |
-| `KindsWithoutDirectContentDetection()` | Test-/Qualitaetsreporting | entdeckt Coverage-Luecken |
+| `KindsWithoutDirectContentDetection()` | Test-/Qualitätsreporting | entdeckt Coverage-Lücken |
 
 ## 4. Datenmodell-Regeln
 | Feld | Regel |
@@ -34,7 +34,7 @@ flowchart TD
     M -->|Archive| Z[Archiv-Gate + Refinement ausserhalb Registry]
 ```
 
-## 6. Testverknuepfungen
+## 6. Testverknüpfungen
 - [FileTypeRegistryUnitTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeRegistryUnitTests.cs)
 - [HeaderCoveragePolicyUnitTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/HeaderCoveragePolicyUnitTests.cs)
 
@@ -44,7 +44,7 @@ flowchart TD
 - [Referenzen](../../../docs/03_REFERENCES.md)
 
 ## Dokumentpflege-Checkliste
-- [ ] Inhalt auf aktuellen Code-Stand geprueft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Inhalt auf aktuellen Code-Stand geprüft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

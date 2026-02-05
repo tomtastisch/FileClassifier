@@ -2,9 +2,9 @@
 
 ## 1. Ziel
 Diese Doku ist in drei Ebenen getrennt:
-1. Funktionen (oeffentliche API, Signaturen, Beispiele)
-2. Gesamtarchitektur und Ablauffluesse
-3. Referenzen (Abhaengigkeiten, interne Pfade, Rueckgabemodelle, ReasonCodes)
+1. Funktionen (öffentliche API, Signaturen, Beispiele)
+2. Gesamtarchitektur und Ablaufflüsse
+3. Referenzen (Abhängigkeiten, interne Pfade, Rückgabemodelle, ReasonCodes)
 
 ## 2. Dokumente
 1. [01_FUNCTIONS.md](./01_FUNCTIONS.md)
@@ -46,14 +46,14 @@ Jedes Dokument folgt demselben Muster:
 - Labels mit Sonderzeichen werden gequotet (`["..."]`), um Parserfehler zu vermeiden.
 
 ## 5. Pflegehinweis
-Wenn eine neue Public-Methode eingefuehrt wird, muss sie in allen drei Ebenen auftauchen:
+Wenn eine neue Public-Methode eingeführt wird, muss sie in allen drei Ebenen auftauchen:
 - Methodenmatrix in `01_FUNCTIONS.md`
 - mindestens ein Ablauf in `02_ARCHITECTURE_AND_FLOWS.md`
 - Referenzzuordnung in `03_REFERENCES.md`
-- Lokale Markdown-Links und Abschnittsanker werden via `python3 tools/check-markdown-links.py` in CI geprueft.
+- Lokale Markdown-Links und Abschnittsanker werden via `python3 tools/check-markdown-links.py` in CI geprüft.
 
 ## Dokumentpflege-Checkliste
-- [ ] Inhalt auf aktuellen Code-Stand geprueft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Inhalt auf aktuellen Code-Stand geprüft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

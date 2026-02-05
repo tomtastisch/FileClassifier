@@ -1,30 +1,30 @@
 # 01 - Funktionen
 
 ## 1. Zweck & Scope
-Dieses Dokument beschreibt alle oeffentlichen Einstiegspunkte der API mit Signaturen, Einsatzfall, Seiteneffekten und minimalen Aufrufbeispielen.
+Dieses Dokument beschreibt alle öffentlichen Einstiegspunkte der API mit Signaturen, Einsatzfall, Seiteneffekten und minimalen Aufrufbeispielen.
 
 ## 2. Definitionen
-- Fail-closed: Fehlerpfade liefern nur sichere Rueckgaben (`Unknown`, `False`, leere Liste).
-- Side-Effects: Dateisystemschreibvorgaenge oder globale Optionsaenderungen.
-- Flow-ID: Verweis auf Architekturablaeufe in `02_ARCHITECTURE_AND_FLOWS.md`.
+- Fail-closed: Fehlerpfade liefern nur sichere Rückgaben (`Unknown`, `False`, leere Liste).
+- Side-Effects: Dateisystemschreibvorgänge oder globale Optionsänderungen.
+- Flow-ID: Verweis auf Architekturabläufe in `02_ARCHITECTURE_AND_FLOWS.md`.
 
 ## 2.1 API-Semantik (prominent)
 - `TryValidateArchive(...)` ist die kanonische Validierungs-API.
-- Die Methode validiert **alle intern unterstuetzten Archivformate** fail-closed (u. a. ZIP/TAR/GZIP/7z/RAR).
-- Technisch passiert die Typfeststellung ueber `ArchiveTypeResolver` + `ArchiveSafetyGate`; OOXML-Refinement bleibt container-spezifisch fuer ZIP-basierte OOXML-Dateien.
-- Begriffsklaerung: `ContainerType` bezeichnet das **physische Archivformat** (z. B. ZIP/TAR/GZIP/7z/RAR), waehrend `FileKind.Zip` aus Kompatibilitaetsgruenden der logische Archiv-Rueckgabetyp bleibt.
+- Die Methode validiert **alle intern unterstützten Archivformate** fail-closed (u. a. ZIP/TAR/GZIP/7z/RAR).
+- Technisch passiert die Typfeststellung über `ArchiveTypeResolver` + `ArchiveSafetyGate`; OOXML-Refinement bleibt container-spezifisch für ZIP-basierte OOXML-Dateien.
+- Begriffsklärung: `ContainerType` bezeichnet das **physische Archivformat** (z. B. ZIP/TAR/GZIP/7z/RAR), während `FileKind.Zip` aus Kompatibilitätsgründen der logische Archiv-Rückgabetyp bleibt.
 
-## 2.2 Weiterfuehrende Detailquellen pro Familie
+## 2.2 Weiterführende Detailquellen pro Familie
 | API-Familie | Detailquelle | Zweck |
 |---|---|---|
 | `FileTypeDetector` / `ArchiveProcessing` | [`../src/FileTypeDetection/Detection/README.md`](../src/FileTypeDetection/Detection/README.md) | SSOT-Detektion, Header-Magic, Aliaslogik |
 | `FileTypeDetector` / `ArchiveProcessing` / `FileMaterializer` | [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md) | Archive-Gate, Guards, Extraktions-Engine |
 | `FileTypeOptions` / `FileTypeProjectBaseline` | [`../src/FileTypeDetection/Configuration/README.md`](../src/FileTypeDetection/Configuration/README.md) | globale Optionen und Baseline |
-| Rueckgabemodelle (`FileType`, `DetectionDetail`, `ZipExtractedEntry`, `DeterministicHash*`) | [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md) | Modellvertraege der Public API |
-| Modulnavigation | [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md) | Uebersicht und Einstieg je Leserrolle |
+| Rückgabemodelle (`FileType`, `DetectionDetail`, `ZipExtractedEntry`, `DeterministicHash*`) | [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md) | Modellverträge der Public API |
+| Modulnavigation | [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md) | Übersicht und Einstieg je Leserrolle |
 
-## 2.2.1 Physische Modellablage (ohne Funktionsaenderung)
-Die Rueckgabemodelle sind rein organisatorisch in Unterordner aufgeteilt; die API-Semantik bleibt unveraendert:
+## 2.2.1 Physische Modellablage (ohne Funktionsänderung)
+Die Rückgabemodelle sind rein organisatorisch in Unterordner aufgeteilt; die API-Semantik bleibt unverändert:
 - Detection-Modelle: [`../src/FileTypeDetection/Abstractions/Detection/README.md`](../src/FileTypeDetection/Abstractions/Detection/README.md)
 - Archive-Modelle: [`../src/FileTypeDetection/Abstractions/Archive/README.md`](../src/FileTypeDetection/Abstractions/Archive/README.md)
 - Hashing-Modelle: [`../src/FileTypeDetection/Abstractions/Hashing/README.md`](../src/FileTypeDetection/Abstractions/Hashing/README.md)
@@ -33,14 +33,14 @@ Die Rueckgabemodelle sind rein organisatorisch in Unterordner aufgeteilt; die AP
 | Begriff | Bedeutung |
 |---|---|
 | Archivformat | Physischer Container wie ZIP, TAR, TAR.GZ, 7z oder RAR. |
-| ContainerType | Interner technischer Typ fuer das physische Archivformat. |
-| FileKind.Zip | Oeffentlicher, kompatibler logischer Rueckgabetyp fuer erkannte Archive. |
-| PhysicalHash | SHA-256 ueber die unveraenderten Rohbytes einer Datei oder eines Byte-Arrays. |
-| LogicalHash | SHA-256 ueber kanonisierten Inhaltszustand (Entry-Pfad + Inhalt), unabhaengig von Containerdetails. |
-| FastHash | Optionaler, nicht-kryptografischer Vergleichsdigest (`XxHash3`) fuer Performance-Shortcuts. |
-| Fail-closed | Unsichere oder ungueltige Eingaben liefern nur sichere Rueckgaben (`Unknown`, `False`, leere Liste). |
+| ContainerType | Interner technischer Typ für das physische Archivformat. |
+| FileKind.Zip | Öffentlicher, kompatibler logischer Rückgabetyp für erkannte Archive. |
+| PhysicalHash | SHA-256 über die unveränderten Rohbytes einer Datei oder eines Byte-Arrays. |
+| LogicalHash | SHA-256 über kanonisierten Inhaltszustand (Entry-Pfad + Inhalt), unabhängig von Containerdetails. |
+| FastHash | Optionaler, nicht-kryptografischer Vergleichsdigest (`XxHash3`) für Performance-Shortcuts. |
+| Fail-closed | Unsichere oder ungültige Eingaben liefern nur sichere Rückgaben (`Unknown`, `False`, leere Liste). |
 
-## 3. Vollstaendige Methodenmatrix (Public API)
+## 3. Vollständige Methodenmatrix (Public API)
 | Familie | Methode | Input | Output | Side-Effects | Primarer Flow |
 |---|---|---|---|---|---|
 | `FileTypeDetector` | `ReadFileSafe(path)` | Datei-Pfad | `Byte()` | keine (read-only) | `F0` |
@@ -69,17 +69,17 @@ Die Rueckgabemodelle sind rein organisatorisch in Unterordner aufgeteilt; die AP
 | `DeterministicHashing` | `HashEntries(entries)` | `IReadOnlyList(Of ZipExtractedEntry)` | `DeterministicHashEvidence` | keine | `F9` |
 | `DeterministicHashing` | `HashEntries(entries, label)` | Entries + Label | `DeterministicHashEvidence` | keine | `F9` |
 | `DeterministicHashing` | `HashEntries(entries, label, options)` | Entries + Label + Optionen | `DeterministicHashEvidence` | keine | `F9` |
-| `DeterministicHashing` | `VerifyRoundTrip(path)` | Datei-Pfad | `DeterministicHashRoundTripReport` | schreibt temp-Datei intern und raeumt auf | `F9` |
-| `DeterministicHashing` | `VerifyRoundTrip(path, options)` | Datei-Pfad + Optionen | `DeterministicHashRoundTripReport` | schreibt temp-Datei intern und raeumt auf | `F9` |
-| `FileTypeOptions` | `LoadOptions(json)` | JSON | `Boolean` | aendert globale Optionen | `F7` |
+| `DeterministicHashing` | `VerifyRoundTrip(path)` | Datei-Pfad | `DeterministicHashRoundTripReport` | schreibt temp-Datei intern und räumt auf | `F9` |
+| `DeterministicHashing` | `VerifyRoundTrip(path, options)` | Datei-Pfad + Optionen | `DeterministicHashRoundTripReport` | schreibt temp-Datei intern und räumt auf | `F9` |
+| `FileTypeOptions` | `LoadOptions(json)` | JSON | `Boolean` | ändert globale Optionen | `F7` |
 | `FileTypeOptions` | `GetOptions()` | - | `String` (JSON) | keine | `F7` |
-| `FileTypeProjectBaseline` | `ApplyDeterministicDefaults()` | - | `Void` | aendert globale Optionen | `F7` |
+| `FileTypeProjectBaseline` | `ApplyDeterministicDefaults()` | - | `Void` | ändert globale Optionen | `F7` |
 
 ## 4. Methodenfamilien
 ### 4.1 FileTypeDetector
 Details: [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md), [`../src/FileTypeDetection/Detection/README.md`](../src/FileTypeDetection/Detection/README.md), [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md).
 
-**Wichtiger Semantikhinweis:** `TryValidateArchive(path)` validiert generische Archivcontainer ueber dieselbe fail-closed Pipeline wie Extraktion und Materialisierung.
+**Wichtiger Semantikhinweis:** `TryValidateArchive(path)` validiert generische Archivcontainer über dieselbe fail-closed Pipeline wie Extraktion und Materialisierung.
 
 ```mermaid
 flowchart TD
@@ -109,7 +109,7 @@ Console.WriteLine($"{t.Kind} / {d.ReasonCode} / {archiveOk} / {entries.Count}");
 ```
 
 ### 4.2 ArchiveProcessing
-API-Name bleibt aus Kompatibilitaetsgruenden erhalten; intern werden Archivcontainer einheitlich behandelt.
+API-Name bleibt aus Kompatibilitätsgründen erhalten; intern werden Archivcontainer einheitlich behandelt.
 Details: [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md), [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md).
 
 ```mermaid
@@ -214,7 +214,7 @@ Console.WriteLine($"LogicalConsistent={report.LogicalConsistent}");
 
 Hinweis:
 - `PhysicalSha256` und `LogicalSha256` sind Security-SSOT.
-- `Fast*XxHash3` ist optionaler Performance-Digest und kein kryptografischer Integritaetsnachweis.
+- `Fast*XxHash3` ist optionaler Performance-Digest und kein kryptografischer Integritätsnachweis.
 - Overloads ohne `options` verwenden die globale Policy `FileTypeOptions.GetSnapshot().DeterministicHash`.
 
 ## 5. Nicht-Ziele
@@ -222,17 +222,17 @@ Hinweis:
 - Keine Norm/Compliance-Herleitung (siehe `DIN_SPECIFICATION_DE.md`).
 
 ## 6. Security-Gate Mini-Contract (neutral)
-Die folgenden Regeln gelten fuer `ArchiveSafetyGate` + `ArchiveExtractor`:
+Die folgenden Regeln gelten für `ArchiveSafetyGate` + `ArchiveExtractor`:
 
 | Regel | Default | Vertrag |
 |---|---|---|
-| Link-Entries (`symlink`/`hardlink`) | `RejectArchiveLinks = true` | Link-Targets werden fail-closed verworfen. Override nur per explizitem Opt-In (`false`) und eigener Risikoentscheidung des Consumers. |
+| Link-Entries (`symlink`/`hardlink`) | `RejectArchiveLinks = true` | Link-Targets werden fail-closed verworfen. Override nur per explizitem Opt-In (`false`) und eigener Risiköntscheidung des Consumers. |
 | Unknown Entry Size | `AllowUnknownArchiveEntrySize = false` | "Unknown" bedeutet `Size` nicht vorhanden oder negativ. Dann wird fail-closed geblockt bzw. per bounded Streaming gemessen; bei Grenzverletzung -> `False`. |
 | Path-Sicherheit | aktiv | Entry-Name wird normalisiert (`\\` -> `/`), root/traversal/leer werden verworfen, Zielpfad muss Prefix-Check bestehen. |
 | Grenzen | aktiv | Entry-Anzahl, per-Entry-Bytes, Gesamtbytes, Rekursionstiefe und archivformat-spezifische Ratio/Nested-Regeln bleiben fail-closed. |
 
 ## 7. Formatmatrix (implementierte Semantik)
-Implementiert bedeutet hier: Archivformat wird geoeffnet, Gate angewendet und Extraktion ueber dieselbe Pipeline ausgefuehrt.
+Implementiert bedeutet hier: Archivformat wird geöffnet, Gate angewendet und Extraktion über dieselbe Pipeline ausgeführt.
 
 | Format | Detection (`Detect`) | Validate (`TryValidateArchive` / `ArchiveProcessing.TryValidate`) | Extract-to-Memory (`ArchiveProcessing.TryExtractToMemory`) | Extract-to-Disk (`FileMaterializer.Persist(..., secureExtract:=True)`) |
 |---|---|---|---|---|
@@ -242,7 +242,7 @@ Implementiert bedeutet hier: Archivformat wird geoeffnet, Gate angewendet und Ex
 | 7z | Ja (Container-Erkennung + Gate, logisches `FileKind.Zip`) | Ja | Ja | Ja |
 | RAR | Ja (Container-Erkennung + Gate, logisches `FileKind.Zip`) | Ja | Ja | Ja |
 
-Hinweis zur Typausgabe: In Phase 1 bleibt der oeffentliche Rueckgabetyp kompatibel; erkannte Archive werden als logischer `FileKind.Zip` gemeldet.
+Hinweis zur Typausgabe: In Phase 1 bleibt der öffentliche Rückgabetyp kompatibel; erkannte Archive werden als logischer `FileKind.Zip` gemeldet.
 
 ## 8. Nachweis Umwandlung/Absicherung + Testabdeckung
 Die Byte-Pfade (Detect/Validate/Extract/Persist) sind auf die gleiche Gate-Pipeline gelegt.
@@ -250,7 +250,7 @@ Die Byte-Pfade (Detect/Validate/Extract/Persist) sind auf die gleiche Gate-Pipel
 | Format | Detection | Validate | Extract Memory | Extract Disk | Testnachweis |
 |---|---|---|---|---|---|
 | ZIP | abgedeckt | abgedeckt | abgedeckt | abgedeckt | `tests/FileTypeDetectionLib.Tests/Unit/ArchiveProcessingFacadeUnitTests.cs`, `tests/FileTypeDetectionLib.Tests/Unit/ArchiveExtractionUnitTests.cs`, `tests/FileTypeDetectionLib.Tests/Unit/FileMaterializerUnitTests.cs` |
-| TAR | abgedeckt | indirekt ueber unified validate | implizit ueber Backend-Pfad | implizit ueber Backend-Pfad | `tests/FileTypeDetectionLib.Tests/Unit/UnifiedArchiveBackendUnitTests.cs` |
+| TAR | abgedeckt | indirekt über unified validate | implizit über Backend-Pfad | implizit über Backend-Pfad | `tests/FileTypeDetectionLib.Tests/Unit/UnifiedArchiveBackendUnitTests.cs` |
 | TAR.GZ | abgedeckt | abgedeckt | abgedeckt | abgedeckt | `tests/FileTypeDetectionLib.Tests/Unit/UnifiedArchiveBackendUnitTests.cs` |
 | 7z | abgedeckt | abgedeckt | abgedeckt | abgedeckt | `tests/FileTypeDetectionLib.Tests/Features/FTD_BDD_040_ARCHIVE_TYPEN_BYTEARRAY_UND_MATERIALISIERUNG.feature` |
 | RAR | abgedeckt | abgedeckt | abgedeckt | abgedeckt | `tests/FileTypeDetectionLib.Tests/Features/FTD_BDD_040_ARCHIVE_TYPEN_BYTEARRAY_UND_MATERIALISIERUNG.feature` |
@@ -259,12 +259,12 @@ Zusatznachweis Security:
 - Link-Entry fail-closed (`RejectArchiveLinks=true`): `tests/FileTypeDetectionLib.Tests/Unit/UnifiedArchiveBackendUnitTests.cs`.
 - Archiv-Fail-closed Regressionen (Traversal, malformed Header, Overwrite/Target-Guards): `tests/FileTypeDetectionLib.Tests/Unit/FileMaterializerUnitTests.cs`.
 
-Portabilitaet/Struktur:
-- Public API bleibt stabil; interne Verantwortungen sind getrennt (`Detection` SSOT, `Infrastructure` Gate/Backend/Extractor, `Configuration` Policies, `Abstractions` Rueckgabemodelle).
-- Wiederverwendung erfolgt ueber ein neutrales Entry-Modell + einheitliche Gate- und Extractor-Pfade.
+Portabilität/Struktur:
+- Public API bleibt stabil; interne Verantwortungen sind getrennt (`Detection` SSOT, `Infrastructure` Gate/Backend/Extractor, `Configuration` Policies, `Abstractions` Rückgabemodelle).
+- Wiederverwendung erfolgt über ein neutrales Entry-Modell + einheitliche Gate- und Extractor-Pfade.
 
 ## Dokumentpflege-Checkliste
-- [ ] Inhalt auf aktuellen Code-Stand geprueft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Inhalt auf aktuellen Code-Stand geprüft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
