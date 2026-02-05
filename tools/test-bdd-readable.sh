@@ -104,6 +104,33 @@ def findall(path):
 def find(node, path):
     return node.find(path, ns) if ns else node.find(path)
 
+def strip_param_suffix(text: str) -> str:
+    value = text.strip()
+    # Drop trailing "(...)" blocks used by data-driven test display names.
+    while True:
+        updated = re.sub(r"\s*\([^()]*\)\s*$", "", value).strip()
+        if updated == value:
+            return value
+        value = updated
+
+def humanize_identifier(text: str) -> str:
+    value = strip_param_suffix(text)
+    value = value.replace("_", " ")
+    value = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", value)
+    value = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1 \2", value)
+    value = re.sub(r"\s+", " ", value).strip()
+    return value
+
+def normalize_title(test_name: str, scenario: str | None) -> str:
+    if scenario:
+        return strip_param_suffix(scenario)
+
+    raw = strip_param_suffix(test_name)
+    # xUnit names are usually Namespace.Class.Method(...). Keep only method part.
+    if "." in raw:
+        raw = raw.rsplit(".", 1)[-1]
+    return humanize_identifier(raw)
+
 def iter_step_lines(stdout: str):
     if not stdout:
         return []
@@ -124,11 +151,13 @@ def iter_step_lines(stdout: str):
             continue
         if re.match(r"^(Angenommen|Wenn|Dann|Und|Aber)\b", line):
             lines.append(line)
-    # dedupe consecutive duplicates
+    # dedupe preserving order
     deduped = []
+    seen = set()
     for line in lines:
-        if not deduped or deduped[-1] != line:
+        if line not in seen:
             deduped.append(line)
+            seen.add(line)
     return deduped
 
 results = []
@@ -151,12 +180,8 @@ for node in findall(".//t:UnitTestResult" if ns else ".//UnitTestResult"):
                 scenario = m.group(1).strip()
                 break
 
-    title = scenario if scenario else test_name
+    title = normalize_title(test_name, scenario)
     steps = iter_step_lines(stdout)
-    if not steps:
-        readable = re.sub(r"[_]+", " ", test_name)
-        steps = [readable]
-
     results.append((title, outcome, steps))
 
 for title, outcome, steps in results:
@@ -164,6 +189,9 @@ for title, outcome, steps in results:
     icon = CHECK if passed else CROSS
     icon_color = GREEN if passed else RED
     end_word = "FINISHED" if passed else "FAILED"
+
+    if not steps:
+        steps = ["Test erfolgreich abgeschlossen" if passed else "Test fehlgeschlagen"]
 
     print(f"{DIM}────────────────────────────────────────────────────────────────{RESET}")
     print(f"{BLUE}{title}{RESET}")
