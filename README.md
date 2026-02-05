@@ -38,6 +38,12 @@ bash tools/sync-portable-filetypedetection.sh
 bash tools/check-portable-filetypedetection.sh --clean
 ```
 
+## 6.1 Versionierung (zentral)
+- Zentrale Versionsquelle: `Directory.Build.props`.
+- Aktueller Baseline-Stand: `1.0.0`.
+- Gilt konsistent fuer `FileTypeDetectionLib`, `FileClassifier.App` und `FileTypeDetectionLib.Tests`.
+- Semantik: `Version` (NuGet/Produkt), `AssemblyVersion`, `FileVersion`, `InformationalVersion`.
+
 ## 7. Aktueller Strukturzustand
 ### 7.1 Source
 Im Root von `src/FileTypeDetection` liegen nur die Public APIs.
