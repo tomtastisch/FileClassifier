@@ -86,7 +86,7 @@ Zielgruppe:
 ### 8.1 Flowchart (Code -> Runtime)
 ```mermaid
 flowchart TD
-    A["Codeaenderung: FileKind and/or Abstractions"] --> B["Build/Test"]
+    A["Codeänderung: FileKind and/or Abstractions"] --> B["Build/Test"]
     B --> C["App/Tests starten neuen Prozess"]
     C --> D["FileTypeRegistry Shared Sub New()"]
     D --> E["BuildDefinitionsFromEnum()"]
@@ -152,7 +152,7 @@ Eine Datatype-/Modelländerung ist nur dann fertig, wenn:
 
 ## 12. Nicht-Ziele
 - Keine stillen API-Surface-Änderungen ohne Contract-Dokumentation.
-- Keine Sicherheitslockerung im Archivpfad ohne explizite Risiköntscheidung und Testnachweis.
+- Keine Sicherheitslockerung im Archivpfad ohne explizite Risikoentscheidung und Testnachweis.
 
 ## Dokumentpflege-Checkliste
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.

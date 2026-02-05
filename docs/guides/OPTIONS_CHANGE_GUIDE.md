@@ -132,7 +132,7 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 
 ## 10. Nicht-Ziele
 - Keine Änderung der API-Semantik ohne begleitende Contract-Dokumentation.
-- Keine stillen Sicherheitslockerungen ohne expliziten Risiköntscheid.
+- Keine stillen Sicherheitslockerungen ohne explizite Risikoentscheidung.
 
 ## Dokumentpflege-Checkliste
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.

@@ -84,7 +84,7 @@ flowchart LR
 ## 8. Pflichtdiagramme für Entwickler
 ```mermaid
 flowchart TD
-    A[Architekturueberblick] --> B[Sicherheitsfluss Archiv-Gate]
+    A[Architekturüberblick] --> B[Sicherheitsfluss Archiv-Gate]
     B --> C[Kritischer Sequenzpfad: Validate/Extract]
 ```
 
