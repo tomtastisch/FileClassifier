@@ -118,20 +118,14 @@ internal sealed class FixtureManifestCatalog
             .Where(name => !string.Equals(name, ManifestFileName, StringComparison.OrdinalIgnoreCase))
             .ToHashSet(KeyComparer);
 
-        foreach (var fileName in allFiles)
+        foreach (var fileName in allFiles.Where(file => !byFileName.ContainsKey(file)))
         {
-            if (!byFileName.ContainsKey(fileName))
-            {
-                throw new InvalidOperationException($"Unlisted fixture file in resources directory: {fileName}");
-            }
+            throw new InvalidOperationException($"Unlisted fixture file in resources directory: {fileName}");
         }
 
-        foreach (var listed in byFileName.Keys)
+        foreach (var listed in byFileName.Keys.Where(file => !allFiles.Contains(file)))
         {
-            if (!allFiles.Contains(listed))
-            {
-                throw new InvalidOperationException($"Manifest lists missing fixture file: {listed}");
-            }
+            throw new InvalidOperationException($"Manifest lists missing fixture file: {listed}");
         }
     }
 
