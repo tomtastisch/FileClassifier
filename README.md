@@ -50,3 +50,23 @@ Im Root von `src/FileTypeDetection` liegen nur die Public APIs.
 
 ### 7.2 Portable
 Die portable Spiegelstruktur wird lokal ueber die Tools erzeugt und ist nicht Teil des veroeffentlichten Repository-Inhalts.
+
+### 7.3 Abstractions-Ordnerhierarchie
+Die Modellschicht unter `src/FileTypeDetection/Abstractions` ist nach Verantwortlichkeiten getrennt:
+
+```mermaid
+graph TD
+    A["Abstractions"] --> B["Detection"]
+    A --> C["Archive"]
+    A --> D["Hashing"]
+    B --> B1["FileKind / FileType / DetectionDetail"]
+    C --> C1["ZipExtractedEntry"]
+    D --> D1["DeterministicHash* Modelle"]
+```
+
+```text
+src/FileTypeDetection/Abstractions/
+  Detection/
+  Archive/
+  Hashing/
+```
