@@ -79,7 +79,7 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 | `@detector` | Faelle um `FileTypeDetector` | `--filter "Category=detector"` |
 | `@materializer` | Faelle um `FileMaterializer` | `--filter "Category=materializer"` |
 | `@processing` | Faelle um Pipeline/Fassaden (`ArchiveProcessing`) | `--filter "Category=processing"` |
-| `@zip` | Archiv-bezogene Pfade (Validate/Refine/Extract, Tagname historisch) | `--filter "Category=zip"` |
+| `@archive` | Archiv-bezogene Pfade (Validate/Refine/Extract) | `--filter "Category=archive"` |
 | `@api` | API-orientierte BDD-Faelle | `--filter "Category=api"` |
 
 ### 5.3 Annotationen nach Fachthema

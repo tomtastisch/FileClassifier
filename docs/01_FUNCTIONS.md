@@ -23,6 +23,17 @@ Dieses Dokument beschreibt alle oeffentlichen Einstiegspunkte der API mit Signat
 | Rueckgabemodelle (`FileType`, `DetectionDetail`, `ZipExtractedEntry`, `DeterministicHash*`) | [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md) | Modellvertraege der Public API |
 | Modulnavigation | [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md) | Uebersicht und Einstieg je Leserrolle |
 
+## 2.3 Glossar (kanonische Begriffe)
+| Begriff | Bedeutung |
+|---|---|
+| Archivformat | Physischer Container wie ZIP, TAR, TAR.GZ, 7z oder RAR. |
+| ContainerType | Interner technischer Typ fuer das physische Archivformat. |
+| FileKind.Zip | Oeffentlicher, kompatibler logischer Rueckgabetyp fuer erkannte Archive. |
+| PhysicalHash | SHA-256 ueber die unveraenderten Rohbytes einer Datei oder eines Byte-Arrays. |
+| LogicalHash | SHA-256 ueber kanonisierten Inhaltszustand (Entry-Pfad + Inhalt), unabhaengig von Containerdetails. |
+| FastHash | Optionaler, nicht-kryptografischer Vergleichsdigest (`XxHash3`) fuer Performance-Shortcuts. |
+| Fail-closed | Unsichere oder ungueltige Eingaben liefern nur sichere Rueckgaben (`Unknown`, `False`, leere Liste). |
+
 ## 3. Vollstaendige Methodenmatrix (Public API)
 | Familie | Methode | Input | Output | Side-Effects | Primarer Flow |
 |---|---|---|---|---|---|

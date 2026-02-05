@@ -1,5 +1,5 @@
 # language: de
-@e2e @materializer @processing @zip
+@e2e @materializer @processing @archive
 Funktionalität: End-to-End-Workflows fuer Extraktion, Payload-Uebernahme und Materialisierung
 
   Hintergrund:
@@ -8,7 +8,7 @@ Funktionalität: End-to-End-Workflows fuer Extraktion, Payload-Uebernahme und Ma
       | sample.zip  |
       | sample.pdf  |
 
-  @positiv @materializer @zip
+  @positiv @materializer @archive
   Szenario: ZIP-Entries werden extrahiert, als Bytes uebernommen und ueber FileMaterializer gespeichert
     Angenommen ein leeres temporäres Zielverzeichnis
     Und die Datei "sample.zip"
@@ -30,7 +30,7 @@ Funktionalität: End-to-End-Workflows fuer Extraktion, Payload-Uebernahme und Ma
     Und existiert die gespeicherte Datei "chain-original-step2.bin"
     Und entspricht die gespeicherte Datei "chain-original-step2.bin" den aktuellen Bytes
 
-  @positiv @materializer @zip
+  @positiv @materializer @archive
   Szenario: Extrahierte ZIP-Entry-Bytes werden iterativ gespeichert und als letzter Stand weiterverwendet
     Angenommen ein leeres temporäres Zielverzeichnis
     Und die Datei "sample.zip"
