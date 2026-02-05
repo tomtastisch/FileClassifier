@@ -19,3 +19,9 @@ Deterministische Hash-Evidence-Modelle fuer Physical/Logical-Nachweise und Round
 - [Abstractions-Index](../README.md)
 - [API-Contract](../../../../docs/04_DETERMINISTIC_HASHING_API_CONTRACT.md)
 - [Test-Matrix Hashing](../../../../docs/test-matrix-hashing.md)
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

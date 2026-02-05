@@ -39,3 +39,9 @@ Beide Guides folgen derselben Struktur:
 
 ## 6. Pflegehinweis
 Die Guides sind verbindliche Arbeitsvorlagen. Bei strukturellen API-Aenderungen muessen die betroffenen Abschnitte zeitgleich mitgepflegt werden.
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

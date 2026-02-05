@@ -34,3 +34,9 @@ Jeder versionierte Quellordner unter `src/*` besitzt eine eigene `README.md` mit
 ## Synchronisation
 - `bash tools/sync-portable-filetypedetection.sh`
 - `bash tools/sync-doc-conventions.sh`
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

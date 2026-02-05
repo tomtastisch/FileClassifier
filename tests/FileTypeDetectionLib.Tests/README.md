@@ -93,3 +93,9 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 | `@grenzen` | MaxBytes-/Grenzwertpfade | `--filter "Category=grenzen"` |
 | `@konfiguration` | Build-/Konfigurationspfade | `--filter "Category=konfiguration"` |
 | `@refinement` | OOXML/Archiv-Refinement-Faelle | `--filter "Category=refinement"` |
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

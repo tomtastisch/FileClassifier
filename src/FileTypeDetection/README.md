@@ -104,3 +104,9 @@ flowchart LR
 - Build: `dotnet build FileClassifier.sln --no-restore -v minimal`
 - Test: `dotnet test FileClassifier.sln --no-build -v minimal`
 - Portable Check: `bash tools/check-portable-filetypedetection.sh --clean`
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

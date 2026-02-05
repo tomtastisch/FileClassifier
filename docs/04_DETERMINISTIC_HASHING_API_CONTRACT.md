@@ -46,3 +46,9 @@ Der Contract gilt als freigegeben, wenn:
 1. Public-Surface-Tests gruen sind,
 2. h1-h4 Semantiktests gruen sind,
 3. CI Coverage Gates (line+branch) gruen sind.
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

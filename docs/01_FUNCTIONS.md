@@ -262,3 +262,9 @@ Zusatznachweis Security:
 Portabilitaet/Struktur:
 - Public API bleibt stabil; interne Verantwortungen sind getrennt (`Detection` SSOT, `Infrastructure` Gate/Backend/Extractor, `Configuration` Policies, `Abstractions` Rueckgabemodelle).
 - Wiederverwendung erfolgt ueber ein neutrales Entry-Modell + einheitliche Gate- und Extractor-Pfade.
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

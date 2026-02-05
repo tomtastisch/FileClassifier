@@ -51,3 +51,9 @@ Wenn eine neue Public-Methode eingefuehrt wird, muss sie in allen drei Ebenen au
 - mindestens ein Ablauf in `02_ARCHITECTURE_AND_FLOWS.md`
 - Referenzzuordnung in `03_REFERENCES.md`
 - Lokale Markdown-Links und Abschnittsanker werden via `python3 tools/check-markdown-links.py` in CI geprueft.
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

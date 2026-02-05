@@ -153,3 +153,9 @@ Eine Datatype-/Modellaenderung ist nur dann fertig, wenn:
 ## 12. Nicht-Ziele
 - Keine stillen API-Surface-Aenderungen ohne Contract-Dokumentation.
 - Keine Sicherheitslockerung im Archivpfad ohne explizite Risikoentscheidung und Testnachweis.
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

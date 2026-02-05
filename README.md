@@ -76,3 +76,9 @@ Detail-README je Unterordner:
 - [src/FileTypeDetection/Abstractions/Detection/README.md](src/FileTypeDetection/Abstractions/Detection/README.md)
 - [src/FileTypeDetection/Abstractions/Archive/README.md](src/FileTypeDetection/Abstractions/Archive/README.md)
 - [src/FileTypeDetection/Abstractions/Hashing/README.md](src/FileTypeDetection/Abstractions/Hashing/README.md)
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

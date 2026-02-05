@@ -62,3 +62,9 @@ Diese Spezifikation ist rueckverfolgbar auf:
 - Referenzdokument: `docs/03_REFERENCES.md`
 - Modulindex: `src/FileTypeDetection/README.md`
 - Unit-/Property-Tests: `tests/FileTypeDetectionLib.Tests`
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

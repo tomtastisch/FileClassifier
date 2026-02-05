@@ -14,3 +14,9 @@ Archiv-Eintragsmodell fuer sichere In-Memory-Extraktion.
 ## 4. Siehe auch
 - [Abstractions-Index](../README.md)
 - [Funktionsreferenz](../../../../docs/01_FUNCTIONS.md)
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

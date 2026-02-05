@@ -350,3 +350,9 @@ flowchart TD
 - Kein Ersatz fuer Quellcode-Reviews interner Guards (z. B. Payload-/Path-Guards).
 - Keine Policy-Festlegung fuer konkrete Grenzwerte; diese kommen aus `FileTypeProjectOptions` und der Baseline.
 - Keine Aussage ueber konkrete Threat-Model-Abdeckung ausserhalb der beschriebenen fail-closed-Semantik.
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

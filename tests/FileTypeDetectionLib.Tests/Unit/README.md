@@ -22,3 +22,9 @@ Direkter Nachweis von API-Korrektheit, Security-Regeln und Determinismus.
 | `CoreAndArchiveInternalsFailClosedUnitTests.cs` | gezielte Fail-closed/Guard-Branches in `CoreInternals` und `ArchiveInternals` |
 | `DeterministicHashingUnitTests.cs` | deterministische Physical/Logical Hash-Evidence inkl. fail-closed Pfade |
 | `DeterministicHashingApiContractUnitTests.cs` | eingefrorener Public API-Contract von `DeterministicHashing` |
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

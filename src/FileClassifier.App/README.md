@@ -21,3 +21,9 @@ dotnet run --project src/FileClassifier.App -- ./tests/FileTypeDetectionLib.Test
 ## 5. Siehe auch
 - [Modulindex FileTypeDetection](../FileTypeDetection/README.md)
 - [Funktionsreferenz](../../docs/01_FUNCTIONS.md)
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

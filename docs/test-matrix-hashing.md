@@ -1,6 +1,6 @@
 # Test Matrix - Deterministic Hashing
 
-## 1. Purpose & Scope
+## 1. Zweck & Scope
 Diese Matrix mappt die komplette Hashing-Pipeline (Datei/Bytes/Archiv) auf konkrete Unit-, Integration- und E2E-Tests.
 Ziel: tracebare Evidenz pro Pipeline-Stufe fuer positive und negative Faelle.
 
@@ -41,3 +41,9 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 ## 6. Open Coverage Gap (for 90-95%)
 - Aktuell gemessen: Line `86.03%`, Branch `70.06%` (Gesamtsuite).
 - Fehlende Schritte bis 90-95%: gezielte Branch-Tests fuer fail-closed Guards in `src/FileTypeDetection/Infrastructure/CoreInternals.vb` und `src/FileTypeDetection/Infrastructure/ArchiveInternals.vb`.
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

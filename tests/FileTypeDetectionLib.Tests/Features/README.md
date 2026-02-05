@@ -1,6 +1,6 @@
 # Index - Features
 
-## 1. Purpose
+## 1. Zweck
 Zentraler Einstieg fuer alle ausfuehrbaren BDD-Feature-Dateien der Test-Suite.
 
 ## 2. Feature Registry
@@ -21,5 +21,11 @@ Zentraler Einstieg fuer alle ausfuehrbaren BDD-Feature-Dateien der Test-Suite.
 ## 4. Step-Bindings
 - Zugehoerige Step-Definitionen: `../Steps/FileTypeDetectionSteps.cs`.
 
-## 5. Verification & Evidence
+## 5. Verifikation und Nachweise
 - Ausfuehrung: `dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -v minimal`.
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

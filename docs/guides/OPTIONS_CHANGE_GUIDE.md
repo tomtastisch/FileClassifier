@@ -133,3 +133,9 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 ## 10. Nicht-Ziele
 - Keine Aenderung der API-Semantik ohne begleitende Contract-Dokumentation.
 - Keine stillen Sicherheitslockerungen ohne expliziten Risikoentscheid.
+
+## Dokumentpflege-Checkliste
+- [ ] Inhalt auf aktuellen Code-Stand geprueft.
+- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprueft.
+- [ ] Beispiele/Kommandos lokal verifiziert.
+- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
