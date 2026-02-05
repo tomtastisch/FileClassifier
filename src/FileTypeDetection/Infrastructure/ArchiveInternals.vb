@@ -399,7 +399,7 @@ Namespace FileTypeDetection
             Dim sizeValue = entry.UncompressedSize
             If sizeValue.HasValue Then
                 If sizeValue.Value < 0 Then
-                    Return True
+                    Return opt.AllowUnknownArchiveEntrySize
                 End If
 
                 If sizeValue.Value > opt.MaxZipEntryUncompressedBytes Then Return False

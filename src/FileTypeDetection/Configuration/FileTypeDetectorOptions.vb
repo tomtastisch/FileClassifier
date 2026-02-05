@@ -12,7 +12,11 @@ Namespace FileTypeDetection
     ''' - Grenzen sind konservativ, um Memory-/CPU-DoS (z. B. Zip-Bomb) zu reduzieren.
     ''' - Logger darf Beobachtbarkeit liefern, aber niemals das Ergebnis beeinflussen.
     ''' </summary>
-    Public NotInheritable Class FileTypeDetectorOptions
+Public NotInheritable Class FileTypeDetectorOptions
+        Private Const MinPositiveLong As Long = 1
+        Private Const MinPositiveInt As Integer = 1
+        Private Const MinNonNegativeInt As Integer = 0
+
         ''' <summary>
         ''' Erzwingt Header-only-Erkennung fuer Nicht-ZIP-Typen.
         ''' Sonderregel: ZIP-Container werden weiterhin sicher inhaltlich verfeinert (OOXML/ZIP).
@@ -79,7 +83,7 @@ Namespace FileTypeDetection
         End Sub
 
         Friend Function Clone() As FileTypeDetectorOptions
-            Return New FileTypeDetectorOptions(Me.HeaderOnlyNonZip) With {
+            Dim cloned = New FileTypeDetectorOptions(Me.HeaderOnlyNonZip) With {
                 .MaxBytes = Me.MaxBytes,
                 .SniffBytes = Me.SniffBytes,
                 .MaxZipEntries = Me.MaxZipEntries,
@@ -92,10 +96,35 @@ Namespace FileTypeDetection
                 .AllowUnknownArchiveEntrySize = Me.AllowUnknownArchiveEntrySize,
                 .Logger = Me.Logger
             }
+            cloned.NormalizeInPlace()
+            Return cloned
+        End Function
+
+        Friend Sub NormalizeInPlace()
+            MaxBytes = Max(MinPositiveLong, MaxBytes)
+            SniffBytes = Max(MinPositiveInt, SniffBytes)
+            MaxZipEntries = Max(MinPositiveInt, MaxZipEntries)
+            MaxZipTotalUncompressedBytes = Max(MinPositiveLong, MaxZipTotalUncompressedBytes)
+            MaxZipEntryUncompressedBytes = Max(MinPositiveLong, MaxZipEntryUncompressedBytes)
+            MaxZipCompressionRatio = Max(MinNonNegativeInt, MaxZipCompressionRatio)
+            MaxZipNestingDepth = Max(MinNonNegativeInt, MaxZipNestingDepth)
+            MaxZipNestedBytes = Max(MinPositiveLong, MaxZipNestedBytes)
+        End Sub
+
+        Private Shared Function Max(minimum As Integer, value As Integer) As Integer
+            If value < minimum Then Return minimum
+            Return value
+        End Function
+
+        Private Shared Function Max(minimum As Long, value As Long) As Long
+            If value < minimum Then Return minimum
+            Return value
         End Function
 
         Friend Shared Function DefaultOptions() As FileTypeDetectorOptions
-            Return New FileTypeDetectorOptions()
+            Dim options = New FileTypeDetectorOptions()
+            options.NormalizeInPlace()
+            Return options
         End Function
 
     End Class

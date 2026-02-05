@@ -335,36 +335,13 @@ Namespace FileTypeDetection
                     Return UnknownType()
                 End If
 
-                trace.UsedZipContentCheck = True
-                If fs Is Nothing OrElse Not fs.CanRead Then
-                    trace.ReasonCode = ReasonZipGateFailed
-                    Return UnknownType()
-                End If
-
-                If fs.CanSeek Then fs.Position = 0
-                If Not ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, descriptor, depth:=0) Then
-                    LogGuard.Warn(opt.Logger, "[Detect] Archive-Gate verletzt.")
-                    trace.ReasonCode = ReasonZipGateFailed
-                    Return UnknownType()
-                End If
-
+                If Not TryValidateArchiveStream(fs, opt, descriptor, trace) Then Return UnknownType()
                 trace.ReasonCode = ReasonZipGeneric
                 Return FileTypeRegistry.Resolve(FileKind.Zip)
             End If
 
-            trace.UsedZipContentCheck = True
-            If fs Is Nothing OrElse Not fs.CanRead Then
-                trace.ReasonCode = ReasonZipGateFailed
-                Return UnknownType()
-            End If
-
-            If fs.CanSeek Then fs.Position = 0
             Dim zipDescriptor = ArchiveDescriptor.ForContainerType(ArchiveContainerType.Zip)
-            If Not ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, zipDescriptor, depth:=0) Then
-                LogGuard.Warn(opt.Logger, "[Detect] ZIP/Archive-Gate verletzt.")
-                trace.ReasonCode = ReasonZipGateFailed
-                Return UnknownType()
-            End If
+            If Not TryValidateArchiveStream(fs, opt, zipDescriptor, trace) Then Return UnknownType()
 
             Dim refined = OpenXmlRefiner.TryRefineStream(fs)
             Return FinalizeZipDetection(refined, opt, trace)
@@ -397,30 +374,53 @@ Namespace FileTypeDetection
                     Return UnknownType()
                 End If
 
-                trace.UsedZipContentCheck = True
-                If Not ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor) Then
-                    LogGuard.Warn(opt.Logger, "[Detect] Archive-Gate verletzt.")
-                    trace.ReasonCode = ReasonZipGateFailed
-                    Return UnknownType()
-                End If
-
+                If Not TryValidateArchiveBytes(data, opt, descriptor, trace) Then Return UnknownType()
                 trace.ReasonCode = ReasonZipGeneric
                 Return FileTypeRegistry.Resolve(FileKind.Zip)
             End If
 
-            trace.UsedZipContentCheck = True
             Dim zipDescriptor = ArchiveDescriptor.ForContainerType(ArchiveContainerType.Zip)
-            If Not ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, zipDescriptor) Then
-                LogGuard.Warn(opt.Logger, "[Detect] ZIP/Archive-Gate verletzt.")
-                trace.ReasonCode = ReasonZipGateFailed
-                Return UnknownType()
-            End If
+            If Not TryValidateArchiveBytes(data, opt, zipDescriptor, trace) Then Return UnknownType()
 
             Dim refined As FileType
             Using ms = CreateReadOnlyMemoryStream(data)
                 refined = OpenXmlRefiner.TryRefineStream(ms)
             End Using
             Return FinalizeZipDetection(refined, opt, trace)
+        End Function
+
+        Private Function TryValidateArchiveStream(
+            fs As FileStream,
+            opt As FileTypeDetectorOptions,
+            descriptor As ArchiveDescriptor,
+            ByRef trace As DetectionTrace
+        ) As Boolean
+            trace.UsedZipContentCheck = True
+            If fs Is Nothing OrElse Not fs.CanRead Then
+                trace.ReasonCode = ReasonZipGateFailed
+                Return False
+            End If
+
+            If fs.CanSeek Then fs.Position = 0
+            If ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, descriptor, depth:=0) Then Return True
+
+            LogGuard.Warn(opt.Logger, "[Detect] Archive-Gate verletzt.")
+            trace.ReasonCode = ReasonZipGateFailed
+            Return False
+        End Function
+
+        Private Function TryValidateArchiveBytes(
+            data As Byte(),
+            opt As FileTypeDetectorOptions,
+            descriptor As ArchiveDescriptor,
+            ByRef trace As DetectionTrace
+        ) As Boolean
+            trace.UsedZipContentCheck = True
+            If ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor) Then Return True
+
+            LogGuard.Warn(opt.Logger, "[Detect] Archive-Gate verletzt.")
+            trace.ReasonCode = ReasonZipGateFailed
+            Return False
         End Function
 
         Private Function FinalizeZipDetection(refined As FileType, opt As FileTypeDetectorOptions, ByRef trace As DetectionTrace) As FileType

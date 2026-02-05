@@ -78,6 +78,7 @@ Namespace FileTypeDetection
                     .AllowUnknownArchiveEntrySize = allowUnknownArchiveEntrySize,
                     .Logger = logger
                 }
+                nextOptions.NormalizeInPlace()
                 SetSnapshot(nextOptions)
                 Return True
             Catch ex As Exception
@@ -172,7 +173,9 @@ Namespace FileTypeDetection
 
         Private Shared Function Snapshot(opt As FileTypeDetectorOptions) As FileTypeDetectorOptions
             If opt Is Nothing Then Return FileTypeDetectorOptions.DefaultOptions()
-            Return opt.Clone()
+            Dim snap = opt.Clone()
+            snap.NormalizeInPlace()
+            Return snap
         End Function
     End Class
 
