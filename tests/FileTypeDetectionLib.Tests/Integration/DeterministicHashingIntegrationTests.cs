@@ -169,7 +169,7 @@ public sealed class DeterministicHashingIntegrationTests
     }
 
     [Fact]
-    public void UnsafeArchiveCandidate_FailsExtraction_AndFallsBackToRawHashing()
+    public void UnsafeArchiveCandidate_FailsExtraction_AndFallsBackToArchiveByteHashing()
     {
         var payload = ArchiveEntryPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8);
 

@@ -131,7 +131,7 @@ public sealed class DeterministicHashingUnitTests
     }
 
     [Fact]
-    public void HashBytes_FallsBackToRawMode_WhenArchivePayloadIsUnsafe()
+    public void HashBytes_FallsBackToArchiveByteMode_WhenArchivePayloadIsUnsafe()
     {
         var payload = ArchiveEntryPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8);
         var evidence = DeterministicHashing.HashBytes(payload, "traversal.zip");

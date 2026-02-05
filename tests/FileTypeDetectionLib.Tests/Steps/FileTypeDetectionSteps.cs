@@ -165,8 +165,8 @@ public sealed class FileTypeDetectionSteps
         state.LastArchiveValidateResult = ArchiveProcessing.TryValidate(state.CurrentPayload!);
     }
 
-    [When("ich extrahiere die ZIP-Datei sicher in Memory")]
-    [When("ich die ZIP-Datei sicher in den Speicher extrahiere")]
+    [When("ich extrahiere die Archiv-Datei sicher in Memory")]
+    [When("ich die Archiv-Datei sicher in den Speicher extrahiere")]
     public void WhenIExtractArchiveFileSafelyToMemory()
     {
         var state = State();
