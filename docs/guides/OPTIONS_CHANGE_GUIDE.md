@@ -1,14 +1,21 @@
 # Playbook: Options anlegen und anpassen
 
 ## 1. Zweck und Zielgruppe
-Dieses Playbook beschreibt den verbindlichen Ablauf fuer neue oder geaenderte Optionen in der FileTypeDetection-API.
+Dieses Playbook beschreibt einen einheitlichen, verbindlichen Ablauf fuer neue oder geaenderte Optionen in der FileTypeDetection-API.
 
 Zielgruppe:
 - Entwickler, die `FileTypeProjectOptions` oder `FileTypeOptions` erweitern
 - Reviewer, die Vollstaendigkeit und fail-closed Verhalten pruefen
 - Verwender, die verstehen wollen, wann Runtime-Konfiguration aktiv wird
 
-## 2. Zentral betroffene Stellen (Datei-Map)
+## 2. Wann dieses Playbook verwenden?
+Verwende dieses Dokument, wenn mindestens einer der folgenden Punkte zutrifft:
+- neue Option in `FileTypeProjectOptions`
+- Aenderung bestehender Default-Werte
+- Erweiterung von JSON-Load/Parse oder JSON-Export in `FileTypeOptions`
+- Baseline-Entscheidung in `FileTypeProjectBaseline`
+
+## 3. Zentral betroffene Stellen (Datei-Map)
 | Bereich | Datei | Muss angepasst werden bei |
 |---|---|---|
 | Option-Definition und Normalize | [`../../src/FileTypeDetection/Configuration/FileTypeProjectOptions.vb`](../../src/FileTypeDetection/Configuration/FileTypeProjectOptions.vb) | neue Property, Default, Normalisierungsregel |
@@ -18,31 +25,39 @@ Zielgruppe:
 | Unit Tests (Options) | [`../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeOptionsFacadeUnitTests.cs`](../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeOptionsFacadeUnitTests.cs) | parse/export/normalize behavior |
 | Unit Tests (Baseline) | [`../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeProjectBaselineUnitTests.cs`](../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeProjectBaselineUnitTests.cs) | Baseline-Defaultwerte |
 
-## 3. Aenderungstypen
-### 3.1 Neue Scalar Option
-Beispiel: `Integer`, `Long`, `Boolean`.
-1. Property in `FileTypeProjectOptions` anlegen (inkl. sinnvollem Default).
-2. `NormalizeInPlace()` um fail-closed Guard erweitern.
-3. Parse-Pfad in `FileTypeOptions.LoadOptions(json)` erweitern.
-4. Export in `FileTypeOptions.GetOptions()` ergaenzen.
-5. Baseline-Entscheidung in `FileTypeProjectBaseline` treffen und dokumentieren.
-6. Tests fuer gueltige und ungueltige Werte ergaenzen.
+## 4. Schritt-fuer-Schritt-Checkliste (Vorgehen)
+Arbeite die Schritte in dieser Reihenfolge ab:
 
-### 3.2 Neue Nested Option
-Beispiel: Unterobjekt wie `DeterministicHash`.
-1. Objekt in `FileTypeProjectOptions` definieren/erweitern.
-2. Dedicated parse helper in `FileTypeOptions` nutzen oder erweitern.
-3. Objekt in `GetOptions()` vollstaendig serialisieren.
-4. `Normalize`/`Clone`-Pfade auf tiefe Kopie und Sanitizing pruefen.
-5. Tests fuer nested JSON + unbekannte Keys + invalid values.
+- [ ] Schritt 1: Option in `FileTypeProjectOptions` anlegen oder anpassen (inkl. Defaultwert).
+- [ ] Schritt 2: `NormalizeInPlace()` fuer fail-closed Grenzen aktualisieren.
+- [ ] Schritt 3: JSON-Parse in `FileTypeOptions.LoadOptions(json)` ergaenzen.
+- [ ] Schritt 4: JSON-Export in `FileTypeOptions.GetOptions()` ergaenzen.
+- [ ] Schritt 5: Baseline-Entscheidung in `FileTypeProjectBaseline` treffen.
+- [ ] Schritt 6: Unit-Tests in `FileTypeOptionsFacadeUnitTests` und ggf. `FileTypeProjectBaselineUnitTests` aktualisieren.
+- [ ] Schritt 7: Doku-Referenzen in `docs/*` und ggf. `src/*/README.md` aktualisieren.
+- [ ] Schritt 8: Verifikation laufen lassen (siehe Abschnitt 8).
 
-### 3.3 Anpassung von Defaults/Normalization
-1. Default-Wert in `FileTypeProjectOptions` und ggf. Baseline in `FileTypeProjectBaseline` konsistent halten.
-2. Unit-Tests auf neue Grenzwerte aktualisieren.
-3. Risikohinweis in Doku ergaenzen, falls strengere Limits zu mehr `Unknown`/`False` fuehren.
+## 5. Beispiel (konkret)
+### Beispiel: Neue Scalar Option `MaxArchiveCommentBytes`
+Angenommen, eine neue Long-Option soll Archiv-Kommentargroesse begrenzen.
 
-## 4. Aktivierung zur Laufzeit
-### 4.1 Flowchart (Aktivierung und Einlesen)
+1. In `FileTypeProjectOptions.vb` Property + Default setzen, z. B. `Public Property MaxArchiveCommentBytes As Long = ...`.
+2. In `NormalizeInPlace()` auf Minimum normalisieren (`>= 1`).
+3. In `FileTypeOptions.LoadOptions(json)` Key `maxArchiveCommentBytes` parsen.
+4. In `FileTypeOptions.GetOptions()` den Wert ins JSON aufnehmen.
+5. In `FileTypeProjectBaseline.vb` bewusst entscheiden, ob ein strengerer Baseline-Wert gesetzt wird.
+6. In `FileTypeOptionsFacadeUnitTests.cs` Tests fuer validen/invaliden Wert und JSON-Roundtrip ergaenzen.
+
+Beispiel-JSON fuer Consumer:
+
+```json
+{
+  "maxArchiveCommentBytes": 8192
+}
+```
+
+## 6. Aktivierung zur Laufzeit
+### 6.1 Flowchart (Aktivierung und Einlesen)
 ```mermaid
 flowchart TD
     A["Consumer/Startup"] --> B["FileTypeProjectOptions.DefaultOptions()"]
@@ -60,7 +75,7 @@ flowchart TD
     I --> J["Runtime-Entscheidung mit aktivem Snapshot"]
 ```
 
-### 4.2 Sequence (Runtime-Leseverhalten)
+### 6.2 Sequence (Runtime-Leseverhalten)
 ```mermaid
 sequenceDiagram
     participant Consumer
@@ -82,8 +97,8 @@ sequenceDiagram
     end
 ```
 
-## 5. Verbindliche Checklist und Done-Kriterien
-### 5.1 Implementierungs-Checklist
+## 7. Implementierungs-Checklist und Done-Kriterien
+### 7.1 Implementierungs-Checklist
 - [ ] Option in `FileTypeProjectOptions` inkl. Default und Typ hinzugefuegt.
 - [ ] `NormalizeInPlace()` fuer fail-closed Grenzen aktualisiert.
 - [ ] `FileTypeOptions.LoadOptions(json)` parse path fuer neue Option erweitert.
@@ -92,7 +107,7 @@ sequenceDiagram
 - [ ] Unit-Tests fuer parse/export/normalize hinzugefuegt oder angepasst.
 - [ ] Doku-Links in `docs/*` und ggf. `src/*/README.md` aktualisiert.
 
-### 5.2 Done-Kriterien
+### 7.2 Done-Kriterien
 Eine Optionsaenderung ist nur dann fertig, wenn:
 1. Werte deterministisch und fail-closed normalisiert werden.
 2. JSON-Load und JSON-Export konsistent sind.
@@ -100,13 +115,13 @@ Eine Optionsaenderung ist nur dann fertig, wenn:
 4. Tests die Aenderung abdecken (Happy Path + Invalid Input).
 5. Markdown-Links gueltig sind.
 
-## 6. Verifikation (Kommandos)
+## 8. Verifikation (Kommandos)
 ```bash
 python3 tools/check-markdown-links.py
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj --filter "FullyQualifiedName~FileTypeOptionsFacadeUnitTests|FullyQualifiedName~FileTypeProjectBaselineUnitTests" -v minimal
 ```
 
-## 7. Typische Fehlerbilder und fail-closed Hinweise
+## 9. Typische Fehlerbilder und fail-closed Hinweise
 | Fehlerbild | Auswirkung | Gegenmassnahme |
 |---|---|---|
 | Property in `FileTypeProjectOptions`, aber kein Parse in `LoadOptions` | Option bleibt nie per JSON setzbar | parse case + Test ergaenzen |
@@ -115,6 +130,6 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 | Baseline-Wert vergessen | Produktionsprofil inkonsistent | `FileTypeProjectBaseline` + Baseline-Test updaten |
 | Nested-Objekt nur flach kopiert | Seiteneffekte/Lecks ueber Snapshots | `Clone`/`Normalize` fuer nested options absichern |
 
-## 8. Nicht-Ziele
+## 10. Nicht-Ziele
 - Keine Aenderung der API-Semantik ohne begleitende Contract-Dokumentation.
 - Keine stillen Sicherheitslockerungen ohne expliziten Risikoentscheid.
