@@ -75,6 +75,8 @@ public sealed class DeterministicHashingUnitTests
         var fromFile = DeterministicHashing.HashFile(path);
         var fromBytes = DeterministicHashing.HashBytes(payload, "sample.pdf");
 
+        Assert.Equal(fromFile.Digests.PhysicalSha256, fromFile.Digests.LogicalSha256);
+        Assert.Equal(fromBytes.Digests.PhysicalSha256, fromBytes.Digests.LogicalSha256);
         Assert.Equal(fromFile.Digests.PhysicalSha256, fromBytes.Digests.PhysicalSha256);
         Assert.Equal(fromFile.Digests.LogicalSha256, fromBytes.Digests.LogicalSha256);
     }
