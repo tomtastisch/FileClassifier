@@ -1,10 +1,10 @@
 # Index - Property
 
 ## 1. Purpose
-Eigenschaftsbasierte Verifikation von ZIP-Limits, Options-Invarianten und Materializer-Grenzen.
+Eigenschaftsbasierte Verifikation von Archiv-Limits, Options-Invarianten und Materializer-Grenzen.
 
 ## 2. Inputs
-- generierte/grenzwertige ZIP-Payloads
+- generierte/grenzwertige Archiv-Payloads
 - deterministische numerische Optionswerte
 - deterministische Byte-Payload-Laengen
 

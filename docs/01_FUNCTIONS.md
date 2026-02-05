@@ -10,8 +10,8 @@ Dieses Dokument beschreibt alle oeffentlichen Einstiegspunkte der API mit Signat
 
 ## 2.1 API-Semantik (prominent)
 - `TryValidateArchive(...)` ist die kanonische Validierungs-API.
-- Die Methode validiert **alle intern unterstuetzten Archivformate** fail-closed (ZIP/TAR/GZIP/7z/RAR).
-- Technisch passiert die Typfeststellung ueber `ArchiveTypeResolver` + `ArchiveSafetyGate`; nur OOXML-Refinement bleibt ZIP-spezifisch.
+- Die Methode validiert **alle intern unterstuetzten Archivformate** fail-closed (u. a. ZIP/TAR/GZIP/7z/RAR).
+- Technisch passiert die Typfeststellung ueber `ArchiveTypeResolver` + `ArchiveSafetyGate`; OOXML-Refinement bleibt container-spezifisch fuer ZIP-basierte OOXML-Dateien.
 - Begriffsklaerung: `ContainerType` bezeichnet das **physische Archivformat** (z. B. ZIP/TAR/GZIP/7z/RAR), waehrend `FileKind.Zip` aus Kompatibilitaetsgruenden der logische Archiv-Rueckgabetyp bleibt.
 
 ## 2.2 Weiterfuehrende Detailquellen pro Familie
@@ -212,7 +212,7 @@ Die folgenden Regeln gelten fuer `ArchiveSafetyGate` + `ArchiveExtractor`:
 | Link-Entries (`symlink`/`hardlink`) | `RejectArchiveLinks = true` | Link-Targets werden fail-closed verworfen. Override nur per explizitem Opt-In (`false`) und eigener Risikoentscheidung des Consumers. |
 | Unknown Entry Size | `AllowUnknownArchiveEntrySize = false` | "Unknown" bedeutet `Size` nicht vorhanden oder negativ. Dann wird fail-closed geblockt bzw. per bounded Streaming gemessen; bei Grenzverletzung -> `False`. |
 | Path-Sicherheit | aktiv | Entry-Name wird normalisiert (`\\` -> `/`), root/traversal/leer werden verworfen, Zielpfad muss Prefix-Check bestehen. |
-| Grenzen | aktiv | Entry-Anzahl, per-Entry-Bytes, Gesamtbytes, Rekursionstiefe und (ZIP-spezifisch) Ratio/Nested-Regeln bleiben fail-closed. |
+| Grenzen | aktiv | Entry-Anzahl, per-Entry-Bytes, Gesamtbytes, Rekursionstiefe und archivformat-spezifische Ratio/Nested-Regeln bleiben fail-closed. |
 
 ## 7. Formatmatrix (implementierte Semantik)
 Implementiert bedeutet hier: Archivformat wird geoeffnet, Gate angewendet und Extraktion ueber dieselbe Pipeline ausgefuehrt.
@@ -240,7 +240,7 @@ Die Byte-Pfade (Detect/Validate/Extract/Persist) sind auf die gleiche Gate-Pipel
 
 Zusatznachweis Security:
 - Link-Entry fail-closed (`RejectArchiveLinks=true`): `tests/FileTypeDetectionLib.Tests/Unit/UnifiedArchiveBackendUnitTests.cs`.
-- ZIP-Fail-closed Regressionen (Traversal, malformed Header, Overwrite/Target-Guards): `tests/FileTypeDetectionLib.Tests/Unit/FileMaterializerUnitTests.cs`.
+- Archiv-Fail-closed Regressionen (Traversal, malformed Header, Overwrite/Target-Guards): `tests/FileTypeDetectionLib.Tests/Unit/FileMaterializerUnitTests.cs`.
 
 Portabilitaet/Struktur:
 - Public API bleibt stabil; interne Verantwortungen sind getrennt (`Detection` SSOT, `Infrastructure` Gate/Backend/Extractor, `Configuration` Policies, `Abstractions` Rueckgabemodelle).

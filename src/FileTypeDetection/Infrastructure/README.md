@@ -7,7 +7,7 @@ Interne, sicherheitskritische Implementierung (kein Public Surface).
 | Datei | Verantwortungsbereich | Wichtige Funktionen |
 |---|---|---|
 | [CoreInternals.vb](./CoreInternals.vb) | Bounds, Gate, Payload-/Path-Guards, Refiner, Logging-Schutz | `CopyBounded`, `IsArchiveSafe*`, `IsArchiveSignatureCandidate`, `IsSafeArchivePayload`, `TryNormalizeRelativePath`, `PrepareMaterializationTarget`, `ValidateNewExtractionTarget`, `TryRefine*`, `LogGuard.*` |
-| [ArchiveManagedInternals.vb](./ArchiveManagedInternals.vb) | managed Archiv-Iteration und ZIP-Backend-Adapter | `ProcessArchiveStream`, `ArchiveManagedBackend` |
+| [ArchiveManagedInternals.vb](./ArchiveManagedInternals.vb) | managed Archiv-Iteration und Backend-Adapter (u. a. ZIP) | `ProcessArchiveStream`, `ArchiveManagedBackend` |
 | [ArchiveInternals.vb](./ArchiveInternals.vb) | Unified Archive Backend, Entry-Adapter, Archiv-Dispatch | `ArchiveTypeResolver`, `ArchiveBackendRegistry`, `ArchiveProcessingEngine`, `ArchiveExtractor`, `ArchiveEntryCollector` |
 | [MimeProvider.vb](./MimeProvider.vb) | MIME-Map aus Extension | `GetMime` |
 
@@ -22,7 +22,7 @@ Interne, sicherheitskritische Implementierung (kein Public Surface).
 | Refiner-Fehler | `OpenXmlRefiner.TryRefine*` | `Unknown` |
 | Logger wirft Exception | `LogGuard` | Fehler wird geschluckt |
 
-Hinweis zur Terminologie: `ContainerType` in der Codebasis beschreibt das physische Archivformat (ZIP/TAR/GZIP/7z/RAR). Die oeffentliche Typausgabe bleibt kompatibel bei `FileKind.Zip`.
+Hinweis zur Terminologie: `ContainerType` in der Codebasis beschreibt das physische Archivformat (z. B. ZIP/TAR/GZIP/7z/RAR). Die oeffentliche Typausgabe bleibt aus Kompatibilitaetsgruenden bei `FileKind.Zip`.
 
 ## 4. Sequenz: Archiv-Extraktion intern
 ```mermaid

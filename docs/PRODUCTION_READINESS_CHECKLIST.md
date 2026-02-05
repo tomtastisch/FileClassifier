@@ -11,7 +11,7 @@
 ## 2. Security and Limits
 - [ ] `FileTypeProjectBaseline.ApplyDeterministicDefaults()` beim Start setzen
 - [ ] Falls noetig: `FileTypeOptions.LoadOptions(json)` fuer Umgebungslimits
-- [ ] ZIP-Grenzen (`MaxZipEntries`, `MaxZipCompressionRatio`, `MaxZipNestingDepth`) mit Ops abstimmen
+- [ ] Archiv-Grenzen (`MaxZipEntries`, `MaxZipCompressionRatio`, `MaxZipNestingDepth`) mit Ops abstimmen
 - [ ] Root-/Traversal-Schutz im Zielsystem validieren (Dateisystemrechte, Container-Mounts)
 
 ## 3. Runtime Configuration
@@ -23,7 +23,7 @@
 - [ ] Logging-Level und Ziel (stdout/file/collector) festlegen
 - [ ] Alarmierung auf fail-closed-Haeufung einrichten (Unknown/False/empty spikes)
 - [ ] Durchsatz-/Latenz-Baseline erfassen (z. B. Benchmark-Smoke in CI)
-- [ ] Incident-Runbook fuer ZIP-Angriffsfaelle (Bomb/Traversal) verfuegbar machen
+- [ ] Incident-Runbook fuer Archiv-Angriffsfaelle (Bomb/Traversal) verfuegbar machen
 
 ## 5. Integration Contract
 - [ ] Aufrufervertrag klarstellen: keine Ausnahme als Kontrollfluss erwarten

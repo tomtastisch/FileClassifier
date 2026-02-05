@@ -14,7 +14,7 @@ Single Source of Truth (SSOT) fuer Dateitypen, Aliase, MIME-Metadaten und Header
 | `ResolveByAlias(alias)` | bei Alias-/Endungsnormalisierung | robustes Mapping ohne Duplikatlogik |
 | `NormalizeAlias(raw)` | bei Endungs-/Aliasvergleich | case-insensitive, punkt-unabhaengige Normalisierung |
 | `HasDirectHeaderDetection(kind)` | Policy-/Coverage-Pruefungen | erkennt reine Header-Matches |
-| `HasStructuredContainerDetection(kind)` | OOXML-Refinement-Kontext | ZIP-Container-Typisierung |
+| `HasStructuredContainerDetection(kind)` | OOXML-Refinement-Kontext | strukturierte Archiv-Typisierung (u. a. ZIP-basiert) |
 | `KindsWithoutDirectContentDetection()` | Test-/Qualitaetsreporting | entdeckt Coverage-Luecken |
 
 ## 4. Datenmodell-Regeln
@@ -31,7 +31,7 @@ flowchart TD
     H[Header Bytes] --> M[DetectByMagic]
     M -->|Unknown| U[Unknown]
     M -->|Direkter Typ| R[Resolve(kind)]
-    M -->|Zip| Z[ZIP-Gate + Refinement ausserhalb Registry]
+    M -->|Archive| Z[Archiv-Gate + Refinement ausserhalb Registry]
 ```
 
 ## 6. Testverknuepfungen

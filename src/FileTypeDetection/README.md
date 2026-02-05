@@ -1,7 +1,7 @@
 # Index - src/FileTypeDetection
 
 ## 1. Ziel dieses Moduls
-Deterministische Dateityp-Erkennung und sichere Archiv-Verarbeitung (u. a. ZIP/TAR/GZIP/7z/RAR) mit fail-closed Verhalten.
+Deterministische Dateityp-Erkennung und sichere Archiv-Verarbeitung (u. a. fuer ZIP/TAR/GZIP/7z/RAR) mit fail-closed Verhalten.
 
 ## 2. Schnellstart fuer Leser
 1. [Doku-Index](../../docs/README.md)
@@ -22,7 +22,7 @@ Deterministische Dateityp-Erkennung und sichere Archiv-Verarbeitung (u. a. ZIP/T
 
 ## 2.2 API-Semantikhinweis (wichtig)
 - `TryValidateArchive(...)` und `ArchiveProcessing.*` sind die kanonischen Archiv-APIs.
-- Die aktuelle Semantik ist archivformat-generisch: validiert/extrahiert werden intern alle unterstuetzten Archive (ZIP/TAR/GZIP/7z/RAR) fail-closed.
+- Die aktuelle Semantik ist archivformat-generisch: validiert/extrahiert werden intern alle unterstuetzten Archivformate (z. B. ZIP/TAR/GZIP/7z/RAR) fail-closed.
 - Begriffsklaerung: `ContainerType` bezeichnet das physische Archivformat; der logische Rueckgabetyp bleibt aus Kompatibilitaetsgruenden `FileKind.Zip`.
 - Verbindliche Details stehen in `docs/01_FUNCTIONS.md`:
   - Abschnitt "API-Semantik"
@@ -84,7 +84,7 @@ flowchart TD
 ```mermaid
 flowchart LR
     API[Public APIs] --> CORE[Infrastructure]
-    CORE --> ZIP[System.IO.Compression]
+    CORE --> COMPR[System.IO.Compression (managed archive backend)]
     CORE --> SHARP[SharpCompress]
     CORE --> MIME[Mime]
     CORE --> RMS[Microsoft.IO.RecyclableMemoryStream]

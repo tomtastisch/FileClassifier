@@ -14,7 +14,7 @@ Die technische Detailbeschreibung der oeffentlichen Schnittstellen ist in `01_FU
 ## 3. Begriffe und Definitionen
 - `fail-closed`: Fehlerpfad liefert nur sichere Standardwerte.
 - `SSOT`: Single Source of Truth fuer Erkennungsregeln.
-- `ZIP-Gate`: sicherheitsorientierte Validierung vor ZIP-Verarbeitung.
+- `Archiv-Gate`: sicherheitsorientierte Validierung vor Archiv-Verarbeitung.
 
 ## 4. Normative Anforderungen
 | ID | Anforderung | Muss-Kriterium | Nachweis |
@@ -24,7 +24,7 @@ Die technische Detailbeschreibung der oeffentlichen Schnittstellen ist in `01_FU
 | FTD-REQ-003 | Archiv-Sicherheit vor Extraktion | Traversal, Bomben und ueberschrittene Limits werden abgewiesen | `ArchiveExtractionUnitTests.cs`, `ArchiveGatePropertyTests.cs` |
 | FTD-REQ-004 | Zentrale Optionsverwaltung | Laden/Lesen globaler Optionen nur ueber `FileTypeOptions` | `FileTypeOptionsFacadeUnitTests.cs` |
 | FTD-REQ-005 | Einheitliche Byte-Persistenz | Byte-Persistenz mit `overwrite`/`secureExtract` in `FileMaterializer` | `FileMaterializerUnitTests.cs` |
-| FTD-REQ-006 | Archiv-Alias-Normalisierung | `tar/tgz/gz/bz2/xz/7z/rar/zz` werden alias-seitig als `Zip` behandelt | `FileTypeRegistryUnitTests.cs`, `ExtensionCheckUnitTests.cs` |
+| FTD-REQ-006 | Archiv-Alias-Normalisierung | `tar/tgz/gz/bz2/xz/7z/rar/zz` werden alias-seitig als logischer Archivtyp `FileKind.Zip` behandelt | `FileTypeRegistryUnitTests.cs`, `ExtensionCheckUnitTests.cs` |
 | FTD-REQ-007 | Defensive Zielpfad-Sicherheit | Root-Pfade duerfen nicht materialisiert werden; Groessenlimit muss gelten | `FileMaterializerUnitTests.cs` |
 | FTD-REQ-008 | Defensive Archiv-Extraktionsziele | Root-Pfade duerfen nicht als Archiv-Extraktionsziel verwendet werden | `ArchiveExtractionUnitTests.cs` |
 

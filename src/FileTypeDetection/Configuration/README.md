@@ -12,13 +12,13 @@ Deterministische Konfiguration der oeffentlichen API inklusive Sicherheitsbaseli
 |---|---|---|
 | `MaxBytes` | maximale Dateigroesse fuer Detect/Read | Upload-Limits, DoS-Schutz |
 | `SniffBytes` | Header-Laenge fuer Magic-Pruefung | Dateiformate mit spaetem Marker |
-| `MaxZipEntries` | Begrenzung Entry-Anzahl | ZIP-Bomb/Many-entry Schutz |
-| `MaxZipTotalUncompressedBytes` | Gesamtgrenze ZIP | Speicher-/CPU-Schutz |
+| `MaxZipEntries` | Begrenzung Entry-Anzahl | Archiv-Bomb/Many-entry Schutz |
+| `MaxZipTotalUncompressedBytes` | Gesamtgrenze Archiv | Speicher-/CPU-Schutz |
 | `MaxZipEntryUncompressedBytes` | pro-Entry-Grenze | grosse Einzeldateien abfangen |
 | `MaxZipCompressionRatio` | Kompressionsratio-Limit | stark komprimierte Bomben |
-| `MaxZipNestingDepth` | maximale ZIP-Verschachtelung | rekursive Angriffe begrenzen |
-| `MaxZipNestedBytes` | Nested-ZIP Byte-Limit | Memory-Schutz bei Nested-Content |
-| `HeaderOnlyNonZip` | Header-only fuer Nicht-ZIP-Typen | konsistente Erkennungsstrategie |
+| `MaxZipNestingDepth` | maximale Archiv-Verschachtelung | rekursive Angriffe begrenzen |
+| `MaxZipNestedBytes` | Nested-Archiv Byte-Limit | Memory-Schutz bei Nested-Content |
+| `HeaderOnlyNonZip` | Header-only fuer Nicht-Archiv-Typen (Property-Name historisch) | konsistente Erkennungsstrategie |
 | `DeterministicHash` | Default-Policy fuer Hash-Evidence (`IncludeFastHash`, `IncludePayloadCopies`, `MaterializedFileName`) | reproduzierbare h1-h4 Nachweise |
 
 ## 4. Baseline-Strategie
