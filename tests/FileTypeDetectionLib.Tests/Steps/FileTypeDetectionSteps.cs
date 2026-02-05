@@ -75,6 +75,12 @@ public sealed class FileTypeDetectionSteps
         State().CurrentPayload = File.ReadAllBytes(path);
     }
 
+    [Given("ich erzeuge aktuelle Archiv-Bytes vom Typ {string}")]
+    public void GivenICreateCurrentArchiveBytesOfType(string archiveType)
+    {
+        State().CurrentPayload = CreateArchivePayload(archiveType);
+    }
+
     [Given("es existiert bereits eine gespeicherte Datei {string}")]
     public void GivenExistingMaterializedFile(string fileName)
     {
@@ -107,6 +113,24 @@ public sealed class FileTypeDetectionSteps
         state.LastResult = detector.Detect(state.CurrentPath!);
     }
 
+    [When("ich den Dateityp der aktuellen Bytes ermittle")]
+    public void WhenIDetectTheCurrentPayloadType()
+    {
+        var state = State();
+        Assert.NotNull(state.CurrentPayload);
+
+        var detector = new FileTypeDetector();
+        state.LastResult = detector.Detect(state.CurrentPayload!);
+    }
+
+    [When("ich die aktuellen Archiv-Bytes validiere")]
+    public void WhenIValidateCurrentArchiveBytes()
+    {
+        var state = State();
+        Assert.NotNull(state.CurrentPayload);
+        state.LastArchiveValidateResult = ZipProcessing.TryValidate(state.CurrentPayload!);
+    }
+
     [When("ich extrahiere die ZIP-Datei sicher in Memory")]
     [When("ich die ZIP-Datei sicher in den Speicher extrahiere")]
     public void WhenIExtractZipFileSafelyToMemory()
@@ -115,6 +139,14 @@ public sealed class FileTypeDetectionSteps
         Assert.False(string.IsNullOrWhiteSpace(state.CurrentPath));
         var entries = ZipProcessing.ExtractToMemory(state.CurrentPath!, verifyBeforeExtract: true);
         state.LastExtractedEntries = entries;
+    }
+
+    [When("ich die aktuellen Archiv-Bytes sicher in den Speicher extrahiere")]
+    public void WhenIExtractCurrentArchiveBytesSafelyToMemory()
+    {
+        var state = State();
+        Assert.NotNull(state.CurrentPayload);
+        state.LastExtractedEntries = ZipProcessing.TryExtractToMemory(state.CurrentPayload!);
     }
 
     [When("ich übernehme den ersten extrahierten Eintrag als aktuelle Bytes")]
@@ -162,6 +194,18 @@ public sealed class FileTypeDetectionSteps
         Assert.NotNull(state.CurrentPayload);
         state.LastPersistResult = FileMaterializer.Persist(state.CurrentPayload!, destinationPath, overwrite: false, secureExtract: false);
         state.LastMaterializedPath = destinationPath;
+    }
+
+    [When("ich die aktuellen Archiv-Bytes sicher als Verzeichnis {string} materialisiere")]
+    public void WhenIMaterializeCurrentArchiveBytesSecurely(string directoryName)
+    {
+        var state = State();
+        Assert.NotNull(state.CurrentPayload);
+        Assert.False(string.IsNullOrWhiteSpace(state.TempRoot));
+
+        var destination = Path.Combine(state.TempRoot!, directoryName);
+        state.LastPersistResult = FileMaterializer.Persist(state.CurrentPayload!, destination, overwrite: false, secureExtract: true);
+        state.LastMaterializedPath = destination;
     }
 
     [When("ich lade die zuletzt gespeicherten Bytes als aktuelle Bytes")]
@@ -265,6 +309,15 @@ public sealed class FileTypeDetectionSteps
         Assert.Equal(expected, state.LastIsOfTypeResult.Value);
     }
 
+    [Then("ist das Archiv-Validierungsergebnis {string}")]
+    public void ThenArchiveValidationResultIs(string expectedBoolean)
+    {
+        var state = State();
+        Assert.NotNull(state.LastArchiveValidateResult);
+        Assert.True(bool.TryParse(expectedBoolean, out var expected), $"Expected boolean literal but got: {expectedBoolean}");
+        Assert.Equal(expected, state.LastArchiveValidateResult.Value);
+    }
+
     [Then("ist der extrahierte Eintragssatz nicht leer")]
     public void ThenExtractedEntrySetIsNotEmpty()
     {
@@ -280,6 +333,16 @@ public sealed class FileTypeDetectionSteps
         Assert.False(string.IsNullOrWhiteSpace(state.TempRoot));
         var path = Path.Combine(state.TempRoot!, fileName);
         Assert.True(File.Exists(path), $"File missing: {path}");
+    }
+
+    [Then("enthaelt das materialisierte Verzeichnis {string} mindestens eine Datei")]
+    public void ThenMaterializedDirectoryContainsAtLeastOneFile(string directoryName)
+    {
+        var state = State();
+        Assert.False(string.IsNullOrWhiteSpace(state.TempRoot));
+        var path = Path.Combine(state.TempRoot!, directoryName);
+        Assert.True(Directory.Exists(path), $"Directory missing: {path}");
+        Assert.NotEmpty(Directory.GetFiles(path, "*", SearchOption.AllDirectories));
     }
 
     [Then("entspricht die gespeicherte Datei {string} den aktuellen Bytes")]
@@ -300,6 +363,14 @@ public sealed class FileTypeDetectionSteps
         var state = State();
         Assert.NotNull(state.LastPersistResult);
         Assert.False(state.LastPersistResult!.Value);
+    }
+
+    [Then("ist der letzte Speicherversuch erfolgreich")]
+    public void ThenLastPersistAttemptSucceeded()
+    {
+        var state = State();
+        Assert.NotNull(state.LastPersistResult);
+        Assert.True(state.LastPersistResult!.Value);
     }
 
     [Then("bleibt die bestehende Datei {string} unveraendert")]
@@ -347,5 +418,22 @@ public sealed class FileTypeDetectionSteps
     {
         var path = TestResources.Resolve(name);
         Assert.True(File.Exists(path), $"Test resource missing: {path}");
+    }
+
+    private static byte[] CreateArchivePayload(string archiveType)
+    {
+        var normalized = (archiveType ?? string.Empty).Trim().ToLowerInvariant();
+        const string entryPath = "inner/note.txt";
+        const string content = "hello";
+
+        return normalized switch
+        {
+            "zip" => ArchivePayloadFactory.CreateZipWithSingleEntry(entryPath, content),
+            "tar" => ArchivePayloadFactory.CreateTarWithSingleEntry(entryPath, content),
+            "tar.gz" => ArchivePayloadFactory.CreateTarGzWithSingleEntry(entryPath, content),
+            "7z" => File.ReadAllBytes(TestResources.Resolve("fx.sample_7z")),
+            "rar" => File.ReadAllBytes(TestResources.Resolve("fx.sample_rar")),
+            _ => throw new InvalidOperationException($"Unsupported archive type literal in feature: {archiveType}")
+        };
     }
 }

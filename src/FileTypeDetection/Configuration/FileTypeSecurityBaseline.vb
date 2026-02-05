@@ -4,7 +4,7 @@ Option Explicit On
 Namespace FileTypeDetection
 
     ''' <summary>
-    ''' Liefert ein konservatives, deterministisches Sicherheitsprofil fuer die Dateityp-Erkennung.
+    ''' Liefert ein konservatives, deterministisches Sicherheitsprofil für die Dateityp-Erkennung.
     ''' </summary>
     Public NotInheritable Class FileTypeSecurityBaseline
         Private Sub New()
@@ -22,7 +22,9 @@ Namespace FileTypeDetection
                 .MaxZipEntryUncompressedBytes = 64L * 1024L * 1024L,
                 .MaxZipCompressionRatio = 30,
                 .MaxZipNestingDepth = 2,
-                .MaxZipNestedBytes = 32L * 1024L * 1024L
+                .MaxZipNestedBytes = 32L * 1024L * 1024L,
+                .RejectArchiveLinks = True,
+                .AllowUnknownArchiveEntrySize = False
             }
         End Function
 

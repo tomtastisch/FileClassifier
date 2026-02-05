@@ -5,6 +5,17 @@ namespace FileTypeDetectionLib.Tests.Support;
 
 internal static class TestResources
 {
-    internal static string Resolve(string name) =>
-        Path.Combine(AppContext.BaseDirectory, "resources", name);
+    private static readonly Lazy<FixtureManifestCatalog> Catalog = new(CreateCatalog);
+
+    internal static string Resolve(string fixtureIdOrFileName) =>
+        Catalog.Value.ResolvePath(fixtureIdOrFileName);
+
+    internal static FixtureManifestEntry Describe(string fixtureIdOrFileName) =>
+        Catalog.Value.ResolveEntry(fixtureIdOrFileName);
+
+    private static FixtureManifestCatalog CreateCatalog()
+    {
+        var resourcesRoot = Path.Combine(AppContext.BaseDirectory, "resources");
+        return FixtureManifestCatalog.LoadAndValidate(resourcesRoot);
+    }
 }

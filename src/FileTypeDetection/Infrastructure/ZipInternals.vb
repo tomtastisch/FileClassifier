@@ -113,6 +113,88 @@ Namespace FileTypeDetection
         End Function
     End Class
 
+    Friend NotInheritable Class ZipArchiveBackend
+        Implements IArchiveBackend
+
+        Public ReadOnly Property ContainerType As ArchiveContainerType Implements IArchiveBackend.ContainerType
+            Get
+                Return ArchiveContainerType.Zip
+            End Get
+        End Property
+
+        Public Function Process(
+            stream As Stream,
+            opt As FileTypeDetectorOptions,
+            depth As Integer,
+            containerType As ArchiveContainerType,
+            extractEntry As Func(Of IArchiveEntryModel, Boolean)
+        ) As Boolean Implements IArchiveBackend.Process
+            If containerType <> ArchiveContainerType.Zip Then Return False
+
+            If extractEntry Is Nothing Then
+                Return ZipProcessingEngine.ProcessZipStream(stream, opt, depth, Nothing)
+            End If
+
+            Return ZipProcessingEngine.ProcessZipStream(
+                stream,
+                opt,
+                depth,
+                Function(entry)
+                    Return extractEntry(New ZipArchiveEntryModel(entry))
+                End Function)
+        End Function
+    End Class
+
+    Friend NotInheritable Class ZipArchiveEntryModel
+        Implements IArchiveEntryModel
+
+        Private ReadOnly _entry As ZipArchiveEntry
+
+        Friend Sub New(entry As ZipArchiveEntry)
+            _entry = entry
+        End Sub
+
+        Public ReadOnly Property RelativePath As String Implements IArchiveEntryModel.RelativePath
+            Get
+                If _entry Is Nothing Then Return String.Empty
+                Return If(_entry.FullName, String.Empty)
+            End Get
+        End Property
+
+        Public ReadOnly Property IsDirectory As Boolean Implements IArchiveEntryModel.IsDirectory
+            Get
+                If _entry Is Nothing Then Return False
+                Dim name = If(_entry.FullName, String.Empty)
+                Return name.EndsWith("/", StringComparison.Ordinal)
+            End Get
+        End Property
+
+        Public ReadOnly Property UncompressedSize As Long? Implements IArchiveEntryModel.UncompressedSize
+            Get
+                If _entry Is Nothing Then Return Nothing
+                Return _entry.Length
+            End Get
+        End Property
+
+        Public ReadOnly Property CompressedSize As Long? Implements IArchiveEntryModel.CompressedSize
+            Get
+                If _entry Is Nothing Then Return Nothing
+                Return _entry.CompressedLength
+            End Get
+        End Property
+
+        Public ReadOnly Property LinkTarget As String Implements IArchiveEntryModel.LinkTarget
+            Get
+                Return String.Empty
+            End Get
+        End Property
+
+        Public Function OpenStream() As Stream Implements IArchiveEntryModel.OpenStream
+            If _entry Is Nothing Then Return Stream.Null
+            Return _entry.Open()
+        End Function
+    End Class
+
     ''' <summary>
     ''' Sicherer ZIP-Extraktionsadapter auf Basis der zentralen ZIP-SSOT-Engine.
     ''' </summary>

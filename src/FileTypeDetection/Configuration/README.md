@@ -37,5 +37,5 @@ flowchart LR
 
 ## 7. Siehe auch
 - [Modulindex](../README.md)
-- [Funktionsreferenz](../docs/01_FUNCTIONS.md)
-- [Architektur und Ablaufe](../docs/02_ARCHITECTURE_AND_FLOWS.md)
+- [Funktionsreferenz](../../../docs/01_FUNCTIONS.md)
+- [Architektur und Ablaufe](../../../docs/02_ARCHITECTURE_AND_FLOWS.md)

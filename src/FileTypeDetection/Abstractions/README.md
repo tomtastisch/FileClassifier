@@ -17,5 +17,5 @@ Immutable Rueckgabemodelle fuer stabile API-Vertraege.
 
 ## 4. Siehe auch
 - [Modulindex](../README.md)
-- [Funktionsreferenz](../docs/01_FUNCTIONS.md)
-- [Referenzen](../docs/03_REFERENCES.md)
+- [Funktionsreferenz](../../../docs/01_FUNCTIONS.md)
+- [Referenzen](../../../docs/03_REFERENCES.md)

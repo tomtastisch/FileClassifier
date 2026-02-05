@@ -15,3 +15,5 @@ Gemeinsame Test-Helfer fuer stabilen, deterministischen Testbetrieb.
 ## 5. Verification & Evidence
 - `DetectorOptionsScope.cs`
 - `BddConsoleHooks.cs`
+- `FixtureManifestCatalog.cs` (Manifest-Load + Hash-Validierung)
+- `TestResources.cs` (Lookup via `fixtureId` oder Dateiname)

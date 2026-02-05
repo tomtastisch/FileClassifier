@@ -16,5 +16,7 @@ public sealed class FileTypeSecurityBaselineUnitTests
         Assert.Equal(128L * 1024L * 1024L, options.MaxBytes);
         Assert.Equal(3000, options.MaxZipEntries);
         Assert.Equal(30, options.MaxZipCompressionRatio);
+        Assert.True(options.RejectArchiveLinks);
+        Assert.False(options.AllowUnknownArchiveEntrySize);
     }
 }

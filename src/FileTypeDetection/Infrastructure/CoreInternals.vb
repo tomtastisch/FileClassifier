@@ -41,6 +41,35 @@ Namespace FileTypeDetection
     End Class
 
     ''' <summary>
+    ''' Sicherheits-Gate fuer Archive-Container.
+    ''' </summary>
+    Friend NotInheritable Class ArchiveSafetyGate
+        Private Sub New()
+        End Sub
+
+        Friend Shared Function IsArchiveSafeBytes(data As Byte(), opt As FileTypeDetectorOptions, descriptor As ArchiveDescriptor) As Boolean
+            If data Is Nothing OrElse data.Length = 0 Then Return False
+            If opt Is Nothing Then Return False
+            If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then Return False
+
+            Try
+                Using ms As New MemoryStream(data, writable:=False)
+                    Return IsArchiveSafeStream(ms, opt, descriptor, depth:=0)
+                End Using
+            Catch ex As Exception
+                LogGuard.Debug(opt.Logger, $"[ArchiveGate] Bytes-Fehler: {ex.Message}")
+                Return False
+            End Try
+        End Function
+
+        Friend Shared Function IsArchiveSafeStream(stream As Stream, opt As FileTypeDetectorOptions, descriptor As ArchiveDescriptor, depth As Integer) As Boolean
+            If stream Is Nothing OrElse Not stream.CanRead Then Return False
+            If opt Is Nothing Then Return False
+            Return ArchiveProcessingEngine.ValidateArchiveStream(stream, opt, depth, descriptor)
+        End Function
+    End Class
+
+    ''' <summary>
     ''' Sicherheits-Gate fuer ZIP-Container.
     '''
     ''' Sicherheitsgrenzen:
@@ -68,7 +97,7 @@ Namespace FileTypeDetection
 
         Friend Shared Function IsZipSafeStream(stream As Stream, opt As FileTypeDetectorOptions, depth As Integer) As Boolean
             If stream Is Nothing OrElse Not stream.CanRead Then Return False
-            Return ZipProcessingEngine.ValidateZipStream(stream, opt, depth)
+            Return ArchiveSafetyGate.IsArchiveSafeStream(stream, opt, ArchiveDescriptor.ForContainerType(ArchiveContainerType.Zip), depth)
         End Function
 
     End Class
@@ -91,6 +120,24 @@ Namespace FileTypeDetection
             If CLng(data.Length) > opt.MaxBytes Then Return False
             If Not IsZipByMagic(data) Then Return False
             Return ZipSafetyGate.IsZipSafeBytes(data, opt)
+        End Function
+    End Class
+
+    ''' <summary>
+    ''' Gemeinsame Guards fuer beliebige Archive-Byte-Payloads.
+    ''' </summary>
+    Friend NotInheritable Class ArchivePayloadGuard
+        Private Sub New()
+        End Sub
+
+        Friend Shared Function IsSafeArchivePayload(data As Byte(), opt As FileTypeDetectorOptions) As Boolean
+            If data Is Nothing OrElse data.Length = 0 Then Return False
+            If opt Is Nothing Then Return False
+            If CLng(data.Length) > opt.MaxBytes Then Return False
+
+            Dim descriptor As ArchiveDescriptor = Nothing
+            If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then Return False
+            Return ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor)
         End Function
     End Class
 

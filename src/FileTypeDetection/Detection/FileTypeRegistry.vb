@@ -22,25 +22,25 @@ Namespace FileTypeDetection
         Friend Shared ReadOnly TypesByKind As ImmutableDictionary(Of FileKind, FileType)
         Friend Shared ReadOnly KindByAlias As ImmutableDictionary(Of String, FileKind)
 
-        Private Shared ReadOnly _extensionOverrides As ImmutableDictionary(Of FileKind, String) =
+        Private Shared ReadOnly ExtensionOverrides As ImmutableDictionary(Of FileKind, String) =
             ImmutableDictionary.CreateRange(Of FileKind, String)(
                 {New KeyValuePair(Of FileKind, String)(FileKind.Jpeg, ".jpg")})
 
-        Private Shared ReadOnly _aliasOverrides As ImmutableDictionary(Of FileKind, ImmutableArray(Of String)) =
+        Private Shared ReadOnly AliasOverrides As ImmutableDictionary(Of FileKind, ImmutableArray(Of String)) =
             ImmutableDictionary.CreateRange(Of FileKind, ImmutableArray(Of String))(
                 {
                     New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Jpeg, ImmutableArray.Create("jpe")),
                     New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Zip, ImmutableArray.Create("tar", "tgz", "gz", "gzip", "bz2", "bzip2", "xz", "7z", "zz", "rar"))
                 })
 
-        Private Shared ReadOnly _magicPatternCatalog As ImmutableDictionary(Of FileKind, ImmutableArray(Of MagicPattern)) = BuildMagicPatternCatalog()
-        Private Shared ReadOnly _magicRules As ImmutableArray(Of MagicRule)
+        Private Shared ReadOnly MagicPatternCatalog As ImmutableDictionary(Of FileKind, ImmutableArray(Of MagicPattern)) = BuildMagicPatternCatalog()
+        Private Shared ReadOnly MagicRules As ImmutableArray(Of MagicRule)
 
         Shared Sub New()
             Dim definitions = BuildDefinitionsFromEnum()
             TypesByKind = BuildTypes(definitions)
             KindByAlias = BuildAliasMap(TypesByKind)
-            _magicRules = BuildMagicRules(definitions)
+            MagicRules = BuildMagicRules(definitions)
         End Sub
 
         Private Shared Function BuildDefinitionsFromEnum() As ImmutableArray(Of FileTypeDefinition)
@@ -71,7 +71,7 @@ Namespace FileTypeDetection
 
         Private Shared Function GetCanonicalExtension(kind As FileKind) As String
             Dim overrideExt As String = Nothing
-            If _extensionOverrides.TryGetValue(kind, overrideExt) Then
+            If ExtensionOverrides.TryGetValue(kind, overrideExt) Then
                 Return overrideExt
             End If
 
@@ -88,7 +88,7 @@ Namespace FileTypeDetection
             If enumAlias.Length > 0 Then aliases.Add(enumAlias)
 
             Dim additional As ImmutableArray(Of String) = ImmutableArray(Of String).Empty
-            If _aliasOverrides.TryGetValue(kind, additional) Then
+            If AliasOverrides.TryGetValue(kind, additional) Then
                 For Each item In additional
                     Dim normalized = NormalizeAlias(item)
                     If normalized.Length > 0 Then aliases.Add(normalized)
@@ -102,7 +102,7 @@ Namespace FileTypeDetection
 
         Private Shared Function GetMagicPatterns(kind As FileKind) As ImmutableArray(Of MagicPattern)
             Dim patterns As ImmutableArray(Of MagicPattern) = ImmutableArray(Of MagicPattern).Empty
-            If _magicPatternCatalog.TryGetValue(kind, patterns) Then
+            If MagicPatternCatalog.TryGetValue(kind, patterns) Then
                 Return patterns
             End If
 
@@ -125,7 +125,7 @@ Namespace FileTypeDetection
         Friend Shared Function DetectByMagic(header As Byte()) As FileKind
             If header Is Nothing OrElse header.Length = 0 Then Return FileKind.Unknown
 
-            For Each rule In _magicRules
+            For Each rule In MagicRules
                 For Each magicPattern In rule.Patterns
                     Dim allMatched = True
                     For Each segment In magicPattern.Segments
@@ -147,7 +147,7 @@ Namespace FileTypeDetection
         Friend Shared Function HasDirectHeaderDetection(kind As FileKind) As Boolean
             If kind = FileKind.Unknown Then Return False
             Dim patterns As ImmutableArray(Of MagicPattern) = ImmutableArray(Of MagicPattern).Empty
-            Return _magicPatternCatalog.TryGetValue(kind, patterns) AndAlso Not patterns.IsDefaultOrEmpty
+            Return MagicPatternCatalog.TryGetValue(kind, patterns) AndAlso Not patterns.IsDefaultOrEmpty
         End Function
 
         Friend Shared Function HasStructuredContainerDetection(kind As FileKind) As Boolean

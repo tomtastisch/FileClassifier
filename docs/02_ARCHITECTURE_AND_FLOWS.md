@@ -32,10 +32,10 @@ flowchart LR
 ```
 
 ### 2.4 Detailquellen fuer tieferes Drill-Down
-- Detection-Details: [`../Detection/README.md`](../Detection/README.md)
-- Infrastructure-Details (Guards/ZIP internals): [`../Infrastructure/README.md`](../Infrastructure/README.md)
-- Konfigurationsdetails: [`../Configuration/README.md`](../Configuration/README.md)
-- Rueckgabemodelle: [`../Abstractions/README.md`](../Abstractions/README.md)
+- Detection-Details: [`../src/FileTypeDetection/Detection/README.md`](../src/FileTypeDetection/Detection/README.md)
+- Infrastructure-Details (Guards/ZIP internals): [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md)
+- Konfigurationsdetails: [`../src/FileTypeDetection/Configuration/README.md`](../src/FileTypeDetection/Configuration/README.md)
+- Rueckgabemodelle: [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md)
 - Funktionskatalog mit Beispielen: [`./01_FUNCTIONS.md`](./01_FUNCTIONS.md)
 
 ## 3. Architekturuebersicht (Systemkontext)

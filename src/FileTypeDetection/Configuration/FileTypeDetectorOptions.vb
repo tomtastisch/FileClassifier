@@ -56,6 +56,17 @@ Namespace FileTypeDetection
         ''' </summary>
         Public Property MaxZipNestedBytes As Long = 50L * 1024L * 1024L
 
+        ''' <summary>
+        ''' Standard-Policy: Link-Entries (symlink/hardlink) werden fail-closed verworfen.
+        ''' </summary>
+        Public Property RejectArchiveLinks As Boolean = True
+
+        ''' <summary>
+        ''' Erlaubt Archive-Entries mit unbekannter Groesse nur bei explizitem Opt-In.
+        ''' Default ist fail-closed (False).
+        ''' </summary>
+        Public Property AllowUnknownArchiveEntrySize As Boolean = False
+
         ''' <summary>Optionaler Logger fuer Diagnosezwecke.</summary>
         Public Property Logger As ILogger = Nothing
 
@@ -77,6 +88,8 @@ Namespace FileTypeDetection
                 .MaxZipCompressionRatio = Me.MaxZipCompressionRatio,
                 .MaxZipNestingDepth = Me.MaxZipNestingDepth,
                 .MaxZipNestedBytes = Me.MaxZipNestedBytes,
+                .RejectArchiveLinks = Me.RejectArchiveLinks,
+                .AllowUnknownArchiveEntrySize = Me.AllowUnknownArchiveEntrySize,
                 .Logger = Me.Logger
             }
         End Function

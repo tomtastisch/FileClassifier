@@ -16,9 +16,19 @@ Nachweis fuer Sicherheit, Determinismus, Korrektheit und API-Klarheit.
 |---|---|
 | Fail-closed ZIP-Grenzen | [Unit/ZipAdversarialTests.cs](./Unit/ZipAdversarialTests.cs) |
 | Sichere ZIP-Extraktion | [Unit/ZipExtractionUnitTests.cs](./Unit/ZipExtractionUnitTests.cs) |
+| Unified-Archive-Flows (ZIP/TAR/TAR.GZ/7z/RAR fuer Byte-Array Detect/Validate/Extract/Materialize) | [Features/FTD_BDD_040_ARCHIVE_TYPEN_BYTEARRAY_UND_MATERIALISIERUNG.feature](./Features/FTD_BDD_040_ARCHIVE_TYPEN_BYTEARRAY_UND_MATERIALISIERUNG.feature), [Unit/UnifiedArchiveBackendUnitTests.cs](./Unit/UnifiedArchiveBackendUnitTests.cs) |
 | Deterministische Registry | [Unit/FileTypeRegistryUnitTests.cs](./Unit/FileTypeRegistryUnitTests.cs) |
 | API Detail-/ZIP-Fassade | [Unit/DetectionDetailAndZipValidationUnitTests.cs](./Unit/DetectionDetailAndZipValidationUnitTests.cs), [Unit/ZipProcessingFacadeUnitTests.cs](./Unit/ZipProcessingFacadeUnitTests.cs) |
 | Options-/Materializer-Invarianten | [Property/FileTypeOptionsPropertyTests.cs](./Property/FileTypeOptionsPropertyTests.cs), [Property/FileMaterializerPropertyTests.cs](./Property/FileMaterializerPropertyTests.cs) |
+
+## 3.1 Formatbezogene Testabdeckung (Stand)
+| Format | Detection | Validate | Extract Memory | Extract Disk |
+|---|---|---|---|---|
+| ZIP | abgedeckt | abgedeckt | abgedeckt | abgedeckt |
+| TAR | abgedeckt | indirekt ueber Unified-Pipeline | implizit ueber Unified-Pipeline | implizit ueber Unified-Pipeline |
+| TAR.GZ | abgedeckt | abgedeckt | abgedeckt | abgedeckt |
+| 7z | abgedeckt (BDD Byte-Array Flow) | abgedeckt (BDD Byte-Array Flow) | abgedeckt (BDD Byte-Array Flow) | abgedeckt (BDD Byte-Array Flow) |
+| RAR | abgedeckt (BDD Byte-Array Flow) | abgedeckt (BDD Byte-Array Flow) | abgedeckt (BDD Byte-Array Flow) | abgedeckt (BDD Byte-Array Flow) |
 
 ## 4. Ausfuehrung
 Vollstaendige Ausfuehrung (ohne Filter, fuehrt alle Tests aus):
@@ -30,6 +40,17 @@ Alternative auf Solution-Ebene:
 ```bash
 dotnet test FileClassifier.sln --no-build -v minimal
 ```
+
+## 4.1 Fixture-Governance (alle Ressourcen)
+- SSOT: `tests/FileTypeDetectionLib.Tests/resources/fixtures.manifest.json`
+- Jede Ressource besitzt:
+  - `fixtureId` (kanonischer, stabiler Identifier; bevorzugt fuer Referenzen),
+  - `dataType` (fachliche Klassifikation),
+  - `objectId` (`sha256:<hex>` als content-addressed Objekt-ID),
+  - `sha256` (Integritaetsnachweis),
+  - `sourceUrl`/`sourceRef` (Herkunft).
+- Beim ersten Zugriff validiert `TestResources` den kompletten Ressourcenbestand fail-closed:
+  - Hash-Mismatch, fehlende Manifest-Eintraege oder unregistrierte Dateien => Testfehler.
 
 ## 5. Tag-Filter (Reqnroll-Annotationen)
 Filter werden ueber `--filter "Category=<tag>"` (ohne `@`) als Suffix angehaengt.

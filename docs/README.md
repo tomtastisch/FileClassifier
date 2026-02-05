@@ -14,10 +14,10 @@ Diese Doku ist in drei Ebenen getrennt:
 5. [DIN_SPECIFICATION_DE.md](./DIN_SPECIFICATION_DE.md)
 
 ## 2.1 Vertiefende Implementierungsquellen
-- [../Detection/README.md](../Detection/README.md)
-- [../Infrastructure/README.md](../Infrastructure/README.md)
-- [../Configuration/README.md](../Configuration/README.md)
-- [../Abstractions/README.md](../Abstractions/README.md)
+- [../src/FileTypeDetection/Detection/README.md](../src/FileTypeDetection/Detection/README.md)
+- [../src/FileTypeDetection/Infrastructure/README.md](../src/FileTypeDetection/Infrastructure/README.md)
+- [../src/FileTypeDetection/Configuration/README.md](../src/FileTypeDetection/Configuration/README.md)
+- [../src/FileTypeDetection/Abstractions/README.md](../src/FileTypeDetection/Abstractions/README.md)
 
 ## 3. Einheitliches Schema
 Jedes Dokument folgt demselben Muster:

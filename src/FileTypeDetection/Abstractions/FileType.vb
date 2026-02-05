@@ -7,7 +7,7 @@ Imports System.Linq
 Namespace FileTypeDetection
 
     ''' <summary>
-    ''' Unveraenderliches Wertobjekt fuer einen Dateityp.
+    ''' Unveränderliches Wertobjekt für einen Dateityp.
     '''
     ''' SSOT-Regel:
     ''' - Instanzen werden zentral in FileTypeRegistry aufgebaut.
