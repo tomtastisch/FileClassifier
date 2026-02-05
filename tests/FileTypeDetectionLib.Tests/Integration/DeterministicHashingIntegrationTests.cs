@@ -9,6 +9,29 @@ namespace FileTypeDetectionLib.Tests.Integration;
 
 public sealed class DeterministicHashingIntegrationTests
 {
+    public static IEnumerable<object[]> ArchiveFixtureCases()
+    {
+        yield return new object[] { "fx.sample_zip" };
+        yield return new object[] { "fx.sample_rar" };
+        yield return new object[] { "fx.sample_7z" };
+    }
+
+    public static IEnumerable<object[]> RoundTripCases()
+    {
+        yield return new object[] { "fx.sample_zip", true };
+        yield return new object[] { "fx.sample_7z", true };
+        yield return new object[] { "fx.sample_rar", true };
+        yield return new object[] { "fx.sample_pdf", false };
+    }
+
+    public static IEnumerable<object[]> DeterminismCases()
+    {
+        yield return new object[] { "fx.sample_zip" };
+        yield return new object[] { "fx.sample_7z" };
+        yield return new object[] { "fx.sample_rar" };
+        yield return new object[] { "fx.sample_pdf" };
+    }
+
     [Fact]
     public void LogicalHash_IsStableAcrossArchiveTarAndTarGz_ForSameContent()
     {
@@ -26,10 +49,7 @@ public sealed class DeterministicHashingIntegrationTests
     }
 
     [Theory]
-    [InlineData("fx.sample_zip", true)]
-    [InlineData("fx.sample_7z", true)]
-    [InlineData("fx.sample_rar", true)]
-    [InlineData("fx.sample_pdf", false)]
+    [MemberData(nameof(RoundTripCases))]
     public void VerifyRoundTrip_ProducesLogicalConsistency(string fixtureId, bool expectedArchive)
     {
         var path = TestResources.Resolve(fixtureId);
@@ -42,27 +62,21 @@ public sealed class DeterministicHashingIntegrationTests
         Assert.True(report.LogicalH1EqualsH4);
     }
 
-    [Fact]
-    public void HashFile_Determinism_HoldsAcrossRepeatedFixtureRuns()
+    [Theory]
+    [MemberData(nameof(DeterminismCases))]
+    public void HashFile_Determinism_HoldsAcrossRepeatedFixtureRuns(string fixtureId)
     {
-        var fixtureIds = new List<string> { "fx.sample_zip", "fx.sample_7z", "fx.sample_rar", "fx.sample_pdf" };
+        var path = TestResources.Resolve(fixtureId);
+        var first = DeterministicHashing.HashFile(path);
+        var second = DeterministicHashing.HashFile(path);
 
-        foreach (var fixtureId in fixtureIds)
-        {
-            var path = TestResources.Resolve(fixtureId);
-            var first = DeterministicHashing.HashFile(path);
-            var second = DeterministicHashing.HashFile(path);
-
-            Assert.Equal(first.Digests.LogicalSha256, second.Digests.LogicalSha256);
-            Assert.Equal(first.Digests.PhysicalSha256, second.Digests.PhysicalSha256);
-            Assert.Equal(first.Digests.FastLogicalXxHash3, second.Digests.FastLogicalXxHash3);
-        }
+        Assert.Equal(first.Digests.LogicalSha256, second.Digests.LogicalSha256);
+        Assert.Equal(first.Digests.PhysicalSha256, second.Digests.PhysicalSha256);
+        Assert.Equal(first.Digests.FastLogicalXxHash3, second.Digests.FastLogicalXxHash3);
     }
 
     [Theory]
-    [InlineData("fx.sample_zip")]
-    [InlineData("fx.sample_rar")]
-    [InlineData("fx.sample_7z")]
+    [MemberData(nameof(ArchiveFixtureCases))]
     public void ArchivePipeline_PreservesCombinedAndPerFileHashes_AfterExtractByteMaterializeAndRecheck(string fixtureId)
     {
         var path = TestResources.Resolve(fixtureId);
@@ -116,9 +130,7 @@ public sealed class DeterministicHashingIntegrationTests
     }
 
     [Theory]
-    [InlineData("fx.sample_zip")]
-    [InlineData("fx.sample_rar")]
-    [InlineData("fx.sample_7z")]
+    [MemberData(nameof(ArchiveFixtureCases))]
     public void ArchiveBytePipeline_PreservesCombinedAndPerFileHashes_AfterExtractAndMaterialize(string fixtureId)
     {
         var path = TestResources.Resolve(fixtureId);
