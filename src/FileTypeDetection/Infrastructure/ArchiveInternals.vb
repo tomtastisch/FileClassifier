@@ -406,7 +406,7 @@ Namespace FileTypeDetection
                 Return True
             End If
 
-            Return True
+            Return opt.AllowUnknownArchiveEntrySize
         End Function
 
         Private Shared Function NormalizeEntryName(entryName As String) As String
