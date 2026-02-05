@@ -18,7 +18,15 @@ else
   BASE="HEAD"
 fi
 
-changes=$(git diff --name-status "${BASE}"..."${HEAD_REF}")
+if ! changes=$(git diff --name-status "${BASE}"..."${HEAD_REF}" 2>/dev/null); then
+  # No merge base (e.g., bot branches). Default to none for labeling, fail closed only in CI guard.
+  if [[ "${MODE}" == "required" ]]; then
+    echo "none"
+    exit 0
+  fi
+  echo "versioning-guard: unable to compute diff between ${BASE} and ${HEAD_REF}" >&2
+  exit 5
+fi
 
 has_any_change=0
 has_code_change=0

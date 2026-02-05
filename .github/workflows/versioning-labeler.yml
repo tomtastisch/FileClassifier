@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
 
       - name: Fetch PR head
-        run: git fetch --no-tags --prune --depth=1 origin ${{ github.event.pull_request.head.sha }}
+        run: git fetch --no-tags --prune --depth=0 origin ${{ github.event.pull_request.head.sha }}
 
       - name: Compute required bump
         id: bump
