@@ -39,9 +39,6 @@ benchmark_detect_ms.txt
 .idea/
 *.iml
 
-# Quodana
-qodana-results/
-.quodana/
 
 # local-only tools
 tools/*

@@ -86,10 +86,8 @@ Die aktuelle Version ergibt sich deterministisch aus der Historie.
 - `versioning-labeler` berechnet die erforderliche Versionierung und setzt das passende `version:*` Label auf PRs.
 - GitHub-Label-Setup ist in `tools/versioning/labels.json` dokumentiert.
 
-## 8.2 Quodana
-- Konfiguration: `qodana.yaml`
-- Workflow: `.github/workflows/qodana_code_quality.yml`
-- Scan wird ueber Qodana Cloud ausgeliefert.
+## 8.2 Code-Analyse
+- Aktuell kein Qodana im Einsatz.
 
 ## 9. Version-Anker (retroaktiv festgelegt)
 - `1.0.0` -> `d9a6015` (Initial Commit)
