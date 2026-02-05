@@ -25,10 +25,10 @@ Quelle: `FileTypeDetector.vb`.
 | `ExtensionMismatch` | Endung passt nicht zum erkannten Typ |
 | `HeaderUnknown` | Header-Magic unzureichend/unbekannt |
 | `HeaderMatch` | Header-Magic hat Typ direkt erkannt |
-| `ZipGateFailed` | ZIP-Sicherheitspruefung fehlgeschlagen |
-| `ZipStructuredRefined` | ZIP wurde strukturiert (z. B. OOXML) verfeinert |
-| `ZipRefined` | Archivtyp wurde inhaltlich verfeinert (kompatibler ReasonCode-Wert) |
-| `ZipGeneric` | Archiv blieb generisch (kompatibler ReasonCode-Wert) |
+| `ArchiveGateFailed` | Archiv-Sicherheitspruefung fehlgeschlagen |
+| `ArchiveStructuredRefined` | Archiv wurde strukturiert (z. B. OOXML) verfeinert |
+| `ArchiveRefined` | Archivtyp wurde inhaltlich verfeinert |
+| `ArchiveGeneric` | Archiv blieb generisch |
 
 ## 4. Interne Kernpfade (Lesefuehrung)
 | Interner Pfad | Datei | Bedeutung | Detail-README |

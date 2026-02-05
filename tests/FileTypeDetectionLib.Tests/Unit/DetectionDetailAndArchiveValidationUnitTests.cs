@@ -15,7 +15,7 @@ public sealed class DetectionDetailAndArchiveValidationUnitTests
         var detail = new FileTypeDetector().DetectDetailed(path);
 
         Assert.Equal(FileKind.Docx, detail.DetectedType.Kind);
-        Assert.Equal("ZipStructuredRefined", detail.ReasonCode);
+        Assert.Equal("ArchiveStructuredRefined", detail.ReasonCode);
         Assert.True(detail.UsedZipContentCheck);
         Assert.True(detail.UsedStructuredRefinement);
         Assert.False(detail.ExtensionVerified);

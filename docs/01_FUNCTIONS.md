@@ -85,10 +85,10 @@ using FileTypeDetection;
 var detector = new FileTypeDetector();
 var t = detector.Detect("/data/invoice.pdf", verifyExtension: true);
 var d = detector.DetectDetailed("/data/archive.docx", verifyExtension: true);
-bool zipOk = detector.TryValidateArchive("/data/archive.zip");
+bool archiveOk = detector.TryValidateArchive("/data/archive.zip");
 var entries = detector.ExtractArchiveSafeToMemory("/data/archive.zip", verifyBeforeExtract: true);
 
-Console.WriteLine($"{t.Kind} / {d.ReasonCode} / {zipOk} / {entries.Count}");
+Console.WriteLine($"{t.Kind} / {d.ReasonCode} / {archiveOk} / {entries.Count}");
 ```
 
 ### 4.2 ArchiveProcessing
@@ -136,10 +136,10 @@ flowchart TD
 using FileTypeDetection;
 
 byte[] payload = File.ReadAllBytes("/data/input.bin");
-byte[] zipPayload = File.ReadAllBytes("/data/archive.zip");
+byte[] archivePayload = File.ReadAllBytes("/data/archive.zip");
 
 bool rawOk = FileMaterializer.Persist(payload, "/data/out/input.bin", overwrite: false, secureExtract: false);
-bool zipOk = FileMaterializer.Persist(zipPayload, "/data/out/unpacked", overwrite: false, secureExtract: true);
+bool archiveExtractOk = FileMaterializer.Persist(archivePayload, "/data/out/unpacked", overwrite: false, secureExtract: true);
 ```
 
 ### 4.4 FileTypeOptions + FileTypeSecurityBaseline
