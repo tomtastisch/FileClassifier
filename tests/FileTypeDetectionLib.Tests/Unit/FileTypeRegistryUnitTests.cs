@@ -63,7 +63,7 @@ public sealed class FileTypeRegistryUnitTests
     [InlineData("7z")]
     [InlineData("zz")]
     [InlineData("rar")]
-    public void ResolveByAlias_ResolvesArchiveAliasesAsArchive(string alias)
+    public void ResolveByAlias_ResolvesArchiveAliasesAsZip(string alias)
     {
         Assert.Equal(FileKind.Zip, FileTypeRegistry.ResolveByAlias(alias).Kind);
     }

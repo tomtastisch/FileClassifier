@@ -5,7 +5,7 @@ using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
-public sealed class ArchiveAdversarialTests
+public sealed class ZipAdversarialTests
 {
     [Fact]
     public void Detect_FailsClosed_ForManySmallEntries()
@@ -16,7 +16,7 @@ public sealed class ArchiveAdversarialTests
         options.MaxBytes = 10 * 1024 * 1024;
         scope.Set(options);
 
-        var adversarialZip = ArchiveEntryPayloadFactory.CreateZipWithEntries(entryCount: 200, entrySize: 1);
+        var adversarialZip = ZipPayloadFactory.CreateZipWithEntries(entryCount: 200, entrySize: 1);
         var result = new FileTypeDetector().Detect(adversarialZip);
 
         Assert.Equal(FileKind.Unknown, result.Kind);
@@ -32,7 +32,7 @@ public sealed class ArchiveAdversarialTests
         options.MaxBytes = 10 * 1024 * 1024;
         scope.Set(options);
 
-        var deepZip = ArchiveEntryPayloadFactory.CreateDeepNestedZip(depth: 3, innerPayloadSize: 16);
+        var deepZip = ZipPayloadFactory.CreateDeepNestedZip(depth: 3, innerPayloadSize: 16);
         var result = new FileTypeDetector().Detect(deepZip);
 
         Assert.Equal(FileKind.Unknown, result.Kind);
@@ -47,14 +47,14 @@ public sealed class ArchiveAdversarialTests
         options.MaxBytes = 10 * 1024 * 1024;
         scope.Set(options);
 
-        var zip = ArchiveEntryPayloadFactory.CreateZipWithEntrySizes(1024, 8, 8);
+        var zip = ZipPayloadFactory.CreateZipWithEntrySizes(1024, 8, 8);
         var result = new FileTypeDetector().Detect(zip);
 
         Assert.Equal(FileKind.Unknown, result.Kind);
     }
 
     [Fact]
-    public void Detect_FailsClosed_WhenNestedArchiveDepthExceeded_ForNonArchiveEntryName()
+    public void Detect_FailsClosed_WhenNestedZipDepthExceeded_ForNonZipEntryName()
     {
         using var scope = new DetectorOptionsScope();
         var options = FileTypeDetector.GetDefaultOptions();
@@ -63,7 +63,7 @@ public sealed class ArchiveAdversarialTests
         options.MaxBytes = 10 * 1024 * 1024;
         scope.Set(options);
 
-        var deepZip = ArchiveEntryPayloadFactory.CreateDeepNestedZipWithEntryName(depth: 3, innerPayloadSize: 16, entryName: "payload.bin");
+        var deepZip = ZipPayloadFactory.CreateDeepNestedZipWithEntryName(depth: 3, innerPayloadSize: 16, entryName: "payload.bin");
         var result = new FileTypeDetector().Detect(deepZip);
 
         Assert.Equal(FileKind.Unknown, result.Kind);

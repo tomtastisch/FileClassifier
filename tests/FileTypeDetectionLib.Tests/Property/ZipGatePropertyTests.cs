@@ -4,12 +4,12 @@ using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Property;
 
-public sealed class ArchiveGatePropertyTests
+public sealed class ZipGatePropertyTests
 {
     [Theory]
     [InlineData(2, 2, FileKind.Zip)]
     [InlineData(3, 2, FileKind.Unknown)]
-    public void Detect_Respects_MaxArchiveEntries(int entries, int maxEntries, FileKind expected)
+    public void Detect_Respects_MaxZipEntries(int entries, int maxEntries, FileKind expected)
     {
         using var scope = new DetectorOptionsScope();
         var options = FileTypeDetector.GetDefaultOptions();
@@ -17,7 +17,7 @@ public sealed class ArchiveGatePropertyTests
         options.MaxBytes = 10 * 1024 * 1024;
         scope.Set(options);
 
-        var zip = ArchiveEntryPayloadFactory.CreateZipWithEntries(entries, entrySize: 8);
+        var zip = ZipPayloadFactory.CreateZipWithEntries(entries, entrySize: 8);
         var result = new FileTypeDetector().Detect(zip);
 
         Assert.Equal(expected, result.Kind);
@@ -26,7 +26,7 @@ public sealed class ArchiveGatePropertyTests
     [Theory]
     [InlineData(64, 64, FileKind.Zip)]
     [InlineData(65, 64, FileKind.Unknown)]
-    public void Detect_Respects_MaxArchiveEntryUncompressedBytes(int entrySize, int maxEntryBytes, FileKind expected)
+    public void Detect_Respects_MaxZipEntryUncompressedBytes(int entrySize, int maxEntryBytes, FileKind expected)
     {
         using var scope = new DetectorOptionsScope();
         var options = FileTypeDetector.GetDefaultOptions();
@@ -34,7 +34,7 @@ public sealed class ArchiveGatePropertyTests
         options.MaxBytes = 10 * 1024 * 1024;
         scope.Set(options);
 
-        var zip = ArchiveEntryPayloadFactory.CreateZipWithEntries(entryCount: 1, entrySize: entrySize);
+        var zip = ZipPayloadFactory.CreateZipWithEntries(entryCount: 1, entrySize: entrySize);
         var result = new FileTypeDetector().Detect(zip);
 
         Assert.Equal(expected, result.Kind);
@@ -43,7 +43,7 @@ public sealed class ArchiveGatePropertyTests
     [Theory]
     [InlineData(2, 40, 80, FileKind.Zip)]
     [InlineData(2, 40, 79, FileKind.Unknown)]
-    public void Detect_Respects_MaxArchiveTotalUncompressedBytes(int entries, int entrySize, long maxTotal, FileKind expected)
+    public void Detect_Respects_MaxZipTotalUncompressedBytes(int entries, int entrySize, long maxTotal, FileKind expected)
     {
         using var scope = new DetectorOptionsScope();
         var options = FileTypeDetector.GetDefaultOptions();
@@ -51,16 +51,16 @@ public sealed class ArchiveGatePropertyTests
         options.MaxBytes = 10 * 1024 * 1024;
         scope.Set(options);
 
-        var zip = ArchiveEntryPayloadFactory.CreateZipWithEntries(entries, entrySize);
+        var zip = ZipPayloadFactory.CreateZipWithEntries(entries, entrySize);
         var result = new FileTypeDetector().Detect(zip);
 
         Assert.Equal(expected, result.Kind);
     }
 
     [Fact]
-    public void Detect_Respects_MaxArchiveCompressionRatio_WhenEnabled()
+    public void Detect_Respects_MaxZipCompressionRatio_WhenEnabled()
     {
-        var zip = ArchiveEntryPayloadFactory.CreateZipWithEntries(entryCount: 1, entrySize: 200_000);
+        var zip = ZipPayloadFactory.CreateZipWithEntries(entryCount: 1, entrySize: 200_000);
 
         using (var strictScope = new DetectorOptionsScope())
         {
@@ -86,9 +86,9 @@ public sealed class ArchiveGatePropertyTests
     }
 
     [Fact]
-    public void Detect_Respects_MaxArchiveNestedBytes_ForInnerArchive()
+    public void Detect_Respects_MaxZipNestedBytes_ForInnerZip()
     {
-        var fixture = ArchiveEntryPayloadFactory.CreateNestedZipWithInnerLength(2048);
+        var fixture = ZipPayloadFactory.CreateNestedZipWithInnerLength(2048);
         var zip = fixture.zipBytes;
         var innerBytes = fixture.innerUncompressedBytes;
 

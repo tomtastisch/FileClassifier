@@ -47,7 +47,7 @@ Namespace FileTypeDetection
         Private Sub New()
         End Sub
 
-        Friend Shared Function IsArchiveSafeBytes(data As Byte(), opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor) As Boolean
+        Friend Shared Function IsArchiveSafeBytes(data As Byte(), opt As FileTypeDetectorOptions, descriptor As ArchiveDescriptor) As Boolean
             If data Is Nothing OrElse data.Length = 0 Then Return False
             If opt Is Nothing Then Return False
             If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then Return False
@@ -62,7 +62,7 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Friend Shared Function IsArchiveSafeStream(stream As Stream, opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor, depth As Integer) As Boolean
+        Friend Shared Function IsArchiveSafeStream(stream As Stream, opt As FileTypeDetectorOptions, descriptor As ArchiveDescriptor, depth As Integer) As Boolean
             If stream Is Nothing OrElse Not stream.CanRead Then Return False
             If opt Is Nothing Then Return False
             Return ArchiveProcessingEngine.ValidateArchiveStream(stream, opt, depth, descriptor)
@@ -70,17 +70,57 @@ Namespace FileTypeDetection
     End Class
 
     ''' <summary>
-    ''' Gemeinsame Guards fuer signaturbasierte Archiv-Byte-Payloads.
+    ''' Sicherheits-Gate fuer ZIP-Container.
+    '''
+    ''' Sicherheitsgrenzen:
+    ''' - zu viele Entries
+    ''' - zu grosse unkomprimierte Datenmengen
+    ''' - hohe Kompressionsraten
+    ''' - tiefe/nicht begrenzte ZIP-Verschachtelung
     ''' </summary>
-    Friend NotInheritable Class ArchiveSignaturePayloadGuard
+    Friend NotInheritable Class ZipSafetyGate
         Private Sub New()
         End Sub
 
-        Friend Shared Function IsArchiveSignatureCandidate(data As Byte()) As Boolean
+        Friend Shared Function IsZipSafeBytes(data As Byte(), opt As FileTypeDetectorOptions) As Boolean
+            If data Is Nothing OrElse data.Length = 0 Then Return False
+
+            Try
+                Using ms As New MemoryStream(data, writable:=False)
+                    Return IsZipSafeStream(ms, opt, depth:=0)
+                End Using
+            Catch ex As Exception
+                LogGuard.Debug(opt.Logger, $"[ZipGate] Bytes-Fehler: {ex.Message}")
+                Return False
+            End Try
+        End Function
+
+        Friend Shared Function IsZipSafeStream(stream As Stream, opt As FileTypeDetectorOptions, depth As Integer) As Boolean
+            If stream Is Nothing OrElse Not stream.CanRead Then Return False
+            Return ArchiveSafetyGate.IsArchiveSafeStream(stream, opt, ArchiveDescriptor.ForContainerType(ArchiveContainerType.Zip), depth)
+        End Function
+
+    End Class
+
+    ''' <summary>
+    ''' Gemeinsame Guards fuer ZIP-Byte-Payloads.
+    ''' </summary>
+    Friend NotInheritable Class ZipPayloadGuard
+        Private Sub New()
+        End Sub
+
+        Friend Shared Function IsZipByMagic(data As Byte()) As Boolean
             If data Is Nothing OrElse data.Length = 0 Then Return False
             Return FileTypeRegistry.DetectByMagic(data) = FileKind.Zip
         End Function
 
+        Friend Shared Function IsSafeZipPayload(data As Byte(), opt As FileTypeDetectorOptions) As Boolean
+            If data Is Nothing OrElse data.Length = 0 Then Return False
+            If opt Is Nothing Then Return False
+            If CLng(data.Length) > opt.MaxBytes Then Return False
+            If Not IsZipByMagic(data) Then Return False
+            Return ZipSafetyGate.IsZipSafeBytes(data, opt)
+        End Function
     End Class
 
     ''' <summary>
@@ -90,7 +130,7 @@ Namespace FileTypeDetection
         Private Sub New()
         End Sub
 
-        Friend Shared Function IsSafeArchivePayload(data As Byte(), opt As FileTypeProjectOptions) As Boolean
+        Friend Shared Function IsSafeArchivePayload(data As Byte(), opt As FileTypeDetectorOptions) As Boolean
             If data Is Nothing OrElse data.Length = 0 Then Return False
             If opt Is Nothing Then Return False
             If CLng(data.Length) > opt.MaxBytes Then Return False
@@ -102,13 +142,13 @@ Namespace FileTypeDetection
     End Class
 
     ''' <summary>
-    ''' Gemeinsame Zielpfad-Policy fuer Materialisierung und Archiv-Extraktion.
+    ''' Gemeinsame Zielpfad-Policy fuer Materialisierung und ZIP-Extraktion.
     ''' </summary>
     Friend NotInheritable Class DestinationPathGuard
         Private Sub New()
         End Sub
 
-        Friend Shared Function PrepareMaterializationTarget(destinationFull As String, overwrite As Boolean, opt As FileTypeProjectOptions) As Boolean
+        Friend Shared Function PrepareMaterializationTarget(destinationFull As String, overwrite As Boolean, opt As FileTypeDetectorOptions) As Boolean
             If IsRootPath(destinationFull) Then
                 LogGuard.Warn(opt.Logger, "[PathGuard] Ziel darf kein Root-Verzeichnis sein.")
                 Return False
@@ -125,7 +165,7 @@ Namespace FileTypeDetection
             Return True
         End Function
 
-        Friend Shared Function ValidateNewExtractionTarget(destinationFull As String, opt As FileTypeProjectOptions) As Boolean
+        Friend Shared Function ValidateNewExtractionTarget(destinationFull As String, opt As FileTypeDetectorOptions) As Boolean
             If IsRootPath(destinationFull) Then
                 LogGuard.Warn(opt.Logger, "[PathGuard] Ziel darf kein Root-Verzeichnis sein.")
                 Return False
@@ -165,56 +205,7 @@ Namespace FileTypeDetection
     End Class
 
     ''' <summary>
-    ''' Gemeinsame Normalisierung fuer relative Archiv-Entry-Pfade.
-    ''' </summary>
-    Friend NotInheritable Class ArchiveEntryPathPolicy
-        Private Sub New()
-        End Sub
-
-        Friend Shared Function TryNormalizeRelativePath(
-            rawPath As String,
-            allowDirectoryMarker As Boolean,
-            ByRef normalizedPath As String,
-            ByRef isDirectory As Boolean
-        ) As Boolean
-            normalizedPath = String.Empty
-            isDirectory = False
-
-            Dim safe = If(rawPath, String.Empty).Trim()
-            If safe.Length = 0 Then Return False
-            If safe.Contains(ChrW(0)) Then Return False
-
-            safe = safe.Replace("\"c, "/"c)
-            If Path.IsPathRooted(safe) Then Return False
-            safe = safe.TrimStart("/"c)
-            If safe.Length = 0 Then Return False
-
-            Dim trimmed = safe.TrimEnd("/"c)
-            If trimmed.Length = 0 Then
-                If Not allowDirectoryMarker Then Return False
-                normalizedPath = safe
-                isDirectory = True
-                Return True
-            End If
-
-            Dim segments = trimmed.Split("/"c)
-            For Each seg In segments
-                If seg.Length = 0 Then Return False
-                If seg = "." OrElse seg = ".." Then Return False
-            Next
-
-            If safe.Length <> trimmed.Length AndAlso Not allowDirectoryMarker Then
-                Return False
-            End If
-
-            normalizedPath = If(allowDirectoryMarker, safe, trimmed)
-            isDirectory = allowDirectoryMarker AndAlso safe.Length <> trimmed.Length
-            Return True
-        End Function
-    End Class
-
-    ''' <summary>
-    ''' Verfeinert Archivpakete zu OOXML-Typen anhand kanonischer Paket-Pfade.
+    ''' Verfeinert ZIP-Dateien zu OOXML-Typen anhand kanonischer Paket-Pfade.
     '''
     ''' Implementationsprinzip:
     ''' - reduziert False-Positives bei generischen ZIP-Dateien
@@ -243,13 +234,13 @@ Namespace FileTypeDetection
 
             Try
                 If stream.CanSeek Then stream.Position = 0
-                Return DetectKindFromArchivePackage(stream)
+                Return DetectKindFromZip(stream)
             Catch
                 Return FileTypeRegistry.Resolve(FileKind.Unknown)
             End Try
         End Function
 
-        Private Shared Function DetectKindFromArchivePackage(stream As Stream) As FileType
+        Private Shared Function DetectKindFromZip(stream As Stream) As FileType
             Try
                 Using zip As New ZipArchive(stream, ZipArchiveMode.Read, leaveOpen:=True)
                     Dim hasContentTypes As Boolean = False

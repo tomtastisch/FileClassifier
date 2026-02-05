@@ -6,15 +6,15 @@ Namespace FileTypeDetection
     ''' <summary>
     ''' Liefert ein konservatives, deterministisches Sicherheitsprofil für die Dateityp-Erkennung.
     ''' </summary>
-    Public NotInheritable Class FileTypeProjectBaseline
+    Public NotInheritable Class FileTypeSecurityBaseline
         Private Sub New()
         End Sub
 
         ''' <summary>
         ''' Erzeugt ein hartes Default-Profil fuer produktive, fail-closed Szenarien.
         ''' </summary>
-        Private Shared Function CreateDeterministicDefaults() As FileTypeProjectOptions
-            Return New FileTypeProjectOptions With {
+        private Shared Function CreateDeterministicDefaults() As FileTypeDetectorOptions
+            Return New FileTypeDetectorOptions With {
                 .MaxBytes = 128L * 1024L * 1024L,
                 .SniffBytes = 64 * 1024,
                 .MaxZipEntries = 3000,
@@ -24,12 +24,7 @@ Namespace FileTypeDetection
                 .MaxZipNestingDepth = 2,
                 .MaxZipNestedBytes = 32L * 1024L * 1024L,
                 .RejectArchiveLinks = True,
-                .AllowUnknownArchiveEntrySize = False,
-                .DeterministicHash = New DeterministicHashOptions With {
-                    .IncludePayloadCopies = False,
-                    .IncludeFastHash = True,
-                    .MaterializedFileName = "deterministic-roundtrip.bin"
-                }
+                .AllowUnknownArchiveEntrySize = False
             }
         End Function
 

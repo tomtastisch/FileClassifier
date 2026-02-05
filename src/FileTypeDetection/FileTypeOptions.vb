@@ -13,7 +13,7 @@ Namespace FileTypeDetection
     ''' </summary>
     Public NotInheritable Class FileTypeOptions
         Private Shared ReadOnly _optionsLock As New Object()
-        Private Shared _currentOptions As FileTypeProjectOptions = FileTypeProjectOptions.DefaultOptions()
+        Private Shared _currentOptions As FileTypeDetectorOptions = FileTypeDetectorOptions.DefaultOptions()
 
         Private Sub New()
         End Sub
@@ -25,7 +25,7 @@ Namespace FileTypeDetection
         Public Shared Function LoadOptions(json As String) As Boolean
             If String.IsNullOrWhiteSpace(json) Then Return False
 
-            Dim defaults = FileTypeProjectOptions.DefaultOptions()
+            Dim defaults = FileTypeDetectorOptions.DefaultOptions()
             Dim headerOnlyNonZip = defaults.HeaderOnlyNonZip
             Dim maxBytes = defaults.MaxBytes
             Dim sniffBytes = defaults.SniffBytes
@@ -37,9 +37,6 @@ Namespace FileTypeDetection
             Dim maxZipNestedBytes = defaults.MaxZipNestedBytes
             Dim rejectArchiveLinks = defaults.RejectArchiveLinks
             Dim allowUnknownArchiveEntrySize = defaults.AllowUnknownArchiveEntrySize
-            Dim hashIncludePayloadCopies = defaults.DeterministicHash.IncludePayloadCopies
-            Dim hashIncludeFastHash = defaults.DeterministicHash.IncludeFastHash
-            Dim hashMaterializedFileName = defaults.DeterministicHash.MaterializedFileName
             Dim logger = defaults.Logger
 
             Try
@@ -62,32 +59,13 @@ Namespace FileTypeDetection
                             Case "maxzipnestedbytes" : maxZipNestedBytes = ParsePositiveLong(p.Value, maxZipNestedBytes, p.Name, logger)
                             Case "rejectarchivelinks" : rejectArchiveLinks = ParseBoolean(p.Value, rejectArchiveLinks, p.Name, logger)
                             Case "allowunknownarchiveentrysize" : allowUnknownArchiveEntrySize = ParseBoolean(p.Value, allowUnknownArchiveEntrySize, p.Name, logger)
-                            Case "deterministichash", "deterministichashoptions"
-                                TryParseDeterministicHashOptions(
-                                    p.Value,
-                                    hashIncludePayloadCopies,
-                                    hashIncludeFastHash,
-                                    hashMaterializedFileName,
-                                    logger)
-                            Case "deterministichashincludepayloadcopies"
-                                hashIncludePayloadCopies = ParseBoolean(p.Value, hashIncludePayloadCopies, p.Name, logger)
-                            Case "deterministichashincludefasthash"
-                                hashIncludeFastHash = ParseBoolean(p.Value, hashIncludeFastHash, p.Name, logger)
-                            Case "deterministichashmaterializedfilename"
-                                hashMaterializedFileName = ParseString(p.Value, hashMaterializedFileName, p.Name, logger)
                             Case Else
                                 LogGuard.Warn(logger, $"[Config] Unbekannter Schluessel '{p.Name}' ignoriert.")
                         End Select
                     Next
                 End Using
 
-                Dim nextHashOptions = New DeterministicHashOptions With {
-                    .IncludePayloadCopies = hashIncludePayloadCopies,
-                    .IncludeFastHash = hashIncludeFastHash,
-                    .MaterializedFileName = hashMaterializedFileName
-                }
-
-                Dim nextOptions = New FileTypeProjectOptions(headerOnlyNonZip) With {
+                Dim nextOptions = New FileTypeDetectorOptions(headerOnlyNonZip) With {
                     .MaxBytes = maxBytes,
                     .SniffBytes = sniffBytes,
                     .MaxZipEntries = maxZipEntries,
@@ -98,8 +76,7 @@ Namespace FileTypeDetection
                     .MaxZipNestedBytes = maxZipNestedBytes,
                     .RejectArchiveLinks = rejectArchiveLinks,
                     .AllowUnknownArchiveEntrySize = allowUnknownArchiveEntrySize,
-                    .Logger = logger,
-                    .DeterministicHash = nextHashOptions
+                    .Logger = logger
                 }
                 nextOptions.NormalizeInPlace()
                 SetSnapshot(nextOptions)
@@ -126,12 +103,7 @@ Namespace FileTypeDetection
                 {"maxZipNestingDepth", opt.MaxZipNestingDepth},
                 {"maxZipNestedBytes", opt.MaxZipNestedBytes},
                 {"rejectArchiveLinks", opt.RejectArchiveLinks},
-                {"allowUnknownArchiveEntrySize", opt.AllowUnknownArchiveEntrySize},
-                {"deterministicHash", New Dictionary(Of String, Object) From {
-                    {"includePayloadCopies", opt.DeterministicHash.IncludePayloadCopies},
-                    {"includeFastHash", opt.DeterministicHash.IncludeFastHash},
-                    {"materializedFileName", opt.DeterministicHash.MaterializedFileName}
-                }}
+                {"allowUnknownArchiveEntrySize", opt.AllowUnknownArchiveEntrySize}
             }
             Return JsonSerializer.Serialize(dto)
         End Function
@@ -147,13 +119,13 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Friend Shared Function GetSnapshot() As FileTypeProjectOptions
+        Friend Shared Function GetSnapshot() As FileTypeDetectorOptions
             SyncLock _optionsLock
                 Return Snapshot(_currentOptions)
             End SyncLock
         End Function
 
-        Friend Shared Sub SetSnapshot(opt As FileTypeProjectOptions)
+        Friend Shared Sub SetSnapshot(opt As FileTypeDetectorOptions)
             SyncLock _optionsLock
                 _currentOptions = Snapshot(opt)
             End SyncLock
@@ -199,42 +171,8 @@ Namespace FileTypeDetection
             Return fallback
         End Function
 
-        Private Shared Function ParseString(el As JsonElement, fallback As String, name As String, logger As Microsoft.Extensions.Logging.ILogger) As String
-            If el.ValueKind = JsonValueKind.String Then
-                Dim value = el.GetString()
-                If value IsNot Nothing Then Return value
-            End If
-            LogGuard.Warn(logger, $"[Config] Ungueltiger Wert fuer '{name}', fallback={fallback}.")
-            Return fallback
-        End Function
-
-        Private Shared Sub TryParseDeterministicHashOptions(
-            el As JsonElement,
-            ByRef includePayloadCopies As Boolean,
-            ByRef includeFastHash As Boolean,
-            ByRef materializedFileName As String,
-            logger As Microsoft.Extensions.Logging.ILogger)
-            If el.ValueKind <> JsonValueKind.Object Then
-                LogGuard.Warn(logger, "[Config] 'deterministicHash' muss ein JSON-Objekt sein.")
-                Return
-            End If
-
-            For Each p In el.EnumerateObject()
-                Select Case p.Name.ToLowerInvariant()
-                    Case "includepayloadcopies"
-                        includePayloadCopies = ParseBoolean(p.Value, includePayloadCopies, $"deterministicHash.{p.Name}", logger)
-                    Case "includefasthash"
-                        includeFastHash = ParseBoolean(p.Value, includeFastHash, $"deterministicHash.{p.Name}", logger)
-                    Case "materializedfilename"
-                        materializedFileName = ParseString(p.Value, materializedFileName, $"deterministicHash.{p.Name}", logger)
-                    Case Else
-                        LogGuard.Warn(logger, $"[Config] Unbekannter Schluessel 'deterministicHash.{p.Name}' ignoriert.")
-                End Select
-            Next
-        End Sub
-
-        Private Shared Function Snapshot(opt As FileTypeProjectOptions) As FileTypeProjectOptions
-            If opt Is Nothing Then Return FileTypeProjectOptions.DefaultOptions()
+        Private Shared Function Snapshot(opt As FileTypeDetectorOptions) As FileTypeDetectorOptions
+            If opt Is Nothing Then Return FileTypeDetectorOptions.DefaultOptions()
             Dim snap = opt.Clone()
             snap.NormalizeInPlace()
             Return snap

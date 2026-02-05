@@ -42,7 +42,7 @@ public sealed class ExtensionCheckUnitTests
     }
 
     [Fact]
-    public void DetectAndVerifyExtension_AcceptsArchiveAlias_ForArchiveContent()
+    public void DetectAndVerifyExtension_AcceptsArchiveAlias_ForZipContent()
     {
         var detector = new FileTypeDetector();
         var source = TestResources.Resolve("sample.zip");

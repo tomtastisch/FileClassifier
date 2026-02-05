@@ -1,10 +1,10 @@
 # Index - Property
 
 ## 1. Purpose
-Eigenschaftsbasierte Verifikation von Archiv-Limits, Options-Invarianten und Materializer-Grenzen.
+Eigenschaftsbasierte Verifikation von ZIP-Limits, Options-Invarianten und Materializer-Grenzen.
 
 ## 2. Inputs
-- generierte/grenzwertige Archiv-Payloads
+- generierte/grenzwertige ZIP-Payloads
 - deterministische numerische Optionswerte
 - deterministische Byte-Payload-Laengen
 
@@ -15,6 +15,6 @@ Eigenschaftsbasierte Verifikation von Archiv-Limits, Options-Invarianten und Mat
 - Limit-/Invarianz-Regressionen werden frueh erkannt.
 
 ## 5. Verification & Evidence
-- `ArchiveGatePropertyTests.cs`
+- `ZipGatePropertyTests.cs`
 - `FileTypeOptionsPropertyTests.cs`
 - `FileMaterializerPropertyTests.cs`

@@ -4,7 +4,7 @@ using System.IO.Compression;
 
 namespace FileTypeDetectionLib.Tests.Support;
 
-internal static class ArchiveEntryPayloadFactory
+internal static class ZipPayloadFactory
 {
     internal static byte[] CreateZipWithEntries(int entryCount, int entrySize)
     {

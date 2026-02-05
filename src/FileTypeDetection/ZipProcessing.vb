@@ -3,21 +3,22 @@ Option Explicit On
 
 Imports System
 Imports System.Collections.Generic
+Imports System.IO
 
 Namespace FileTypeDetection
 
     ''' <summary>
-    ''' Oeffentliche Archiv-Fassade fuer Validierung und sichere Extraktion.
+    ''' Oeffentliche ZIP-Fassade fuer Validierung und sichere Extraktion.
     ''' </summary>
-    Public NotInheritable Class ArchiveProcessing
+    Public NotInheritable Class ZipProcessing
         Private Sub New()
         End Sub
 
         ''' <summary>
-        ''' Prueft fail-closed, ob ein Dateipfad ein sicherer Archiv-Container ist.
+        ''' Prueft fail-closed, ob ein Dateipfad ein sicherer ZIP-Container ist.
         ''' </summary>
         Public Shared Function TryValidate(path As String) As Boolean
-            Return New FileTypeDetector().TryValidateArchive(path)
+            Return New FileTypeDetector().TryValidateZip(path)
         End Function
 
         ''' <summary>
@@ -29,14 +30,14 @@ Namespace FileTypeDetection
         End Function
 
         ''' <summary>
-        ''' Extrahiert eine Archivdatei sicher in Memory.
+        ''' Extrahiert eine ZIP-Datei sicher in Memory.
         ''' </summary>
         Public Shared Function ExtractToMemory(path As String, verifyBeforeExtract As Boolean) As IReadOnlyList(Of ZipExtractedEntry)
-            Return New FileTypeDetector().ExtractArchiveSafeToMemory(path, verifyBeforeExtract)
+            Return New FileTypeDetector().ExtractZipSafeToMemory(path, verifyBeforeExtract)
         End Function
 
         ''' <summary>
-        ''' Extrahiert Archiv-Bytes sicher in Memory.
+        ''' Extrahiert ZIP-Bytes sicher in Memory.
         ''' </summary>
         Public Shared Function TryExtractToMemory(data As Byte()) As IReadOnlyList(Of ZipExtractedEntry)
             Dim opt = FileTypeOptions.GetSnapshot()
@@ -44,9 +45,17 @@ Namespace FileTypeDetection
 
             If data Is Nothing OrElse data.Length = 0 Then Return emptyResult
 
-            Dim entries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
-            If Not ArchiveEntryCollector.TryCollectFromBytes(data, opt, entries) Then Return emptyResult
-            Return entries
+            Dim descriptor As ArchiveDescriptor = Nothing
+            If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then Return emptyResult
+            If Not ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor) Then Return emptyResult
+
+            Try
+                Using ms As New MemoryStream(data, writable:=False)
+                    Return ArchiveExtractor.TryExtractArchiveStreamToMemory(ms, opt, descriptor)
+                End Using
+            Catch
+                Return emptyResult
+            End Try
         End Function
     End Class
 

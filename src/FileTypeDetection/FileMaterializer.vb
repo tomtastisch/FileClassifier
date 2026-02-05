@@ -49,8 +49,8 @@ Namespace FileTypeDetection
                     Return MaterializeArchiveBytes(data, destinationFull, overwrite, opt, descriptor)
                 End If
 
-                If ArchiveSignaturePayloadGuard.IsArchiveSignatureCandidate(data) Then
-                    LogGuard.Warn(opt.Logger, "[Materialize] Archiv kann nicht gelesen werden.")
+                If ZipPayloadGuard.IsZipByMagic(data) Then
+                    LogGuard.Warn(opt.Logger, "[Materialize] ZIP kann nicht gelesen werden.")
                     Return False
                 End If
             End If
@@ -58,7 +58,7 @@ Namespace FileTypeDetection
             Return MaterializeRawBytes(data, destinationFull, overwrite, opt)
         End Function
 
-        Private Shared Function MaterializeRawBytes(data As Byte(), destinationFull As String, overwrite As Boolean, opt As FileTypeProjectOptions) As Boolean
+        Private Shared Function MaterializeRawBytes(data As Byte(), destinationFull As String, overwrite As Boolean, opt As FileTypeDetectorOptions) As Boolean
             Try
                 If Not DestinationPathGuard.PrepareMaterializationTarget(destinationFull, overwrite, opt) Then Return False
 
@@ -77,7 +77,7 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Private Shared Function MaterializeArchiveBytes(data As Byte(), destinationFull As String, overwrite As Boolean, opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor) As Boolean
+        Private Shared Function MaterializeArchiveBytes(data As Byte(), destinationFull As String, overwrite As Boolean, opt As FileTypeDetectorOptions, descriptor As ArchiveDescriptor) As Boolean
             Try
                 If Not DestinationPathGuard.PrepareMaterializationTarget(destinationFull, overwrite, opt) Then Return False
 

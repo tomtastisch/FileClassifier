@@ -46,7 +46,7 @@ public sealed class FileMaterializerUnitTests
     }
 
     [Fact]
-    public void Persist_UsesSecureExtract_ForArchivePayload_WhenEnabled()
+    public void Persist_UsesSecureExtract_ForZipPayload_WhenEnabled()
     {
         using var tempRoot = TestTempPaths.CreateScope("ftd-materialize-test");
         var destination = Path.Combine(tempRoot.RootPath, "unzipped");
@@ -59,11 +59,11 @@ public sealed class FileMaterializerUnitTests
     }
 
     [Fact]
-    public void Persist_FailsClosed_ForUnsafeArchive_WhenSecureExtractEnabled()
+    public void Persist_FailsClosed_ForUnsafeZip_WhenSecureExtractEnabled()
     {
         using var tempRoot = TestTempPaths.CreateScope("ftd-materialize-test");
         var destination = Path.Combine(tempRoot.RootPath, "unzipped");
-        var traversalZip = ArchiveEntryPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8);
+        var traversalZip = ZipPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8);
 
         var ok = FileMaterializer.Persist(traversalZip, destination, overwrite: false, secureExtract: true);
 
@@ -114,7 +114,7 @@ public sealed class FileMaterializerUnitTests
     }
 
     [Fact]
-    public void Persist_WritesRawBytes_WhenSecureExtractEnabledButPayloadIsNotArchive()
+    public void Persist_WritesRawBytes_WhenSecureExtractEnabledButPayloadIsNotZip()
     {
         using var tempRoot = TestTempPaths.CreateScope("ftd-materialize-test");
         var destination = Path.Combine(tempRoot.RootPath, "raw.bin");
@@ -127,7 +127,7 @@ public sealed class FileMaterializerUnitTests
     }
 
     [Fact]
-    public void Persist_FailsClosed_ForMalformedArchiveHeader_WhenSecureExtractEnabled()
+    public void Persist_FailsClosed_ForMalformedZipHeader_WhenSecureExtractEnabled()
     {
         using var tempRoot = TestTempPaths.CreateScope("ftd-materialize-test");
         var destination = Path.Combine(tempRoot.RootPath, "unzipped");

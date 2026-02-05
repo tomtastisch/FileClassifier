@@ -4,7 +4,7 @@
 Benchmark-Szenarien fuer relative Laufzeitentwicklung.
 
 ## 2. Inputs
-- repraesentative Header-/Archivfaelle
+- repraesentative Header-/ZIP-Faelle
 
 ## 3. Outputs
 - trendbasierte Laufzeitbeobachtung

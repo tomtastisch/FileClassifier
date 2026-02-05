@@ -4,25 +4,24 @@
 Deterministische Konfiguration der oeffentlichen API inklusive Sicherheitsbaseline.
 
 ## 2. Dateien
-- [FileTypeProjectOptions.vb](./FileTypeProjectOptions.vb)
-- [FileTypeProjectBaseline.vb](./FileTypeProjectBaseline.vb)
+- [FileTypeDetectorOptions.vb](./FileTypeDetectorOptions.vb)
+- [FileTypeSecurityBaseline.vb](./FileTypeSecurityBaseline.vb)
 
 ## 3. Optionen (wann relevant)
 | Option | Wirkung | Typischer Trigger |
 |---|---|---|
 | `MaxBytes` | maximale Dateigroesse fuer Detect/Read | Upload-Limits, DoS-Schutz |
 | `SniffBytes` | Header-Laenge fuer Magic-Pruefung | Dateiformate mit spaetem Marker |
-| `MaxZipEntries` | Begrenzung Entry-Anzahl | Archiv-Bomb/Many-entry Schutz |
-| `MaxZipTotalUncompressedBytes` | Gesamtgrenze Archiv | Speicher-/CPU-Schutz |
+| `MaxZipEntries` | Begrenzung Entry-Anzahl | ZIP-Bomb/Many-entry Schutz |
+| `MaxZipTotalUncompressedBytes` | Gesamtgrenze ZIP | Speicher-/CPU-Schutz |
 | `MaxZipEntryUncompressedBytes` | pro-Entry-Grenze | grosse Einzeldateien abfangen |
 | `MaxZipCompressionRatio` | Kompressionsratio-Limit | stark komprimierte Bomben |
-| `MaxZipNestingDepth` | maximale Archiv-Verschachtelung | rekursive Angriffe begrenzen |
-| `MaxZipNestedBytes` | Nested-Archiv Byte-Limit | Memory-Schutz bei Nested-Content |
-| `HeaderOnlyNonZip` | Header-only fuer Nicht-Archiv-Typen (Property-Name historisch) | konsistente Erkennungsstrategie |
-| `DeterministicHash` | Default-Policy fuer Hash-Evidence (`IncludeFastHash`, `IncludePayloadCopies`, `MaterializedFileName`) | reproduzierbare h1-h4 Nachweise |
+| `MaxZipNestingDepth` | maximale ZIP-Verschachtelung | rekursive Angriffe begrenzen |
+| `MaxZipNestedBytes` | Nested-ZIP Byte-Limit | Memory-Schutz bei Nested-Content |
+| `HeaderOnlyNonZip` | Header-only fuer Nicht-ZIP-Typen | konsistente Erkennungsstrategie |
 
 ## 4. Baseline-Strategie
-- `FileTypeProjectBaseline.ApplyDeterministicDefaults()` setzt konservative Werte fuer produktive Umgebungen.
+- `FileTypeSecurityBaseline.ApplyDeterministicDefaults()` setzt konservative Werte fuer produktive Umgebungen.
 - `FileTypeOptions.LoadOptions(json)` setzt Optionen via JSON (partiell, default-basiert).
 
 ## 5. Diagramm: Konfigurationsfluss
@@ -34,7 +33,7 @@ flowchart LR
 ```
 
 ## 6. Testverknuepfung
-- [FileTypeProjectBaselineUnitTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeProjectBaselineUnitTests.cs)
+- [FileTypeSecurityBaselineUnitTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeSecurityBaselineUnitTests.cs)
 
 ## 7. Siehe auch
 - [Modulindex](../README.md)

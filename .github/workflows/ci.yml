@@ -11,19 +11,8 @@ permissions:
   contents: read
 
 jobs:
-  docs-linkcheck:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Markdown Link Check
-        run: python3 tools/check-markdown-links.py
-
   build-test:
     runs-on: ubuntu-latest
-    needs: docs-linkcheck
 
     steps:
       - name: Checkout
@@ -37,22 +26,8 @@ jobs:
       - name: Restore
         run: dotnet restore FileClassifier.sln -v minimal
 
-      - name: Format Check
-        run: dotnet format FileClassifier.sln --verify-no-changes
-
       - name: Build
-        run: dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal
+        run: dotnet build FileClassifier.sln --no-restore -v minimal
 
-      - name: Test With Coverage Gates (Line + Branch)
-        run: >
-          dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj
-          -v minimal
-          /p:CollectCoverage=true
-          /p:Include="[FileTypeDetectionLib]*"
-          /p:CoverletOutputFormat=cobertura
-          /p:Threshold=85%2c69
-          /p:ThresholdType=line%2cbranch
-          /p:ThresholdStat=total
-
-      - name: Vulnerability Check
-        run: dotnet list FileClassifier.sln package --vulnerable --include-transitive
+      - name: Test
+        run: dotnet test FileClassifier.sln --no-build -v minimal

@@ -27,16 +27,16 @@ Namespace FileTypeDetection
         Private Const ReasonExtensionMismatch As String = "ExtensionMismatch"
         Private Const ReasonHeaderUnknown As String = "HeaderUnknown"
         Private Const ReasonHeaderMatch As String = "HeaderMatch"
-        Private Const ReasonArchiveGateFailed As String = "ArchiveGateFailed"
-        Private Const ReasonArchiveStructuredRefined As String = "ArchiveStructuredRefined"
-        Private Const ReasonArchiveRefined As String = "ArchiveRefined"
-        Private Const ReasonArchiveGeneric As String = "ArchiveGeneric"
+        Private Const ReasonZipGateFailed As String = "ZipGateFailed"
+        Private Const ReasonZipStructuredRefined As String = "ZipStructuredRefined"
+        Private Const ReasonZipRefined As String = "ZipRefined"
+        Private Const ReasonZipGeneric As String = "ZipGeneric"
 
         ''' <summary>
         ''' Setzt globale Default-Optionen als Snapshot.
         ''' </summary>
         ''' <param name="opt">Quelloptionen fuer den globalen Snapshot.</param>
-        Friend Shared Sub SetDefaultOptions(opt As FileTypeProjectOptions)
+        Friend Shared Sub SetDefaultOptions(opt As FileTypeDetectorOptions)
             FileTypeOptions.SetSnapshot(opt)
         End Sub
 
@@ -44,7 +44,7 @@ Namespace FileTypeDetection
         ''' Liefert einen Snapshot der aktuellen Default-Optionen.
         ''' </summary>
         ''' <returns>Unabhaengige Kopie der globalen Optionen.</returns>
-        Friend Shared Function GetDefaultOptions() As FileTypeProjectOptions
+        Friend Shared Function GetDefaultOptions() As FileTypeDetectorOptions
             Return FileTypeOptions.GetSnapshot()
         End Function
 
@@ -54,8 +54,8 @@ Namespace FileTypeDetection
         ''' </summary>
         ''' <param name="path">Pfad zur JSON-Konfigurationsdatei.</param>
         ''' <returns>Geparste Optionen oder Defaults.</returns>
-        Friend Shared Function LoadOptions(path As String) As FileTypeProjectOptions
-            Dim defaults = FileTypeProjectOptions.DefaultOptions()
+        Friend Shared Function LoadOptions(path As String) As FileTypeDetectorOptions
+            Dim defaults = FileTypeDetectorOptions.DefaultOptions()
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(defaults.Logger, "[Config] Datei nicht gefunden, Defaults.")
                 Return defaults
@@ -175,7 +175,7 @@ Namespace FileTypeDetection
         ''' <summary>
         ''' Prueft, ob eine Datei ein sicherer Archiv-Container ist (inkl. ZIP).
         ''' </summary>
-        Public Function TryValidateArchive(path As String) As Boolean
+        Public Function TryValidateZip(path As String) As Boolean
             Dim opt = GetDefaultOptions()
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then Return False
 
@@ -197,7 +197,7 @@ Namespace FileTypeDetection
             Return DetectPathCoreWithTrace(path, opt, trace)
         End Function
 
-        Private Function DetectPathCoreWithTrace(path As String, opt As FileTypeProjectOptions, ByRef trace As DetectionTrace) As FileType
+        Private Function DetectPathCoreWithTrace(path As String, opt As FileTypeDetectorOptions, ByRef trace As DetectionTrace) As FileType
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(opt.Logger, "[Detect] Datei nicht gefunden.")
                 trace.ReasonCode = ReasonFileNotFound
@@ -248,51 +248,51 @@ Namespace FileTypeDetection
         End Function
 
         ''' <summary>
-        ''' Entpackt ein Archiv deterministisch und fail-closed in ein neues Zielverzeichnis.
+        ''' Entpackt ein ZIP deterministisch und fail-closed in ein neues Zielverzeichnis.
         ''' Sicherheitsregeln (Traversal/Limits/Nesting) sind immer aktiv.
         ''' </summary>
-        ''' <param name="path">Pfad zur Archivdatei.</param>
+        ''' <param name="path">Pfad zur ZIP-Datei.</param>
         ''' <param name="destinationDirectory">Leeres, noch nicht existierendes Zielverzeichnis.</param>
         ''' <param name="verifyBeforeExtract">Optionale Vorpruefung ueber Detect(path).</param>
         ''' <returns>True bei erfolgreichem, atomarem Entpacken.</returns>
-        Public Function ExtractArchiveSafe(path As String, destinationDirectory As String, verifyBeforeExtract As Boolean) As Boolean
+        Public Function ExtractZipSafe(path As String, destinationDirectory As String, verifyBeforeExtract As Boolean) As Boolean
             Dim opt = GetDefaultOptions()
-            If Not CanExtractArchivePath(path, verifyBeforeExtract, opt) Then Return False
+            If Not CanExtractZipPath(path, verifyBeforeExtract, opt) Then Return False
 
             Try
                 Dim payload = ReadFileSafe(path)
                 If payload.Length = 0 Then Return False
                 Return FileMaterializer.Persist(payload, destinationDirectory, overwrite:=False, secureExtract:=True)
             Catch ex As Exception
-                LogGuard.Error(opt.Logger, "[ArchiveExtract] Ausnahme, fail-closed.", ex)
+                LogGuard.Error(opt.Logger, "[ZipExtract] Ausnahme, fail-closed.", ex)
                 Return False
             End Try
         End Function
 
         ''' <summary>
-        ''' Extrahiert Archiv-Inhalte sicher in Memory und gibt sie als wiederverwendbare Objekte zurueck.
+        ''' Extrahiert ZIP-Inhalte sicher in Memory und gibt sie als wiederverwendbare Objekte zurueck.
         ''' Es erfolgt keine persistente Speicherung; Fehler liefern fail-closed eine leere Liste.
         ''' </summary>
-        ''' <param name="path">Pfad zur Archivdatei.</param>
+        ''' <param name="path">Pfad zur ZIP-Datei.</param>
         ''' <param name="verifyBeforeExtract">Optionale Vorpruefung ueber Detect(path).</param>
         ''' <returns>Read-only Liste extrahierter Eintraege oder leer bei Fehler.</returns>
-        Public Function ExtractArchiveSafeToMemory(path As String, verifyBeforeExtract As Boolean) As IReadOnlyList(Of ZipExtractedEntry)
+        Public Function ExtractZipSafeToMemory(path As String, verifyBeforeExtract As Boolean) As IReadOnlyList(Of ZipExtractedEntry)
             Dim opt = GetDefaultOptions()
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
 
-            If Not CanExtractArchivePath(path, verifyBeforeExtract, opt) Then Return emptyResult
+            If Not CanExtractZipPath(path, verifyBeforeExtract, opt) Then Return emptyResult
 
             Try
                 Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
                     Return ArchiveExtractor.TryExtractArchiveStreamToMemory(fs, opt)
                 End Using
             Catch ex As Exception
-                LogGuard.Error(opt.Logger, "[ArchiveExtract] Ausnahme, fail-closed.", ex)
+                LogGuard.Error(opt.Logger, "[ZipExtract] Ausnahme, fail-closed.", ex)
                 Return emptyResult
             End Try
         End Function
 
-        Private Function DetectInternalBytes(data As Byte(), opt As FileTypeProjectOptions) As FileType
+        Private Function DetectInternalBytes(data As Byte(), opt As FileTypeDetectorOptions) As FileType
             If data Is Nothing OrElse data.Length = 0 Then Return UnknownType()
             If CLng(data.Length) > opt.MaxBytes Then
                 LogGuard.Warn(opt.Logger, $"[Detect] Daten zu gross ({data.Length} > {opt.MaxBytes}).")
@@ -313,62 +313,9 @@ Namespace FileTypeDetection
         ''' </summary>
         Private Function ResolveByHeaderForPath(
             header As Byte(),
-            opt As FileTypeProjectOptions,
+            opt As FileTypeDetectorOptions,
             ByRef trace As DetectionTrace,
             fs As FileStream
-        ) As FileType
-            Return ResolveByHeaderCommon(
-                header,
-                opt,
-                trace,
-                tryDescribe:=Function()
-                                 Dim descriptor As ArchiveDescriptor = Nothing
-                                 If Not ArchiveTypeResolver.TryDescribeStream(fs, opt, descriptor) Then Return Nothing
-                                 Return descriptor
-                             End Function,
-                tryValidate:=Function(descriptor)
-                                 Return ValidateArchiveStreamRaw(fs, opt, descriptor)
-                             End Function,
-                tryRefine:=Function()
-                               Return OpenXmlRefiner.TryRefineStream(fs)
-                           End Function)
-        End Function
-
-        ''' <summary>
-        ''' Entscheidungslogik fuer die Byte-Variante.
-        ''' </summary>
-        Private Function ResolveByHeaderForBytes(
-            header As Byte(),
-            opt As FileTypeProjectOptions,
-            ByRef trace As DetectionTrace,
-            data As Byte()
-        ) As FileType
-            Return ResolveByHeaderCommon(
-                header,
-                opt,
-                trace,
-                tryDescribe:=Function()
-                                 Dim descriptor As ArchiveDescriptor = Nothing
-                                 If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then Return Nothing
-                                 Return descriptor
-                             End Function,
-                tryValidate:=Function(descriptor)
-                                 Return ValidateArchiveBytesRaw(data, opt, descriptor)
-                             End Function,
-                tryRefine:=Function()
-                               Using ms = CreateReadOnlyMemoryStream(data)
-                                   Return OpenXmlRefiner.TryRefineStream(ms)
-                               End Using
-                           End Function)
-        End Function
-
-        Private Function ResolveByHeaderCommon(
-            header As Byte(),
-            opt As FileTypeProjectOptions,
-            ByRef trace As DetectionTrace,
-            tryDescribe As Func(Of ArchiveDescriptor),
-            tryValidate As Func(Of ArchiveDescriptor, Boolean),
-            tryRefine As Func(Of FileType)
         ) As FileType
             If header Is Nothing OrElse header.Length = 0 Then
                 trace.ReasonCode = ReasonHeaderUnknown
@@ -381,82 +328,123 @@ Namespace FileTypeDetection
                 Return FileTypeRegistry.Resolve(magicKind)
             End If
 
-            Dim descriptor As ArchiveDescriptor = Nothing
-            If magicKind = FileKind.Zip Then
-                descriptor = ArchiveDescriptor.ForContainerType(ArchiveContainerType.Zip)
-            Else
-                descriptor = tryDescribe()
-                If descriptor Is Nothing Then
+            If magicKind <> FileKind.Zip Then
+                Dim descriptor As ArchiveDescriptor = Nothing
+                If Not ArchiveTypeResolver.TryDescribeStream(fs, opt, descriptor) Then
                     trace.ReasonCode = ReasonHeaderUnknown
                     Return UnknownType()
                 End If
-            End If
 
-            trace.UsedZipContentCheck = True
-            If Not tryValidate(descriptor) Then
-                LogGuard.Warn(opt.Logger, "[Detect] Archive-Gate verletzt.")
-                trace.ReasonCode = ReasonArchiveGateFailed
-                Return UnknownType()
-            End If
-
-            Return ResolveAfterArchiveGate(magicKind, opt, trace, tryRefine)
-        End Function
-
-        Private Function ValidateArchiveStreamRaw(
-            fs As FileStream,
-            opt As FileTypeProjectOptions,
-            descriptor As ArchiveDescriptor
-        ) As Boolean
-            If fs Is Nothing OrElse Not fs.CanRead Then Return False
-            If fs.CanSeek Then fs.Position = 0
-            Return ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, descriptor, depth:=0)
-        End Function
-
-        Private Function ValidateArchiveBytesRaw(
-            data As Byte(),
-            opt As FileTypeProjectOptions,
-            descriptor As ArchiveDescriptor
-        ) As Boolean
-            Return ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor)
-        End Function
-
-        Private Function ResolveAfterArchiveGate(
-            magicKind As FileKind,
-            opt As FileTypeProjectOptions,
-            ByRef trace As DetectionTrace,
-            tryRefine As Func(Of FileType)
-        ) As FileType
-            If magicKind <> FileKind.Zip Then
-                trace.ReasonCode = ReasonArchiveGeneric
+                If Not TryValidateArchiveStream(fs, opt, descriptor, trace) Then Return UnknownType()
+                trace.ReasonCode = ReasonZipGeneric
                 Return FileTypeRegistry.Resolve(FileKind.Zip)
             End If
 
-            Dim refined = tryRefine()
-            Return FinalizeArchiveDetection(refined, opt, trace)
+            Dim zipDescriptor = ArchiveDescriptor.ForContainerType(ArchiveContainerType.Zip)
+            If Not TryValidateArchiveStream(fs, opt, zipDescriptor, trace) Then Return UnknownType()
+
+            Dim refined = OpenXmlRefiner.TryRefineStream(fs)
+            Return FinalizeZipDetection(refined, opt, trace)
         End Function
 
-        Private Function FinalizeArchiveDetection(refined As FileType, opt As FileTypeProjectOptions, ByRef trace As DetectionTrace) As FileType
+        ''' <summary>
+        ''' Entscheidungslogik fuer die Byte-Variante.
+        ''' </summary>
+        Private Function ResolveByHeaderForBytes(
+            header As Byte(),
+            opt As FileTypeDetectorOptions,
+            ByRef trace As DetectionTrace,
+            data As Byte()
+        ) As FileType
+            If header Is Nothing OrElse header.Length = 0 Then
+                trace.ReasonCode = ReasonHeaderUnknown
+                Return UnknownType()
+            End If
+
+            Dim magicKind = FileTypeRegistry.DetectByMagic(header)
+            If magicKind <> FileKind.Unknown AndAlso magicKind <> FileKind.Zip Then
+                trace.ReasonCode = ReasonHeaderMatch
+                Return FileTypeRegistry.Resolve(magicKind)
+            End If
+
+            If magicKind <> FileKind.Zip Then
+                Dim descriptor As ArchiveDescriptor = Nothing
+                If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then
+                    trace.ReasonCode = ReasonHeaderUnknown
+                    Return UnknownType()
+                End If
+
+                If Not TryValidateArchiveBytes(data, opt, descriptor, trace) Then Return UnknownType()
+                trace.ReasonCode = ReasonZipGeneric
+                Return FileTypeRegistry.Resolve(FileKind.Zip)
+            End If
+
+            Dim zipDescriptor = ArchiveDescriptor.ForContainerType(ArchiveContainerType.Zip)
+            If Not TryValidateArchiveBytes(data, opt, zipDescriptor, trace) Then Return UnknownType()
+
+            Dim refined As FileType
+            Using ms = CreateReadOnlyMemoryStream(data)
+                refined = OpenXmlRefiner.TryRefineStream(ms)
+            End Using
+            Return FinalizeZipDetection(refined, opt, trace)
+        End Function
+
+        Private Function TryValidateArchiveStream(
+            fs As FileStream,
+            opt As FileTypeDetectorOptions,
+            descriptor As ArchiveDescriptor,
+            ByRef trace As DetectionTrace
+        ) As Boolean
+            trace.UsedZipContentCheck = True
+            If fs Is Nothing OrElse Not fs.CanRead Then
+                trace.ReasonCode = ReasonZipGateFailed
+                Return False
+            End If
+
+            If fs.CanSeek Then fs.Position = 0
+            If ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, descriptor, depth:=0) Then Return True
+
+            LogGuard.Warn(opt.Logger, "[Detect] Archive-Gate verletzt.")
+            trace.ReasonCode = ReasonZipGateFailed
+            Return False
+        End Function
+
+        Private Function TryValidateArchiveBytes(
+            data As Byte(),
+            opt As FileTypeDetectorOptions,
+            descriptor As ArchiveDescriptor,
+            ByRef trace As DetectionTrace
+        ) As Boolean
+            trace.UsedZipContentCheck = True
+            If ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor) Then Return True
+
+            LogGuard.Warn(opt.Logger, "[Detect] Archive-Gate verletzt.")
+            trace.ReasonCode = ReasonZipGateFailed
+            Return False
+        End Function
+
+        Private Function FinalizeZipDetection(refined As FileType, opt As FileTypeDetectorOptions, ByRef trace As DetectionTrace) As FileType
             If refined.Kind <> FileKind.Unknown Then
                 WarnIfNoDirectContentDetection(refined.Kind, opt)
                 trace.UsedStructuredRefinement = (refined.Kind = FileKind.Docx OrElse refined.Kind = FileKind.Xlsx OrElse refined.Kind = FileKind.Pptx)
-                trace.ReasonCode = If(trace.UsedStructuredRefinement, ReasonArchiveStructuredRefined, ReasonArchiveRefined)
+                trace.ReasonCode = If(trace.UsedStructuredRefinement, ReasonZipStructuredRefined, ReasonZipRefined)
                 Return refined
             End If
 
-            trace.ReasonCode = ReasonArchiveGeneric
+            trace.ReasonCode = ReasonZipGeneric
             Return FileTypeRegistry.Resolve(FileKind.Zip)
         End Function
 
-        Private Function CanExtractArchivePath(path As String, verifyBeforeExtract As Boolean, opt As FileTypeProjectOptions) As Boolean
+        Private Function CanExtractZipPath(path As String, verifyBeforeExtract As Boolean, opt As FileTypeDetectorOptions) As Boolean
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
-                LogGuard.Warn(opt.Logger, "[ArchiveExtract] Quelldatei fehlt.")
+                LogGuard.Warn(opt.Logger, "[ZipExtract] Quelldatei fehlt.")
                 Return False
             End If
 
             If verifyBeforeExtract Then
                 Dim detected = Detect(path)
-                If Not IsArchiveContainerKind(detected.Kind) Then
-                    LogGuard.Warn(opt.Logger, $"[ArchiveExtract] Vorpruefung fehlgeschlagen ({detected.Kind}).")
+                If Not IsZipContainerKind(detected.Kind) Then
+                    LogGuard.Warn(opt.Logger, $"[ZipExtract] Vorpruefung fehlgeschlagen ({detected.Kind}).")
                     Return False
                 End If
             End If
@@ -470,14 +458,14 @@ Namespace FileTypeDetection
             Return UnknownType()
         End Function
 
-        Private Shared Function IsArchiveContainerKind(kind As FileKind) As Boolean
+        Private Shared Function IsZipContainerKind(kind As FileKind) As Boolean
             Return kind = FileKind.Zip OrElse
                 kind = FileKind.Docx OrElse
                 kind = FileKind.Xlsx OrElse
                 kind = FileKind.Pptx
         End Function
 
-        Private Shared Sub WarnIfNoDirectContentDetection(kind As FileKind, opt As FileTypeProjectOptions)
+        Private Shared Sub WarnIfNoDirectContentDetection(kind As FileKind, opt As FileTypeDetectorOptions)
             If kind = FileKind.Unknown Then Return
             If FileTypeRegistry.HasDirectContentDetection(kind) Then Return
             LogGuard.Warn(opt.Logger, $"[Detect] Keine direkte Content-Erkennung fuer Typ '{kind}'. Ergebnis stammt aus Fallback/Refinement.")

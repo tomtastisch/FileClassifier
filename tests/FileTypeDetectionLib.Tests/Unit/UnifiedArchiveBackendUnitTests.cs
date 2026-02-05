@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,81 +10,45 @@ namespace FileTypeDetectionLib.Tests.Unit;
 
 public sealed class UnifiedArchiveBackendUnitTests
 {
-    public static IEnumerable<object[]> GeneratedArchivePayloadCases()
+    [Fact]
+    public void Detect_ReturnsZip_ForTarPayload()
     {
-        yield return new object[]
-        {
-            "tar",
-            ArchivePayloadFactory.CreateTarWithSingleEntry("inner/note.txt", "hello"),
-            "inner/note.txt",
-            "hello"
-        };
-
-        yield return new object[]
-        {
-            "tar.gz",
-            ArchivePayloadFactory.CreateTarGzWithSingleEntry("inner/note.txt", "hello"),
-            "inner/note.txt",
-            "hello"
-        };
-    }
-
-    [Theory]
-    [MemberData(nameof(GeneratedArchivePayloadCases))]
-    public void Detect_ReturnsArchive_ForGeneratedPayloads(string archiveType, byte[] payload, string expectedPath, string expectedContent)
-    {
-        var detected = new FileTypeDetector().Detect(payload);
+        var tar = ArchivePayloadFactory.CreateTarWithSingleEntry("note.txt", "hello");
+        var detected = new FileTypeDetector().Detect(tar);
         Assert.Equal(FileKind.Zip, detected.Kind);
-        Assert.False(string.IsNullOrWhiteSpace(archiveType));
-        Assert.False(string.IsNullOrWhiteSpace(expectedPath));
-        Assert.False(string.IsNullOrWhiteSpace(expectedContent));
     }
 
-    [Theory]
-    [MemberData(nameof(GeneratedArchivePayloadCases))]
-    public void ArchiveProcessing_TryExtractToMemory_ReadsGeneratedInnerEntries(string archiveType, byte[] payload, string expectedPath, string expectedContent)
+    [Fact]
+    public void Detect_ReturnsZip_ForTarGzPayload()
     {
-        var entries = ArchiveProcessing.TryExtractToMemory(payload);
+        var tarGz = ArchivePayloadFactory.CreateTarGzWithSingleEntry("note.txt", "hello");
+        var detected = new FileTypeDetector().Detect(tarGz);
+        Assert.Equal(FileKind.Zip, detected.Kind);
+    }
+
+    [Fact]
+    public void ZipProcessing_TryExtractToMemory_ReadsTarGzInnerEntries()
+    {
+        var tarGz = ArchivePayloadFactory.CreateTarGzWithSingleEntry("inner/note.txt", "hello");
+        var entries = ZipProcessing.TryExtractToMemory(tarGz);
 
         Assert.NotNull(entries);
         Assert.Single(entries);
-        Assert.Equal(expectedPath, entries[0].RelativePath);
-        Assert.Equal(expectedContent, Encoding.UTF8.GetString(entries[0].Content.ToArray()));
-        Assert.False(string.IsNullOrWhiteSpace(archiveType));
+        Assert.Equal("inner/note.txt", entries[0].RelativePath);
+        Assert.Equal("hello", Encoding.UTF8.GetString(entries[0].Content.ToArray()));
     }
 
-    [Theory]
-    [MemberData(nameof(GeneratedArchivePayloadCases))]
-    public void ArchiveEntryCollector_TryCollectFromBytes_MatchesArchiveProcessingFacade(string archiveType, byte[] payload, string expectedPath, string expectedContent)
-    {
-        var options = FileTypeOptions.GetSnapshot();
-        IReadOnlyList<ZipExtractedEntry> collected = Array.Empty<ZipExtractedEntry>();
-
-        var ok = ArchiveEntryCollector.TryCollectFromBytes(payload, options, ref collected);
-        var facade = ArchiveProcessing.TryExtractToMemory(payload);
-
-        Assert.True(ok);
-        Assert.Equal(facade.Count, collected.Count);
-        Assert.Equal(expectedPath, facade[0].RelativePath);
-        Assert.Equal(expectedPath, collected[0].RelativePath);
-        Assert.Equal(expectedContent, Encoding.UTF8.GetString(collected[0].Content.ToArray()));
-        Assert.Equal(facade[0].Content.ToArray(), collected[0].Content.ToArray());
-        Assert.False(string.IsNullOrWhiteSpace(archiveType));
-    }
-
-    [Theory]
-    [MemberData(nameof(GeneratedArchivePayloadCases))]
-    public void FileMaterializer_Persist_ExtractsGeneratedArchive_WhenSecureExtractEnabled(string archiveType, byte[] payload, string expectedPath, string expectedContent)
+    [Fact]
+    public void FileMaterializer_Persist_ExtractsTarGz_WhenSecureExtractEnabled()
     {
         using var tempRoot = TestTempPaths.CreateScope("ftd-unified-archive");
         var destination = Path.Combine(tempRoot.RootPath, "out");
+        var tarGz = ArchivePayloadFactory.CreateTarGzWithSingleEntry("inner/note.txt", "hello");
 
-        var ok = FileMaterializer.Persist(payload, destination, overwrite: false, secureExtract: true);
-        var expectedAbsolutePath = Path.Combine(destination, expectedPath.Replace('/', Path.DirectorySeparatorChar));
+        var ok = FileMaterializer.Persist(tarGz, destination, overwrite: false, secureExtract: true);
         Assert.True(ok);
-        Assert.True(File.Exists(expectedAbsolutePath));
-        Assert.Equal(expectedContent, File.ReadAllText(expectedAbsolutePath));
-        Assert.False(string.IsNullOrWhiteSpace(archiveType));
+        Assert.True(File.Exists(Path.Combine(destination, "inner", "note.txt")));
+        Assert.Equal("hello", File.ReadAllText(Path.Combine(destination, "inner", "note.txt")));
     }
 
     [Fact]

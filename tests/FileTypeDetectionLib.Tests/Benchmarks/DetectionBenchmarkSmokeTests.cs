@@ -11,11 +11,11 @@ public sealed class DetectionBenchmarkSmokeTests
 {
     [Fact]
     [Trait("Category", "Benchmark")]
-    public void Detect_Logs_HeaderOnly_Vs_ArchiveHeavy_Duration()
+    public void Detect_Logs_HeaderOnly_Vs_ZipHeavy_Duration()
     {
         var detector = new FileTypeDetector();
         var pdf = File.ReadAllBytes(TestResources.Resolve("sample.pdf"));
-        var archivePayload = File.ReadAllBytes(TestResources.Resolve("sample.zip"));
+        var zip = File.ReadAllBytes(TestResources.Resolve("sample.zip"));
 
         const int iterations = 200;
 
@@ -30,22 +30,22 @@ public sealed class DetectionBenchmarkSmokeTests
         }
         pdfSw.Stop();
 
-        var archiveSw = Stopwatch.StartNew();
+        var zipSw = Stopwatch.StartNew();
         for (var i = 0; i < iterations; i++)
         {
-            var result = detector.Detect(archivePayload);
+            var result = detector.Detect(zip);
             if (result.Kind != FileKind.Zip)
             {
-                throw new InvalidOperationException($"Unexpected kind for archive benchmark run: {result.Kind}");
+                throw new InvalidOperationException($"Unexpected kind for zip benchmark run: {result.Kind}");
             }
         }
-        archiveSw.Stop();
+        zipSw.Stop();
 
         // Dokumentationszweck: reproduzierbare Messpunkte ohne harte Timing-Schwelle.
-        var benchmarkLine = $"benchmark_detect_ms: pdf={pdfSw.ElapsedMilliseconds}, archive={archiveSw.ElapsedMilliseconds}, iterations={iterations}";
+        var benchmarkLine = $"benchmark_detect_ms: pdf={pdfSw.ElapsedMilliseconds}, zip={zipSw.ElapsedMilliseconds}, iterations={iterations}";
         File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "benchmark_detect_ms.txt"), benchmarkLine);
 
         Assert.True(pdfSw.ElapsedMilliseconds >= 0);
-        Assert.True(archiveSw.ElapsedMilliseconds >= 0);
+        Assert.True(zipSw.ElapsedMilliseconds >= 0);
     }
 }

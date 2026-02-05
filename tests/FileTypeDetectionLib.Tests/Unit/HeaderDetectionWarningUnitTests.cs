@@ -14,7 +14,7 @@ public sealed class HeaderDetectionWarningUnitTests
     {
         using var scope = new DetectorOptionsScope();
         var logger = new CollectingLogger();
-        scope.Set(new FileTypeProjectOptions
+        scope.Set(new FileTypeDetectorOptions
         {
             Logger = logger
         });
@@ -31,7 +31,7 @@ public sealed class HeaderDetectionWarningUnitTests
     {
         using var scope = new DetectorOptionsScope();
         var logger = new CollectingLogger();
-        scope.Set(new FileTypeProjectOptions
+        scope.Set(new FileTypeDetectorOptions
         {
             Logger = logger
         });

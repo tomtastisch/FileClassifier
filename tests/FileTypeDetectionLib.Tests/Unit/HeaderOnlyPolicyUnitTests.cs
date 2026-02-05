@@ -14,10 +14,10 @@ public sealed class HeaderOnlyPolicyUnitTests
     }
 
     [Fact]
-    public void Detect_StillRefines_ArchiveContainers_WhenHeaderOnlyNonZipIsTrue()
+    public void Detect_StillRefines_ZipContainers_WhenHeaderOnlyNonZipIsTrue()
     {
         using var scope = new DetectorOptionsScope();
-        scope.Set(new FileTypeProjectOptions());
+        scope.Set(new FileTypeDetectorOptions());
 
         var source = TestResources.Resolve("sample.docx");
         var detected = new FileTypeDetector().Detect(source);
@@ -26,10 +26,10 @@ public sealed class HeaderOnlyPolicyUnitTests
     }
 
     [Fact]
-    public void Detect_ReturnsArchive_ForPlainArchiveWithoutOoxmlMarkers_WhenHeaderOnlyNonZipIsTrue()
+    public void Detect_ReturnsZip_ForPlainZipWithoutOoxmlMarkers_WhenHeaderOnlyNonZipIsTrue()
     {
         using var scope = new DetectorOptionsScope();
-        scope.Set(new FileTypeProjectOptions());
+        scope.Set(new FileTypeDetectorOptions());
 
         var source = TestResources.Resolve("sample.zip");
         var detected = new FileTypeDetector().Detect(source);

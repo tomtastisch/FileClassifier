@@ -41,8 +41,6 @@ public sealed class FileTypeOptionsPropertyTests
                 Assert.True(snapshot.MaxZipCompressionRatio >= 0);
                 Assert.True(snapshot.MaxZipNestingDepth >= 0);
                 Assert.True(snapshot.MaxZipNestedBytes > 0);
-                Assert.NotNull(snapshot.DeterministicHash);
-                Assert.False(string.IsNullOrWhiteSpace(snapshot.DeterministicHash.MaterializedFileName));
             }
         }
         finally
