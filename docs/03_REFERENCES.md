@@ -27,8 +27,8 @@ Quelle: `FileTypeDetector.vb`.
 | `HeaderMatch` | Header-Magic hat Typ direkt erkannt |
 | `ZipGateFailed` | ZIP-Sicherheitspruefung fehlgeschlagen |
 | `ZipStructuredRefined` | ZIP wurde strukturiert (z. B. OOXML) verfeinert |
-| `ArchiveRefined` | Archivtyp wurde inhaltlich verfeinert |
-| `ArchiveGeneric` | Archiv blieb generisch |
+| `ZipRefined` | Archivtyp wurde inhaltlich verfeinert (kompatibler ReasonCode-Wert) |
+| `ZipGeneric` | Archiv blieb generisch (kompatibler ReasonCode-Wert) |
 
 ## 4. Interne Kernpfade (Lesefuehrung)
 | Interner Pfad | Datei | Bedeutung | Detail-README |
