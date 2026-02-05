@@ -115,6 +115,60 @@ public sealed class DeterministicHashingIntegrationTests
         }
     }
 
+    [Theory]
+    [InlineData("fx.sample_zip")]
+    [InlineData("fx.sample_rar")]
+    [InlineData("fx.sample_7z")]
+    public void ArchiveBytePipeline_PreservesCombinedAndPerFileHashes_AfterExtractAndMaterialize(string fixtureId)
+    {
+        var path = TestResources.Resolve(fixtureId);
+        var archiveBytes = File.ReadAllBytes(path);
+        Assert.True(ArchiveProcessing.TryValidate(archiveBytes));
+
+        var extractedEntries = ArchiveProcessing.TryExtractToMemory(archiveBytes);
+        Assert.NotEmpty(extractedEntries);
+
+        var archiveFromBytesEvidence = DeterministicHashing.HashBytes(archiveBytes, $"{fixtureId}-bytes");
+        var extractedCombinedEvidence = DeterministicHashing.HashEntries(extractedEntries, $"{fixtureId}-entries");
+        Assert.True(archiveFromBytesEvidence.Digests.HasLogicalHash);
+        Assert.True(extractedCombinedEvidence.Digests.HasLogicalHash);
+        Assert.Equal(archiveFromBytesEvidence.Digests.LogicalSha256, extractedCombinedEvidence.Digests.LogicalSha256);
+
+        using var scope = TestTempPaths.CreateScope($"ftd-bytes-materialized-{fixtureId}");
+        var rematerializedEntries = new List<ZipExtractedEntry>();
+
+        foreach (var entry in extractedEntries.OrderBy(e => e.RelativePath, StringComparer.Ordinal))
+        {
+            var entryBytes = entry.Content.ToArray();
+            var perEntryEvidence = DeterministicHashing.HashBytes(entryBytes, entry.RelativePath);
+            var destinationPath = Path.Combine(scope.RootPath, ToPlatformRelativePath(entry.RelativePath));
+            Assert.True(FileMaterializer.Persist(entryBytes, destinationPath, overwrite: false, secureExtract: false));
+
+            var perMaterializedFileEvidence = DeterministicHashing.HashFile(destinationPath);
+            Assert.Equal(perEntryEvidence.Digests.LogicalSha256, perMaterializedFileEvidence.Digests.LogicalSha256);
+            Assert.Equal(perEntryEvidence.Digests.PhysicalSha256, perMaterializedFileEvidence.Digests.PhysicalSha256);
+
+            rematerializedEntries.Add(new ZipExtractedEntry(entry.RelativePath, File.ReadAllBytes(destinationPath)));
+        }
+
+        var rematerializedCombinedEvidence = DeterministicHashing.HashEntries(rematerializedEntries, $"{fixtureId}-bytes-materialized");
+        Assert.Equal(extractedCombinedEvidence.Digests.LogicalSha256, rematerializedCombinedEvidence.Digests.LogicalSha256);
+        Assert.Equal(archiveFromBytesEvidence.Digests.LogicalSha256, rematerializedCombinedEvidence.Digests.LogicalSha256);
+    }
+
+    [Fact]
+    public void UnsafeArchiveCandidate_FailsExtraction_AndFallsBackToRawHashing()
+    {
+        var payload = ArchiveEntryPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8);
+
+        Assert.Empty(ArchiveProcessing.TryExtractToMemory(payload));
+
+        var evidence = DeterministicHashing.HashBytes(payload, "unsafe-archive-candidate.zip");
+        Assert.True(evidence.Digests.HasLogicalHash);
+        Assert.True(evidence.Digests.HasPhysicalHash);
+        Assert.Equal(evidence.Digests.PhysicalSha256, evidence.Digests.LogicalSha256);
+    }
+
     private static string ToPlatformRelativePath(string relativePath)
     {
         return relativePath

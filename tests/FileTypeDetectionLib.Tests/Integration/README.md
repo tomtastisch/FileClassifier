@@ -6,4 +6,4 @@ Nachweise fuer deterministisches Verhalten ueber mehrere Containerformate und ec
 ## Testabdeckung
 | Testdatei | Fokus |
 |---|---|
-| `DeterministicHashingIntegrationTests.cs` | formatuebergreifende LogicalHash-Stabilitaet und h1-h4 RoundTrip-Konsistenz |
+| `DeterministicHashingIntegrationTests.cs` | formatuebergreifende LogicalHash-Stabilitaet, h1-h4 RoundTrip-Konsistenz sowie Extract->Bytes->Materialize Hash-Invarianz (positiv/negativ) |

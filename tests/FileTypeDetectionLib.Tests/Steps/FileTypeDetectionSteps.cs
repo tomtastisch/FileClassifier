@@ -129,6 +129,24 @@ public sealed class FileTypeDetectionSteps
         state.LastHashEvidence = DeterministicHashing.HashBytes(state.CurrentPayload!, "bdd-current-bytes");
     }
 
+    [When("ich den letzten logischen Hash als Referenz speichere")]
+    public void WhenIStoreLastLogicalHashAsReference()
+    {
+        var state = State();
+        Assert.NotNull(state.LastHashEvidence);
+        Assert.True(state.LastHashEvidence!.Digests.HasLogicalHash);
+        state.LogicalHashReference = state.LastHashEvidence.Digests.LogicalSha256;
+    }
+
+    [When("ich den letzten physischen Hash als Referenz speichere")]
+    public void WhenIStoreLastPhysicalHashAsReference()
+    {
+        var state = State();
+        Assert.NotNull(state.LastHashEvidence);
+        Assert.True(state.LastHashEvidence!.Digests.HasPhysicalHash);
+        state.PhysicalHashReference = state.LastHashEvidence.Digests.PhysicalSha256;
+    }
+
     [When("ich den Dateityp der aktuellen Bytes ermittle")]
     public void WhenIDetectTheCurrentPayloadType()
     {
@@ -342,6 +360,14 @@ public sealed class FileTypeDetectionSteps
         Assert.NotEmpty(state.LastExtractedEntries!);
     }
 
+    [Then("ist der extrahierte Eintragssatz leer")]
+    public void ThenExtractedEntrySetIsEmpty()
+    {
+        var state = State();
+        Assert.NotNull(state.LastExtractedEntries);
+        Assert.Empty(state.LastExtractedEntries!);
+    }
+
     [Then("existiert die gespeicherte Datei {string}")]
     public void ThenMaterializedFileExists(string fileName)
     {
@@ -439,6 +465,26 @@ public sealed class FileTypeDetectionSteps
                      evidence.Digests.HasPhysicalHash &&
                      string.Equals(evidence.Digests.LogicalSha256, evidence.Digests.PhysicalSha256, StringComparison.Ordinal);
         Assert.Equal(expected, actual);
+    }
+
+    [Then("entspricht der letzte logische Hash der gespeicherten Referenz")]
+    public void ThenLastLogicalHashMatchesStoredReference()
+    {
+        var state = State();
+        Assert.NotNull(state.LastHashEvidence);
+        Assert.False(string.IsNullOrWhiteSpace(state.LogicalHashReference));
+        Assert.True(state.LastHashEvidence!.Digests.HasLogicalHash);
+        Assert.Equal(state.LogicalHashReference, state.LastHashEvidence.Digests.LogicalSha256);
+    }
+
+    [Then("entspricht der letzte physische Hash der gespeicherten Referenz")]
+    public void ThenLastPhysicalHashMatchesStoredReference()
+    {
+        var state = State();
+        Assert.NotNull(state.LastHashEvidence);
+        Assert.False(string.IsNullOrWhiteSpace(state.PhysicalHashReference));
+        Assert.True(state.LastHashEvidence!.Digests.HasPhysicalHash);
+        Assert.Equal(state.PhysicalHashReference, state.LastHashEvidence.Digests.PhysicalSha256);
     }
 
     [Then("bleibt die bestehende Datei {string} unveraendert")]
