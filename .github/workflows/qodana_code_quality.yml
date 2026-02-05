@@ -36,8 +36,7 @@ jobs:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
           QODANA_ENDPOINT: https://qodana.cloud
         with:
-          args: >-
-            --image jetbrains/qodana-dotnet:2025.3
+          linter: qodana-dotnet
           upload-result: true
           artifact-name: qodana-report
           use-annotations: true
