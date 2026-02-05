@@ -26,8 +26,22 @@ jobs:
       - name: Restore
         run: dotnet restore FileClassifier.sln -v minimal
 
-      - name: Build
-        run: dotnet build FileClassifier.sln --no-restore -v minimal
+      - name: Format Check
+        run: dotnet format FileClassifier.sln --verify-no-changes
 
-      - name: Test
-        run: dotnet test FileClassifier.sln --no-build -v minimal
+      - name: Build
+        run: dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal
+
+      - name: Test With Coverage Gates (Line + Branch)
+        run: >
+          dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj
+          -v minimal
+          /p:CollectCoverage=true
+          /p:Include="[FileTypeDetectionLib]*"
+          /p:CoverletOutputFormat=cobertura
+          /p:Threshold=75%2c60
+          /p:ThresholdType=line%2cbranch
+          /p:ThresholdStat=total
+
+      - name: Vulnerability Check
+        run: dotnet list FileClassifier.sln package --vulnerable --include-transitive

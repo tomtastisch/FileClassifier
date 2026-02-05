@@ -169,6 +169,7 @@ Console.WriteLine($"Loaded={loaded}; Snapshot={snapshot}");
 
 ### 4.5 DeterministicHashing
 Details: [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md), [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md).
+Formaler API-Contract: [`./04_DETERMINISTIC_HASHING_API_CONTRACT.md`](./04_DETERMINISTIC_HASHING_API_CONTRACT.md).
 
 ```mermaid
 flowchart LR

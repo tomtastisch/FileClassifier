@@ -2,8 +2,10 @@
 
 ## 1. Build and Test Gate
 - [ ] `dotnet restore FileClassifier.sln -v minimal`
-- [ ] `dotnet build FileClassifier.sln --no-restore -v minimal`
-- [ ] `dotnet test FileClassifier.sln --no-build -v minimal`
+- [ ] `dotnet format FileClassifier.sln --verify-no-changes`
+- [ ] `dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal`
+- [ ] `dotnet test FileClassifier.sln -v minimal`
+- [ ] Coverage-Gate: `dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -v minimal /p:CollectCoverage=true /p:Include="[FileTypeDetectionLib]*" /p:CoverletOutputFormat=cobertura /p:Threshold=75%2c60 /p:ThresholdType=line%2cbranch /p:ThresholdStat=total`
 - [ ] BDD-Tag-Filter pruefen (z. B. `Category=e2e`, `Category=materializer`)
 
 ## 2. Security and Limits
@@ -40,8 +42,10 @@
 ## 7. Quick Commands
 ```bash
 dotnet restore FileClassifier.sln -v minimal
-dotnet build FileClassifier.sln --no-restore -v minimal
-dotnet test FileClassifier.sln --no-build -v minimal
+dotnet format FileClassifier.sln --verify-no-changes
+dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal
+dotnet test FileClassifier.sln -v minimal
+dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -v minimal /p:CollectCoverage=true /p:Include="[FileTypeDetectionLib]*" /p:CoverletOutputFormat=cobertura /p:Threshold=75%2c60 /p:ThresholdType=line%2cbranch /p:ThresholdStat=total
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj --filter "Category=e2e" -v minimal
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj --filter "Category=materializer" -v minimal
 ```

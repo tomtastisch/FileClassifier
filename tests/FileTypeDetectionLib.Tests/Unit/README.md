@@ -20,3 +20,4 @@ Direkter Nachweis von API-Korrektheit, Security-Regeln und Determinismus.
 | `ZipAdversarialTests.cs` | adversarial ZIP-Faelle |
 | `ZipExtractionUnitTests.cs` | sichere Disk-/Memory-Extraktion |
 | `DeterministicHashingUnitTests.cs` | deterministische Physical/Logical Hash-Evidence inkl. fail-closed Pfade |
+| `DeterministicHashingApiContractUnitTests.cs` | eingefrorener Public API-Contract von `DeterministicHashing` |
