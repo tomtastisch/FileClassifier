@@ -148,7 +148,7 @@ Namespace FileTypeDetection
         Friend Shared Function IsRootPath(destinationFull As String) As Boolean
             If String.IsNullOrWhiteSpace(destinationFull) Then Return False
 
-            Dim rootPath As String = Nothing
+            Dim rootPath As String
             Try
                 rootPath = Path.GetPathRoot(destinationFull)
             Catch

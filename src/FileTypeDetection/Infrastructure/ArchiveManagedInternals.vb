@@ -125,10 +125,10 @@ Namespace FileTypeDetection
             stream As Stream,
             opt As FileTypeProjectOptions,
             depth As Integer,
-            containerType As ArchiveContainerType,
+            containerTypeValue As ArchiveContainerType,
             extractEntry As Func(Of IArchiveEntryModel, Boolean)
         ) As Boolean Implements IArchiveBackend.Process
-            If containerType <> ArchiveContainerType.Zip Then Return False
+            If containerTypeValue <> ArchiveContainerType.Zip Then Return False
 
             If extractEntry Is Nothing Then
                 Return ArchiveStreamEngine.ProcessArchiveStream(stream, opt, depth, Nothing)

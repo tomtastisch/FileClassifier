@@ -1,7 +1,7 @@
-using FileTypeDetection;
-using FileTypeDetectionLib.Tests.Support;
 using System;
 using System.IO;
+using FileTypeDetection;
+using FileTypeDetectionLib.Tests.Support;
 using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;

@@ -181,7 +181,7 @@ Namespace FileTypeDetection
 
             Try
                 Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
-                    Dim descriptor As ArchiveDescriptor = Nothing
+                    Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
                     If Not ArchiveTypeResolver.TryDescribeStream(fs, opt, descriptor) Then Return False
                     If fs.CanSeek Then fs.Position = 0
                     Return ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, descriptor, depth:=0)
@@ -322,7 +322,7 @@ Namespace FileTypeDetection
                 opt,
                 trace,
                 tryDescribe:=Function()
-                                 Dim descriptor As ArchiveDescriptor = Nothing
+                                 Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
                                  If Not ArchiveTypeResolver.TryDescribeStream(fs, opt, descriptor) Then Return Nothing
                                  Return descriptor
                              End Function,
@@ -348,7 +348,7 @@ Namespace FileTypeDetection
                 opt,
                 trace,
                 tryDescribe:=Function()
-                                 Dim descriptor As ArchiveDescriptor = Nothing
+                                 Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
                                  If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then Return Nothing
                                  Return descriptor
                              End Function,
@@ -381,7 +381,7 @@ Namespace FileTypeDetection
                 Return FileTypeRegistry.Resolve(magicKind)
             End If
 
-            Dim descriptor As ArchiveDescriptor = Nothing
+            Dim descriptor As ArchiveDescriptor
             If magicKind = FileKind.Zip Then
                 descriptor = ArchiveDescriptor.ForContainerType(ArchiveContainerType.Zip)
             Else
@@ -484,7 +484,7 @@ Namespace FileTypeDetection
         End Sub
 
         Private Shared Function ExtensionMatchesKind(path As String, detectedKind As FileKind) As Boolean
-            Dim ext = Global.System.IO.Path.GetExtension(If(path, String.Empty))
+            Dim ext = IO.Path.GetExtension(If(path, String.Empty))
             If String.IsNullOrWhiteSpace(ext) Then Return True
 
             If detectedKind = FileKind.Unknown Then Return False

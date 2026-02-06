@@ -1,9 +1,9 @@
 using System;
+using System.Formats.Tar;
 using System.IO;
 using System.Text;
 using SharpCompress.Common;
 using SharpCompress.Writers;
-using System.Formats.Tar;
 
 namespace FileTypeDetectionLib.Tests.Support;
 
@@ -13,7 +13,7 @@ internal static class ArchivePayloadFactory
     {
         using var ms = new MemoryStream();
         using (var writer = WriterFactory.Open(ms, ArchiveType.Zip, new WriterOptions(CompressionType.Deflate)))
-        using (var payload = new MemoryStream(Encoding.UTF8.GetBytes(content ?? string.Empty)))
+        using (var payload = new MemoryStream(Encoding.UTF8.GetBytes(content)))
         {
             writer.Write(string.IsNullOrWhiteSpace(entryName) ? "note.txt" : entryName, payload, DateTime.UnixEpoch);
         }
@@ -25,7 +25,7 @@ internal static class ArchivePayloadFactory
     {
         using var ms = new MemoryStream();
         using (var writer = WriterFactory.Open(ms, ArchiveType.Tar, new WriterOptions(CompressionType.None)))
-        using (var payload = new MemoryStream(Encoding.UTF8.GetBytes(content ?? string.Empty)))
+        using (var payload = new MemoryStream(Encoding.UTF8.GetBytes(content)))
         {
             writer.Write(string.IsNullOrWhiteSpace(entryName) ? "note.txt" : entryName, payload, DateTime.UnixEpoch);
         }
@@ -37,7 +37,7 @@ internal static class ArchivePayloadFactory
     {
         using var ms = new MemoryStream();
         using (var writer = WriterFactory.Open(ms, ArchiveType.GZip, new WriterOptions(CompressionType.GZip)))
-        using (var source = new MemoryStream(payload ?? Array.Empty<byte>(), writable: false))
+        using (var source = new MemoryStream(payload, writable: false))
         {
             writer.Write(string.IsNullOrWhiteSpace(entryName) ? "payload.bin" : entryName, source, DateTime.UnixEpoch);
         }
@@ -58,7 +58,7 @@ internal static class ArchivePayloadFactory
         {
             var regular = new PaxTarEntry(TarEntryType.RegularFile, string.IsNullOrWhiteSpace(fileName) ? "note.txt" : fileName)
             {
-                DataStream = new MemoryStream(Encoding.UTF8.GetBytes(fileContent ?? string.Empty))
+                DataStream = new MemoryStream(Encoding.UTF8.GetBytes(fileContent))
             };
             writer.WriteEntry(regular);
 

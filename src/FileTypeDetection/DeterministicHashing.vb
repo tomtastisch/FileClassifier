@@ -45,7 +45,7 @@ Namespace FileTypeDetection
             If ArchiveEntryCollector.TryCollectFromFile(path, detectorOptions, entries) Then
                 Return BuildEvidenceFromEntries(
                     sourceType:=DeterministicHashSourceType.FilePath,
-                    label:=Global.System.IO.Path.GetFileName(path),
+                    label:=IO.Path.GetFileName(path),
                     detectedType:=detectedType,
                     compressedBytes:=fileBytes,
                     entries:=entries,
@@ -55,7 +55,7 @@ Namespace FileTypeDetection
 
             Return BuildEvidenceFromRawPayload(
                 sourceType:=DeterministicHashSourceType.FilePath,
-                label:=Global.System.IO.Path.GetFileName(path),
+                label:=IO.Path.GetFileName(path),
                 detectedType:=detectedType,
                 payload:=fileBytes,
                 hashOptions:=normalizedOptions,
@@ -180,10 +180,10 @@ Namespace FileTypeDetection
                 notes:="Canonical logical bytes hashed directly.")
 
             Dim h4 As DeterministicHashEvidence = DeterministicHashEvidence.CreateFailure(DeterministicHashSourceType.MaterializedFile, "roundtrip-h4-file", "Materialization failed.")
-            Dim roundTripTempRoot = Global.System.IO.Path.Combine(Global.System.IO.Path.GetTempPath(), "ftd-roundtrip-" & Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture))
+            Dim roundTripTempRoot = IO.Path.Combine(IO.Path.GetTempPath(), "ftd-roundtrip-" & Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture))
             Try
                 Directory.CreateDirectory(roundTripTempRoot)
-                Dim targetFile = Global.System.IO.Path.Combine(roundTripTempRoot, NormalizeLabel(normalizedOptions.MaterializedFileName))
+                Dim targetFile = IO.Path.Combine(roundTripTempRoot, NormalizeLabel(normalizedOptions.MaterializedFileName))
                 If FileMaterializer.Persist(canonicalBytes, targetFile, overwrite:=False, secureExtract:=False) Then
                     h4 = HashFile(targetFile, normalizedOptions)
                 End If

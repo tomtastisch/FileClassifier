@@ -194,7 +194,7 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
         using var stream = new MemoryStream(gzipPayload, writable: false);
         var backend = new SharpCompressArchiveBackend();
 
-        var ok = backend.Process(stream, opt, depth: 0, containerType: ArchiveContainerType.GZip, extractEntry: _ => true);
+        var ok = backend.Process(stream, opt, depth: 0, containerTypeValue: ArchiveContainerType.GZip, extractEntry: _ => true);
 
         Assert.True(ok);
     }

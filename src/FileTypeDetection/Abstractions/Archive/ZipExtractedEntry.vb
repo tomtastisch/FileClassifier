@@ -15,14 +15,14 @@ Namespace FileTypeDetection
         Public ReadOnly Property Content As ImmutableArray(Of Byte)
         Public ReadOnly Property Size As Integer
 
-        Friend Sub New(relativePath As String, content As Byte())
-            Me.RelativePath = If(relativePath, String.Empty)
-            If content Is Nothing OrElse content.Length = 0 Then
-                Me.Content = ImmutableArray(Of Byte).Empty
-                Me.Size = 0
+        Friend Sub New(entryPath As String, payload As Byte())
+            RelativePath = If(entryPath, String.Empty)
+            If payload Is Nothing OrElse payload.Length = 0 Then
+                Content = ImmutableArray(Of Byte).Empty
+                Size = 0
             Else
-                Me.Content = ImmutableArray.Create(content)
-                Me.Size = content.Length
+                Content = ImmutableArray.Create(payload)
+                Size = payload.Length
             End If
         End Sub
 

@@ -153,7 +153,7 @@ public sealed class CoreAndArchiveInternalsFailClosedUnitTests
         var payload = ArchivePayloadFactory.CreateTarWithSingleEntry("inner/note.txt", "hello");
         using var ms = new MemoryStream(payload, writable: false);
         using var archive = ArchiveFactory.Open(ms);
-        var entry = archive.Entries.First(e => e is not null && !e.IsDirectory);
+        var entry = archive.Entries.First(e => !e.IsDirectory);
         var model = new SharpCompressEntryModel(entry);
 
         Assert.Equal("inner/note.txt", model.RelativePath);

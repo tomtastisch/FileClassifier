@@ -146,7 +146,7 @@ public sealed class FileMaterializerUnitTests
         var rootPath = Path.GetPathRoot(Path.GetTempPath());
         Assert.False(string.IsNullOrWhiteSpace(rootPath));
 
-        var ok = FileMaterializer.Persist(payload, rootPath!, overwrite: true, secureExtract: false);
+        var ok = FileMaterializer.Persist(payload, rootPath, overwrite: true, secureExtract: false);
         Assert.False(ok);
     }
 

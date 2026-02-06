@@ -62,7 +62,7 @@ Namespace FileTypeDetection
             stream As Stream,
             opt As FileTypeProjectOptions,
             depth As Integer,
-            containerType As ArchiveContainerType,
+            containerTypeValue As ArchiveContainerType,
             extractEntry As Func(Of IArchiveEntryModel, Boolean)
         ) As Boolean
     End Interface
@@ -399,11 +399,11 @@ Namespace FileTypeDetection
         End Function
 
         Private Shared Function EnsureTrailingSeparator(dirPath As String) As String
-            If String.IsNullOrEmpty(dirPath) Then Return System.IO.Path.DirectorySeparatorChar.ToString()
-            If dirPath.EndsWith(System.IO.Path.DirectorySeparatorChar) OrElse dirPath.EndsWith(System.IO.Path.AltDirectorySeparatorChar) Then
+            If String.IsNullOrEmpty(dirPath) Then Return Path.DirectorySeparatorChar.ToString()
+            If dirPath.EndsWith(Path.DirectorySeparatorChar) OrElse dirPath.EndsWith(Path.AltDirectorySeparatorChar) Then
                 Return dirPath
             End If
-            Return dirPath & System.IO.Path.DirectorySeparatorChar
+            Return dirPath & Path.DirectorySeparatorChar
         End Function
     End Class
 
@@ -465,13 +465,13 @@ Namespace FileTypeDetection
             stream As Stream,
             opt As FileTypeProjectOptions,
             depth As Integer,
-            containerType As ArchiveContainerType,
+            containerTypeValue As ArchiveContainerType,
             extractEntry As Func(Of IArchiveEntryModel, Boolean)
         ) As Boolean Implements IArchiveBackend.Process
             If stream Is Nothing OrElse Not stream.CanRead Then Return False
             If opt Is Nothing Then Return False
             If depth > opt.MaxZipNestingDepth Then Return False
-            If containerType = ArchiveContainerType.Unknown Then Return False
+            If containerTypeValue = ArchiveContainerType.Unknown Then Return False
 
             Try
                 If stream.CanSeek Then stream.Position = 0
@@ -479,14 +479,14 @@ Namespace FileTypeDetection
                 Using archive = ArchiveFactory.Open(stream)
                     If archive Is Nothing Then Return False
                     Dim mapped = ArchiveTypeResolver.MapArchiveType(archive.Type)
-                    If mapped <> containerType Then Return False
+                    If mapped <> containerTypeValue Then Return False
 
                     Dim entries = archive.Entries.
                         OrderBy(Function(e) If(e.Key, String.Empty), StringComparer.Ordinal).
                         ToList()
 
                     Dim nestedResult As Boolean
-                    Dim nestedHandled = TryProcessNestedGArchive(entries, opt, depth, containerType, extractEntry, nestedResult)
+                    Dim nestedHandled = TryProcessNestedGArchive(entries, opt, depth, containerTypeValue, extractEntry, nestedResult)
                     If nestedHandled Then Return nestedResult
 
                     If entries.Count > opt.MaxZipEntries Then Return False

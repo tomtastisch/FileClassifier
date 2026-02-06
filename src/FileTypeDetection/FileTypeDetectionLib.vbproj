@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace></RootNamespace>
+    <RootNamespace />
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
 

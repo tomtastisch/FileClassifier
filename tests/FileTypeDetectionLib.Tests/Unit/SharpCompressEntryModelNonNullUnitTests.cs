@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using FileTypeDetection;
 using SharpCompress.Archives;
 using SharpCompress.Common;
@@ -33,7 +34,7 @@ public sealed class SharpCompressEntryModelNonNullUnitTests
     {
         using var ms = new MemoryStream();
         using (var writer = WriterFactory.Open(ms, ArchiveType.Tar, new WriterOptions(CompressionType.None)))
-        using (var data = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(content ?? string.Empty)))
+        using (var data = new MemoryStream(Encoding.UTF8.GetBytes(content)))
         {
             writer.Write(name, data, DateTime.UnixEpoch);
         }

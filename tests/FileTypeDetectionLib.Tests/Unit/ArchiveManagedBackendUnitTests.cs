@@ -15,7 +15,7 @@ public sealed class ArchiveManagedBackendUnitTests
         using var stream = new MemoryStream(new byte[0]);
         var opt = FileTypeProjectOptions.DefaultOptions();
 
-        var ok = backend.Process(stream, opt, depth: 0, containerType: ArchiveContainerType.Rar, extractEntry: null);
+        var ok = backend.Process(stream, opt, depth: 0, containerTypeValue: ArchiveContainerType.Rar, extractEntry: null);
 
         Assert.False(ok);
     }
@@ -31,7 +31,7 @@ public sealed class ArchiveManagedBackendUnitTests
         var sawFile = false;
         var sawDir = false;
 
-        var ok = backend.Process(stream, opt, depth: 0, containerType: ArchiveContainerType.Zip, extractEntry: entry =>
+        var ok = backend.Process(stream, opt, depth: 0, containerTypeValue: ArchiveContainerType.Zip, extractEntry: entry =>
         {
             if (entry.RelativePath == "a.txt")
             {

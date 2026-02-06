@@ -83,24 +83,24 @@ Namespace FileTypeDetection
             Me.New(True)
         End Sub
 
-        Friend Sub New(headerOnlyNonZip As Boolean)
-            Me.HeaderOnlyNonZip = headerOnlyNonZip
+        Friend Sub New(headerOnlyNonZipValue As Boolean)
+            HeaderOnlyNonZip = headerOnlyNonZipValue
         End Sub
 
         Friend Function Clone() As FileTypeProjectOptions
-            Dim cloned = New FileTypeProjectOptions(Me.HeaderOnlyNonZip) With {
-                .MaxBytes = Me.MaxBytes,
-                .SniffBytes = Me.SniffBytes,
-                .MaxZipEntries = Me.MaxZipEntries,
-                .MaxZipTotalUncompressedBytes = Me.MaxZipTotalUncompressedBytes,
-                .MaxZipEntryUncompressedBytes = Me.MaxZipEntryUncompressedBytes,
-                .MaxZipCompressionRatio = Me.MaxZipCompressionRatio,
-                .MaxZipNestingDepth = Me.MaxZipNestingDepth,
-                .MaxZipNestedBytes = Me.MaxZipNestedBytes,
-                .RejectArchiveLinks = Me.RejectArchiveLinks,
-                .AllowUnknownArchiveEntrySize = Me.AllowUnknownArchiveEntrySize,
-                .Logger = Me.Logger,
-                .DeterministicHash = DeterministicHashOptions.Normalize(Me.DeterministicHash)
+            Dim cloned = New FileTypeProjectOptions(HeaderOnlyNonZip) With {
+                .MaxBytes = MaxBytes,
+                .SniffBytes = SniffBytes,
+                .MaxZipEntries = MaxZipEntries,
+                .MaxZipTotalUncompressedBytes = MaxZipTotalUncompressedBytes,
+                .MaxZipEntryUncompressedBytes = MaxZipEntryUncompressedBytes,
+                .MaxZipCompressionRatio = MaxZipCompressionRatio,
+                .MaxZipNestingDepth = MaxZipNestingDepth,
+                .MaxZipNestedBytes = MaxZipNestedBytes,
+                .RejectArchiveLinks = RejectArchiveLinks,
+                .AllowUnknownArchiveEntrySize = AllowUnknownArchiveEntrySize,
+                .Logger = Logger,
+                .DeterministicHash = DeterministicHashOptions.Normalize(DeterministicHash)
             }
             cloned.NormalizeInPlace()
             Return cloned

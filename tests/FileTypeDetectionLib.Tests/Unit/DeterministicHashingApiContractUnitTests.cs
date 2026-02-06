@@ -15,7 +15,7 @@ public sealed class DeterministicHashingApiContractUnitTests
             .GetMethods(BindingFlags.Public | BindingFlags.Static)
             .Where(m => m.DeclaringType == typeof(DeterministicHashing))
             .Select(Describe)
-            .OrderBy(x => x, System.StringComparer.Ordinal)
+            .OrderBy(x => x, StringComparer.Ordinal)
             .ToArray();
 
         var expected = new[]
@@ -30,7 +30,7 @@ public sealed class DeterministicHashingApiContractUnitTests
             "HashFile(String,DeterministicHashOptions):DeterministicHashEvidence",
             "VerifyRoundTrip(String):DeterministicHashRoundTripReport",
             "VerifyRoundTrip(String,DeterministicHashOptions):DeterministicHashRoundTripReport"
-        }.OrderBy(x => x, System.StringComparer.Ordinal).ToArray();
+        }.OrderBy(x => x, StringComparer.Ordinal).ToArray();
 
         Assert.Equal(expected, methods);
     }

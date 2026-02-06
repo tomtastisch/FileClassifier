@@ -91,7 +91,6 @@ public sealed class FileTypeDetectionSteps
         var bytes = new byte[] { 0xAA, 0xBB, 0xCC };
         File.WriteAllBytes(path, bytes);
 
-        state.ExistingFilePath = path;
         state.ExistingFileBytes = bytes;
     }
 
@@ -536,7 +535,7 @@ public sealed class FileTypeDetectionSteps
 
     private static byte[] CreateArchivePayload(string archiveType)
     {
-        var normalized = (archiveType ?? string.Empty).Trim().ToLowerInvariant();
+        var normalized = archiveType.Trim().ToLowerInvariant();
         const string entryPath = "inner/note.txt";
         const string content = "hello";
 

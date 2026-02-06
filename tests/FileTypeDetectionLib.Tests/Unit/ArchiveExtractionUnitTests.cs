@@ -68,7 +68,7 @@ public sealed class ArchiveExtractionUnitTests
         var rootPath = Path.GetPathRoot(Path.GetTempPath());
         Assert.False(string.IsNullOrWhiteSpace(rootPath));
 
-        var ok = new FileTypeDetector().ExtractArchiveSafe(source, rootPath!, verifyBeforeExtract: false);
+        var ok = new FileTypeDetector().ExtractArchiveSafe(source, rootPath, verifyBeforeExtract: false);
         Assert.False(ok);
     }
 
