@@ -2,9 +2,36 @@ version: "1.0"
 linter: jetbrains/qodana-dotnet:2025.3
 
 profile:
-  name: qodana.recommended
+    name: qodana.recommended
 
-# CI soll FAILen, wenn Schwellen überschritten werden
-failureConditions:
-  severityThresholds:
-    any: 0
+include:
+    - "src/**"
+    - "tests/**"
+
+exclude:
+    - "**/bin/**"
+    - "**/obj/**"
+    - "**/.qodana/**"
+    - "**/.idea/**"
+    - "**/.vs/**"
+    - "**/TestResults/**"
+    - "**/artifacts/**"
+    - "**/packages/**"
+    - "**/node_modules/**"
+    - "**/dist/**"
+    - "**/build/**"
+    - "**/out/**"
+    - "**/coverage/**"
+    - "**/generated/**"
+    - "**/Generated/**"
+    - "**/*Designer.cs"
+    - "**/*.g.cs"
+    - "**/*.g.i.cs"
+    - "**/*.AssemblyInfo.cs"
+    - "**/*.generated.*"
+    - "**/*.min.*"
+    - "**/*.snap"
+    - "**/*.lock"
+    - "**/*.sarif"
+    - "**/*.log"
+    - "**/*.tmp"

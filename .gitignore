@@ -50,3 +50,28 @@ tools/*
 
 # local secrets
 .secrets/
+.qodana_reports/
+
+# --- Qodana / IDE / Build artifacts ---
+.qodana/
+artifacts/
+.idea/
+.vscode/
+**/node_modules/
+**/dist/
+**/build/
+**/out/
+**/.venv/
+**/venv/
+**/__pycache__/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.cache/
+**/coverage/
+**/.coverage*
+
+# --- local temp / qodana downloads ---
+.tmp/
+qodana-artifacts/
+qodana-results/

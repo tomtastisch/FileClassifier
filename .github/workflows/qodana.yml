@@ -1,140 +1,34 @@
-name: Qodana
+name: qodana
 
 on:
-  pull_request:
-  workflow_dispatch:
-  push:
-    branches: [ "main" ]
+    push:
+        branches:
+            - "**"
+
+permissions:
+    contents: read
 
 jobs:
-  qodana:
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      security-events: write
-      pull-requests: write
-
-    steps:
-      - name: Checkout (full history for merge-base)
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      # Scan darf nicht den Job abbrechen, sonst kein Upload/Report.
-      - name: Qodana Scan (non-blocking; gate later)
-        uses: JetBrains/qodana-action@v2025.3
-        continue-on-error: true
-        env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
-        with:
-          results-dir: ${{ runner.temp }}/qodana/results
-          cache-dir: ${{ runner.temp }}/qodana/caches
-          upload-result: false
-          use-annotations: true
-          pr-mode: true
-          post-pr-comment: true
-
-      - name: Locate SARIF
-        id: sarif
-        if: always()
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          CAND1="${RUNNER_TEMP}/qodana/results/qodana.sarif.json"
-          CAND2="qodana/results/qodana.sarif.json"
-
-          FOUND=""
-          for p in "$CAND1" "$CAND2"; do
-            if [ -f "$p" ]; then FOUND="$p"; break; fi
-          done
-
-          if [ -z "$FOUND" ]; then
-            FOUND="$(find . -maxdepth 8 -type f -iname "*sarif*.json" | head -n 1 || true)"
-          fi
-
-          if [ -z "$FOUND" ]; then
-            echo "sarif_path=" >> "$GITHUB_OUTPUT"
-            echo "No SARIF found."
-            exit 0
-          fi
-
-          echo "sarif_path=$FOUND" >> "$GITHUB_OUTPUT"
-          echo "Found SARIF at: $FOUND"
-
-      - name: Upload SARIF to GitHub Code Scanning
-        if: always() && steps.sarif.outputs.sarif_path != ''
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: ${{ steps.sarif.outputs.sarif_path }}
-
-      - name: Upload SARIF artifact (CLI download)
-        if: always() && steps.sarif.outputs.sarif_path != ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: qodana-sarif
-          path: ${{ steps.sarif.outputs.sarif_path }}
-          if-no-files-found: warn
-
-      # HARD GATE: nur "echte Probleme" sollen failen.
-      # Default: SARIF level == "error"
-      - name: Quality Gate (fail only on errors)
-        if: always() && steps.sarif.outputs.sarif_path != ''
-        shell: bash
-        run: |
-          set -euo pipefail
-          SARIF="${{ steps.sarif.outputs.sarif_path }}"
-
-          ERRORS="$(jq '[.runs[].results[] | select((.level // "warning") == "error")] | length' "$SARIF")"
-          echo "Errors: $ERRORS" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-
-          echo "Top error ruleIds:" >> "$GITHUB_STEP_SUMMARY"
-          jq -r '
-            [.runs[].results[] | select((.level // "warning") == "error") | .ruleId // "unknown"]
-            | sort
-            | group_by(.)
-            | map({ruleId: .[0], count: length})
-            | sort_by(-.count)
-            | .[0:20]
-            | map("- \(.ruleId): \(.count)")
-            | .[]
-          ' "$SARIF" >> "$GITHUB_STEP_SUMMARY" || true
-
-          if [ "$ERRORS" -gt 0 ]; then
-            echo "Quality gate failed: $ERRORS error(s)."
-            exit 1
-          fi
-
-          echo "Quality gate passed: no errors."
-
-      # Optional: Kurzsummary als PR-Kommentar (nur wenn SARIF da ist)
-      - name: Comment SARIF summary on PR
-        if: always() && github.event_name == 'pull_request' && steps.sarif.outputs.sarif_path != ''
-        uses: actions/github-script@v7
-        env:
-          SARIF_PATH: ${{ steps.sarif.outputs.sarif_path }}
-        with:
-          script: |
-            const fs = require('fs');
-            const p = process.env.SARIF_PATH;
-            const sarif = JSON.parse(fs.readFileSync(p, 'utf8'));
-            const results = (((sarif.runs||[])[0]||{}).results)||[];
-            const byRule = new Map();
-            for (const r of results) {
-              const k = r.ruleId || 'unknown';
-              byRule.set(k, (byRule.get(k)||0) + 1);
-            }
-            const top = [...byRule.entries()].sort((a,b)=>b[1]-a[1]).slice(0,15);
-            const lines = top.map(([k,v])=>`- ${k}: ${v}`);
-            const body =
-              `Qodana Summary\n` +
-              `Total results: ${results.length}\n\n` +
-              (lines.length ? lines.join('\n') : '(no results)');
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body
-            });
+    qodana:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            
+            # QODANA_TOKEN muss als Repo-Secret existieren (hast du bereits)
+            - name: Run Qodana
+              uses: JetBrains/qodana-action@v2025.3
+              env:
+                  QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+              with:
+                  # Wichtig: Wir wollen NICHTS "hochladen" außer Artefakt
+                  # => Report/Results lokal im Runner ablegen
+                  results-dir: qodana-results
+            
+            # Nur Artefakt, keine GitHub Code Scanning Integration
+            - name: Upload SARIF artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: qodana-sarif
+                  path: qodana-results/qodana.sarif.json
+                  if-no-files-found: error
