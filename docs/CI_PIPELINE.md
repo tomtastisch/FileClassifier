@@ -74,6 +74,8 @@ Not required:
 ## 7. Qodana
 Qodana remains a separate workflow and complements CI quality gates.
 Coverage source of truth remains CI coverage artifacts and gate enforcement.
+For `pull_request`, Qodana publishes SARIF as workflow artifact only.
+Code Scanning SARIF upload is performed on non-PR runs to avoid noisy PR annotations.
 
 ## 8. Local Reproduction
 ```bash

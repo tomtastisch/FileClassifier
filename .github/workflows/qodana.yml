@@ -30,7 +30,7 @@ jobs:
           upload-result: false
 
       - name: Upload SARIF To Code Scanning
-        if: env.QODANA_TOKEN != ''
+        if: env.QODANA_TOKEN != '' && github.event_name != 'pull_request'
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: qodana-results/qodana.sarif.json
