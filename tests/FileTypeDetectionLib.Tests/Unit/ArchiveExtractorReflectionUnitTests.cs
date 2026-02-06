@@ -20,7 +20,7 @@ public sealed class ArchiveExtractorReflectionUnitTests
         var entry = new FakeEntry(() => Stream.Null, relativePath: "folder/", isDirectory: true);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
-        var ok = (bool)method!.Invoke(null, new object[] { entry, prefix, opt });
+        var ok = TestGuard.Unbox<bool>(method!.Invoke(null, new object[] { entry, prefix, opt }));
 
         Assert.True(ok);
         Assert.True(Directory.Exists(Path.Combine(scope.RootPath, "folder")));
@@ -38,14 +38,14 @@ public sealed class ArchiveExtractorReflectionUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
 
         var traversal = new FakeEntry(() => Stream.Null, relativePath: "../evil.txt");
-        Assert.False((bool)method!.Invoke(null, new object[] { traversal, prefix, opt }));
+        Assert.False(TestGuard.Unbox<bool>(method!.Invoke(null, new object[] { traversal, prefix, opt })));
 
         var existing = Path.Combine(scope.RootPath, "exists.txt");
         File.WriteAllText(existing, "x");
 
         var entry = new FakeEntry(() => new MemoryStream(new byte[] { 1 }), relativePath: "exists.txt",
             uncompressedSize: 1);
-        Assert.False((bool)method.Invoke(null, new object[] { entry, prefix, opt }));
+        Assert.False(TestGuard.Unbox<bool>(method.Invoke(null, new object[] { entry, prefix, opt })));
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public sealed class ArchiveExtractorReflectionUnitTests
 
         var entry = new FakeEntry(() => new UnreadableStream(), relativePath: "file.bin", uncompressedSize: 1);
 
-        Assert.False((bool)method!.Invoke(null, new object[] { entry, prefix, opt }));
+        Assert.False(TestGuard.Unbox<bool>(method!.Invoke(null, new object[] { entry, prefix, opt })));
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public sealed class ArchiveExtractorReflectionUnitTests
             uncompressedSize: 10);
 
         var list = new List<ZipExtractedEntry>();
-        var ok = (bool)method!.Invoke(null, new object[] { entry, list, opt });
+        var ok = TestGuard.Unbox<bool>(method!.Invoke(null, new object[] { entry, list, opt }));
 
         Assert.False(ok);
         Assert.Empty(list);

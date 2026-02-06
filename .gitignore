@@ -46,7 +46,6 @@ tools/*
 !tools/check-docs.py
 !tools/check-quality.sh
 !tools/run-coverage.sh
-!tools/test-bdd-readable.sh
 !tools/versioning/
 !tools/versioning/check-versioning.sh
 !tools/versioning/labels.json

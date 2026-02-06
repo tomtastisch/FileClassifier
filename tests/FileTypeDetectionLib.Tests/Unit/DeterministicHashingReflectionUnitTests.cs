@@ -1,5 +1,6 @@
 using System.Reflection;
 using FileTypeDetection;
+using FileTypeDetectionLib.Tests.Support;
 using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
@@ -13,7 +14,7 @@ public sealed class DeterministicHashingReflectionUnitTests
             typeof(DeterministicHashing).GetMethod("ResolveHashOptions", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
-        var result = (DeterministicHashOptions)method.Invoke(null, new object?[] { null, null });
+        var result = TestGuard.NotNull(method.Invoke(null, new object?[] { null, null }) as DeterministicHashOptions);
 
         Assert.NotNull(result);
         Assert.Equal("deterministic-roundtrip.bin", result.MaterializedFileName);
