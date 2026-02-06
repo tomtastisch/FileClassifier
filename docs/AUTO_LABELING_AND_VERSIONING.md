@@ -87,7 +87,7 @@ sequenceDiagram
   participant Engine as "compute-pr-labels.js"
   participant API as "GitHub Labels API"
 
-  GH->>CI: pull_request_target event
+  GH->>CI: pull_request event
   CI->>Guard: compute required/actual bump
   CI->>Engine: files + labels + guard result
   Engine-->>CI: decision.json

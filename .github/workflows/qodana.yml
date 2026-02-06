@@ -1,36 +1,25 @@
 name: qodana
 
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types: [completed]
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
   contents: read
-  actions: read
+  security-events: write
 
 jobs:
   qodana:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     env:
       QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
-
-      - name: Download Coverage Artifact (from CI)
-        if: github.event_name == 'workflow_run'
-        continue-on-error: true
-        uses: actions/download-artifact@v4
-        with:
-          name: coverage-report
-          path: .qodana/code-coverage
-          run-id: ${{ github.event.workflow_run.id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Qodana
         if: env.QODANA_TOKEN != ''
@@ -40,6 +29,12 @@ jobs:
           results-dir: qodana-results
           upload-result: false
 
+      - name: Upload SARIF To Code Scanning
+        if: env.QODANA_TOKEN != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: qodana-results/qodana.sarif.json
+
       - name: Upload SARIF Artifact
         if: env.QODANA_TOKEN != ''
         uses: actions/upload-artifact@v4
@@ -47,3 +42,7 @@ jobs:
           name: qodana-sarif
           path: qodana-results/qodana.sarif.json
           if-no-files-found: error
+
+      - name: Skip Message (No Token)
+        if: env.QODANA_TOKEN == ''
+        run: echo "QODANA_TOKEN not set; qodana scan skipped."

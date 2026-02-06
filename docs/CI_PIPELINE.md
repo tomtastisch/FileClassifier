@@ -11,7 +11,7 @@ This CI pipeline provides auditable production-readiness evidence for:
 
 ## 2. Workflow Structure
 The `CI` workflow contains two separated responsibility paths:
-- `pull_request_target` path: `pr-labeling` (label governance only)
+- `pull_request` path: `pr-labeling` (label governance only)
 - `pull_request`/`push` path: technical quality jobs (`preflight`, `build`, `security-nuget`, `tests-bdd-coverage`, `summary`)
 
 ## 3. Jobs (1 job = 1 concern)
