@@ -48,11 +48,17 @@ Die technische Detailbeschreibung der öffentlichen Schnittstellen ist in `01_FU
 ## 7. Verifikation
 Pflichtlauf für Freigabe:
 ```bash
+python3 tools/check-docs.py
 dotnet restore FileClassifier.sln -v minimal
 dotnet build FileClassifier.sln --no-restore -v minimal
-dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj --no-build -v minimal
-bash tools/sync-portable-filetypedetection.sh
-bash tools/sync-doc-conventions.sh
+TEST_BDD_OUTPUT_DIR=artifacts/tests bash tools/test-bdd-readable.sh -- \
+  /p:CollectCoverage=true \
+  /p:Include="[FileTypeDetectionLib]*" \
+  /p:CoverletOutputFormat=cobertura \
+  /p:CoverletOutput="$(pwd)/artifacts/coverage/coverage" \
+  /p:Threshold=85%2c69 \
+  /p:ThresholdType=line%2cbranch \
+  /p:ThresholdStat=total
 ```
 
 ## 8. Rückverfolgbarkeit

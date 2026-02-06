@@ -5,6 +5,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS_DIR = ROOT / "docs"
+SRC_DIR = ROOT / "src"
+TESTS_DIR = ROOT / "tests"
 
 LINK_PATTERN = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
 
@@ -27,11 +29,17 @@ def resolve_target(base: Path, target: str) -> Path:
     return (base / path_part).resolve()
 
 
+def collect_markdown_files() -> list[Path]:
+    files: list[Path] = [ROOT / "README.md"]
+    for directory in (DOCS_DIR, SRC_DIR, TESTS_DIR):
+        if directory.exists():
+            files.extend(directory.rglob("*.md"))
+    return files
+
+
 def check_links() -> list[str]:
     errors: list[str] = []
-    files = [ROOT / "README.md"]
-    if DOCS_DIR.exists():
-        files.extend(DOCS_DIR.rglob("*.md"))
+    files = collect_markdown_files()
 
     for md_file in files:
         if not md_file.exists():

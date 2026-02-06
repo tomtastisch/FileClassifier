@@ -50,9 +50,8 @@ TEST_BDD_OUTPUT_DIR=artifacts/tests bash tools/test-bdd-readable.sh -- \
   /p:Threshold=85%2c69 \
   /p:ThresholdType=line%2cbranch \
   /p:ThresholdStat=total
-bash tools/sync-portable-filetypedetection.sh
-bash tools/check-portable-filetypedetection.sh --clean
 ```
+Hinweis: Portable-Sync/Check-Tools sind aktuell nicht im Repository enthalten.
 
 ## 7.1 Versionierung (zentral)
 - Zentrale Versionsquelle: `Directory.Build.props`.
@@ -66,7 +65,7 @@ bash tools/check-portable-filetypedetection.sh --clean
 Im Root von `src/FileTypeDetection` liegen nur die Public APIs.
 
 ### 8.2 Portable
-Die portable Spiegelstruktur wird lokal über die Tools erzeugt und ist nicht Teil des veröffentlichten Repository-Inhalts.
+Die portable Spiegelstruktur ist nicht Teil des Repository-Inhalts; es gibt keine Sync/Check-Skripte im Repo.
 
 ### 8.3 Abstractions-Ordnerhierarchie
 Die Modellschicht unter `src/FileTypeDetection/Abstractions` ist nach Verantwortlichkeiten getrennt:

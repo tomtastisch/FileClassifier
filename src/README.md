@@ -32,11 +32,10 @@ Im Root von `FileTypeDetection` liegen nur:
 Jeder versionierte Quellordner unter `src/*` besitzt eine eigene `README.md` mit Verantwortungen und Verweisen.
 
 ## Synchronisation
-- `bash tools/sync-portable-filetypedetection.sh`
-- `bash tools/sync-doc-conventions.sh`
+Derzeit keine Repo-internen Sync-Skripte (portable/doc conventions).
 
 ## Dokumentpflege-Checkliste
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
+- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

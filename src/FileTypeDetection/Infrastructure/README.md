@@ -59,6 +59,6 @@ sequenceDiagram
 ## Dokumentpflege-Checkliste
 
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
+- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
