@@ -15,10 +15,7 @@ internal static class TestGuard
 
     public static T NotNull<T>(T? value) where T : class
     {
-        if (value is not null)
-        {
-            return value;
-        }
+        if (value is not null) return value;
 
         throw new InvalidOperationException($"Expected non-null {typeof(T).Name}.");
     }

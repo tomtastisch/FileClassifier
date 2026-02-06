@@ -133,6 +133,7 @@ internal sealed class FixtureManifestDocument
     public List<FixtureManifestEntry> Fixtures { get; set; } = new();
 }
 
+// ReSharper disable once ClassNeverInstantiated.Global
 internal sealed class FixtureManifestEntry
 {
     public string FixtureId { get; set; } = string.Empty;

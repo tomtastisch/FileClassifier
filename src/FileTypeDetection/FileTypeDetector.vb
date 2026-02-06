@@ -2,6 +2,7 @@ Option Strict On
 Option Explicit On
 
 Imports System.IO
+Imports System.Linq
 
 Namespace FileTypeDetection
     ''' <summary>
@@ -374,7 +375,7 @@ Namespace FileTypeDetection
                            End Function)
         End Function
 
-        Private Function ResolveByHeaderCommon(
+        Private Shared Function ResolveByHeaderCommon(
                                                header As Byte(),
                                                opt As FileTypeProjectOptions,
                                                ByRef trace As DetectionTrace,
@@ -516,12 +517,9 @@ Namespace FileTypeDetection
                 Return True
             End If
 
-            If Not detectedType.Aliases.IsDefault Then
-                For Each a In detectedType.Aliases
-                    If String.Equals(a, normalizedExt, StringComparison.OrdinalIgnoreCase) Then
-                        Return True
-                    End If
-                Next
+            If Not detectedType.Aliases.IsDefault AndAlso
+               detectedType.Aliases.Any(Function(a) String.Equals(a, normalizedExt, StringComparison.OrdinalIgnoreCase)) Then
+                Return True
             End If
 
             Return False

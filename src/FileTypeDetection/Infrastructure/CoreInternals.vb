@@ -298,24 +298,27 @@ Namespace FileTypeDetection
 
         Friend Shared Sub Debug(logger As ILogger, message As String)
             If logger Is Nothing Then Return
+            If Not logger.IsEnabled(LogLevel.Debug) Then Return
             Try
-                logger.LogDebug("{Message}", message)
+                logger.LogDebug(message)
             Catch
             End Try
         End Sub
 
         Friend Shared Sub Warn(logger As ILogger, message As String)
             If logger Is Nothing Then Return
+            If Not logger.IsEnabled(LogLevel.Warning) Then Return
             Try
-                logger.LogWarning("{Message}", message)
+                logger.LogWarning(message)
             Catch
             End Try
         End Sub
 
         Friend Shared Sub [Error](logger As ILogger, message As String, ex As Exception)
             If logger Is Nothing Then Return
+            If Not logger.IsEnabled(LogLevel.Error) Then Return
             Try
-                logger.LogError(ex, "{Message}", message)
+                logger.LogError(ex, message)
             Catch
             End Try
         End Sub

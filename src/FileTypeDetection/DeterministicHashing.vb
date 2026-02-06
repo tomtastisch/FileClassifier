@@ -4,6 +4,7 @@ Option Explicit On
 Imports System.Globalization
 Imports System.IO
 Imports System.IO.Hashing
+Imports System.Linq
 Imports System.Security.Cryptography
 Imports System.Text
 
@@ -264,10 +265,7 @@ Namespace FileTypeDetection
                 hasPhysicalHash:=hasPhysical,
                 hasLogicalHash:=True)
 
-            Dim totalBytes As Long = 0
-            For Each entry In normalizedEntries
-                totalBytes += entry.Content.LongLength
-            Next
+            Dim totalBytes As Long = normalizedEntries.Sum(Function(entry) CLng(entry.Content.LongLength))
 
             Dim persistedCompressed =
                     If(hashOptions.IncludePayloadCopies, CopyBytes(compressedBytes), Array.Empty(Of Byte)())

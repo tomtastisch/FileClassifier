@@ -503,6 +503,10 @@ public sealed class FileTypeDetectionSteps
     }
 
     [Then("existiert keine Datei im Zielpfad {string}")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "SpecFlow step bindings are kept as instance members for consistent binding style.")]
     public void ThenNoFileExistsAtRawDestination(string destinationPath)
     {
         Assert.False(File.Exists(destinationPath), $"Unexpected file exists: {destinationPath}");
