@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
@@ -75,6 +74,7 @@ public sealed class FileTypeDetectorAdditionalUnitTests
 
         Assert.Equal(payload, data);
     }
+
     [Fact]
     public void Detect_ReturnsUnknown_WhenFileTooLarge_ForConfiguredMaxBytes()
     {

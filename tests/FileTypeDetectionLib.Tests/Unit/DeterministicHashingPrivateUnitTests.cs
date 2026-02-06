@@ -12,11 +12,12 @@ public sealed class DeterministicHashingPrivateUnitTests
     [Fact]
     public void TryReadFileBounded_ReturnsFalse_ForMissingPathOrOptions()
     {
-        var method = typeof(DeterministicHashing).GetMethod("TryReadFileBounded", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(DeterministicHashing).GetMethod("TryReadFileBounded", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
-        byte[] bytes = Array.Empty<byte>();
-        string error = string.Empty;
+        var bytes = Array.Empty<byte>();
+        var error = string.Empty;
 
         object[] args1 = { string.Empty, FileTypeProjectOptions.DefaultOptions(), bytes, error };
         var ok1 = (bool)method!.Invoke(null, args1)!;
@@ -30,7 +31,8 @@ public sealed class DeterministicHashingPrivateUnitTests
     [Fact]
     public void TryReadFileBounded_ReturnsFalse_WhenFileTooLarge()
     {
-        var method = typeof(DeterministicHashing).GetMethod("TryReadFileBounded", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(DeterministicHashing).GetMethod("TryReadFileBounded", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         using var scope = TestTempPaths.CreateScope("ftd-hash-read");

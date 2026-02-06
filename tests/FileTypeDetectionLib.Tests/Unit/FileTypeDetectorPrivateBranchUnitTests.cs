@@ -71,7 +71,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
         File.WriteAllBytes(path, Array.Empty<byte>());
 
         var detector = new FileTypeDetector();
-        var ok = detector.ExtractArchiveSafe(path, Path.Combine(scope.RootPath, "out"), verifyBeforeExtract: false);
+        var ok = detector.ExtractArchiveSafe(path, Path.Combine(scope.RootPath, "out"), false);
 
         Assert.False(ok);
     }
@@ -84,7 +84,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
         File.WriteAllBytes(path, Array.Empty<byte>());
 
         var detector = new FileTypeDetector();
-        var entries = detector.ExtractArchiveSafeToMemory(path, verifyBeforeExtract: false);
+        var entries = detector.ExtractArchiveSafeToMemory(path, false);
 
         Assert.Empty(entries);
     }
@@ -110,7 +110,8 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     [Fact]
     public void ValidateArchiveStreamRaw_ReturnsFalse_WhenStreamUnreadable()
     {
-        var method = typeof(FileTypeDetector).GetMethod("ValidateArchiveStreamRaw", BindingFlags.NonPublic | BindingFlags.Instance);
+        var method = typeof(FileTypeDetector).GetMethod("ValidateArchiveStreamRaw",
+            BindingFlags.NonPublic | BindingFlags.Instance);
         Assert.NotNull(method);
 
         using var scope = TestTempPaths.CreateScope("ftd-validate-stream");
@@ -130,7 +131,8 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     [Fact]
     public void FinalizeArchiveDetection_ReturnsZip_ForUnknownRefinement()
     {
-        var method = typeof(FileTypeDetector).GetMethod("FinalizeArchiveDetection", BindingFlags.NonPublic | BindingFlags.Instance);
+        var method = typeof(FileTypeDetector).GetMethod("FinalizeArchiveDetection",
+            BindingFlags.NonPublic | BindingFlags.Instance);
         Assert.NotNull(method);
 
         var detector = new FileTypeDetector();
@@ -139,7 +141,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
 
         var refined = FileTypeRegistry.Resolve(FileKind.Unknown);
-        var result = (FileType)method!.Invoke(detector, new object[] { refined, opt, trace! })!;
+        var result = (FileType)method!.Invoke(detector, new[] { refined, opt, trace! })!;
 
         Assert.Equal(FileKind.Zip, result.Kind);
     }
@@ -147,7 +149,8 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     [Fact]
     public void FinalizeArchiveDetection_ReturnsRefined_WhenNotUnknown()
     {
-        var method = typeof(FileTypeDetector).GetMethod("FinalizeArchiveDetection", BindingFlags.NonPublic | BindingFlags.Instance);
+        var method = typeof(FileTypeDetector).GetMethod("FinalizeArchiveDetection",
+            BindingFlags.NonPublic | BindingFlags.Instance);
         Assert.NotNull(method);
 
         var detector = new FileTypeDetector();
@@ -156,7 +159,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
 
         var refined = FileTypeRegistry.Resolve(FileKind.Docx);
-        var result = (FileType)method!.Invoke(detector, new object[] { refined, opt, trace! })!;
+        var result = (FileType)method!.Invoke(detector, new[] { refined, opt, trace! })!;
 
         Assert.Equal(FileKind.Docx, result.Kind);
     }
@@ -164,7 +167,8 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     [Fact]
     public void WarnIfNoDirectContentDetection_SwallowsUnknownAndDirectKinds()
     {
-        var method = typeof(FileTypeDetector).GetMethod("WarnIfNoDirectContentDetection", BindingFlags.NonPublic | BindingFlags.Static);
+        var method = typeof(FileTypeDetector).GetMethod("WarnIfNoDirectContentDetection",
+            BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         method!.Invoke(null, new object[] { FileKind.Unknown, FileTypeProjectOptions.DefaultOptions() });
@@ -174,7 +178,8 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     [Fact]
     public void ExtensionMatchesKind_HandlesEmptyAndMismatch()
     {
-        var method = typeof(FileTypeDetector).GetMethod("ExtensionMatchesKind", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(FileTypeDetector).GetMethod("ExtensionMatchesKind", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var okEmpty = (bool)method!.Invoke(null, new object[] { "file", FileKind.Pdf })!;

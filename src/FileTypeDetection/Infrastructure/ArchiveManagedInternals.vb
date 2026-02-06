@@ -1,17 +1,14 @@
 Option Strict On
 Option Explicit On
 
-Imports System
 Imports System.IO
 Imports System.IO.Compression
-Imports System.Linq
 Imports Microsoft.IO
 
 Namespace FileTypeDetection
-
     ''' <summary>
-    ''' Zentrale SSOT-Engine fuer archivbasierte Verarbeitung.
-    ''' Eine Iterationslogik fuer Validierung und sichere Extraktion.
+    '''     Zentrale SSOT-Engine fuer archivbasierte Verarbeitung.
+    '''     Eine Iterationslogik fuer Validierung und sichere Extraktion.
     ''' </summary>
     Friend NotInheritable Class ArchiveStreamEngine
         Private Shared ReadOnly _recyclableStreams As New RecyclableMemoryStreamManager()
@@ -19,23 +16,24 @@ Namespace FileTypeDetection
         Private Sub New()
         End Sub
 
-        Friend Shared Function ValidateArchiveStream(stream As Stream, opt As FileTypeProjectOptions, depth As Integer) As Boolean
+        Friend Shared Function ValidateArchiveStream(stream As Stream, opt As FileTypeProjectOptions, depth As Integer) _
+            As Boolean
             Return ProcessArchiveStream(stream, opt, depth, Nothing)
         End Function
 
         Friend Shared Function ProcessArchiveStream(
-            stream As Stream,
-            opt As FileTypeProjectOptions,
-            depth As Integer,
-            extractEntry As Func(Of ZipArchiveEntry, Boolean)
-        ) As Boolean
+                                                    stream As Stream,
+                                                    opt As FileTypeProjectOptions,
+                                                    depth As Integer,
+                                                    extractEntry As Func(Of ZipArchiveEntry, Boolean)
+                                                    ) As Boolean
             If stream Is Nothing OrElse Not stream.CanRead Then Return False
             If depth > opt.MaxZipNestingDepth Then Return False
 
             Try
                 If stream.CanSeek Then stream.Position = 0
 
-                Using zip As New ZipArchive(stream, ZipArchiveMode.Read, leaveOpen:=True)
+                Using zip As New ZipArchive(stream, ZipArchiveMode.Read, leaveOpen := True)
                     If zip.Entries.Count > opt.MaxZipEntries Then Return False
 
                     Dim totalUncompressed As Long = 0
@@ -51,7 +49,7 @@ Namespace FileTypeDetection
                         If totalUncompressed > opt.MaxZipTotalUncompressedBytes Then Return False
 
                         If c > 0 AndAlso opt.MaxZipCompressionRatio > 0 Then
-                            Dim ratio As Double = CDbl(u) / CDbl(c)
+                            Dim ratio As Double = CDbl(u)/CDbl(c)
                             If ratio > opt.MaxZipCompressionRatio Then Return False
                         End If
 
@@ -122,12 +120,12 @@ Namespace FileTypeDetection
         End Property
 
         Public Function Process(
-            stream As Stream,
-            opt As FileTypeProjectOptions,
-            depth As Integer,
-            containerTypeValue As ArchiveContainerType,
-            extractEntry As Func(Of IArchiveEntryModel, Boolean)
-        ) As Boolean Implements IArchiveBackend.Process
+                                stream As Stream,
+                                opt As FileTypeProjectOptions,
+                                depth As Integer,
+                                containerTypeValue As ArchiveContainerType,
+                                extractEntry As Func(Of IArchiveEntryModel, Boolean)
+                                ) As Boolean Implements IArchiveBackend.Process
             If containerTypeValue <> ArchiveContainerType.Zip Then Return False
 
             If extractEntry Is Nothing Then
@@ -193,5 +191,4 @@ Namespace FileTypeDetection
             Return _entry.Open()
         End Function
     End Class
-
 End Namespace

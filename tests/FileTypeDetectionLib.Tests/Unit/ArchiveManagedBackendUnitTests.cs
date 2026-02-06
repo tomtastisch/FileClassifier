@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.IO.Compression;
 using FileTypeDetection;
@@ -15,7 +14,7 @@ public sealed class ArchiveManagedBackendUnitTests
         using var stream = new MemoryStream(new byte[0]);
         var opt = FileTypeProjectOptions.DefaultOptions();
 
-        var ok = backend.Process(stream, opt, depth: 0, containerTypeValue: ArchiveContainerType.Rar, extractEntry: null);
+        var ok = backend.Process(stream, opt, 0, ArchiveContainerType.Rar, null);
 
         Assert.False(ok);
     }
@@ -31,7 +30,7 @@ public sealed class ArchiveManagedBackendUnitTests
         var sawFile = false;
         var sawDir = false;
 
-        var ok = backend.Process(stream, opt, depth: 0, containerTypeValue: ArchiveContainerType.Zip, extractEntry: entry =>
+        var ok = backend.Process(stream, opt, 0, ArchiveContainerType.Zip, entry =>
         {
             if (entry.RelativePath == "a.txt")
             {
@@ -60,7 +59,7 @@ public sealed class ArchiveManagedBackendUnitTests
     private static byte[] CreateZipBytes()
     {
         using var ms = new MemoryStream();
-        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
+        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, true))
         {
             var file = zip.CreateEntry("a.txt");
             using (var s = file.Open())
@@ -68,8 +67,10 @@ public sealed class ArchiveManagedBackendUnitTests
                 var content = new byte[] { 0x01, 0x02, 0x03 };
                 s.Write(content, 0, content.Length);
             }
+
             zip.CreateEntry("dir/");
         }
+
         return ms.ToArray();
     }
 }

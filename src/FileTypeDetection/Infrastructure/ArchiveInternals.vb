@@ -1,16 +1,12 @@
 Option Strict On
 Option Explicit On
 
-Imports System
-Imports System.Collections.Generic
 Imports System.IO
-Imports System.Linq
 Imports Microsoft.IO
 Imports SharpCompress.Archives
 Imports SharpCompress.Common
 
 Namespace FileTypeDetection
-
     Friend Enum ArchiveContainerType
         Unknown = 0
         Zip
@@ -25,15 +21,18 @@ Namespace FileTypeDetection
         Public ReadOnly Property ContainerType As ArchiveContainerType
         Public ReadOnly Property ContainerChain As IReadOnlyList(Of ArchiveContainerType)
 
-        Private Sub New(logicalKind As FileKind, containerType As ArchiveContainerType, containerChain As ArchiveContainerType())
+        Private Sub New(logicalKind As FileKind, containerType As ArchiveContainerType,
+                        containerChain As ArchiveContainerType())
             Me.LogicalKind = logicalKind
             Me.ContainerType = containerType
-            Dim chain = If(containerChain, Array.Empty(Of ArchiveContainerType)())
+            Dim chain = If(containerChain, Array.Empty (Of ArchiveContainerType)())
             Me.ContainerChain = Array.AsReadOnly(CType(chain.Clone(), ArchiveContainerType()))
         End Sub
 
         Friend Shared Function UnknownDescriptor() As ArchiveDescriptor
-            Return New ArchiveDescriptor(FileKind.Unknown, ArchiveContainerType.Unknown, Array.Empty(Of ArchiveContainerType)())
+            Return _
+                New ArchiveDescriptor(FileKind.Unknown, ArchiveContainerType.Unknown,
+                                      Array.Empty (Of ArchiveContainerType)())
         End Function
 
         Friend Shared Function ForContainerType(containerType As ArchiveContainerType) As ArchiveDescriptor
@@ -59,12 +58,12 @@ Namespace FileTypeDetection
         ReadOnly Property ContainerType As ArchiveContainerType
 
         Function Process(
-            stream As Stream,
-            opt As FileTypeProjectOptions,
-            depth As Integer,
-            containerTypeValue As ArchiveContainerType,
-            extractEntry As Func(Of IArchiveEntryModel, Boolean)
-        ) As Boolean
+                         stream As Stream,
+                         opt As FileTypeProjectOptions,
+                         depth As Integer,
+                         containerTypeValue As ArchiveContainerType,
+                         extractEntry As Func(Of IArchiveEntryModel, Boolean)
+                         ) As Boolean
     End Interface
 
     Friend NotInheritable Class ArchiveBackendRegistry
@@ -78,7 +77,8 @@ Namespace FileTypeDetection
             Select Case containerType
                 Case ArchiveContainerType.Zip
                     Return _managedArchiveBackend
-                Case ArchiveContainerType.Tar, ArchiveContainerType.GZip, ArchiveContainerType.SevenZip, ArchiveContainerType.Rar
+                Case ArchiveContainerType.Tar, ArchiveContainerType.GZip, ArchiveContainerType.SevenZip,
+                    ArchiveContainerType.Rar
                     Return _sharpCompressBackend
                 Case Else
                     Return Nothing
@@ -90,12 +90,13 @@ Namespace FileTypeDetection
         Private Sub New()
         End Sub
 
-        Friend Shared Function TryDescribeBytes(data As Byte(), opt As FileTypeProjectOptions, ByRef descriptor As ArchiveDescriptor) As Boolean
+        Friend Shared Function TryDescribeBytes(data As Byte(), opt As FileTypeProjectOptions,
+                                                ByRef descriptor As ArchiveDescriptor) As Boolean
             descriptor = ArchiveDescriptor.UnknownDescriptor()
             If data Is Nothing OrElse data.Length = 0 Then Return False
 
             Try
-                Using ms As New MemoryStream(data, writable:=False)
+                Using ms As New MemoryStream(data, writable := False)
                     Return TryDescribeStream(ms, opt, descriptor)
                 End Using
             Catch ex As Exception
@@ -105,7 +106,8 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Friend Shared Function TryDescribeStream(stream As Stream, opt As FileTypeProjectOptions, ByRef descriptor As ArchiveDescriptor) As Boolean
+        Friend Shared Function TryDescribeStream(stream As Stream, opt As FileTypeProjectOptions,
+                                                 ByRef descriptor As ArchiveDescriptor) As Boolean
             descriptor = ArchiveDescriptor.UnknownDescriptor()
             If stream Is Nothing OrElse Not stream.CanRead Then Return False
 
@@ -156,17 +158,18 @@ Namespace FileTypeDetection
         Private Sub New()
         End Sub
 
-        Friend Shared Function ValidateArchiveStream(stream As Stream, opt As FileTypeProjectOptions, depth As Integer, descriptor As ArchiveDescriptor) As Boolean
+        Friend Shared Function ValidateArchiveStream(stream As Stream, opt As FileTypeProjectOptions, depth As Integer,
+                                                     descriptor As ArchiveDescriptor) As Boolean
             Return ProcessArchiveStream(stream, opt, depth, descriptor, Nothing)
         End Function
 
         Friend Shared Function ProcessArchiveStream(
-            stream As Stream,
-            opt As FileTypeProjectOptions,
-            depth As Integer,
-            descriptor As ArchiveDescriptor,
-            extractEntry As Func(Of IArchiveEntryModel, Boolean)
-        ) As Boolean
+                                                    stream As Stream,
+                                                    opt As FileTypeProjectOptions,
+                                                    depth As Integer,
+                                                    descriptor As ArchiveDescriptor,
+                                                    extractEntry As Func(Of IArchiveEntryModel, Boolean)
+                                                    ) As Boolean
             If stream Is Nothing OrElse Not stream.CanRead Then Return False
             If opt Is Nothing Then Return False
             If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then Return False
@@ -183,18 +186,22 @@ Namespace FileTypeDetection
         Private Sub New()
         End Sub
 
-        Friend Shared Function TryExtractArchiveStreamToMemory(stream As Stream, opt As FileTypeProjectOptions) As IReadOnlyList(Of ZipExtractedEntry)
+        Friend Shared Function TryExtractArchiveStreamToMemory(stream As Stream, opt As FileTypeProjectOptions) _
+            As IReadOnlyList(Of ZipExtractedEntry)
             Dim descriptor As ArchiveDescriptor = Nothing
-            Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
+            Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty (Of ZipExtractedEntry)()
             If Not ArchiveTypeResolver.TryDescribeStream(stream, opt, descriptor) Then Return emptyResult
             Return TryExtractArchiveStreamToMemory(stream, opt, descriptor)
         End Function
 
-        Friend Shared Function TryExtractArchiveStreamToMemory(stream As Stream, opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor) As IReadOnlyList(Of ZipExtractedEntry)
-            Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
+        Friend Shared Function TryExtractArchiveStreamToMemory(stream As Stream, opt As FileTypeProjectOptions,
+                                                               descriptor As ArchiveDescriptor) _
+            As IReadOnlyList(Of ZipExtractedEntry)
+            Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty (Of ZipExtractedEntry)()
             If stream Is Nothing OrElse Not stream.CanRead Then Return emptyResult
             If opt Is Nothing Then Return emptyResult
-            If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then Return emptyResult
+            If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then _
+                Return emptyResult
 
             Dim entries As New List(Of ZipExtractedEntry)()
             Try
@@ -202,11 +209,11 @@ Namespace FileTypeDetection
                 Dim ok = ArchiveProcessingEngine.ProcessArchiveStream(
                     stream,
                     opt,
-                    depth:=0,
-                    descriptor:=descriptor,
-                    extractEntry:=Function(entry)
-                                      Return ExtractEntryToMemory(entry, entries, opt)
-                                  End Function)
+                    depth := 0,
+                    descriptor := descriptor,
+                    extractEntry := Function(entry)
+                        Return ExtractEntryToMemory(entry, entries, opt)
+                    End Function)
                 If Not ok Then
                     entries.Clear()
                     Return emptyResult
@@ -220,13 +227,16 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Friend Shared Function TryExtractArchiveStream(stream As Stream, destinationDirectory As String, opt As FileTypeProjectOptions) As Boolean
+        Friend Shared Function TryExtractArchiveStream(stream As Stream, destinationDirectory As String,
+                                                       opt As FileTypeProjectOptions) As Boolean
             Dim descriptor As ArchiveDescriptor = Nothing
             If Not ArchiveTypeResolver.TryDescribeStream(stream, opt, descriptor) Then Return False
             Return TryExtractArchiveStream(stream, destinationDirectory, opt, descriptor)
         End Function
 
-        Friend Shared Function TryExtractArchiveStream(stream As Stream, destinationDirectory As String, opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor) As Boolean
+        Friend Shared Function TryExtractArchiveStream(stream As Stream, destinationDirectory As String,
+                                                       opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor) _
+            As Boolean
             If stream Is Nothing OrElse Not stream.CanRead Then Return False
             If opt Is Nothing Then Return False
             If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then Return False
@@ -256,11 +266,11 @@ Namespace FileTypeDetection
                 Dim ok = ArchiveProcessingEngine.ProcessArchiveStream(
                     stream,
                     opt,
-                    depth:=0,
-                    descriptor:=descriptor,
-                    extractEntry:=Function(entry)
-                                      Return ExtractEntryToDirectory(entry, stagePrefix, opt)
-                                  End Function)
+                    depth := 0,
+                    descriptor := descriptor,
+                    extractEntry := Function(entry)
+                        Return ExtractEntryToDirectory(entry, stagePrefix, opt)
+                    End Function)
                 If Not ok Then Return False
 
                 Directory.Move(stageDir, destinationFull)
@@ -271,19 +281,20 @@ Namespace FileTypeDetection
             Finally
                 If Directory.Exists(stageDir) Then
                     Try
-                        Directory.Delete(stageDir, recursive:=True)
+                        Directory.Delete(stageDir, recursive := True)
                     Catch
                     End Try
                 End If
             End Try
         End Function
 
-        Private Shared Function ExtractEntryToDirectory(entry As IArchiveEntryModel, destinationPrefix As String, opt As FileTypeProjectOptions) As Boolean
+        Private Shared Function ExtractEntryToDirectory(entry As IArchiveEntryModel, destinationPrefix As String,
+                                                        opt As FileTypeProjectOptions) As Boolean
             If entry Is Nothing Then Return False
             If opt Is Nothing Then Return False
 
             Dim entryName As String = Nothing
-            Dim isDirectory As Boolean = False
+            Dim isDirectory = False
             If Not TryGetSafeEntryName(entry, opt, entryName, isDirectory) Then Return False
 
             Dim targetPath As String
@@ -317,7 +328,10 @@ Namespace FileTypeDetection
             Try
                 Using source = entry.OpenStream()
                     If source Is Nothing OrElse Not source.CanRead Then Return False
-                    Using target As New FileStream(targetPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
+                    Using _
+                        target As _
+                            New FileStream(targetPath, FileMode.CreateNew, FileAccess.Write, FileShare.None,
+                                           InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
                         StreamBounds.CopyBounded(source, target, opt.MaxZipEntryUncompressedBytes)
                     End Using
                 End Using
@@ -328,12 +342,13 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Private Shared Function ExtractEntryToMemory(entry As IArchiveEntryModel, entries As List(Of ZipExtractedEntry), opt As FileTypeProjectOptions) As Boolean
+        Private Shared Function ExtractEntryToMemory(entry As IArchiveEntryModel, entries As List(Of ZipExtractedEntry),
+                                                     opt As FileTypeProjectOptions) As Boolean
             If entry Is Nothing OrElse entries Is Nothing Then Return False
             If opt Is Nothing Then Return False
 
             Dim entryName As String = Nothing
-            Dim isDirectory As Boolean = False
+            Dim isDirectory = False
             If Not TryGetSafeEntryName(entry, opt, entryName, isDirectory) Then Return False
             If isDirectory Then Return True
 
@@ -344,7 +359,7 @@ Namespace FileTypeDetection
                     If source Is Nothing OrElse Not source.CanRead Then Return False
                     Using ms = _recyclableStreams.GetStream("ArchiveExtractor.MemoryEntry")
                         StreamBounds.CopyBounded(source, ms, opt.MaxZipEntryUncompressedBytes)
-                        Dim payload As Byte() = Array.Empty(Of Byte)()
+                        Dim payload As Byte() = Array.Empty (Of Byte)()
                         If ms.Length > 0 Then
                             payload = New Byte(CInt(ms.Length) - 1) {}
                             Buffer.BlockCopy(ms.GetBuffer(), 0, payload, 0, payload.Length)
@@ -359,7 +374,9 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Private Shared Function TryGetSafeEntryName(entry As IArchiveEntryModel, opt As FileTypeProjectOptions, ByRef safeEntryName As String, ByRef isDirectory As Boolean) As Boolean
+        Private Shared Function TryGetSafeEntryName(entry As IArchiveEntryModel, opt As FileTypeProjectOptions,
+                                                    ByRef safeEntryName As String, ByRef isDirectory As Boolean) _
+            As Boolean
             safeEntryName = Nothing
             isDirectory = False
             If entry Is Nothing Then Return False
@@ -371,13 +388,17 @@ Namespace FileTypeDetection
             End If
 
             Dim entryName As String = Nothing
-            Dim normalizedDirectoryFlag As Boolean = False
-            If Not ArchiveEntryPathPolicy.TryNormalizeRelativePath(entry.RelativePath, allowDirectoryMarker:=True, entryName, normalizedDirectoryFlag) Then
+            Dim normalizedDirectoryFlag = False
+            If _
+                Not _
+                ArchiveEntryPathPolicy.TryNormalizeRelativePath(entry.RelativePath, allowDirectoryMarker := True,
+                                                                entryName, normalizedDirectoryFlag) Then
                 Return False
             End If
 
             safeEntryName = entryName
-            isDirectory = entry.IsDirectory OrElse normalizedDirectoryFlag OrElse entryName.EndsWith("/", StringComparison.Ordinal)
+            isDirectory = entry.IsDirectory OrElse normalizedDirectoryFlag OrElse
+                          entryName.EndsWith("/", StringComparison.Ordinal)
             Return True
         End Function
 
@@ -400,7 +421,8 @@ Namespace FileTypeDetection
 
         Private Shared Function EnsureTrailingSeparator(dirPath As String) As String
             If String.IsNullOrEmpty(dirPath) Then Return Path.DirectorySeparatorChar.ToString()
-            If dirPath.EndsWith(Path.DirectorySeparatorChar) OrElse dirPath.EndsWith(Path.AltDirectorySeparatorChar) Then
+            If dirPath.EndsWith(Path.DirectorySeparatorChar) OrElse dirPath.EndsWith(Path.AltDirectorySeparatorChar) _
+                Then
                 Return dirPath
             End If
             Return dirPath & Path.DirectorySeparatorChar
@@ -411,29 +433,34 @@ Namespace FileTypeDetection
         Private Sub New()
         End Sub
 
-        Friend Shared Function TryCollectFromFile(path As String, opt As FileTypeProjectOptions, ByRef entries As IReadOnlyList(Of ZipExtractedEntry)) As Boolean
-            entries = Array.Empty(Of ZipExtractedEntry)()
+        Friend Shared Function TryCollectFromFile(path As String, opt As FileTypeProjectOptions,
+                                                  ByRef entries As IReadOnlyList(Of ZipExtractedEntry)) As Boolean
+            entries = Array.Empty (Of ZipExtractedEntry)()
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then Return False
             If opt Is Nothing Then Return False
 
             Try
-                Using fs As New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
+                Using _
+                    fs As _
+                        New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read,
+                                       InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
                     Dim descriptor As ArchiveDescriptor = Nothing
                     If Not ArchiveTypeResolver.TryDescribeStream(fs, opt, descriptor) Then Return False
                     If fs.CanSeek Then fs.Position = 0
-                    If Not ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, descriptor, depth:=0) Then Return False
+                    If Not ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, descriptor, depth := 0) Then Return False
                     If fs.CanSeek Then fs.Position = 0
                     entries = ArchiveExtractor.TryExtractArchiveStreamToMemory(fs, opt, descriptor)
                     Return entries IsNot Nothing AndAlso entries.Count > 0
                 End Using
             Catch
-                entries = Array.Empty(Of ZipExtractedEntry)()
+                entries = Array.Empty (Of ZipExtractedEntry)()
                 Return False
             End Try
         End Function
 
-        Friend Shared Function TryCollectFromBytes(data As Byte(), opt As FileTypeProjectOptions, ByRef entries As IReadOnlyList(Of ZipExtractedEntry)) As Boolean
-            entries = Array.Empty(Of ZipExtractedEntry)()
+        Friend Shared Function TryCollectFromBytes(data As Byte(), opt As FileTypeProjectOptions,
+                                                   ByRef entries As IReadOnlyList(Of ZipExtractedEntry)) As Boolean
+            entries = Array.Empty (Of ZipExtractedEntry)()
             If data Is Nothing OrElse data.Length = 0 Then Return False
             If opt Is Nothing Then Return False
 
@@ -441,12 +468,12 @@ Namespace FileTypeDetection
                 Dim descriptor As ArchiveDescriptor = Nothing
                 If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then Return False
                 If Not ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor) Then Return False
-                Using ms As New MemoryStream(data, writable:=False)
+                Using ms As New MemoryStream(data, writable := False)
                     entries = ArchiveExtractor.TryExtractArchiveStreamToMemory(ms, opt, descriptor)
                     Return entries IsNot Nothing AndAlso entries.Count > 0
                 End Using
             Catch
-                entries = Array.Empty(Of ZipExtractedEntry)()
+                entries = Array.Empty (Of ZipExtractedEntry)()
                 Return False
             End Try
         End Function
@@ -462,12 +489,12 @@ Namespace FileTypeDetection
         End Property
 
         Public Function Process(
-            stream As Stream,
-            opt As FileTypeProjectOptions,
-            depth As Integer,
-            containerTypeValue As ArchiveContainerType,
-            extractEntry As Func(Of IArchiveEntryModel, Boolean)
-        ) As Boolean Implements IArchiveBackend.Process
+                                stream As Stream,
+                                opt As FileTypeProjectOptions,
+                                depth As Integer,
+                                containerTypeValue As ArchiveContainerType,
+                                extractEntry As Func(Of IArchiveEntryModel, Boolean)
+                                ) As Boolean Implements IArchiveBackend.Process
             If stream Is Nothing OrElse Not stream.CanRead Then Return False
             If opt Is Nothing Then Return False
             If depth > opt.MaxZipNestingDepth Then Return False
@@ -482,11 +509,12 @@ Namespace FileTypeDetection
                     If mapped <> containerTypeValue Then Return False
 
                     Dim entries = archive.Entries.
-                        OrderBy(Function(e) If(e.Key, String.Empty), StringComparer.Ordinal).
-                        ToList()
+                            OrderBy(Function(e) If(e.Key, String.Empty), StringComparer.Ordinal).
+                            ToList()
 
                     Dim nestedResult As Boolean
-                    Dim nestedHandled = TryProcessNestedGArchive(entries, opt, depth, containerTypeValue, extractEntry, nestedResult)
+                    Dim nestedHandled = TryProcessNestedGArchive(entries, opt, depth, containerTypeValue, extractEntry,
+                                                                 nestedResult)
                     If nestedHandled Then Return nestedResult
 
                     If entries.Count > opt.MaxZipEntries Then Return False
@@ -525,13 +553,13 @@ Namespace FileTypeDetection
         End Function
 
         Private Shared Function TryProcessNestedGArchive(
-            entries As List(Of SharpCompress.Archives.IArchiveEntry),
-            opt As FileTypeProjectOptions,
-            depth As Integer,
-            containerType As ArchiveContainerType,
-            extractEntry As Func(Of IArchiveEntryModel, Boolean),
-            ByRef nestedResult As Boolean
-        ) As Boolean
+                                                         entries As List(Of IArchiveEntry),
+                                                         opt As FileTypeProjectOptions,
+                                                         depth As Integer,
+                                                         containerType As ArchiveContainerType,
+                                                         extractEntry As Func(Of IArchiveEntryModel, Boolean),
+                                                         ByRef nestedResult As Boolean
+                                                         ) As Boolean
             nestedResult = False
             If containerType <> ArchiveContainerType.GZip Then Return False
             If entries Is Nothing OrElse entries.Count <> 1 Then Return False
@@ -563,14 +591,16 @@ Namespace FileTypeDetection
                 Return True
             End If
 
-            Using nestedMs As New MemoryStream(payload, writable:=False)
-                nestedResult = ArchiveProcessingEngine.ProcessArchiveStream(nestedMs, opt, depth + 1, nestedDescriptor, extractEntry)
+            Using nestedMs As New MemoryStream(payload, writable := False)
+                nestedResult = ArchiveProcessingEngine.ProcessArchiveStream(nestedMs, opt, depth + 1, nestedDescriptor,
+                                                                            extractEntry)
             End Using
             Return True
         End Function
 
-        Private Shared Function TryReadEntryPayloadBounded(entry As SharpCompress.Archives.IArchiveEntry, maxBytes As Long, ByRef payload As Byte()) As Boolean
-            payload = Array.Empty(Of Byte)()
+        Private Shared Function TryReadEntryPayloadBounded(entry As IArchiveEntry, maxBytes As Long,
+                                                           ByRef payload As Byte()) As Boolean
+            payload = Array.Empty (Of Byte)()
             If entry Is Nothing Then Return False
             If maxBytes <= 0 Then Return False
 
@@ -584,12 +614,13 @@ Namespace FileTypeDetection
                     End Using
                 End Using
             Catch
-                payload = Array.Empty(Of Byte)()
+                payload = Array.Empty (Of Byte)()
                 Return False
             End Try
         End Function
 
-        Private Shared Function TryGetValidatedSize(entry As IArchiveEntryModel, opt As FileTypeProjectOptions, ByRef knownSize As Long, requireKnownForTotal As Boolean) As Boolean
+        Private Shared Function TryGetValidatedSize(entry As IArchiveEntryModel, opt As FileTypeProjectOptions,
+                                                    ByRef knownSize As Long, requireKnownForTotal As Boolean) As Boolean
             knownSize = 0
             If entry Is Nothing Then Return False
             If opt Is Nothing Then Return False
@@ -610,7 +641,8 @@ Namespace FileTypeDetection
             Return TryMeasureEntrySize(entry, opt, knownSize)
         End Function
 
-        Private Shared Function TryMeasureEntrySize(entry As IArchiveEntryModel, opt As FileTypeProjectOptions, ByRef measured As Long) As Boolean
+        Private Shared Function TryMeasureEntrySize(entry As IArchiveEntryModel, opt As FileTypeProjectOptions,
+                                                    ByRef measured As Long) As Boolean
             measured = 0
             If entry Is Nothing OrElse opt Is Nothing Then Return False
 
@@ -637,9 +669,9 @@ Namespace FileTypeDetection
     Friend NotInheritable Class SharpCompressEntryModel
         Implements IArchiveEntryModel
 
-        Private ReadOnly _entry As SharpCompress.Archives.IArchiveEntry
+        Private ReadOnly _entry As IArchiveEntry
 
-        Friend Sub New(entry As SharpCompress.Archives.IArchiveEntry)
+        Friend Sub New(entry As IArchiveEntry)
             _entry = entry
         End Sub
 
@@ -686,5 +718,4 @@ Namespace FileTypeDetection
             Return _entry.OpenEntryStream()
         End Function
     End Class
-
 End Namespace

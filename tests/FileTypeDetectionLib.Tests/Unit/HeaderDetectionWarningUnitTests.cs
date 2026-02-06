@@ -23,7 +23,8 @@ public sealed class HeaderDetectionWarningUnitTests
         var detected = new FileTypeDetector().Detect(source);
 
         Assert.Equal(FileKind.Docx, detected.Kind);
-        Assert.DoesNotContain(logger.Messages, m => m.Contains("Keine direkte Content-Erkennung", StringComparison.Ordinal));
+        Assert.DoesNotContain(logger.Messages,
+            m => m.Contains("Keine direkte Content-Erkennung", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -40,7 +41,8 @@ public sealed class HeaderDetectionWarningUnitTests
         var detected = new FileTypeDetector().Detect(source);
 
         Assert.Equal(FileKind.Pdf, detected.Kind);
-        Assert.DoesNotContain(logger.Messages, m => m.Contains("Keine direkte Content-Erkennung", StringComparison.Ordinal));
+        Assert.DoesNotContain(logger.Messages,
+            m => m.Contains("Keine direkte Content-Erkennung", StringComparison.Ordinal));
     }
 
     private sealed class CollectingLogger : ILogger
@@ -57,7 +59,8 @@ public sealed class HeaderDetectionWarningUnitTests
             return true;
         }
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
+            Func<TState, Exception?, string> formatter)
         {
             Messages.Enqueue(formatter(state, exception));
         }
@@ -65,6 +68,7 @@ public sealed class HeaderDetectionWarningUnitTests
         private sealed class NullScope : IDisposable
         {
             internal static readonly NullScope Instance = new();
+
             public void Dispose()
             {
             }

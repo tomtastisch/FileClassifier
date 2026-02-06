@@ -4,13 +4,11 @@ Option Explicit On
 Imports Microsoft.Extensions.Logging
 
 Namespace FileTypeDetection
-
     ''' <summary>
-    ''' Konfiguration fuer Dateityp-Erkennung und ZIP-Sicherheitsgrenzen.
-    '''
-    ''' Sicherheitsannahmen:
-    ''' - Grenzen sind konservativ, um Memory-/CPU-DoS (z. B. Zip-Bomb) zu reduzieren.
-    ''' - Logger darf Beobachtbarkeit liefern, aber niemals das Ergebnis beeinflussen.
+    '''     Konfiguration fuer Dateityp-Erkennung und ZIP-Sicherheitsgrenzen.
+    '''     Sicherheitsannahmen:
+    '''     - Grenzen sind konservativ, um Memory-/CPU-DoS (z. B. Zip-Bomb) zu reduzieren.
+    '''     - Logger darf Beobachtbarkeit liefern, aber niemals das Ergebnis beeinflussen.
     ''' </summary>
     Public NotInheritable Class FileTypeProjectOptions
         Private Const MinPositiveLong As Long = 1
@@ -18,56 +16,56 @@ Namespace FileTypeDetection
         Private Const MinNonNegativeInt As Integer = 0
 
         ''' <summary>
-        ''' Erzwingt Header-only-Erkennung fuer Nicht-ZIP-Typen.
-        ''' Sonderregel: ZIP-Container werden weiterhin sicher inhaltlich verfeinert (OOXML/ZIP).
-        ''' Default ist True und read-only.
+        '''     Erzwingt Header-only-Erkennung fuer Nicht-ZIP-Typen.
+        '''     Sonderregel: ZIP-Container werden weiterhin sicher inhaltlich verfeinert (OOXML/ZIP).
+        '''     Default ist True und read-only.
         ''' </summary>
         Public ReadOnly Property HeaderOnlyNonZip As Boolean
 
         ''' <summary>
-        ''' Harte Obergrenze fuer Datei-/Byte-Payloads.
-        ''' Alles darueber wird fail-closed verworfen.
+        '''     Harte Obergrenze fuer Datei-/Byte-Payloads.
+        '''     Alles darueber wird fail-closed verworfen.
         ''' </summary>
-        Public Property MaxBytes As Long = 200L * 1024L * 1024L
+        Public Property MaxBytes As Long = 200L*1024L*1024L
 
         ''' <summary>
-        ''' Maximale Header-Laenge fuer Sniffing/Magic.
+        '''     Maximale Header-Laenge fuer Sniffing/Magic.
         ''' </summary>
-        Public Property SniffBytes As Integer = 64 * 1024
+        Public Property SniffBytes As Integer = 64*1024
 
         ''' <summary>Maximal erlaubte Anzahl ZIP-Entries.</summary>
         Public Property MaxZipEntries As Integer = 5000
 
         ''' <summary>Maximale Summe unkomprimierter ZIP-Bytes.</summary>
-        Public Property MaxZipTotalUncompressedBytes As Long = 500L * 1024L * 1024L
+        Public Property MaxZipTotalUncompressedBytes As Long = 500L*1024L*1024L
 
         ''' <summary>Maximal erlaubte unkomprimierte Bytes pro ZIP-Entry.</summary>
-        Public Property MaxZipEntryUncompressedBytes As Long = 200L * 1024L * 1024L
+        Public Property MaxZipEntryUncompressedBytes As Long = 200L*1024L*1024L
 
         ''' <summary>
-        ''' Maximal erlaubtes Kompressionsverhaeltnis (u/c).
-        ''' Dient als einfacher Schutz gegen stark komprimierte Bomben.
+        '''     Maximal erlaubtes Kompressionsverhaeltnis (u/c).
+        '''     Dient als einfacher Schutz gegen stark komprimierte Bomben.
         ''' </summary>
         Public Property MaxZipCompressionRatio As Integer = 50
 
         ''' <summary>
-        ''' Maximale Rekursionstiefe fuer verschachtelte ZIP-Dateien (0 = aus).
+        '''     Maximale Rekursionstiefe fuer verschachtelte ZIP-Dateien (0 = aus).
         ''' </summary>
         Public Property MaxZipNestingDepth As Integer = 2
 
         ''' <summary>
-        ''' Harte In-Memory-Grenze fuer verschachtelte ZIP-Entries.
+        '''     Harte In-Memory-Grenze fuer verschachtelte ZIP-Entries.
         ''' </summary>
-        Public Property MaxZipNestedBytes As Long = 50L * 1024L * 1024L
+        Public Property MaxZipNestedBytes As Long = 50L*1024L*1024L
 
         ''' <summary>
-        ''' Standard-Policy: Link-Entries (symlink/hardlink) werden fail-closed verworfen.
+        '''     Standard-Policy: Link-Entries (symlink/hardlink) werden fail-closed verworfen.
         ''' </summary>
         Public Property RejectArchiveLinks As Boolean = True
 
         ''' <summary>
-        ''' Erlaubt Archive-Entries mit unbekannter Groesse nur bei explizitem Opt-In.
-        ''' Default ist fail-closed (False).
+        '''     Erlaubt Archive-Entries mit unbekannter Groesse nur bei explizitem Opt-In.
+        '''     Default ist fail-closed (False).
         ''' </summary>
         Public Property AllowUnknownArchiveEntrySize As Boolean = False
 
@@ -75,7 +73,7 @@ Namespace FileTypeDetection
         Public Property Logger As ILogger = Nothing
 
         ''' <summary>
-        ''' Optionen fuer deterministische Hash-/Evidence-Funktionen.
+        '''     Optionen fuer deterministische Hash-/Evidence-Funktionen.
         ''' </summary>
         Public Property DeterministicHash As DeterministicHashOptions = New DeterministicHashOptions()
 
@@ -89,19 +87,19 @@ Namespace FileTypeDetection
 
         Friend Function Clone() As FileTypeProjectOptions
             Dim cloned = New FileTypeProjectOptions(HeaderOnlyNonZip) With {
-                .MaxBytes = MaxBytes,
-                .SniffBytes = SniffBytes,
-                .MaxZipEntries = MaxZipEntries,
-                .MaxZipTotalUncompressedBytes = MaxZipTotalUncompressedBytes,
-                .MaxZipEntryUncompressedBytes = MaxZipEntryUncompressedBytes,
-                .MaxZipCompressionRatio = MaxZipCompressionRatio,
-                .MaxZipNestingDepth = MaxZipNestingDepth,
-                .MaxZipNestedBytes = MaxZipNestedBytes,
-                .RejectArchiveLinks = RejectArchiveLinks,
-                .AllowUnknownArchiveEntrySize = AllowUnknownArchiveEntrySize,
-                .Logger = Logger,
-                .DeterministicHash = DeterministicHashOptions.Normalize(DeterministicHash)
-            }
+                    .MaxBytes = MaxBytes,
+                    .SniffBytes = SniffBytes,
+                    .MaxZipEntries = MaxZipEntries,
+                    .MaxZipTotalUncompressedBytes = MaxZipTotalUncompressedBytes,
+                    .MaxZipEntryUncompressedBytes = MaxZipEntryUncompressedBytes,
+                    .MaxZipCompressionRatio = MaxZipCompressionRatio,
+                    .MaxZipNestingDepth = MaxZipNestingDepth,
+                    .MaxZipNestedBytes = MaxZipNestedBytes,
+                    .RejectArchiveLinks = RejectArchiveLinks,
+                    .AllowUnknownArchiveEntrySize = AllowUnknownArchiveEntrySize,
+                    .Logger = Logger,
+                    .DeterministicHash = DeterministicHashOptions.Normalize(DeterministicHash)
+                    }
             cloned.NormalizeInPlace()
             Return cloned
         End Function
@@ -133,7 +131,5 @@ Namespace FileTypeDetection
             options.NormalizeInPlace()
             Return options
         End Function
-
     End Class
-
 End Namespace

@@ -35,7 +35,7 @@ public sealed class ArchiveInternalsUnitTests
     public void ArchiveTypeResolver_TryDescribeBytes_DetectsArchives()
     {
         var opt = FileTypeProjectOptions.DefaultOptions();
-        ArchiveDescriptor descriptor = ArchiveDescriptor.UnknownDescriptor();
+        var descriptor = ArchiveDescriptor.UnknownDescriptor();
 
         Assert.False(ArchiveTypeResolver.TryDescribeBytes(Array.Empty<byte>(), opt, ref descriptor));
 
@@ -55,8 +55,10 @@ public sealed class ArchiveInternalsUnitTests
         var descriptor = ArchiveDescriptor.UnknownDescriptor();
 
         Assert.False(ArchiveProcessingEngine.ProcessArchiveStream(null, opt, depth: 0, descriptor, extractEntry: null));
-        Assert.False(ArchiveProcessingEngine.ProcessArchiveStream(new MemoryStream(), null, depth: 0, descriptor, extractEntry: null));
-        Assert.False(ArchiveProcessingEngine.ProcessArchiveStream(new MemoryStream(), opt, depth: 0, descriptor, extractEntry: null));
+        Assert.False(ArchiveProcessingEngine.ProcessArchiveStream(new MemoryStream(), null, depth: 0, descriptor,
+            extractEntry: null));
+        Assert.False(ArchiveProcessingEngine.ProcessArchiveStream(new MemoryStream(), opt, depth: 0, descriptor,
+            extractEntry: null));
     }
 
     [Fact]

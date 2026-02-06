@@ -33,7 +33,7 @@ public sealed class OpenXmlRefinerUnitTests
     public void TryRefineStream_DetectsOpenXmlKinds(string markerPath, FileKind expected)
     {
         var payload = CreateOpenXmlPackage(markerPath);
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
 
         var result = OpenXmlRefiner.TryRefineStream(stream);
 
@@ -44,7 +44,7 @@ public sealed class OpenXmlRefinerUnitTests
     public void TryRefineStream_ReturnsUnknown_WhenContentTypesMissing()
     {
         var payload = CreateZipWithEntries("word/document.xml");
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
 
         var result = OpenXmlRefiner.TryRefineStream(stream);
 
@@ -55,7 +55,7 @@ public sealed class OpenXmlRefinerUnitTests
     public void TryRefineStream_ReturnsUnknown_WhenMarkersMissing()
     {
         var payload = CreateZipWithEntries("[Content_Types].xml");
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
 
         var result = OpenXmlRefiner.TryRefineStream(stream);
 
@@ -65,7 +65,7 @@ public sealed class OpenXmlRefinerUnitTests
     [Fact]
     public void TryRefine_ReturnsUnknown_WhenFactoryThrows()
     {
-        FileType result = OpenXmlRefiner.TryRefine(() => throw new InvalidOperationException("boom"));
+        var result = OpenXmlRefiner.TryRefine(() => throw new InvalidOperationException("boom"));
 
         Assert.Equal(FileKind.Unknown, result.Kind);
     }
@@ -73,7 +73,7 @@ public sealed class OpenXmlRefinerUnitTests
     private static byte[] CreateOpenXmlPackage(string markerPath)
     {
         using var ms = new MemoryStream();
-        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
+        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, true))
         {
             zip.CreateEntry("[Content_Types].xml");
             zip.CreateEntry(markerPath);
@@ -85,12 +85,9 @@ public sealed class OpenXmlRefinerUnitTests
     private static byte[] CreateZipWithEntries(params string[] names)
     {
         using var ms = new MemoryStream();
-        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
+        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, true))
         {
-            foreach (var name in names)
-            {
-                zip.CreateEntry(name);
-            }
+            foreach (var name in names) zip.CreateEntry(name);
         }
 
         return ms.ToArray();

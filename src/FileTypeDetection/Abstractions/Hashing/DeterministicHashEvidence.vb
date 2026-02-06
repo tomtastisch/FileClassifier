@@ -4,12 +4,10 @@ Option Explicit On
 Imports System.Collections.Immutable
 
 Namespace FileTypeDetection
-
     ''' <summary>
-    ''' Nachweisobjekt fuer einen deterministischen Hash-Schritt.
+    '''     Nachweisobjekt fuer einen deterministischen Hash-Schritt.
     ''' </summary>
     Public NotInheritable Class DeterministicHashEvidence
-
         Public ReadOnly Property SourceType As DeterministicHashSourceType
         Public ReadOnly Property Label As String
         Public ReadOnly Property DetectedType As FileType
@@ -22,16 +20,16 @@ Namespace FileTypeDetection
         Public ReadOnly Property Notes As String
 
         Friend Sub New(
-            sourceType As DeterministicHashSourceType,
-            label As String,
-            detectedType As FileType,
-            entry As ZipExtractedEntry,
-            compressedBytes As Byte(),
-            uncompressedBytes As Byte(),
-            entryCount As Integer,
-            totalUncompressedBytes As Long,
-            digests As DeterministicHashDigestSet,
-            notes As String)
+                       sourceType As DeterministicHashSourceType,
+                       label As String,
+                       detectedType As FileType,
+                       entry As ZipExtractedEntry,
+                       compressedBytes As Byte(),
+                       uncompressedBytes As Byte(),
+                       entryCount As Integer,
+                       totalUncompressedBytes As Long,
+                       digests As DeterministicHashDigestSet,
+                       notes As String)
             Me.SourceType = sourceType
             Me.Label = If(label, String.Empty)
             Me.DetectedType = If(detectedType, FileTypeRegistry.Resolve(FileKind.Unknown))
@@ -44,26 +42,26 @@ Namespace FileTypeDetection
             Me.UncompressedBytes = ToImmutable(uncompressedBytes)
         End Sub
 
-        Friend Shared Function CreateFailure(sourceType As DeterministicHashSourceType, label As String, notes As String) As DeterministicHashEvidence
+        Friend Shared Function CreateFailure(sourceType As DeterministicHashSourceType, label As String, notes As String) _
+            As DeterministicHashEvidence
             Return New DeterministicHashEvidence(
-                sourceType:=sourceType,
-                label:=label,
-                detectedType:=FileTypeRegistry.Resolve(FileKind.Unknown),
-                entry:=Nothing,
-                compressedBytes:=Array.Empty(Of Byte)(),
-                uncompressedBytes:=Array.Empty(Of Byte)(),
-                entryCount:=0,
-                totalUncompressedBytes:=0,
-                digests:=DeterministicHashDigestSet.Empty,
-                notes:=notes)
+                sourceType := sourceType,
+                label := label,
+                detectedType := FileTypeRegistry.Resolve(FileKind.Unknown),
+                entry := Nothing,
+                compressedBytes := Array.Empty (Of Byte)(),
+                uncompressedBytes := Array.Empty (Of Byte)(),
+                entryCount := 0,
+                totalUncompressedBytes := 0,
+                digests := DeterministicHashDigestSet.Empty,
+                notes := notes)
         End Function
 
         Private Shared Function ToImmutable(data As Byte()) As ImmutableArray(Of Byte)
             If data Is Nothing OrElse data.Length = 0 Then
-                Return ImmutableArray(Of Byte).Empty
+                Return ImmutableArray (Of Byte).Empty
             End If
             Return ImmutableArray.Create(data)
         End Function
     End Class
-
 End Namespace

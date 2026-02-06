@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -10,49 +9,15 @@ namespace FileTypeDetectionLib.Tests.Unit;
 
 public sealed class ArchiveExtractorAdditionalUnitTests
 {
-    private sealed class FakeEntry : IArchiveEntryModel
-    {
-        public string RelativePath { get; set; } = "entry.txt";
-        public bool IsDirectory { get; set; }
-        public long? UncompressedSize { get; set; }
-        public long? CompressedSize { get; set; }
-        public string LinkTarget { get; set; } = string.Empty;
-        public Stream OpenStream() => Stream.Null;
-    }
-
-    private sealed class NullStreamEntry : IArchiveEntryModel
-    {
-        public string RelativePath { get; set; } = "entry.txt";
-        public bool IsDirectory { get; set; }
-        public long? UncompressedSize { get; set; }
-        public long? CompressedSize { get; set; }
-        public string LinkTarget { get; set; } = string.Empty;
-        public Stream OpenStream() => null!;
-    }
-
     [Fact]
     public void TryExtractArchiveStreamToMemory_ReturnsEmpty_ForNonArchivePayload()
     {
         var opt = FileTypeProjectOptions.DefaultOptions();
-        using var ms = new MemoryStream(new byte[] { 0x01, 0x02, 0x03 }, writable: false);
+        using var ms = new MemoryStream(new byte[] { 0x01, 0x02, 0x03 }, false);
 
         var entries = ArchiveExtractor.TryExtractArchiveStreamToMemory(ms, opt);
 
         Assert.Empty(entries);
-    }
-
-    private sealed class UnreadableStream : Stream
-    {
-        public override bool CanRead => false;
-        public override bool CanSeek => false;
-        public override bool CanWrite => false;
-        public override long Length => 0;
-        public override long Position { get => 0; set { } }
-        public override void Flush() { }
-        public override int Read(byte[] buffer, int offset, int count) => 0;
-        public override long Seek(long offset, SeekOrigin origin) => 0;
-        public override void SetLength(long value) { }
-        public override void Write(byte[] buffer, int offset, int count) { }
     }
 
     [Fact]
@@ -82,11 +47,12 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     public void TryExtractArchiveStreamToMemory_ReturnsEmpty_ForNullOptionsOrDescriptor()
     {
         var payload = ArchiveEntryPayloadFactory.CreateZipWithEntries(1, 4);
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
         var descriptor = ArchiveDescriptor.ForContainerType(ArchiveContainerType.Zip);
 
         var nullOpt = ArchiveExtractor.TryExtractArchiveStreamToMemory(stream, null!, descriptor);
-        var nullDescriptor = ArchiveExtractor.TryExtractArchiveStreamToMemory(stream, FileTypeProjectOptions.DefaultOptions(), null!);
+        var nullDescriptor =
+            ArchiveExtractor.TryExtractArchiveStreamToMemory(stream, FileTypeProjectOptions.DefaultOptions(), null!);
 
         Assert.Empty(nullOpt);
         Assert.Empty(nullDescriptor);
@@ -100,7 +66,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
         Directory.CreateDirectory(destination);
 
         var payload = ArchiveEntryPayloadFactory.CreateZipWithSingleEntry("note.txt", 4);
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
         var opt = FileTypeProjectOptions.DefaultOptions();
 
         var ok = ArchiveExtractor.TryExtractArchiveStream(stream, destination, opt);
@@ -113,7 +79,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     {
         var opt = FileTypeProjectOptions.DefaultOptions();
         var payload = ArchiveEntryPayloadFactory.CreateZipWithEntries(1, 4);
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
 
         var ok = ArchiveExtractor.TryExtractArchiveStream(stream, "bad\0path", opt);
 
@@ -124,7 +90,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     public void TryExtractArchiveStream_ReturnsFalse_WhenStreamNotArchive()
     {
         var opt = FileTypeProjectOptions.DefaultOptions();
-        using var stream = new MemoryStream(new byte[] { 0x01, 0x02, 0x03 }, writable: false);
+        using var stream = new MemoryStream(new byte[] { 0x01, 0x02, 0x03 }, false);
         using var scope = TestTempPaths.CreateScope("ftd-extract-nonarchive");
         var destination = Path.Combine(scope.RootPath, "out");
 
@@ -138,7 +104,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     {
         var opt = FileTypeProjectOptions.DefaultOptions();
         var payload = ArchiveEntryPayloadFactory.CreateZipWithEntries(1, 4);
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
         var descriptor = ArchiveDescriptor.ForContainerType(ArchiveContainerType.Zip);
 
         Assert.False(ArchiveExtractor.TryExtractArchiveStream(null!, "x", opt, descriptor));
@@ -154,7 +120,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
         opt.MaxZipEntries = 0;
         var payload = ArchiveEntryPayloadFactory.CreateZipWithEntries(1, 4);
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
 
         var entries = ArchiveExtractor.TryExtractArchiveStreamToMemory(stream, opt);
 
@@ -164,7 +130,8 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     [Fact]
     public void ExtractEntryToMemory_ReturnsTrue_ForDirectoryEntry()
     {
-        var method = typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -180,7 +147,8 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     [Fact]
     public void ExtractEntryToMemory_ReturnsFalse_ForNullEntriesOrOptions()
     {
-        var method = typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -195,7 +163,8 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     [Fact]
     public void ExtractEntryToMemory_ReturnsFalse_ForNullEntry()
     {
-        var method = typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -209,7 +178,8 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     [Fact]
     public void ExtractEntryToMemory_ReturnsFalse_WhenEntryStreamNullOrUnreadable()
     {
-        var method = typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -224,7 +194,8 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     [Fact]
     public void ExtractEntryToMemory_ReturnsFalse_ForInvalidPath()
     {
-        var method = typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -239,7 +210,8 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     [Fact]
     public void ExtractEntryToDirectory_ReturnsFalse_ForNullInputs()
     {
-        var method = typeof(ArchiveExtractor).GetMethod("ExtractEntryToDirectory", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToDirectory", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -253,7 +225,8 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     [Fact]
     public void ExtractEntryToDirectory_ReturnsFalse_WhenEntryTooLarge()
     {
-        var method = typeof(ArchiveExtractor).GetMethod("ExtractEntryToDirectory", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToDirectory", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         using var scope = TestTempPaths.CreateScope("ftd-extract-large");
@@ -270,5 +243,69 @@ public sealed class ArchiveExtractorAdditionalUnitTests
         var ok = (bool)method!.Invoke(null, new object[] { entry, prefix, opt })!;
 
         Assert.False(ok);
+    }
+
+    private sealed class FakeEntry : IArchiveEntryModel
+    {
+        public string RelativePath { get; set; } = "entry.txt";
+        public bool IsDirectory { get; set; }
+        public long? UncompressedSize { get; set; }
+        public long? CompressedSize { get; set; }
+        public string LinkTarget { get; } = string.Empty;
+
+        public Stream OpenStream()
+        {
+            return Stream.Null;
+        }
+    }
+
+    private sealed class NullStreamEntry : IArchiveEntryModel
+    {
+        public string RelativePath { get; set; } = "entry.txt";
+        public bool IsDirectory { get; set; }
+        public long? UncompressedSize { get; set; }
+        public long? CompressedSize { get; set; }
+        public string LinkTarget { get; } = string.Empty;
+
+        public Stream OpenStream()
+        {
+            return null!;
+        }
+    }
+
+    private sealed class UnreadableStream : Stream
+    {
+        public override bool CanRead => false;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override long Length => 0;
+
+        public override long Position
+        {
+            get => 0;
+            set { }
+        }
+
+        public override void Flush()
+        {
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            return 0;
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            return 0;
+        }
+
+        public override void SetLength(long value)
+        {
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+        }
     }
 }

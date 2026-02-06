@@ -2,9 +2,8 @@ Option Strict On
 Option Explicit On
 
 Namespace FileTypeDetection
-
     ''' <summary>
-    ''' Quelle eines Hash-Nachweises.
+    '''     Quelle eines Hash-Nachweises.
     ''' </summary>
     Public Enum DeterministicHashSourceType
         Unknown = 0
@@ -13,5 +12,4 @@ Namespace FileTypeDetection
         ArchiveEntries = 3
         MaterializedFile = 4
     End Enum
-
 End Namespace

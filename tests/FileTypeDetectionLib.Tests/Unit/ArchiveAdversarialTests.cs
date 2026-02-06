@@ -1,4 +1,3 @@
-using System;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
 using Xunit;
@@ -16,7 +15,7 @@ public sealed class ArchiveAdversarialTests
         options.MaxBytes = 10 * 1024 * 1024;
         scope.Set(options);
 
-        var adversarialZip = ArchiveEntryPayloadFactory.CreateZipWithEntries(entryCount: 200, entrySize: 1);
+        var adversarialZip = ArchiveEntryPayloadFactory.CreateZipWithEntries(200, 1);
         var result = new FileTypeDetector().Detect(adversarialZip);
 
         Assert.Equal(FileKind.Unknown, result.Kind);
@@ -32,7 +31,7 @@ public sealed class ArchiveAdversarialTests
         options.MaxBytes = 10 * 1024 * 1024;
         scope.Set(options);
 
-        var deepZip = ArchiveEntryPayloadFactory.CreateDeepNestedZip(depth: 3, innerPayloadSize: 16);
+        var deepZip = ArchiveEntryPayloadFactory.CreateDeepNestedZip(3, 16);
         var result = new FileTypeDetector().Detect(deepZip);
 
         Assert.Equal(FileKind.Unknown, result.Kind);
@@ -63,7 +62,7 @@ public sealed class ArchiveAdversarialTests
         options.MaxBytes = 10 * 1024 * 1024;
         scope.Set(options);
 
-        var deepZip = ArchiveEntryPayloadFactory.CreateDeepNestedZipWithEntryName(depth: 3, innerPayloadSize: 16, entryName: "payload.bin");
+        var deepZip = ArchiveEntryPayloadFactory.CreateDeepNestedZipWithEntryName(3, 16, "payload.bin");
         var result = new FileTypeDetector().Detect(deepZip);
 
         Assert.Equal(FileKind.Unknown, result.Kind);

@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Reflection;
 using FileTypeDetection;
@@ -9,37 +8,12 @@ namespace FileTypeDetectionLib.Tests.Unit;
 
 public sealed class ArchiveInternalsPrivateBranchUnitTests
 {
-    private sealed class FakeEntry : IArchiveEntryModel
-    {
-        public string RelativePath { get; set; } = "entry.bin";
-        public bool IsDirectory { get; set; }
-        public long? UncompressedSize { get; set; }
-        public long? CompressedSize { get; set; }
-        public string LinkTarget { get; set; } = string.Empty;
-        public Stream OpenStream() => Stream.Null;
-    }
-
-    private sealed class SizedEntry : IArchiveEntryModel
-    {
-        private readonly byte[] _payload;
-
-        public SizedEntry(int size)
-        {
-            _payload = new byte[size];
-        }
-
-        public string RelativePath => "payload.bin";
-        public bool IsDirectory => false;
-        public long? UncompressedSize => null;
-        public long? CompressedSize => null;
-        public string LinkTarget => string.Empty;
-        public Stream OpenStream() => new MemoryStream(_payload, writable: false);
-    }
-
     [Fact]
     public void TryGetValidatedSize_MeasuresWhenUnknownAndRequired()
     {
-        var method = typeof(SharpCompressArchiveBackend).GetMethod("TryGetValidatedSize", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(SharpCompressArchiveBackend).GetMethod("TryGetValidatedSize",
+                BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -56,7 +30,9 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
     [Fact]
     public void TryGetValidatedSize_FailsWhenMeasuredExceedsLimit()
     {
-        var method = typeof(SharpCompressArchiveBackend).GetMethod("TryGetValidatedSize", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(SharpCompressArchiveBackend).GetMethod("TryGetValidatedSize",
+                BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -72,7 +48,9 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
     [Fact]
     public void TryGetValidatedSize_RejectsNullInputs()
     {
-        var method = typeof(SharpCompressArchiveBackend).GetMethod("TryGetValidatedSize", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(SharpCompressArchiveBackend).GetMethod("TryGetValidatedSize",
+                BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -87,7 +65,9 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
     [Fact]
     public void TryGetValidatedSize_ReturnsTrue_WhenUnknownSizeNotRequired()
     {
-        var method = typeof(SharpCompressArchiveBackend).GetMethod("TryGetValidatedSize", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(SharpCompressArchiveBackend).GetMethod("TryGetValidatedSize",
+                BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -102,7 +82,9 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
     [Fact]
     public void TryMeasureEntrySize_ReturnsTrue_WhenAllowUnknownEnabled()
     {
-        var method = typeof(SharpCompressArchiveBackend).GetMethod("TryMeasureEntrySize", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(SharpCompressArchiveBackend).GetMethod("TryMeasureEntrySize",
+                BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -117,7 +99,9 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
     [Fact]
     public void TryGetValidatedSize_ReturnsTrue_ForNegativeSize_WhenNotRequired()
     {
-        var method = typeof(SharpCompressArchiveBackend).GetMethod("TryGetValidatedSize", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(SharpCompressArchiveBackend).GetMethod("TryGetValidatedSize",
+                BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -131,7 +115,9 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
     [Fact]
     public void TryMeasureEntrySize_ReturnsFalse_ForNullInputs()
     {
-        var method = typeof(SharpCompressArchiveBackend).GetMethod("TryMeasureEntrySize", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(SharpCompressArchiveBackend).GetMethod("TryMeasureEntrySize",
+                BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -146,7 +132,9 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
     [Fact]
     public void TryMeasureEntrySize_ReturnsFalse_WhenStreamUnreadable()
     {
-        var method = typeof(SharpCompressArchiveBackend).GetMethod("TryMeasureEntrySize", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(SharpCompressArchiveBackend).GetMethod("TryMeasureEntrySize",
+                BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -155,30 +143,6 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
         var ok = (bool)method!.Invoke(null, args)!;
 
         Assert.False(ok);
-    }
-
-    private sealed class UnreadableEntry : IArchiveEntryModel
-    {
-        public string RelativePath => "payload.bin";
-        public bool IsDirectory => false;
-        public long? UncompressedSize => null;
-        public long? CompressedSize => null;
-        public string LinkTarget => string.Empty;
-        public Stream OpenStream() => new UnreadableStream();
-    }
-
-    private sealed class UnreadableStream : Stream
-    {
-        public override bool CanRead => false;
-        public override bool CanSeek => false;
-        public override bool CanWrite => false;
-        public override long Length => 0;
-        public override long Position { get => 0; set { } }
-        public override void Flush() { }
-        public override int Read(byte[] buffer, int offset, int count) => 0;
-        public override long Seek(long offset, SeekOrigin origin) => 0;
-        public override void SetLength(long value) { }
-        public override void Write(byte[] buffer, int offset, int count) { }
     }
 
     [Fact]
@@ -191,11 +155,96 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
         var nestedZip = ArchiveEntryPayloadFactory.CreateZipWithEntries(1, 8);
         var gzipPayload = ArchivePayloadFactory.CreateGZipWithSingleEntry("payload.zip", nestedZip);
 
-        using var stream = new MemoryStream(gzipPayload, writable: false);
+        using var stream = new MemoryStream(gzipPayload, false);
         var backend = new SharpCompressArchiveBackend();
 
-        var ok = backend.Process(stream, opt, depth: 0, containerTypeValue: ArchiveContainerType.GZip, extractEntry: _ => true);
+        var ok = backend.Process(stream, opt, 0, ArchiveContainerType.GZip, _ => true);
 
         Assert.True(ok);
+    }
+
+    private sealed class FakeEntry : IArchiveEntryModel
+    {
+        public string RelativePath { get; } = "entry.bin";
+        public bool IsDirectory { get; set; }
+        public long? UncompressedSize { get; set; }
+        public long? CompressedSize { get; set; }
+        public string LinkTarget { get; } = string.Empty;
+
+        public Stream OpenStream()
+        {
+            return Stream.Null;
+        }
+    }
+
+    private sealed class SizedEntry : IArchiveEntryModel
+    {
+        private readonly byte[] _payload;
+
+        public SizedEntry(int size)
+        {
+            _payload = new byte[size];
+        }
+
+        public string RelativePath => "payload.bin";
+        public bool IsDirectory => false;
+        public long? UncompressedSize => null;
+        public long? CompressedSize => null;
+        public string LinkTarget => string.Empty;
+
+        public Stream OpenStream()
+        {
+            return new MemoryStream(_payload, false);
+        }
+    }
+
+    private sealed class UnreadableEntry : IArchiveEntryModel
+    {
+        public string RelativePath => "payload.bin";
+        public bool IsDirectory => false;
+        public long? UncompressedSize => null;
+        public long? CompressedSize => null;
+        public string LinkTarget => string.Empty;
+
+        public Stream OpenStream()
+        {
+            return new UnreadableStream();
+        }
+    }
+
+    private sealed class UnreadableStream : Stream
+    {
+        public override bool CanRead => false;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override long Length => 0;
+
+        public override long Position
+        {
+            get => 0;
+            set { }
+        }
+
+        public override void Flush()
+        {
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            return 0;
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            return 0;
+        }
+
+        public override void SetLength(long value)
+        {
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+        }
     }
 }

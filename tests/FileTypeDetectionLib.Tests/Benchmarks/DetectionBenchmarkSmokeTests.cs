@@ -24,10 +24,9 @@ public sealed class DetectionBenchmarkSmokeTests
         {
             var result = detector.Detect(pdf);
             if (result.Kind != FileKind.Pdf)
-            {
                 throw new InvalidOperationException($"Unexpected kind for pdf benchmark run: {result.Kind}");
-            }
         }
+
         pdfSw.Stop();
 
         var archiveSw = Stopwatch.StartNew();
@@ -35,14 +34,14 @@ public sealed class DetectionBenchmarkSmokeTests
         {
             var result = detector.Detect(archivePayload);
             if (result.Kind != FileKind.Zip)
-            {
                 throw new InvalidOperationException($"Unexpected kind for archive benchmark run: {result.Kind}");
-            }
         }
+
         archiveSw.Stop();
 
         // Dokumentationszweck: reproduzierbare Messpunkte ohne harte Timing-Schwelle.
-        var benchmarkLine = $"benchmark_detect_ms: pdf={pdfSw.ElapsedMilliseconds}, archive={archiveSw.ElapsedMilliseconds}, iterations={iterations}";
+        var benchmarkLine =
+            $"benchmark_detect_ms: pdf={pdfSw.ElapsedMilliseconds}, archive={archiveSw.ElapsedMilliseconds}, iterations={iterations}";
         File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "benchmark_detect_ms.txt"), benchmarkLine);
 
         Assert.True(pdfSw.ElapsedMilliseconds >= 0);

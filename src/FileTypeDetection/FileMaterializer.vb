@@ -1,27 +1,26 @@
 Option Strict On
 Option Explicit On
 
-Imports System
 Imports System.IO
 
 Namespace FileTypeDetection
-
     ''' <summary>
-    ''' Einheitliche Byte-basierte Materialisierung mit optionaler sicherer ZIP-Extraktion.
+    '''     Einheitliche Byte-basierte Materialisierung mit optionaler sicherer ZIP-Extraktion.
     ''' </summary>
     Public NotInheritable Class FileMaterializer
         Private Sub New()
         End Sub
 
         Public Shared Function Persist(data As Byte(), destinationPath As String) As Boolean
-            Return Persist(data, destinationPath, overwrite:=False, secureExtract:=False)
+            Return Persist(data, destinationPath, overwrite := False, secureExtract := False)
         End Function
 
         Public Shared Function Persist(data As Byte(), destinationPath As String, overwrite As Boolean) As Boolean
-            Return Persist(data, destinationPath, overwrite, secureExtract:=False)
+            Return Persist(data, destinationPath, overwrite, secureExtract := False)
         End Function
 
-        Public Shared Function Persist(data As Byte(), destinationPath As String, overwrite As Boolean, secureExtract As Boolean) As Boolean
+        Public Shared Function Persist(data As Byte(), destinationPath As String, overwrite As Boolean,
+                                       secureExtract As Boolean) As Boolean
             Dim opt = FileTypeOptions.GetSnapshot()
             If data Is Nothing Then Return False
             If CLng(data.Length) > opt.MaxBytes Then
@@ -58,15 +57,20 @@ Namespace FileTypeDetection
             Return MaterializeRawBytes(data, destinationFull, overwrite, opt)
         End Function
 
-        Private Shared Function MaterializeRawBytes(data As Byte(), destinationFull As String, overwrite As Boolean, opt As FileTypeProjectOptions) As Boolean
+        Private Shared Function MaterializeRawBytes(data As Byte(), destinationFull As String, overwrite As Boolean,
+                                                    opt As FileTypeProjectOptions) As Boolean
             Try
-                If Not DestinationPathGuard.PrepareMaterializationTarget(destinationFull, overwrite, opt) Then Return False
+                If Not DestinationPathGuard.PrepareMaterializationTarget(destinationFull, overwrite, opt) Then _
+                    Return False
 
                 Dim parent = Path.GetDirectoryName(destinationFull)
                 If String.IsNullOrWhiteSpace(parent) Then Return False
                 Directory.CreateDirectory(parent)
 
-                Using fs As New FileStream(destinationFull, FileMode.CreateNew, FileAccess.Write, FileShare.None, InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
+                Using _
+                    fs As _
+                        New FileStream(destinationFull, FileMode.CreateNew, FileAccess.Write, FileShare.None,
+                                       InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
                     fs.Write(data, 0, data.Length)
                 End Using
 
@@ -77,11 +81,14 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Private Shared Function MaterializeArchiveBytes(data As Byte(), destinationFull As String, overwrite As Boolean, opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor) As Boolean
+        Private Shared Function MaterializeArchiveBytes(data As Byte(), destinationFull As String, overwrite As Boolean,
+                                                        opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor) _
+            As Boolean
             Try
-                If Not DestinationPathGuard.PrepareMaterializationTarget(destinationFull, overwrite, opt) Then Return False
+                If Not DestinationPathGuard.PrepareMaterializationTarget(destinationFull, overwrite, opt) Then _
+                    Return False
 
-                Using ms As New MemoryStream(data, writable:=False)
+                Using ms As New MemoryStream(data, writable := False)
                     Return ArchiveExtractor.TryExtractArchiveStream(ms, destinationFull, opt, descriptor)
                 End Using
             Catch ex As Exception
@@ -89,7 +96,5 @@ Namespace FileTypeDetection
                 Return False
             End Try
         End Function
-
     End Class
-
 End Namespace

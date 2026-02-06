@@ -1,4 +1,3 @@
-using FileTypeDetection;
 using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
@@ -10,9 +9,9 @@ public sealed class MimeProviderUnitTests
     {
         var provider = MimeProvider.Instance;
 
-        Assert.Equal(string.Empty, provider.GetMime(null));
-        Assert.Equal(string.Empty, provider.GetMime(""));
-        Assert.Equal(string.Empty, provider.GetMime("   "));
+        Assert.Equal(string.Empty, (string?)provider.GetMime(null));
+        Assert.Equal(string.Empty, (string?)provider.GetMime(""));
+        Assert.Equal(string.Empty, (string?)provider.GetMime("   "));
     }
 
     [Fact]
@@ -23,13 +22,13 @@ public sealed class MimeProviderUnitTests
         var withDot = provider.GetMime(".txt");
         var withoutDot = provider.GetMime("txt");
 
-        Assert.Equal(withDot, withoutDot);
+        Assert.Equal((string?)withDot, (string?)withoutDot);
         Assert.False(string.IsNullOrWhiteSpace(withDot));
     }
 
     [Fact]
     public void ActiveBackendName_IsHeyRedMime_ByDefault()
     {
-        Assert.Equal("HeyRedMime", MimeProviderDiagnostics.ActiveBackendName);
+        Assert.Equal((string?)"HeyRedMime", (string?)MimeProviderDiagnostics.ActiveBackendName);
     }
 }

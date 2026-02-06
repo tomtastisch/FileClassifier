@@ -2,12 +2,10 @@ Option Strict On
 Option Explicit On
 
 Namespace FileTypeDetection
-
     ''' <summary>
-    ''' Deterministische Hash-Sammlung fuer einen Verarbeitungsschritt.
+    '''     Deterministische Hash-Sammlung fuer einen Verarbeitungsschritt.
     ''' </summary>
     Public NotInheritable Class DeterministicHashDigestSet
-
         Public ReadOnly Property PhysicalSha256 As String
         Public ReadOnly Property LogicalSha256 As String
         Public ReadOnly Property FastPhysicalXxHash3 As String
@@ -16,12 +14,12 @@ Namespace FileTypeDetection
         Public ReadOnly Property HasLogicalHash As Boolean
 
         Friend Sub New(
-            physicalSha256 As String,
-            logicalSha256 As String,
-            fastPhysicalXxHash3 As String,
-            fastLogicalXxHash3 As String,
-            hasPhysicalHash As Boolean,
-            hasLogicalHash As Boolean)
+                       physicalSha256 As String,
+                       logicalSha256 As String,
+                       fastPhysicalXxHash3 As String,
+                       fastLogicalXxHash3 As String,
+                       hasPhysicalHash As Boolean,
+                       hasLogicalHash As Boolean)
             Me.PhysicalSha256 = Normalize(physicalSha256)
             Me.LogicalSha256 = Normalize(logicalSha256)
             Me.FastPhysicalXxHash3 = Normalize(fastPhysicalXxHash3)
@@ -33,12 +31,12 @@ Namespace FileTypeDetection
         Friend Shared ReadOnly Property Empty As DeterministicHashDigestSet
             Get
                 Return New DeterministicHashDigestSet(
-                    physicalSha256:=String.Empty,
-                    logicalSha256:=String.Empty,
-                    fastPhysicalXxHash3:=String.Empty,
-                    fastLogicalXxHash3:=String.Empty,
-                    hasPhysicalHash:=False,
-                    hasLogicalHash:=False)
+                    physicalSha256 := String.Empty,
+                    logicalSha256 := String.Empty,
+                    fastPhysicalXxHash3 := String.Empty,
+                    fastLogicalXxHash3 := String.Empty,
+                    hasPhysicalHash := False,
+                    hasLogicalHash := False)
             End Get
         End Property
 
@@ -46,5 +44,4 @@ Namespace FileTypeDetection
             Return If(value, String.Empty).Trim().ToLowerInvariant()
         End Function
     End Class
-
 End Namespace

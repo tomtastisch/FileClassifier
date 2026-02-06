@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using FileTypeDetection;
 using Xunit;
@@ -9,7 +10,8 @@ public sealed class DeterministicHashingPrivateBranchUnitTests
     [Fact]
     public void NormalizeLabel_FallsBack_ForNullOrWhitespace()
     {
-        var method = typeof(DeterministicHashing).GetMethod("NormalizeLabel", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(DeterministicHashing).GetMethod("NormalizeLabel", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var label1 = (string)method!.Invoke(null, new object?[] { null })!;
@@ -26,7 +28,7 @@ public sealed class DeterministicHashingPrivateBranchUnitTests
         Assert.NotNull(method);
 
         var empty1 = (byte[])method!.Invoke(null, new object?[] { null })!;
-        var empty2 = (byte[])method.Invoke(null, new object?[] { System.Array.Empty<byte>() })!;
+        var empty2 = (byte[])method.Invoke(null, new object?[] { Array.Empty<byte>() })!;
 
         Assert.Empty(empty1);
         Assert.Empty(empty2);
@@ -35,7 +37,8 @@ public sealed class DeterministicHashingPrivateBranchUnitTests
     [Fact]
     public void ComputeFastHash_ReturnsEmpty_WhenOptionDisabled()
     {
-        var method = typeof(DeterministicHashing).GetMethod("ComputeFastHash", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(DeterministicHashing).GetMethod("ComputeFastHash", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var options = new DeterministicHashOptions { IncludeFastHash = false };

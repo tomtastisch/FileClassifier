@@ -82,8 +82,8 @@ public sealed class FileMaterializerPropertyTests
                     File.WriteAllBytes(Path.Combine(destination, "marker.txt"), new byte[] { 0x01 });
                 }
 
-                var ok = FileMaterializer.Persist(payload, destination, overwrite, secureExtract: false);
-                var expected = (state == 0) || overwrite;
+                var ok = FileMaterializer.Persist(payload, destination, overwrite, false);
+                var expected = state == 0 || overwrite;
 
                 Assert.Equal(expected, ok);
 
@@ -123,9 +123,8 @@ public sealed class FileMaterializerPropertyTests
 
         foreach (var destination in invalidDestinations)
         {
-            var ok = FileMaterializer.Persist(payload, destination, overwrite: false, secureExtract: false);
+            var ok = FileMaterializer.Persist(payload, destination, false, false);
             Assert.False(ok);
         }
     }
-
 }

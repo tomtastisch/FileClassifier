@@ -1,19 +1,15 @@
 Option Strict On
 Option Explicit On
 
-Imports System.Collections.Generic
 Imports System.Collections.Immutable
-Imports System.Linq
 
 Namespace FileTypeDetection
-
     ''' <summary>
-    ''' Zentrale Registry als SSOT fuer Typmetadaten, Alias-Aufloesung und Magic-Patterns.
-    '''
-    ''' Regeln:
-    ''' - Neue Typen werden primaer ueber FileKind erweitert.
-    ''' - Metadaten werden deterministisch aus FileKind + zentralen Overrides aufgebaut.
-    ''' - Unknown ist immer als fail-closed Fallback vorhanden.
+    '''     Zentrale Registry als SSOT fuer Typmetadaten, Alias-Aufloesung und Magic-Patterns.
+    '''     Regeln:
+    '''     - Neue Typen werden primaer ueber FileKind erweitert.
+    '''     - Metadaten werden deterministisch aus FileKind + zentralen Overrides aufgebaut.
+    '''     - Unknown ist immer als fail-closed Fallback vorhanden.
     ''' </summary>
     Friend NotInheritable Class FileTypeRegistry
         Private Sub New()
@@ -23,17 +19,33 @@ Namespace FileTypeDetection
         Friend Shared ReadOnly KindByAlias As ImmutableDictionary(Of String, FileKind)
 
         Private Shared ReadOnly ExtensionOverrides As ImmutableDictionary(Of FileKind, String) =
-            ImmutableDictionary.CreateRange(Of FileKind, String)(
-                {New KeyValuePair(Of FileKind, String)(FileKind.Jpeg, ".jpg")})
+                                    ImmutableDictionary.CreateRange (Of FileKind, String)(
+                                        {New KeyValuePair(Of FileKind, String)(FileKind.Jpeg, ".jpg")})
 
         Private Shared ReadOnly AliasOverrides As ImmutableDictionary(Of FileKind, ImmutableArray(Of String)) =
-            ImmutableDictionary.CreateRange(Of FileKind, ImmutableArray(Of String))(
-                {
-                    New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Jpeg, ImmutableArray.Create("jpe")),
-                    New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Zip, ImmutableArray.Create("tar", "tgz", "gz", "gzip", "bz2", "bzip2", "xz", "7z", "zz", "rar"))
-                })
+                                    ImmutableDictionary.CreateRange (Of FileKind, ImmutableArray(Of String))(
+                                        { _
+                                            New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Jpeg,
+                                                                                                     ImmutableArray.
+                                                                                                        Create("jpe")),
+                                            New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Zip,
+                                                                                                     ImmutableArray.
+                                                                                                        Create("tar",
+                                                                                                               "tgz",
+                                                                                                               "gz",
+                                                                                                               "gzip",
+                                                                                                               "bz2",
+                                                                                                               "bzip2",
+                                                                                                               "xz",
+                                                                                                               "7z",
+                                                                                                               "zz",
+                                                                                                               "rar"))
+                                        })
 
-        Private Shared ReadOnly MagicPatternCatalog As ImmutableDictionary(Of FileKind, ImmutableArray(Of MagicPattern)) = BuildMagicPatternCatalog()
+        Private Shared ReadOnly _
+            MagicPatternCatalog As ImmutableDictionary(Of FileKind, ImmutableArray(Of MagicPattern)) =
+                BuildMagicPatternCatalog()
+
         Private Shared ReadOnly MagicRules As ImmutableArray(Of MagicRule)
 
         Shared Sub New()
@@ -44,7 +56,7 @@ Namespace FileTypeDetection
         End Sub
 
         Private Shared Function BuildDefinitionsFromEnum() As ImmutableArray(Of FileTypeDefinition)
-            Dim b = ImmutableArray.CreateBuilder(Of FileTypeDefinition)()
+            Dim b = ImmutableArray.CreateBuilder (Of FileTypeDefinition)()
 
             For Each kind In OrderedKinds()
                 If kind = FileKind.Unknown Then Continue For
@@ -87,7 +99,7 @@ Namespace FileTypeDetection
             Dim enumAlias = NormalizeAlias(kind.ToString())
             If enumAlias.Length > 0 Then aliases.Add(enumAlias)
 
-            Dim additional As ImmutableArray(Of String) = ImmutableArray(Of String).Empty
+            Dim additional As ImmutableArray(Of String) = ImmutableArray (Of String).Empty
             If AliasOverrides.TryGetValue(kind, additional) Then
                 For Each item In additional
                     Dim normalized = NormalizeAlias(item)
@@ -101,22 +113,25 @@ Namespace FileTypeDetection
         End Function
 
         Private Shared Function GetMagicPatterns(kind As FileKind) As ImmutableArray(Of MagicPattern)
-            Dim patterns As ImmutableArray(Of MagicPattern) = ImmutableArray(Of MagicPattern).Empty
+            Dim patterns As ImmutableArray(Of MagicPattern) = ImmutableArray (Of MagicPattern).Empty
             If MagicPatternCatalog.TryGetValue(kind, patterns) Then
                 Return patterns
             End If
 
-            Return ImmutableArray(Of MagicPattern).Empty
+            Return ImmutableArray (Of MagicPattern).Empty
         End Function
 
-        Private Shared Function BuildTypes(definitions As ImmutableArray(Of FileTypeDefinition)) As ImmutableDictionary(Of FileKind, FileType)
+        Private Shared Function BuildTypes(definitions As ImmutableArray(Of FileTypeDefinition)) _
+            As ImmutableDictionary(Of FileKind, FileType)
             Dim mimeProvider As MimeProvider = MimeProvider.Instance
-            Dim b = ImmutableDictionary.CreateBuilder(Of FileKind, FileType)()
+            Dim b = ImmutableDictionary.CreateBuilder (Of FileKind, FileType)()
 
-            b(FileKind.Unknown) = New FileType(FileKind.Unknown, Nothing, Nothing, False, ImmutableArray(Of String).Empty)
+            b(FileKind.Unknown) = New FileType(FileKind.Unknown, Nothing, Nothing, False,
+                                               ImmutableArray (Of String).Empty)
 
             For Each d In definitions
-                b(d.Kind) = New FileType(d.Kind, d.CanonicalExtension, mimeProvider.GetMime(d.CanonicalExtension), True, d.Aliases)
+                b(d.Kind) = New FileType(d.Kind, d.CanonicalExtension, mimeProvider.GetMime(d.CanonicalExtension), True,
+                                         d.Aliases)
             Next
 
             Return b.ToImmutable()
@@ -146,14 +161,14 @@ Namespace FileTypeDetection
 
         Friend Shared Function HasDirectHeaderDetection(kind As FileKind) As Boolean
             If kind = FileKind.Unknown Then Return False
-            Dim patterns As ImmutableArray(Of MagicPattern) = ImmutableArray(Of MagicPattern).Empty
+            Dim patterns As ImmutableArray(Of MagicPattern) = ImmutableArray (Of MagicPattern).Empty
             Return MagicPatternCatalog.TryGetValue(kind, patterns) AndAlso Not patterns.IsDefaultOrEmpty
         End Function
 
         Friend Shared Function HasStructuredContainerDetection(kind As FileKind) As Boolean
             Return kind = FileKind.Docx OrElse
-                kind = FileKind.Xlsx OrElse
-                kind = FileKind.Pptx
+                   kind = FileKind.Xlsx OrElse
+                   kind = FileKind.Pptx
         End Function
 
         Friend Shared Function HasDirectContentDetection(kind As FileKind) As Boolean
@@ -161,7 +176,7 @@ Namespace FileTypeDetection
         End Function
 
         Friend Shared Function KindsWithoutDirectContentDetection() As ImmutableArray(Of FileKind)
-            Dim b = ImmutableArray.CreateBuilder(Of FileKind)()
+            Dim b = ImmutableArray.CreateBuilder (Of FileKind)()
             For Each kind In OrderedKinds()
                 If kind = FileKind.Unknown Then Continue For
                 If Not HasDirectContentDetection(kind) Then
@@ -171,8 +186,9 @@ Namespace FileTypeDetection
             Return b.ToImmutable()
         End Function
 
-        Private Shared Function BuildMagicRules(definitions As ImmutableArray(Of FileTypeDefinition)) As ImmutableArray(Of MagicRule)
-            Dim b = ImmutableArray.CreateBuilder(Of MagicRule)()
+        Private Shared Function BuildMagicRules(definitions As ImmutableArray(Of FileTypeDefinition)) _
+            As ImmutableArray(Of MagicRule)
+            Dim b = ImmutableArray.CreateBuilder (Of MagicRule)()
             For Each d In definitions
                 If d.MagicPatterns.IsDefaultOrEmpty Then Continue For
                 b.Add(New MagicRule(d.Kind, d.MagicPatterns))
@@ -180,8 +196,9 @@ Namespace FileTypeDetection
             Return b.ToImmutable()
         End Function
 
-        Private Shared Function BuildMagicPatternCatalog() As ImmutableDictionary(Of FileKind, ImmutableArray(Of MagicPattern))
-            Dim b = ImmutableDictionary.CreateBuilder(Of FileKind, ImmutableArray(Of MagicPattern))()
+        Private Shared Function BuildMagicPatternCatalog() _
+            As ImmutableDictionary(Of FileKind, ImmutableArray(Of MagicPattern))
+            Dim b = ImmutableDictionary.CreateBuilder (Of FileKind, ImmutableArray(Of MagicPattern))()
 
             b(FileKind.Pdf) = ImmutableArray.Create(
                 Pattern(Prefix(0, &H25, &H50, &H44, &H46, &H2D)))
@@ -223,16 +240,17 @@ Namespace FileTypeDetection
             Dim endPos = segment.Offset + segment.Bytes.Length
             If endPos < 0 OrElse data.Length < endPos Then Return False
 
-            For i As Integer = 0 To segment.Bytes.Length - 1
+            For i = 0 To segment.Bytes.Length - 1
                 If data(segment.Offset + i) <> segment.Bytes(i) Then Return False
             Next
             Return True
         End Function
 
-        Private Shared Function BuildAliasMap(types As ImmutableDictionary(Of FileKind, FileType)) As ImmutableDictionary(Of String, FileKind)
-            If types Is Nothing Then Return ImmutableDictionary(Of String, FileKind).Empty
+        Private Shared Function BuildAliasMap(types As ImmutableDictionary(Of FileKind, FileType)) _
+            As ImmutableDictionary(Of String, FileKind)
+            If types Is Nothing Then Return ImmutableDictionary (Of String, FileKind).Empty
 
-            Dim b = ImmutableDictionary.CreateBuilder(Of String, FileKind)(StringComparer.OrdinalIgnoreCase)
+            Dim b = ImmutableDictionary.CreateBuilder (Of String, FileKind)(StringComparer.OrdinalIgnoreCase)
             For Each kv In types
                 Dim t = kv.Value
                 If t Is Nothing Then Continue For
@@ -255,7 +273,7 @@ Namespace FileTypeDetection
         End Function
 
         ''' <summary>
-        ''' Liefert den zugeordneten FileType fuer einen Enumwert.
+        '''     Liefert den zugeordneten FileType fuer einen Enumwert.
         ''' </summary>
         ''' <param name="kind">Enumwert des Typs.</param>
         ''' <returns>Registrierter Typ oder Unknown.</returns>
@@ -266,12 +284,12 @@ Namespace FileTypeDetection
         End Function
 
         ''' <summary>
-        ''' Liefert den zugeordneten FileType fuer einen Aliaswert.
+        '''     Liefert den zugeordneten FileType fuer einen Aliaswert.
         ''' </summary>
         ''' <param name="aliasKey">Alias mit oder ohne fuehrenden Punkt.</param>
         ''' <returns>Registrierter Typ oder Unknown.</returns>
         Friend Shared Function ResolveByAlias(aliasKey As String) As FileType
-            Dim k As FileKind = FileKind.Unknown
+            Dim k = FileKind.Unknown
             If KindByAlias.TryGetValue(NormalizeAlias(aliasKey), k) Then
                 Return Resolve(k)
             End If
@@ -284,7 +302,8 @@ Namespace FileTypeDetection
             Friend ReadOnly Aliases As String()
             Friend ReadOnly MagicPatterns As ImmutableArray(Of MagicPattern)
 
-            Friend Sub New(kind As FileKind, canonicalExtension As String, aliases As String(), magicPatterns As ImmutableArray(Of MagicPattern))
+            Friend Sub New(kind As FileKind, canonicalExtension As String, aliases As String(),
+                           magicPatterns As ImmutableArray(Of MagicPattern))
                 Me.Kind = kind
                 Me.CanonicalExtension = canonicalExtension
                 Me.Aliases = aliases
@@ -319,7 +338,5 @@ Namespace FileTypeDetection
                 Me.Bytes = bytes
             End Sub
         End Structure
-
     End Class
-
 End Namespace

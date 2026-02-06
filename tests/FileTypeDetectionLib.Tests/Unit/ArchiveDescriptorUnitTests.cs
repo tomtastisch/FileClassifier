@@ -1,4 +1,3 @@
-using System;
 using FileTypeDetection;
 using Xunit;
 

@@ -8,7 +8,8 @@ public sealed class DeterministicHashRoundTripReportUnitTests
     [Fact]
     public void Constructor_DefaultsToFailureEvidence_WhenInputsNull()
     {
-        var report = new DeterministicHashRoundTripReport("", isArchiveInput: false, h1: null, h2: null, h3: null, h4: null, notes: null);
+        var report = new DeterministicHashRoundTripReport("", isArchiveInput: false, h1: null, h2: null, h3: null,
+            h4: null, notes: null);
 
         Assert.False(report.LogicalConsistent);
         Assert.False(report.LogicalH1EqualsH2);
@@ -42,7 +43,8 @@ public sealed class DeterministicHashRoundTripReportUnitTests
             digests: digest,
             notes: "ok");
 
-        var report = new DeterministicHashRoundTripReport("x", isArchiveInput: false, h1: evidence, h2: evidence, h3: evidence, h4: evidence, notes: "ok");
+        var report = new DeterministicHashRoundTripReport("x", isArchiveInput: false, h1: evidence, h2: evidence,
+            h3: evidence, h4: evidence, notes: "ok");
 
         Assert.True(report.LogicalConsistent);
         Assert.True(report.LogicalH1EqualsH2);
@@ -76,7 +78,8 @@ public sealed class DeterministicHashRoundTripReportUnitTests
             digests: digest,
             notes: "ok");
 
-        var report = new DeterministicHashRoundTripReport("x", isArchiveInput: false, h1: evidence, h2: evidence, h3: evidence, h4: evidence, notes: "ok");
+        var report = new DeterministicHashRoundTripReport("x", isArchiveInput: false, h1: evidence, h2: evidence,
+            h3: evidence, h4: evidence, notes: "ok");
 
         Assert.False(report.LogicalH1EqualsH2);
         Assert.True(report.PhysicalH1EqualsH2);

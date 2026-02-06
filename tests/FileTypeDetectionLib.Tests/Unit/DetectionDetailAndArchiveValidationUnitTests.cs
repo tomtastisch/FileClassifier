@@ -25,7 +25,7 @@ public sealed class DetectionDetailAndArchiveValidationUnitTests
     public void DetectDetailed_WithVerifyExtension_FailsClosed_OnExtensionMismatch()
     {
         var path = TestResources.Resolve("sample.changed.pdf.txt");
-        var detail = new FileTypeDetector().DetectDetailed(path, verifyExtension: true);
+        var detail = new FileTypeDetector().DetectDetailed(path, true);
 
         Assert.Equal(FileKind.Unknown, detail.DetectedType.Kind);
         Assert.Equal("ExtensionMismatch", detail.ReasonCode);

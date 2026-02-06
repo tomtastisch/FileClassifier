@@ -27,7 +27,7 @@ public sealed class FileTypeDetectorEdgeUnitTests
         var wrongPath = Path.Combine(scope.RootPath, "sample.txt");
         File.Copy(TestResources.Resolve("sample.pdf"), wrongPath);
 
-        var detail = new FileTypeDetector().DetectDetailed(wrongPath, verifyExtension: true);
+        var detail = new FileTypeDetector().DetectDetailed(wrongPath, true);
 
         Assert.Equal(FileKind.Unknown, detail.DetectedType.Kind);
         Assert.Equal("ExtensionMismatch", detail.ReasonCode);

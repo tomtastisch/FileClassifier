@@ -7,11 +7,15 @@ internal static class TestResources
 {
     private static readonly Lazy<FixtureManifestCatalog> Catalog = new(CreateCatalog);
 
-    internal static string Resolve(string fixtureIdOrFileName) =>
-        Catalog.Value.ResolvePath(fixtureIdOrFileName);
+    internal static string Resolve(string fixtureIdOrFileName)
+    {
+        return Catalog.Value.ResolvePath(fixtureIdOrFileName);
+    }
 
-    internal static FixtureManifestEntry Describe(string fixtureIdOrFileName) =>
-        Catalog.Value.ResolveEntry(fixtureIdOrFileName);
+    internal static FixtureManifestEntry Describe(string fixtureIdOrFileName)
+    {
+        return Catalog.Value.ResolveEntry(fixtureIdOrFileName);
+    }
 
     private static FixtureManifestCatalog CreateCatalog()
     {

@@ -32,7 +32,8 @@ public sealed class UnifiedArchiveBackendUnitTests
 
     [Theory]
     [MemberData(nameof(GeneratedArchivePayloadCases))]
-    public void Detect_ReturnsArchive_ForGeneratedPayloads(string archiveType, byte[] payload, string expectedPath, string expectedContent)
+    public void Detect_ReturnsArchive_ForGeneratedPayloads(string archiveType, byte[] payload, string expectedPath,
+        string expectedContent)
     {
         var detected = new FileTypeDetector().Detect(payload);
         Assert.Equal(FileKind.Zip, detected.Kind);
@@ -43,7 +44,8 @@ public sealed class UnifiedArchiveBackendUnitTests
 
     [Theory]
     [MemberData(nameof(GeneratedArchivePayloadCases))]
-    public void ArchiveProcessing_TryExtractToMemory_ReadsGeneratedInnerEntries(string archiveType, byte[] payload, string expectedPath, string expectedContent)
+    public void ArchiveProcessing_TryExtractToMemory_ReadsGeneratedInnerEntries(string archiveType, byte[] payload,
+        string expectedPath, string expectedContent)
     {
         var entries = ArchiveProcessing.TryExtractToMemory(payload);
 
@@ -56,7 +58,8 @@ public sealed class UnifiedArchiveBackendUnitTests
 
     [Theory]
     [MemberData(nameof(GeneratedArchivePayloadCases))]
-    public void ArchiveEntryCollector_TryCollectFromBytes_MatchesArchiveProcessingFacade(string archiveType, byte[] payload, string expectedPath, string expectedContent)
+    public void ArchiveEntryCollector_TryCollectFromBytes_MatchesArchiveProcessingFacade(string archiveType,
+        byte[] payload, string expectedPath, string expectedContent)
     {
         var options = FileTypeOptions.GetSnapshot();
         IReadOnlyList<ZipExtractedEntry> collected = Array.Empty<ZipExtractedEntry>();
@@ -75,12 +78,13 @@ public sealed class UnifiedArchiveBackendUnitTests
 
     [Theory]
     [MemberData(nameof(GeneratedArchivePayloadCases))]
-    public void FileMaterializer_Persist_ExtractsGeneratedArchive_WhenSecureExtractEnabled(string archiveType, byte[] payload, string expectedPath, string expectedContent)
+    public void FileMaterializer_Persist_ExtractsGeneratedArchive_WhenSecureExtractEnabled(string archiveType,
+        byte[] payload, string expectedPath, string expectedContent)
     {
         using var tempRoot = TestTempPaths.CreateScope("ftd-unified-archive");
         var destination = Path.Combine(tempRoot.RootPath, "out");
 
-        var ok = FileMaterializer.Persist(payload, destination, overwrite: false, secureExtract: true);
+        var ok = FileMaterializer.Persist(payload, destination, false, true);
         var expectedAbsolutePath = Path.Combine(destination, expectedPath.Replace('/', Path.DirectorySeparatorChar));
         Assert.True(ok);
         Assert.True(File.Exists(expectedAbsolutePath));
@@ -102,7 +106,7 @@ public sealed class UnifiedArchiveBackendUnitTests
 
         try
         {
-            var ok = FileMaterializer.Persist(tarWithLink, destination, overwrite: false, secureExtract: true);
+            var ok = FileMaterializer.Persist(tarWithLink, destination, false, true);
             Assert.False(ok);
             Assert.False(Directory.Exists(destination));
         }

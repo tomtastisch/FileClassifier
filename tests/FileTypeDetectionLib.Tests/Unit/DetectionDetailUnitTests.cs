@@ -8,7 +8,8 @@ public sealed class DetectionDetailUnitTests
     [Fact]
     public void Constructor_NormalizesNulls()
     {
-        var detail = new DetectionDetail(null, null, usedZipContentCheck: false, usedStructuredRefinement: true, extensionVerified: false);
+        var detail = new DetectionDetail(null, null, usedZipContentCheck: false, usedStructuredRefinement: true,
+            extensionVerified: false);
 
         Assert.Equal(FileKind.Unknown, detail.DetectedType.Kind);
         Assert.Equal(string.Empty, detail.ReasonCode);

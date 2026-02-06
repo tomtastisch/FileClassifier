@@ -1,4 +1,3 @@
-using FileTypeDetection;
 using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
@@ -10,11 +9,11 @@ public sealed class SharpCompressEntryModelUnitTests
     {
         var model = new SharpCompressEntryModel(null!);
 
-        Assert.Equal(string.Empty, model.RelativePath);
-        Assert.False(model.IsDirectory);
-        Assert.Null(model.UncompressedSize);
-        Assert.Null(model.CompressedSize);
-        Assert.Equal(string.Empty, model.LinkTarget);
+        Assert.Equal(string.Empty, (string?)model.RelativePath);
+        Assert.False((bool)model.IsDirectory);
+        Assert.Null<long>(model.UncompressedSize);
+        Assert.Null<long>(model.CompressedSize);
+        Assert.Equal(string.Empty, (string?)model.LinkTarget);
         Assert.NotNull(model.OpenStream());
     }
 }

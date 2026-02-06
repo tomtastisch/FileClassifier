@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Reflection;
 using FileTypeDetection;
@@ -19,6 +18,7 @@ public sealed class ArchiveInternalsEarlyReturnUnitTests
         var empty = ArchiveExtractor.TryExtractArchiveStreamToMemory(ms, opt, descriptor);
         Assert.Empty(empty);
     }
+
     [Fact]
     public void TryExtractArchiveStream_ReturnsFalse_ForInvalidDestination()
     {
@@ -32,7 +32,7 @@ public sealed class ArchiveInternalsEarlyReturnUnitTests
     public void ArchiveTypeResolver_TryDescribeBytes_ReturnsFalse_ForNonArchive()
     {
         var opt = FileTypeProjectOptions.DefaultOptions();
-        ArchiveDescriptor descriptor = ArchiveDescriptor.UnknownDescriptor();
+        var descriptor = ArchiveDescriptor.UnknownDescriptor();
 
         Assert.False(ArchiveTypeResolver.TryDescribeBytes(new byte[] { 0x00, 0x01 }, opt, ref descriptor));
     }
@@ -53,7 +53,8 @@ public sealed class ArchiveInternalsEarlyReturnUnitTests
     [Fact]
     public void EnsureTrailingSeparator_AppendsSeparator_WhenMissing()
     {
-        var method = typeof(ArchiveExtractor).GetMethod("EnsureTrailingSeparator", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(ArchiveExtractor).GetMethod("EnsureTrailingSeparator", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var value = (string)method!.Invoke(null, new object[] { "a/b" })!;
@@ -63,7 +64,8 @@ public sealed class ArchiveInternalsEarlyReturnUnitTests
     [Fact]
     public void EnsureTrailingSeparator_ReturnsSeparator_ForEmpty()
     {
-        var method = typeof(ArchiveExtractor).GetMethod("EnsureTrailingSeparator", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(ArchiveExtractor).GetMethod("EnsureTrailingSeparator", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var value = (string)method!.Invoke(null, new object[] { string.Empty })!;
@@ -73,7 +75,8 @@ public sealed class ArchiveInternalsEarlyReturnUnitTests
     [Fact]
     public void EnsureTrailingSeparator_PreservesExistingSeparator()
     {
-        var method = typeof(ArchiveExtractor).GetMethod("EnsureTrailingSeparator", BindingFlags.NonPublic | BindingFlags.Static);
+        var method =
+            typeof(ArchiveExtractor).GetMethod("EnsureTrailingSeparator", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var suffix = Path.DirectorySeparatorChar.ToString();

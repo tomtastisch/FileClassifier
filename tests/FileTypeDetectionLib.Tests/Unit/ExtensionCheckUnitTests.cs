@@ -34,10 +34,7 @@ public sealed class ExtensionCheckUnitTests
         }
         finally
         {
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
+            if (File.Exists(path)) File.Delete(path);
         }
     }
 
@@ -59,10 +56,7 @@ public sealed class ExtensionCheckUnitTests
         }
         finally
         {
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
+            if (File.Exists(path)) File.Delete(path);
         }
     }
 }

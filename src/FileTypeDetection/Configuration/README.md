@@ -1,31 +1,36 @@
 # Index - Configuration
 
 ## 1. Zweck
+
 Deterministische Konfiguration der öffentlichen API inklusive Sicherheitsbaseline.
 
 ## 2. Dateien
+
 - [FileTypeProjectOptions.vb](./FileTypeProjectOptions.vb)
 - [FileTypeProjectBaseline.vb](./FileTypeProjectBaseline.vb)
 
 ## 3. Optionen (wann relevant)
-| Option | Wirkung | Typischer Trigger |
-|---|---|---|
-| `MaxBytes` | maximale Dateigrösse für Detect/Read | Upload-Limits, DoS-Schutz |
-| `SniffBytes` | Header-Länge für Magic-Prüfung | Dateiformate mit spätem Marker |
-| `MaxZipEntries` | Begrenzung Entry-Anzahl | Archiv-Bomb/Many-entry Schutz |
-| `MaxZipTotalUncompressedBytes` | Gesamtgrenze Archiv | Speicher-/CPU-Schutz |
-| `MaxZipEntryUncompressedBytes` | pro-Entry-Grenze | grosse Einzeldateien abfangen |
-| `MaxZipCompressionRatio` | Kompressionsratio-Limit | stark komprimierte Bomben |
-| `MaxZipNestingDepth` | maximale Archiv-Verschachtelung | rekursive Angriffe begrenzen |
-| `MaxZipNestedBytes` | Nested-Archiv Byte-Limit | Memory-Schutz bei Nested-Content |
-| `HeaderOnlyNonZip` | Header-only für Nicht-Archiv-Typen (Property-Name historisch) | konsistente Erkennungsstrategie |
-| `DeterministicHash` | Default-Policy für Hash-Evidence (`IncludeFastHash`, `IncludePayloadCopies`, `MaterializedFileName`) | reproduzierbare h1-h4 Nachweise |
+
+| Option                         | Wirkung                                                                                              | Typischer Trigger                |
+|--------------------------------|------------------------------------------------------------------------------------------------------|----------------------------------|
+| `MaxBytes`                     | maximale Dateigrösse für Detect/Read                                                                 | Upload-Limits, DoS-Schutz        |
+| `SniffBytes`                   | Header-Länge für Magic-Prüfung                                                                       | Dateiformate mit spätem Marker   |
+| `MaxZipEntries`                | Begrenzung Entry-Anzahl                                                                              | Archiv-Bomb/Many-entry Schutz    |
+| `MaxZipTotalUncompressedBytes` | Gesamtgrenze Archiv                                                                                  | Speicher-/CPU-Schutz             |
+| `MaxZipEntryUncompressedBytes` | pro-Entry-Grenze                                                                                     | grosse Einzeldateien abfangen    |
+| `MaxZipCompressionRatio`       | Kompressionsratio-Limit                                                                              | stark komprimierte Bomben        |
+| `MaxZipNestingDepth`           | maximale Archiv-Verschachtelung                                                                      | rekursive Angriffe begrenzen     |
+| `MaxZipNestedBytes`            | Nested-Archiv Byte-Limit                                                                             | Memory-Schutz bei Nested-Content |
+| `HeaderOnlyNonZip`             | Header-only für Nicht-Archiv-Typen (Property-Name historisch)                                        | konsistente Erkennungsstrategie  |
+| `DeterministicHash`            | Default-Policy für Hash-Evidence (`IncludeFastHash`, `IncludePayloadCopies`, `MaterializedFileName`) | reproduzierbare h1-h4 Nachweise  |
 
 ## 4. Baseline-Strategie
+
 - `FileTypeProjectBaseline.ApplyDeterministicDefaults()` setzt konservative Werte für produktive Umgebungen.
 - `FileTypeOptions.LoadOptions(json)` setzt Optionen via JSON (partiell, default-basiert).
 
 ## 5. Diagramm: Konfigurationsfluss
+
 ```mermaid
 flowchart LR
     A[Startup] --> B[ApplyDeterministicDefaults]
@@ -34,14 +39,17 @@ flowchart LR
 ```
 
 ## 6. Testverknüpfung
+
 - [FileTypeProjectBaselineUnitTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeProjectBaselineUnitTests.cs)
 
 ## 7. Siehe auch
+
 - [Modulindex](../README.md)
 - [Funktionsreferenz](../../../docs/01_FUNCTIONS.md)
 - [Architektur und Ablaufe](../../../docs/02_ARCHITECTURE_AND_FLOWS.md)
 
 ## Dokumentpflege-Checkliste
+
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.
 - [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.

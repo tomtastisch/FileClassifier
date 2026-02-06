@@ -32,10 +32,7 @@ public sealed class FileTypeRegistryUnitTests
     {
         foreach (var kind in Enum.GetValues<FileKind>())
         {
-            if (kind == FileKind.Unknown)
-            {
-                continue;
-            }
+            if (kind == FileKind.Unknown) continue;
 
             var alias = FileTypeRegistry.NormalizeAlias(kind.ToString());
             var resolved = FileTypeRegistry.ResolveByAlias(alias);

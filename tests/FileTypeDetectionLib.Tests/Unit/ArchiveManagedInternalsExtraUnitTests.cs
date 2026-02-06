@@ -14,7 +14,7 @@ public sealed class ArchiveManagedInternalsExtraUnitTests
         opt.MaxZipTotalUncompressedBytes = 2;
 
         var payload = CreateZipWithEntries(("a.txt", new byte[] { 0x01, 0x02 }), ("b.txt", new byte[] { 0x03 }));
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
 
         var ok = ArchiveStreamEngine.ProcessArchiveStream(stream, opt, depth: 0, extractEntry: null);
 
@@ -28,7 +28,7 @@ public sealed class ArchiveManagedInternalsExtraUnitTests
         opt.MaxZipEntryUncompressedBytes = 2;
 
         var payload = CreateZipWithEntries(("a.txt", new byte[] { 0x01, 0x02, 0x03 }));
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
 
         var ok = ArchiveStreamEngine.ProcessArchiveStream(stream, opt, depth: 0, extractEntry: null);
 
@@ -45,7 +45,7 @@ public sealed class ArchiveManagedInternalsExtraUnitTests
         var nested = CreateZipWithEntries(("inner.txt", new byte[] { 0x01 }));
         var payload = CreateZipWithEntries(("inner.zip", nested));
 
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
         var ok = ArchiveStreamEngine.ProcessArchiveStream(stream, opt, depth: 0, extractEntry: null);
 
         Assert.False(ok);
@@ -54,18 +54,16 @@ public sealed class ArchiveManagedInternalsExtraUnitTests
     private static byte[] CreateZipWithEntries(params (string name, byte[] content)[] entries)
     {
         using var ms = new MemoryStream();
-        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
+        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, true))
         {
             foreach (var (name, content) in entries)
             {
                 var entry = zip.CreateEntry(name, CompressionLevel.SmallestSize);
                 using var s = entry.Open();
-                if (content.Length > 0)
-                {
-                    s.Write(content, 0, content.Length);
-                }
+                if (content.Length > 0) s.Write(content, 0, content.Length);
             }
         }
+
         return ms.ToArray();
     }
 }
