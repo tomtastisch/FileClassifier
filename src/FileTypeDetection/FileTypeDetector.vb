@@ -200,8 +200,8 @@ Namespace FileTypeDetection
             Return DetectPathCoreWithTrace(path, opt, trace)
         End Function
 
-        Private Function DetectPathCoreWithTrace(path As String, opt As FileTypeProjectOptions,
-                                                 ByRef trace As DetectionTrace) As FileType
+        Private Shared Function DetectPathCoreWithTrace(path As String, opt As FileTypeProjectOptions,
+                                                        ByRef trace As DetectionTrace) As FileType
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(opt.Logger, "[Detect] Datei nicht gefunden.")
                 trace.ReasonCode = ReasonFileNotFound
@@ -305,7 +305,7 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Private Function DetectInternalBytes(data As Byte(), opt As FileTypeProjectOptions) As FileType
+        Private Shared Function DetectInternalBytes(data As Byte(), opt As FileTypeProjectOptions) As FileType
             If data Is Nothing OrElse data.Length = 0 Then Return UnknownType()
             If CLng(data.Length) > opt.MaxBytes Then
                 LogGuard.Warn(opt.Logger, $"[Detect] Daten zu gross ({data.Length} > {opt.MaxBytes}).")

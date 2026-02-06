@@ -15,6 +15,7 @@ internal sealed class DetectorOptionsScope : IDisposable
     [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance API keeps BDD/test call sites explicit and scoped.")]
     internal void Set(FileTypeProjectOptions options)
     {
+        _ = _original;
         FileTypeDetector.SetDefaultOptions(options);
     }
 }

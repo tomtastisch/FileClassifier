@@ -40,7 +40,7 @@ public sealed class ArchiveManagedBackendUnitTests
                 Assert.True(s.CanRead);
             }
 
-            if (entry.RelativePath == "dir/")
+            else if (entry.RelativePath == "dir/")
             {
                 sawDir = true;
                 Assert.True(entry.IsDirectory);

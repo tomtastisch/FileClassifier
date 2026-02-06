@@ -73,13 +73,10 @@ Namespace FileTypeDetection
         End Function
 
         Private Shared Function OrderedKinds() As ImmutableArray(Of FileKind)
-            Dim kinds As New List(Of FileKind)()
-            For Each raw As Object In [Enum].GetValues(Of FileKind)()
-                kinds.Add(CType(raw, FileKind))
-            Next
-
-            kinds.Sort(Function(a, b) CInt(a).CompareTo(CInt(b)))
-            Return kinds.ToImmutableArray()
+            Return [Enum].
+                GetValues(Of FileKind)().
+                OrderBy(Function(kind) CInt(kind)).
+                ToImmutableArray()
         End Function
 
         Private Shared Function GetCanonicalExtension(kind As FileKind) As String
@@ -141,15 +138,15 @@ Namespace FileTypeDetection
         Friend Shared Function DetectByMagic(header As Byte()) As FileKind
             If header Is Nothing OrElse header.Length = 0 Then Return FileKind.Unknown
 
-            For Each rule In MagicRules
-                For Each magicPattern In rule.Patterns
-                    If magicPattern.Segments.All(Function(segment) HasSegment(header, segment)) Then
-                        Return rule.Kind
-                    End If
-                Next
-            Next
+            Dim match = MagicRules.
+                SelectMany(Function(rule) rule.Patterns.
+                    Select(Function(pattern) New With {.Rule = rule, .Pattern = pattern})).
+                FirstOrDefault(Function(item)
+                                   Dim segments = item.Pattern.Segments
+                                   Return segments.All(Function(segment) HasSegment(header, segment))
+                               End Function)
 
-            Return FileKind.Unknown
+            Return If(match Is Nothing, FileKind.Unknown, match.Rule.Kind)
         End Function
 
         Friend Shared Function HasDirectHeaderDetection(kind As FileKind) As Boolean
@@ -177,12 +174,10 @@ Namespace FileTypeDetection
 
         Private Shared Function BuildMagicRules(definitions As ImmutableArray(Of FileTypeDefinition)) _
             As ImmutableArray(Of MagicRule)
-            Dim b = ImmutableArray.CreateBuilder(Of MagicRule)()
-            For Each d In definitions
-                If d.MagicPatterns.IsDefaultOrEmpty Then Continue For
-                b.Add(New MagicRule(d.Kind, d.MagicPatterns))
-            Next
-            Return b.ToImmutable()
+            Return definitions.
+                Where(Function(definition) Not definition.MagicPatterns.IsDefaultOrEmpty).
+                Select(Function(definition) New MagicRule(definition.Kind, definition.MagicPatterns)).
+                ToImmutableArray()
         End Function
 
         Private Shared Function BuildMagicPatternCatalog() _
@@ -239,20 +234,24 @@ Namespace FileTypeDetection
             As ImmutableDictionary(Of String, FileKind)
             If types Is Nothing Then Return ImmutableDictionary(Of String, FileKind).Empty
 
-            Dim b = ImmutableDictionary.CreateBuilder(Of String, FileKind)(StringComparer.OrdinalIgnoreCase)
-            For Each kv In types
-                Dim t = kv.Value
-                If t Is Nothing Then Continue For
-                If t.Aliases.IsDefault OrElse t.Aliases.Length = 0 Then Continue For
+            Dim entries = types.
+                Where(Function(kv) kv.Value IsNot Nothing).
+                Where(Function(kv) Not kv.Value.Aliases.IsDefault AndAlso kv.Value.Aliases.Length > 0).
+                SelectMany(Function(kv) kv.Value.Aliases.
+                    Select(Function(aliasValue) New With {
+                        .Kind = kv.Key,
+                        .Normalized = NormalizeAlias(aliasValue)
+                    })).
+                Where(Function(item) item.Normalized.Length > 0).
+                ToList()
 
-                For Each a In t.Aliases
-                    Dim n = NormalizeAlias(a)
-                    If n.Length = 0 Then Continue For
-                    b(n) = kv.Key
-                Next
-            Next
-
-            Return b.ToImmutable()
+            Return entries.
+                Aggregate(ImmutableDictionary.CreateBuilder(Of String, FileKind)(StringComparer.OrdinalIgnoreCase),
+                          Function(builder, entry)
+                              builder(entry.Normalized) = entry.Kind
+                              Return builder
+                          End Function).
+                ToImmutable()
         End Function
 
         Friend Shared Function NormalizeAlias(raw As String) As String

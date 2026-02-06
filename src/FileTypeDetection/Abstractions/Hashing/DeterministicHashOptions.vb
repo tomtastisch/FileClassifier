@@ -2,6 +2,7 @@ Option Strict On
 Option Explicit On
 
 Imports System.IO
+Imports System.Linq
 
 Namespace FileTypeDetection
     ''' <summary>
@@ -51,11 +52,9 @@ Namespace FileTypeDetection
 
             If String.IsNullOrWhiteSpace(normalized) Then Return "deterministic-roundtrip.bin"
 
-            For Each c In Path.GetInvalidFileNameChars()
-                If normalized.Contains(c) Then
-                    Return "deterministic-roundtrip.bin"
-                End If
-            Next
+            If Path.GetInvalidFileNameChars().Any(Function(invalidChar) normalized.Contains(invalidChar)) Then
+                Return "deterministic-roundtrip.bin"
+            End If
 
             Return normalized
         End Function
