@@ -2,6 +2,7 @@ Option Strict On
 Option Explicit On
 
 Imports System.Collections.Immutable
+Imports System.Linq
 
 Namespace FileTypeDetection
     ''' <summary>
@@ -101,10 +102,11 @@ Namespace FileTypeDetection
 
             Dim additional As ImmutableArray(Of String) = ImmutableArray(Of String).Empty
             If AliasOverrides.TryGetValue(kind, additional) Then
-                For Each item In additional
-                    Dim normalized = NormalizeAlias(item)
-                    If normalized.Length > 0 Then aliases.Add(normalized)
-                Next
+                additional.
+                    Select(Function(item) NormalizeAlias(item)).
+                    Where(Function(normalized) normalized.Length > 0).
+                    ToList().
+                    ForEach(Sub(normalized) aliases.Add(normalized))
             End If
 
             Dim orderedAliases = aliases.ToList()
@@ -141,15 +143,7 @@ Namespace FileTypeDetection
 
             For Each rule In MagicRules
                 For Each magicPattern In rule.Patterns
-                    Dim allMatched = True
-                    For Each segment In magicPattern.Segments
-                        If Not HasSegment(header, segment) Then
-                            allMatched = False
-                            Exit For
-                        End If
-                    Next
-
-                    If allMatched Then
+                    If magicPattern.Segments.All(Function(segment) HasSegment(header, segment)) Then
                         Return rule.Kind
                     End If
                 Next
@@ -175,14 +169,10 @@ Namespace FileTypeDetection
         End Function
 
         Friend Shared Function KindsWithoutDirectContentDetection() As ImmutableArray(Of FileKind)
-            Dim b = ImmutableArray.CreateBuilder(Of FileKind)()
-            For Each kind In OrderedKinds()
-                If kind = FileKind.Unknown Then Continue For
-                If Not HasDirectContentDetection(kind) Then
-                    b.Add(kind)
-                End If
-            Next
-            Return b.ToImmutable()
+            Return OrderedKinds().
+                Where(Function(kind) kind <> FileKind.Unknown).
+                Where(Function(kind) Not HasDirectContentDetection(kind)).
+                ToImmutableArray()
         End Function
 
         Private Shared Function BuildMagicRules(definitions As ImmutableArray(Of FileTypeDefinition)) _

@@ -76,10 +76,9 @@ internal sealed class FixtureManifestCatalog
             throw new InvalidOperationException("Fixture lookup key is empty.");
 
         if (_byFixtureId.TryGetValue(nameOrFixtureId, out var byId)) return byId;
-
-        if (_byFileName.TryGetValue(nameOrFixtureId, out var byName)) return byName;
-
-        throw new FileNotFoundException($"Fixture not found by id or file name: {nameOrFixtureId}");
+        return _byFileName.TryGetValue(nameOrFixtureId, out var byName)
+            ? byName
+            : throw new FileNotFoundException($"Fixture not found by id or file name: {nameOrFixtureId}");
     }
 
     private static void ValidateCoverage(string resourcesRoot, Dictionary<string, FixtureManifestEntry> byFileName)

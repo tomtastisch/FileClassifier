@@ -300,7 +300,7 @@ Namespace FileTypeDetection
             If logger Is Nothing Then Return
             If Not logger.IsEnabled(LogLevel.Debug) Then Return
             Try
-                logger.LogDebug(message)
+                logger.LogDebug("{Message}", message)
             Catch
             End Try
         End Sub
@@ -309,7 +309,7 @@ Namespace FileTypeDetection
             If logger Is Nothing Then Return
             If Not logger.IsEnabled(LogLevel.Warning) Then Return
             Try
-                logger.LogWarning(message)
+                logger.LogWarning("{Message}", message)
             Catch
             End Try
         End Sub
@@ -318,7 +318,7 @@ Namespace FileTypeDetection
             If logger Is Nothing Then Return
             If Not logger.IsEnabled(LogLevel.Error) Then Return
             Try
-                logger.LogError(ex, message)
+                logger.LogError(ex, "{Message}", message)
             Catch
             End Try
         End Sub

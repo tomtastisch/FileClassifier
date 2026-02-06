@@ -324,7 +324,7 @@ Namespace FileTypeDetection
         ''' <summary>
         '''     Entscheidungslogik fuer die Pfad-Variante.
         ''' </summary>
-        Private Function ResolveByHeaderForPath(
+        Private Shared Function ResolveByHeaderForPath(
                                                 header As Byte(),
                                                 opt As FileTypeProjectOptions,
                                                 ByRef trace As DetectionTrace,
@@ -350,7 +350,7 @@ Namespace FileTypeDetection
         ''' <summary>
         '''     Entscheidungslogik fuer die Byte-Variante.
         ''' </summary>
-        Private Function ResolveByHeaderForBytes(
+        Private Shared Function ResolveByHeaderForBytes(
                                                  header As Byte(),
                                                  opt As FileTypeProjectOptions,
                                                  ByRef trace As DetectionTrace,
