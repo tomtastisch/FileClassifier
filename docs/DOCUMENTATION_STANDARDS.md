@@ -1,0 +1,57 @@
+# Dokumentationsstandard (SSOT)
+
+## 1. Zweck
+Dieser Standard definiert Aufbau, Benennung und Pflege aller Markdown-Dokumente im Repository.
+Ziel ist eine konsistente, auditierbare und schnell erfassbare Dokumentation.
+
+## 2. Geltungsbereich
+- `README.md`
+- `docs/**/*.md`
+- modulnahe `README.md` unter `src/**` und `tests/**`
+
+## 3. Benennungsregeln
+- Root- und Kern-Dokumente unter `docs/` in `UPPER_SNAKE_CASE.md`.
+- Unterordner behalten bestehende fachliche Struktur:
+  - `docs/versioning/`
+  - `docs/guides/`
+  - `docs/governance/`
+- Ausnahmen nur, wenn historisch etabliert und bereits breit verlinkt (z. B. `docs/test-matrix-hashing.md`).
+
+## 4. Pflichtstruktur pro Dokument
+Jedes fachliche Dokument folgt dieser Reihenfolge:
+1. Zweck
+2. Geltungsbereich
+3. Regeln/Architektur
+4. Verifikation/Nachweise
+5. Grenzen/Nicht-Ziele
+6. Verlinkte SSOT-Quellen
+
+## 5. Sprache und Stil
+- Primärsprache: Deutsch.
+- Technische Begriffe bleiben in üblicher Form (`CI`, `Qodana`, `SemVer`, `SSOT`).
+- Aussagen möglichst deterministisch und prüfbar formulieren.
+
+## 6. Verlinkungsregeln
+- `README.md` verlinkt auf `docs/README.md` als zentralen Einstieg.
+- `docs/README.md` verlinkt auf alle SSOT-Dokumente.
+- Jede Spezialdoku verlinkt zurück auf `docs/README.md`.
+
+## 7. Diagrammstandard
+- Für Abläufe: `flowchart` oder `sequenceDiagram` (Mermaid).
+- Knoten mit Sonderzeichen immer quoten: `["..."]`.
+- Diagramme müssen den tatsächlichen CI-/Code-Fluss abbilden, keine generischen Platzhalter.
+
+## 8. Pflegeprozess
+Bei Änderungen an CI, Labeling, Versioning oder API:
+1. Implementierung anpassen.
+2. Zugehörige SSOT-Doku im selben Commit aktualisieren.
+3. Link- und Strukturprüfung ausführen.
+
+Pflichtcheck:
+```bash
+python3 tools/check-docs.py
+```
+
+## 9. Nicht-Ziele
+- Keine doppelte Pflege derselben Regel in mehreren SSOT-Dateien.
+- Keine veralteten Backup-/Deprecated-Dokumente im aktiven Pfad.

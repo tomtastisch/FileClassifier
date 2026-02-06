@@ -13,7 +13,8 @@ Professionelle, auditierbare und deterministische Dateityp-Erkennung mit sichere
 - Modulindex: [src/FileTypeDetection/README.md](src/FileTypeDetection/README.md)
 - Architektur & Flows (vollständig): [docs/02_ARCHITECTURE_AND_FLOWS.md](docs/02_ARCHITECTURE_AND_FLOWS.md)
 - DIN-orientierte Spezifikation: [docs/DIN_SPECIFICATION_DE.md](docs/DIN_SPECIFICATION_DE.md)
-- Ablauf/UML: [src/FileTypeDetection/README.md](src/FileTypeDetection/README.md)
+- Dokumentationsindex (SSOT): [docs/README.md](docs/README.md)
+- Dokumentationsstandard: [docs/DOCUMENTATION_STANDARDS.md](docs/DOCUMENTATION_STANDARDS.md)
 
 ## 4. API-Einstiegspunkte
 - [src/FileTypeDetection/FileTypeDetector.vb](src/FileTypeDetection/FileTypeDetector.vb)
@@ -33,6 +34,7 @@ Professionelle, auditierbare und deterministische Dateityp-Erkennung mit sichere
 Die CI ist deterministisch und auditierbar aufgebaut. Alle Checks laufen in separaten Steps und erzeugen Artefakte.
 - Details: [docs/CI_PIPELINE.md](docs/CI_PIPELINE.md)
 - Auto-Labeling & Auto-Versionierung: [docs/AUTO_LABELING_AND_VERSIONING.md](docs/AUTO_LABELING_AND_VERSIONING.md)
+- Governance/Ownership: [docs/governance/LABELING_OWNERSHIP.md](docs/governance/LABELING_OWNERSHIP.md)
 
 ## 7. Runbook (reproduzierbar)
 ```bash
@@ -95,3 +97,4 @@ Detail-README je Unterordner:
 - [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
+- [ ] Dokumentstruktur gegen `docs/DOCUMENTATION_STANDARDS.md` geprüft.

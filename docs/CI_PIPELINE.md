@@ -1,61 +1,61 @@
-# CI Pipeline - FileClassifier
+# CI-Pipeline (SSOT)
 
-## 1. Purpose
-This CI pipeline provides auditable production-readiness evidence for:
-- consistency/format
-- build correctness (`warnaserror`)
-- dependency security (NuGet vulnerabilities)
-- BDD-readable tests with coverage gate
-- documentation consistency
-- deterministic PR auto-labeling and auto-versioning evidence
+## 1. Zweck
+Diese Pipeline liefert auditierbare Nachweise für Produktionsreife:
+- Konsistenz/Format
+- Build-Korrektheit (`--warnaserror`)
+- Paket-Sicherheit (NuGet-Vulnerabilities)
+- BDD-Readable-Tests mit Coverage-Gate
+- Doku-Konsistenz
+- deterministisches PR-Labeling und Versionierungs-Nachweise
 
-## 2. Workflow Structure
-The `CI` workflow contains two separated responsibility paths:
-- `pull_request` path: `pr-labeling` (label governance only)
-- `pull_request`/`push` path: technical quality jobs (`preflight`, `build`, `security-nuget`, `tests-bdd-coverage`, `summary`)
+## 2. Workflow-Struktur
+Der Workflow `CI` hat zwei klar getrennte Verantwortungswege:
+- `pull_request`: `pr-labeling` (Governance, nicht-gating)
+- `pull_request`/`push`: technische Qualitätsjobs (`preflight`, `build`, `security-nuget`, `tests-bdd-coverage`, `summary`)
 
-## 3. Jobs (1 job = 1 concern)
-### Job: pr-labeling (governance)
-- Collect changed files and current PR labels
-- Derive `required/actual/reason` from versioning guard
-- Compute deterministic labels (`decision.json`)
-- Validate schema
-- Remove stale auto-labels and apply new labels
-- Upload labeling artifact
+## 3. Jobs (1 Job = 1 Verantwortung)
+### Job: pr-labeling (Governance)
+- geänderte Dateien und aktuelle PR-Labels erfassen
+- `required/actual/reason` aus Versioning-Guard ableiten
+- deterministische Label-Entscheidung berechnen (`decision.json`)
+- Schema validieren
+- veraltete Auto-Labels entfernen und neue setzen
+- Artefakte hochladen
 
 ### Job: preflight (fail-fast)
-1. Label engine golden tests
-2. Docs check
-3. Versioning guard
-4. Format check
+1. Label-Engine Golden-Tests
+2. Docs-Check
+3. Versioning-Guard
+4. Format-Check
 
 ### Job: build
 1. Restore
 2. Build (`--warnaserror`)
 
 ### Job: security-nuget
-1. Vulnerability scan (`--include-transitive`)
-2. Deprecated package report
+1. Vulnerability-Scan (`--include-transitive`)
+2. Deprecated-Packages-Report
 
 ### Job: tests-bdd-coverage
-1. Single-run BDD tests + coverage gate (`Line >= 85`, `Branch >= 69`)
+1. Single-Run BDD-Tests + Coverage-Gate (`Line >= 85`, `Branch >= 69`)
 
 ### Job: summary
-- Coverage and security summary (report-only)
+- Coverage- und Security-Zusammenfassung (nur Reporting)
 
-## 4. Required vs Non-Required Checks
-Required in branch protection:
+## 4. Required vs. Non-Required Checks
+Required in Branch-Protection:
 - `preflight`
 - `build`
 - `security-nuget`
 - `tests-bdd-coverage`
-- optional: Qodana (policy-dependent)
+- optional: `qodana` (policy-abhängig)
 
-Not required:
-- `pr-labeling` (governance automation, non-gating)
-`pr-labeling` is fail-open by design: label apply API failures are reported as artifacts but do not fail technical quality gates.
+Nicht required:
+- `pr-labeling` (Governance-Automation, fail-open)
+Wenn Label-API-Aufrufe fehlschlagen, wird dies als Artefakt protokolliert, ohne technische Quality-Gates zu brechen.
 
-## 5. Stable Artifact Paths
+## 5. Stabile Artefaktpfade
 - `artifacts/labels/decision.json`
 - `artifacts/docs/doc-check.txt`
 - `artifacts/versioning/versioning-check.txt`
@@ -67,18 +67,18 @@ Not required:
 - `artifacts/coverage/coverage.cobertura.xml`
 - `artifacts/coverage/coverage-summary.txt`
 
-## 6. Labeling and Versioning SSOT
+## 6. Labeling- und Versioning-SSOT
 - Policy: `docs/versioning/POLICY.md`
-- Full behavior + charts: `docs/AUTO_LABELING_AND_VERSIONING.md`
+- Verhalten + Diagramme: `docs/AUTO_LABELING_AND_VERSIONING.md`
 - Ownership: `docs/governance/LABELING_OWNERSHIP.md`
 
 ## 7. Qodana
-Qodana remains a separate workflow and complements CI quality gates.
-Coverage source of truth remains CI coverage artifacts and gate enforcement.
-For `pull_request`, Qodana publishes SARIF as workflow artifact only.
-Code Scanning SARIF upload is performed on non-PR runs to avoid noisy PR annotations.
+Qodana bleibt ein separater Workflow und ergänzt die CI-Qualitätsgates.
+Coverage-SSOT bleibt CI (Coverage-Artefakte + Gate-Enforcement).
+Für `pull_request` wird SARIF als Workflow-Artefakt veröffentlicht.
+Code-Scanning-SARIF-Upload erfolgt nur auf non-PR-Runs, um PR-Noise zu vermeiden.
 
-## 8. Local Reproduction
+## 8. Lokale Reproduktion
 ```bash
 node tools/versioning/test-compute-pr-labels.js
 python3 tools/check-docs.py

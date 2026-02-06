@@ -1,81 +1,83 @@
-# Versioning & Release Policy
+# Versionierungs- und Release-Policy (SSOT)
 
-## 1. Purpose
-This policy defines strict SemVer (`MAJOR.MINOR.PATCH`) and deterministic CI enforcement.
+## 1. Zweck
+Diese Policy definiert verbindliche SemVer-Regeln (`MAJOR.MINOR.PATCH`) und die deterministische CI-Erzwingung.
 
-## 2. Terms
-- SSOT: `Directory.Build.props` is the only source for current version.
-- Breaking Change: public API/behavior/default changes that break existing integrations.
+## 2. Geltungsbereich
+- Produkt- und Bibliotheksversionen aus `Directory.Build.props` (einzige SSOT-Quelle).
+- PR-Versioning-Guard und Auto-Labeling in CI.
 
-## 3. SemVer Rules (Binding)
-- MAJOR
-  - rename/remove public API
-  - breaking default behavior changes
-- MINOR
-  - new compatible features, datatypes, or API surface
-- PATCH
-  - fixes, refactoring without behavior change, tests, docs, CI, tooling
-- NONE
-  - pure metadata changes with no version impact
+## 3. Begriffe
+- SSOT: Single Source of Truth fuer Versioninformation.
+- Breaking Change: Aenderung, die bestehende Integrationen ohne Anpassung brechen kann.
 
-## 4. Decision Matrix
-| Change Type | Example | Bump |
+## 4. SemVer-Regeln (verbindlich)
+- `MAJOR`
+  - oeffentliche API entfernt/umbenannt
+  - inkompatibles Standardverhalten
+- `MINOR`
+  - neue abwaertskompatible Features oder API-Erweiterungen
+- `PATCH`
+  - Fixes, Refactorings ohne Verhaltensbruch, Tests, Doku, CI, Tooling
+- `NONE`
+  - reine Metadatenaenderungen ohne Versionsauswirkung
+
+## 5. Entscheidungs-Matrix
+| Aenderungstyp | Beispiel | Bump |
 |---|---|---|
 | Public API rename/remove | `ZipProcessing` -> `ArchiveProcessing` | MAJOR |
-| Breaking defaults/policy | stricter behavior without opt-in | MAJOR |
-| Compatible feature | new supported format/model | MINOR |
-| Bugfix/refactor | stabilization, cleanup | PATCH |
-| Docs/Test/CI/Tooling | docs, test, workflows, scripts | PATCH |
-| Metadata-only | mechanical/meta-only update | NONE |
+| Breaking Defaults/Policy | stricteres Verhalten ohne Opt-in | MAJOR |
+| Kompatibles Feature | neuer Datentyp/Flow | MINOR |
+| Fix/Refactor | Stabilisierung, Cleanup | PATCH |
+| Doku/Test/CI/Tooling | Workflow-, Skript-, Test-, Doku-Update | PATCH |
+| Metadaten-only | mechanische Aenderung ohne Laufzeitwirkung | NONE |
 
-## 5. CI Guard (Mandatory)
-- `tools/versioning/check-versioning.sh` classifies changes and verifies required bump.
-- `versioning-guard` must pass before build/test jobs.
+## 6. CI-Guard (Pflicht)
+- `tools/versioning/check-versioning.sh` klassifiziert Aenderungen und prueft den erforderlichen Bump.
+- `versioning-guard` muss vor Build/Test grün sein.
+- Nachweis in Logs/Summary:
+  - `required=<...>`
+  - `actual=<...>`
+  - `reason=<...>`
 
-## 6. Deterministic Auto-Labeling (Mandatory)
-The PR auto-labeler runs in CI and follows strict caps:
-- exactly one `version:*`
-- exactly one primary label (`breaking|feature|fix|refactor|ci|test|docs|tooling|chore`)
-- at most one `impl:*`
-- at most two `area:*`
+## 7. Deterministisches Auto-Labeling (Pflicht)
+Caps pro PR-Lauf:
+- genau ein `version:*`
+- genau ein Primary-Label
+- maximal ein `impl:*`
+- maximal zwei `area:*`
 
-No extra keyword label group exists.
+Alle veralteten Auto-Labels werden vor dem Anwenden neuer Labels entfernt.
 
-All stale auto-labels are removed before new labels are applied.
-
-## 7. Label Registry
-### 7.1 Version labels
+## 8. Label-Registry
+### 8.1 Version-Labels
 - `version:major`
 - `version:minor`
 - `version:patch`
 - `version:none`
 
-### 7.2 Primary labels
-- `breaking`, `feature`, `fix`, `refactor`, `docs`, `test`, `ci`, `tooling`, `chore`
+### 8.2 Primary-Labels
+- `breaking`, `feature`, `fix`, `refactor`, `ci`, `test`, `docs`, `tooling`, `chore`
 
-### 7.3 Implementation labels
+### 8.3 Implementation-Labels
 - `impl:quality`, `impl:security`, `impl:docs`, `impl:config`
 
-### 7.4 Area labels
+### 8.4 Area-Labels
 - `area:pipeline`, `area:qodana`, `area:archive`, `area:hashing`, `area:detection`,
-  `area:materializer`, `area:versioning`, `area:tests`, `area:docs`, `area:tooling`
+- `area:materializer`, `area:versioning`, `area:tests`, `area:docs`, `area:tooling`
 
-Canonical registry source:
+Kanonische Quelle:
 - `tools/versioning/labels.json`
 
-## 8. Primary Priority (Fixed)
+## 9. Prioritaetsregel
+Primary-Prioritaet ist fix:
 `breaking > feature > fix > refactor > ci > test > docs > tooling > chore`
 
-## 9. Console Evidence (Mandatory)
-CI outputs deterministic versioning evidence:
-- `required=<...>`
-- `actual=<...>`
-- `reason=<...>`
-
-## 10. Documentation & Governance
-- Auto-labeling/auto-versioning SSOT: `docs/AUTO_LABELING_AND_VERSIONING.md`
-- Ownership rules: `docs/governance/LABELING_OWNERSHIP.md`
-- CI pipeline overview: `docs/CI_PIPELINE.md`
+## 10. Zugehoerige SSOT-Dokumente
+- `docs/AUTO_LABELING_AND_VERSIONING.md`
+- `docs/CI_PIPELINE.md`
+- `docs/governance/LABELING_OWNERSHIP.md`
+- `docs/DOCUMENTATION_STANDARDS.md`
 
 ## 11. Qodana
-Qodana is integrated as static analysis workflow and complements CI quality gates.
+Qodana ist zusaetzliche Static-Analysis und ersetzt keine CI-Quality-Gates fuer Build/Test/Coverage/Versioning.

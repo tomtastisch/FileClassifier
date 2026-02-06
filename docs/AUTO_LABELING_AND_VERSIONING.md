@@ -1,84 +1,82 @@
-# Auto-Labeling And Auto-Versioning
+# Auto-Labeling und Auto-Versionierung (SSOT)
 
-## 1. Purpose
-This document defines the deterministic PR labeling and versioning decision flow.
-It is the SSOT for label taxonomy, caps, priority, and CI integration.
+## 1. Zweck
+Diese Spezifikation definiert den deterministischen Entscheidungsfluss fuer PR-Labeling und Versionierungsnachweise.
 
-## 2. Deterministic Label Caps
-Per PR run, the auto-labeler enforces:
-- Exactly one `version:*` label
-- Exactly one primary label: `breaking|feature|fix|refactor|ci|test|docs|tooling|chore`
-- At most one `impl:*` label
-- At most two `area:*` labels
+## 2. Verbindliche Caps
+Pro PR-Lauf erzwingt der Auto-Labeler:
+- genau ein `version:*`
+- genau ein Primary-Label aus `breaking|feature|fix|refactor|ci|test|docs|tooling|chore`
+- maximal ein `impl:*`
+- maximal zwei `area:*`
 
-No additional keyword label group is used.
+Es gibt keine zusaetzliche Keyword-Labelgruppe.
 
-## 3. Versioning Source Of Truth
-`tools/versioning/check-versioning.sh` determines required bump semantics.
-
-Console and summary outputs include:
+## 3. Versioning-SSOT
+`tools/versioning/check-versioning.sh` liefert die SemVer-Entscheidung.
+Im CI-Nachweis muessen enthalten sein:
 - `required=<major|minor|patch|none>`
 - `actual=<major|minor|patch|none>`
 - `reason=<deterministic-reason>`
 
-## 4. Priority Rules
-Primary label priority is fixed:
+## 4. Prioritaetsregel
+Feste Reihenfolge:
 `breaking > feature > fix > refactor > ci > test > docs > tooling > chore`
 
-## 5. Mapping Rules
-### 5.1 impl:* (max 1)
-- `impl:security` -> security/vuln focused changes
-- `impl:docs` -> docs-only implementation focus
-- `impl:config` -> CI/config/tooling/versioning mechanics
-- `impl:quality` -> source/tests quality/refactoring focus
+## 5. Mapping-Regeln
+### 5.1 `impl:*` (max 1)
+- `impl:security` fuer Security-/Vuln-Aenderungen
+- `impl:docs` fuer reine Dokumentationsumsetzung
+- `impl:config` fuer CI/Tooling/Config/Versioning-Mechanik
+- `impl:quality` fuer Code-/Test-Qualitaetsarbeit
 
-### 5.2 area:* (max 2)
+### 5.2 `area:*` (max 2)
 - `area:pipeline` -> `.github/workflows/**`
 - `area:qodana` -> `qodana.yaml`, `.qodana/**`
-- `area:archive` -> archive internals/processing
-- `area:hashing` -> deterministic hashing
-- `area:detection` -> detection engine
-- `area:materializer` -> materialization flow
+- `area:archive` -> Archiv-Internals/Processing
+- `area:hashing` -> Deterministic Hashing
+- `area:detection` -> Detection Engine
+- `area:materializer` -> Materializer-Flows
 - `area:versioning` -> `docs/versioning/**`, `Directory.Build.props`
 - `area:tests` -> `tests/**`
 - `area:docs` -> `docs/**`, `README.md`
 - `area:tooling` -> `tools/**`
 
-## 6. End-To-End Flow
+## 6. End-to-End-Flow
 ```mermaid
 flowchart TD
-  A["PR Event"] --> B["Collect changed files + existing labels"]
-  B --> C["Run versioning guard"]
-  C --> D["Compute deterministic decision JSON"]
-  D --> E["Validate decision schema"]
-  E --> F["Remove stale auto-labels"]
-  F --> G["Apply new labels with caps"]
-  G --> H["Write artifact + job summary"]
+  A["PR Event"] --> B["Changed files + existing labels laden"]
+  B --> C["Versioning-Guard ausfuehren"]
+  C --> D["Deterministische Entscheidung berechnen"]
+  D --> E["Schema validieren"]
+  E --> F["Veraltete Auto-Labels entfernen"]
+  F --> G["Neue Labels mit Caps anwenden"]
+  G --> H["Artifact + Job-Summary schreiben"]
 ```
 
-## 7. Primary Decision Flow
+## 7. Primary-Entscheidungsfluss
 ```mermaid
 flowchart TD
   A["Input: required bump, title, changed files"] --> B{"required == major?"}
   B -- Yes --> C["primary=breaking"]
-  B -- No --> D{"src changed or feat keyword?"}
+  B -- No --> D{"src geaendert oder feat keyword?"}
   D -- Yes --> E["primary=feature"]
   D -- No --> F{"fix keyword?"}
   F -- Yes --> G["primary=fix"]
   F -- No --> H{"refactor keyword?"}
   H -- Yes --> I["primary=refactor"]
-  H -- No --> J{"ci changed?"}
+  H -- No --> J{"ci geaendert?"}
   J -- Yes --> K["primary=ci"]
-  J -- No --> L{"tests changed?"}
+  J -- No --> L{"tests geaendert?"}
   L -- Yes --> M["primary=test"]
-  L -- No --> N{"docs changed?"}
+  L -- No --> N{"docs geaendert?"}
   N -- Yes --> O["primary=docs"]
-  N -- No --> P{"tools changed?"}
+  N -- No --> P{"tools geaendert?"}
   P -- Yes --> Q["primary=tooling"]
   P -- No --> R["primary=chore"]
 ```
 
-## 8. Sequence Diagram
+## 8. Sequenzdiagramm
 ```mermaid
 sequenceDiagram
   participant GH as "GitHub"
@@ -88,41 +86,37 @@ sequenceDiagram
   participant API as "GitHub Labels API"
 
   GH->>CI: pull_request event
-  CI->>Guard: compute required/actual bump
+  CI->>Guard: required/actual berechnen
   CI->>Engine: files + labels + guard result
   Engine-->>CI: decision.json
   CI->>CI: schema validation
-  CI->>API: remove stale auto-labels
-  CI->>API: add deterministic labels
+  CI->>API: stale auto-labels entfernen
+  CI->>API: deterministische labels setzen
   CI-->>GH: artifact + summary
 ```
 
-## 9. Version Guard Decision Flow
+## 9. Version-Guard-Flow
 ```mermaid
 flowchart TD
-  A["Run check-versioning.sh"] --> B{"guard successful?"}
-  B -- Yes --> C["Use required + actual from guard"]
+  A["check-versioning.sh"] --> B{"guard erfolgreich?"}
+  B -- Yes --> C["required + actual verwenden"]
   B -- No --> D["Fallback required=none actual=none"]
-  C --> E{"actual satisfies required?"}
+  C --> E{"actual erfuellt required?"}
   D --> F["reason=guard-unavailable-fallback"]
-  E -- Yes --> G["Pass and label with reason"]
-  E -- No --> H["Fail in preflight versioning-guard"]
+  E -- Yes --> G["Pass + Labeling mit reason"]
+  E -- No --> H["Fail in preflight/versioning-guard"]
 ```
 
-## 10. Examples
-### Docs-only PR
-- `version:none`, `primary=docs`, optional `impl:docs`, `area:docs`
-
-### CI-only PR
-- `version:patch`, `primary=ci`, `impl:config`, `area:pipeline`
-
-### Source + tests + docs PR
-- `version:minor` (or `major` if breaking), single primary by priority, capped area labels
-
-## 11. Regression Safety
-Golden testcases live in:
+## 10. Regressionssicherheit
+Golden-Testdaten:
 - `tools/versioning/testcases/*.json`
 
-Validation scripts:
+Validierung:
 - `tools/versioning/test-compute-pr-labels.js`
 - `tools/versioning/validate-label-decision.js`
+
+## 11. Verlinkte SSOT-Quellen
+- `docs/versioning/POLICY.md`
+- `docs/CI_PIPELINE.md`
+- `docs/governance/LABELING_OWNERSHIP.md`
+- `docs/DOCUMENTATION_STANDARDS.md`
