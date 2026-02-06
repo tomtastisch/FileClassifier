@@ -9,24 +9,66 @@ on:
 jobs:
   qodana:
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
-      security-events: write
+      security-events: write   # nötig für Code Scanning SARIF upload
+      pull-requests: write     # nur nötig, wenn du PR-Kommentar willst
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Läuft auch ohne QODANA_TOKEN, wenn du nur GitHub Code Scanning willst.
       - name: Qodana Scan
         uses: JetBrains/qodana-action@v2025.3
-        env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
 
-      # immer eine kopierbare SARIF-Datei als Artifact
+      # 1) GitHub Code Scanning füttern (damit Findings unter Security > Code scanning landen)
+      - name: Upload SARIF to GitHub Code Scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
+
+      # 2) Zusätzlich als Artifact (damit du per gh run download abrufen kannst)
       - name: Upload SARIF artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: qodana-sarif
-          path: qodana/results/qodana.sarif.json
+          path: ${{ runner.temp }}/qodana/results/qodana.sarif.json
           if-no-files-found: warn
+
+      # 3) Optional: Kurz-Report als PR-Kommentar (nur bei pull_request)
+      - name: Comment SARIF summary on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const p = process.env.SARIF_PATH;
+            if (!fs.existsSync(p)) {
+              core.warning(`SARIF not found at ${p}`);
+              return;
+            }
+            const sarif = JSON.parse(fs.readFileSync(p, 'utf8'));
+            const results = (((sarif.runs||[])[0]||{}).results)||[];
+            const byRule = new Map();
+            for (const r of results) {
+              const k = r.ruleId || 'unknown';
+              byRule.set(k, (byRule.get(k)||0) + 1);
+            }
+            const top = [...byRule.entries()].sort((a,b)=>b[1]-a[1]).slice(0,15);
+            const lines = top.map(([k,v])=>`- ${k}: ${v}`);
+            const body =
+              `Qodana (SARIF) Summary\\n` +
+              `Total results: ${results.length}\\n\\n` +
+              (lines.length ? lines.join('\\n') : '(no results)');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
+        env:
+          SARIF_PATH: ${{ runner.temp }}/qodana/results/qodana.sarif.json

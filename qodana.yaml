@@ -1,2 +1,10 @@
 version: "1.0"
 linter: jetbrains/qodana-dotnet:2025.3
+
+profile:
+  name: qodana.recommended
+
+# CI soll FAILen, wenn Schwellen überschritten werden
+failureConditions:
+  severityThresholds:
+    any: 0
