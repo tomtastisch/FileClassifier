@@ -158,7 +158,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
-          include-prerelease: true
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -222,7 +221,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
-          include-prerelease: true
 
       - name: Restore
         run: dotnet restore FileClassifier.sln -v minimal
@@ -253,7 +251,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
-          include-prerelease: true
 
       - name: Restore
         run: dotnet restore FileClassifier.sln -v minimal
@@ -294,7 +291,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
-          include-prerelease: true
 
       - name: Restore
         run: dotnet restore FileClassifier.sln -v minimal
