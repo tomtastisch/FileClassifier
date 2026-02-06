@@ -21,7 +21,7 @@ Angenommen die folgenden Ressourcen existieren
         Wenn ich den Dateityp der aktuellen Bytes ermittle
         Und ich die aktuellen Archiv-Bytes validiere
         Und ich die aktuellen Archiv-Bytes sicher in den Speicher extrahiere
-        Und ich übernehme den ersten extrahierten Eintrag als aktuelle Bytes
+        Und ich den ersten extrahierten Eintrag als aktuelle Bytes uebernehme
         Und ich speichere die aktuellen Bytes als "entry-<slug>.txt"
         Dann ist der erkannte Typ "Zip"
         Und ist das Archiv-Validierungsergebnis "True"

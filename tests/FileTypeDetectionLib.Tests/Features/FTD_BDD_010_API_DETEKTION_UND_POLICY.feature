@@ -92,7 +92,7 @@ Angenommen die folgenden Ressourcen existieren
     @detector
     Szenariogrundriss: IsOfType prueft aktuelle Bytes gegen erwarteten Typ
         Angenommen ich lese die Datei "<datei>" als aktuelle Bytes
-        Wenn ich pruefe ob die aktuellen Bytes vom Typ "<typ>" sind
+        Wenn ich pruefe, ob die aktuellen Bytes vom Typ "<typ>" sind
         Dann ist das Typpruefungsergebnis "<ergebnis>"
 
         Beispiele:

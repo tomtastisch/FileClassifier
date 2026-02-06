@@ -41,7 +41,7 @@ Angenommen die folgenden Ressourcen existieren
         Dann ist das Archiv-Validierungsergebnis "True"
         Wenn ich die aktuellen Archiv-Bytes sicher in den Speicher extrahiere
         Dann ist der extrahierte Eintragssatz nicht leer
-        Wenn ich übernehme den ersten extrahierten Eintrag als aktuelle Bytes
+        Wenn ich den ersten extrahierten Eintrag als aktuelle Bytes uebernehme
         Und ich den deterministischen Hash der aktuellen Bytes berechne
         Und ich den letzten logischen Hash als Referenz speichere
         Und ich den letzten physischen Hash als Referenz speichere

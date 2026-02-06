@@ -15,7 +15,8 @@ Ziel ist eine konsistente, auditierbare und schnell erfassbare Dokumentation.
   - `docs/versioning/`
   - `docs/guides/`
   - `docs/governance/`
-- Ausnahmen nur, wenn historisch etabliert und bereits breit verlinkt (z. B. `docs/test-matrix-hashing.md`).
+  - `docs/tests/`
+- Auch in Unterordnern gilt `UPPER_SNAKE_CASE.md` (Ausnahme: `README.md` als Einstieg).
 
 ## 4. Pflichtstruktur pro Dokument
 Jedes fachliche Dokument folgt dieser Reihenfolge:
@@ -55,3 +56,4 @@ python3 tools/check-docs.py
 ## 9. Nicht-Ziele
 - Keine doppelte Pflege derselben Regel in mehreren SSOT-Dateien.
 - Keine veralteten Backup-/Deprecated-Dokumente im aktiven Pfad.
+- Keine gemischten Benennungsschemata (`kebab-case`/`snake_case`) innerhalb derselben Doku-Ebene.

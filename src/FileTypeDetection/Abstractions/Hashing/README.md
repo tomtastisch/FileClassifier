@@ -22,7 +22,7 @@ Deterministische Hash-Evidence-Modelle für Physical/Logical-Nachweise und Round
 
 - [Abstractions-Index](../README.md)
 - [API-Contract](../../../../docs/04_DETERMINISTIC_HASHING_API_CONTRACT.md)
-- [Test-Matrix Hashing](../../../../docs/test-matrix-hashing.md)
+- [Test-Matrix Hashing](../../../../docs/TEST_MATRIX_HASHING.md)
 
 ## Dokumentpflege-Checkliste
 

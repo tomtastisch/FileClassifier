@@ -161,7 +161,6 @@ public sealed class FileTypeDetectionSteps
         state.LastArchiveValidateResult = ArchiveProcessing.TryValidate(state.CurrentPayload!);
     }
 
-    [When("ich extrahiere die Archiv-Datei sicher in Memory")]
     [When("ich die Archiv-Datei sicher in den Speicher extrahiere")]
     public void WhenIExtractArchiveFileSafelyToMemory()
     {
@@ -179,7 +178,7 @@ public sealed class FileTypeDetectionSteps
         state.LastExtractedEntries = ArchiveProcessing.TryExtractToMemory(state.CurrentPayload!);
     }
 
-    [When("ich übernehme den ersten extrahierten Eintrag als aktuelle Bytes")]
+    [When("ich den ersten extrahierten Eintrag als aktuelle Bytes uebernehme")]
     public void WhenIUseFirstExtractedEntryAsCurrentBytes()
     {
         var state = State();
@@ -189,7 +188,6 @@ public sealed class FileTypeDetectionSteps
     }
 
     [When("ich speichere die aktuellen Bytes als {string}")]
-    [When("ich die aktuellen Bytes als {string} speichere")]
     public void WhenIPersistCurrentBytesAs(string fileName)
     {
         var state = State();
@@ -203,8 +201,7 @@ public sealed class FileTypeDetectionSteps
         state.LastMaterializedPath = destination;
     }
 
-    [When("ich versuche die aktuellen Bytes als {string} ohne overwrite zu speichern")]
-    [When("ich versuche, die aktuellen Bytes als {string} ohne overwrite zu speichern")]
+    [When("ich versuche, die aktuellen Bytes als {string} ohne Overwrite zu speichern")]
     public void WhenITryPersistCurrentBytesWithoutOverwrite(string fileName)
     {
         var state = State();
@@ -216,7 +213,6 @@ public sealed class FileTypeDetectionSteps
         state.LastMaterializedPath = destination;
     }
 
-    [When("ich versuche die aktuellen Bytes in den Zielpfad {string} zu speichern")]
     [When("ich versuche, die aktuellen Bytes in den Zielpfad {string} zu speichern")]
     public void WhenITryPersistCurrentBytesToRawDestination(string destinationPath)
     {
@@ -275,7 +271,7 @@ public sealed class FileTypeDetectionSteps
         state.LastSafeReadBytes = FileTypeDetector.ReadFileSafe(state.CurrentPath!);
     }
 
-    [When("ich pruefe ob die aktuellen Bytes vom Typ {string} sind")]
+    [When("ich pruefe, ob die aktuellen Bytes vom Typ {string} sind")]
     public void WhenICheckCurrentBytesType(string expectedKind)
     {
         var state = State();

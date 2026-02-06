@@ -18,7 +18,7 @@ Angenommen die folgenden Ressourcen existieren
         Angenommen ein leeres temporäres Zielverzeichnis
         Und die Datei "sample.zip"
         Wenn ich die Archiv-Datei sicher in den Speicher extrahiere
-        Und ich übernehme den ersten extrahierten Eintrag als aktuelle Bytes
+        Und ich den ersten extrahierten Eintrag als aktuelle Bytes uebernehme
         Und ich speichere die aktuellen Bytes als "archive-entry-note.txt"
         Dann ist der extrahierte Eintragssatz nicht leer
         Und existiert die gespeicherte Datei "archive-entry-note.txt"
@@ -29,7 +29,7 @@ Angenommen die folgenden Ressourcen existieren
     Szenario: Originaldatei-Bytes werden iterativ gespeichert und als letzter Stand weiterverwendet
         Angenommen ein leeres temporäres Zielverzeichnis
         Und ich lese die Datei "sample.pdf" als aktuelle Bytes
-        Wenn ich die aktuellen Bytes als "chain-original-step1.bin" speichere
+        Wenn ich speichere die aktuellen Bytes als "chain-original-step1.bin"
         Und ich lade die zuletzt gespeicherten Bytes als aktuelle Bytes
         Und ich speichere die aktuellen Bytes als "chain-original-step2.bin"
         Dann existiert die gespeicherte Datei "chain-original-step1.bin"
@@ -43,7 +43,7 @@ Angenommen die folgenden Ressourcen existieren
         Angenommen ein leeres temporäres Zielverzeichnis
         Und die Datei "sample.zip"
         Wenn ich die Archiv-Datei sicher in den Speicher extrahiere
-        Und ich übernehme den ersten extrahierten Eintrag als aktuelle Bytes
+        Und ich den ersten extrahierten Eintrag als aktuelle Bytes uebernehme
         Und ich speichere die aktuellen Bytes als "chain-archive-step1.bin"
         Und ich lade die zuletzt gespeicherten Bytes als aktuelle Bytes
         Und ich speichere die aktuellen Bytes als "chain-archive-step2.bin"
@@ -58,7 +58,7 @@ Angenommen die folgenden Ressourcen existieren
         Angenommen ein leeres temporäres Zielverzeichnis
         Und es existiert bereits eine gespeicherte Datei "conflict.bin"
         Und ich lese die Datei "sample.pdf" als aktuelle Bytes
-        Wenn ich versuche, die aktuellen Bytes als "conflict.bin" ohne overwrite zu speichern
+        Wenn ich versuche, die aktuellen Bytes als "conflict.bin" ohne Overwrite zu speichern
         Dann ist der letzte Speicherversuch fehlgeschlagen
         Und bleibt die bestehende Datei "conflict.bin" unveraendert
 
@@ -76,6 +76,6 @@ Angenommen die folgenden Ressourcen existieren
         Angenommen ein leeres temporäres Zielverzeichnis
         Und die maximale Dateigroesse ist 16 Bytes
         Und ich lese die Datei "sample.pdf" als aktuelle Bytes
-        Wenn ich versuche, die aktuellen Bytes als "too-large.bin" ohne overwrite zu speichern
+        Wenn ich versuche, die aktuellen Bytes als "too-large.bin" ohne Overwrite zu speichern
         Dann ist der letzte Speicherversuch fehlgeschlagen
         Und existiert die gespeicherte Datei "too-large.bin" nicht

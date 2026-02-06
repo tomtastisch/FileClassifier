@@ -7,6 +7,7 @@ Zentrale Einstiegsstelle für alle Projektdokumente mit klarer Trennung nach Ver
 - Dokumentationsstandard (verbindlich): [DOCUMENTATION_STANDARDS.md](./DOCUMENTATION_STANDARDS.md)
 - CI-/Qualitätsnachweise: [CI_PIPELINE.md](./CI_PIPELINE.md)
 - Auto-Labeling und Auto-Versionierung: [AUTO_LABELING_AND_VERSIONING.md](./AUTO_LABELING_AND_VERSIONING.md)
+- Testdokumentation (BDD): [tests/README.md](./tests/README.md)
 
 ## 3. Kernarchitektur (SSOT)
 1. [01_FUNCTIONS.md](./01_FUNCTIONS.md)
@@ -28,7 +29,9 @@ Zentrale Einstiegsstelle für alle Projektdokumente mit klarer Trennung nach Ver
 3. [guides/DATATYPE_EXTENSION_GUIDE.md](./guides/DATATYPE_EXTENSION_GUIDE.md)
 
 ## 6. Test- und Nachweisdokumente
-1. [test-matrix-hashing.md](./test-matrix-hashing.md)
+1. [TEST_MATRIX_HASHING.md](./TEST_MATRIX_HASHING.md)
+2. [tests/BDD_SATZKATALOG.md](./tests/BDD_SATZKATALOG.md)
+3. [tests/BDD_EXECUTION_AND_GHERKIN_FLOW.md](./tests/BDD_EXECUTION_AND_GHERKIN_FLOW.md)
 
 ## 7. Modulnahe Dokumentation
 - [../src/FileTypeDetection/README.md](../src/FileTypeDetection/README.md)

@@ -34,6 +34,7 @@ Professionelle, auditierbare und deterministische Dateityp-Erkennung mit sichere
 Die CI ist deterministisch und auditierbar aufgebaut. Alle Checks laufen in separaten Steps und erzeugen Artefakte.
 - Details: [docs/CI_PIPELINE.md](docs/CI_PIPELINE.md)
 - Auto-Labeling & Auto-Versionierung: [docs/AUTO_LABELING_AND_VERSIONING.md](docs/AUTO_LABELING_AND_VERSIONING.md)
+- BDD-Testkatalog und Testablauf: [docs/tests/README.md](docs/tests/README.md)
 - Governance/Ownership: [docs/governance/LABELING_OWNERSHIP.md](docs/governance/LABELING_OWNERSHIP.md)
 
 ## 7. Runbook (reproduzierbar)
