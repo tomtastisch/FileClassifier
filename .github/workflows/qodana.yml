@@ -1,34 +1,49 @@
 name: qodana
 
 on:
-    push:
-        branches: ["main"]
-    pull_request:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+  workflow_dispatch:
 
 permissions:
-    contents: read
+  contents: read
+  actions: read
 
 jobs:
-    qodana:
-        runs-on: ubuntu-latest
-        env:
-            QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
-        steps:
-            - uses: actions/checkout@v4
+  qodana:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    env:
+      QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
-            -   name: Run Qodana
-                if: env.QODANA_TOKEN != ''
-                uses: JetBrains/qodana-action@v2025.3
-                with:
-                    image: jetbrains/qodana-dotnet:2025.3
-                    results-dir: qodana-results
-                    upload-result: false
-            
-            
-            - name: Upload SARIF artifact
-              if: env.QODANA_TOKEN != ''
-              uses: actions/upload-artifact@v4
-              with:
-                  name: qodana-sarif
-                  path: qodana-results/qodana.sarif.json
-                  if-no-files-found: error
+      - name: Download Coverage Artifact (from CI)
+        if: github.event_name == 'workflow_run'
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+          path: .qodana/code-coverage
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Qodana
+        if: env.QODANA_TOKEN != ''
+        uses: JetBrains/qodana-action@v2025.3
+        with:
+          image: jetbrains/qodana-dotnet:2025.3
+          results-dir: qodana-results
+          upload-result: false
+
+      - name: Upload SARIF Artifact
+        if: env.QODANA_TOKEN != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: qodana-sarif
+          path: qodana-results/qodana.sarif.json
+          if-no-files-found: error

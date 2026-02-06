@@ -24,6 +24,7 @@ USAGE
 mode="${1:-}"
 target="${SOLUTION_FILE}"
 filter=""
+extra_args=()
 
 case "${mode}" in
   -h|--help)
@@ -42,6 +43,14 @@ case "${mode}" in
     ;;
 esac
 
+if [[ "${1:-}" == "--" ]]; then
+  shift
+fi
+
+if [[ $# -gt 0 ]]; then
+  extra_args=("$@")
+fi
+
 if [[ -n "${TEST_BDD_OUTPUT_DIR:-}" ]]; then
   tmp_dir="${TEST_BDD_OUTPUT_DIR}"
   mkdir -p "${tmp_dir}"
@@ -51,6 +60,10 @@ else
 fi
 trx_file="${tmp_dir}/results.trx"
 raw_log="${tmp_dir}/dotnet-test.log"
+readable_report="${tmp_dir}/bdd-readable.txt"
+coverage_dir="${ROOT_DIR}/artifacts/coverage"
+coverage_file="${coverage_dir}/coverage.cobertura.xml"
+coverage_summary="${coverage_dir}/coverage-summary.txt"
 
 cmd=(
   dotnet test "${target}"
@@ -62,8 +75,8 @@ if [[ -n "${filter}" ]]; then
   cmd+=(--filter "${filter}")
 fi
 
-if [[ $# -gt 0 ]]; then
-  cmd+=("$@")
+if [[ ${#extra_args[@]} -gt 0 ]]; then
+  cmd+=("${extra_args[@]}")
 fi
 
 set +e
@@ -84,7 +97,18 @@ if [[ ! -f "${trx_file}" ]]; then
   exit "${test_exit}"
 fi
 
-python3 - "$trx_file" <<'PY'
+mkdir -p "${coverage_dir}"
+{
+  echo "Coverage summary (from dotnet test output):"
+  grep -E "^\| Total\s+\|" "${raw_log}" || true
+  if [[ -f "${coverage_file}" ]]; then
+    echo "Coverage file: ${coverage_file}"
+  else
+    echo "Coverage file: not found (${coverage_file})"
+  fi
+} >"${coverage_summary}"
+
+python3 - "$trx_file" <<'PY' | tee "${readable_report}"
 import re
 import sys
 import xml.etree.ElementTree as ET

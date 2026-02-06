@@ -15,26 +15,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  docs-linkcheck:
+  preflight:
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Doc Consistency Check
-        run: python3 tools/check-docs.py | tee artifacts/doc-check.txt
-
-      - name: Upload Doc Check Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: doc-check
-          path: artifacts/doc-check.txt
-          if-no-files-found: error
-
-  versioning-guard:
-    runs-on: ubuntu-latest
-    needs: docs-linkcheck
 
     steps:
       - name: Checkout
@@ -42,12 +24,57 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Versioning Guard
-        run: tools/versioning/check-versioning.sh
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+          include-prerelease: true
 
-  build-test:
+      - name: Docs Check
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/docs
+          python3 tools/check-docs.py | tee artifacts/docs/doc-check.txt
+
+      - name: Versioning Guard
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/versioning
+          bash tools/versioning/check-versioning.sh | tee artifacts/versioning/versioning-check.txt
+
+      - name: Format Check
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/format
+          dotnet format FileClassifier.sln --verify-no-changes | tee artifacts/format/format-check.txt
+
+      - name: Upload Docs Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-check
+          path: artifacts/docs/
+          if-no-files-found: error
+
+      - name: Upload Versioning Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: versioning-check
+          path: artifacts/versioning/
+          if-no-files-found: error
+
+      - name: Upload Format Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: format-check
+          path: artifacts/format/
+          if-no-files-found: error
+
+  build:
     runs-on: ubuntu-latest
-    needs: [docs-linkcheck, versioning-guard]
+    needs: preflight
 
     steps:
       - name: Checkout
@@ -62,40 +89,142 @@ jobs:
       - name: Restore
         run: dotnet restore FileClassifier.sln -v minimal
 
-      - name: Format Check
-        run: dotnet format FileClassifier.sln --verify-no-changes
-
       - name: Build (Warnings As Errors)
-        run: dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/build
+          dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal | tee artifacts/build/build-log.txt
 
-      - name: Vulnerability Check (NuGet)
-        run: dotnet list FileClassifier.sln package --vulnerable --include-transitive | tee artifacts/vuln-scan.txt
-
-      - name: Coverage Gate (85/69)
-        run: tools/run-coverage.sh
-
-      - name: Upload Coverage Artifact
+      - name: Upload Build Artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-cobertura
-          path: tests/FileTypeDetectionLib.Tests/coverage.cobertura.xml
+          name: build-log
+          path: artifacts/build/
           if-no-files-found: error
 
-      - name: BDD Tests (Readable)
-        run: |
-          TEST_BDD_OUTPUT_DIR="${{ github.workspace }}/artifacts/test-bdd" \
-            bash tools/test-bdd-readable.sh
+  security-nuget:
+    runs-on: ubuntu-latest
+    needs: build
 
-      - name: Upload BDD Test Artifacts
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+          include-prerelease: true
+
+      - name: Restore
+        run: dotnet restore FileClassifier.sln -v minimal
+
+      - name: NuGet Vulnerability Scan
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/security
+          dotnet list FileClassifier.sln package --vulnerable --include-transitive | tee artifacts/security/nuget-vuln.txt
+          if grep -E "\b(High|Critical)\b" artifacts/security/nuget-vuln.txt; then
+            echo "High/Critical vulnerabilities detected."
+            exit 1
+          fi
+
+      - name: NuGet Deprecated Packages
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/security
+          dotnet list FileClassifier.sln package --deprecated | tee artifacts/security/nuget-deprecated.txt
+
+      - name: Upload Security Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-security
+          path: artifacts/security/
+          if-no-files-found: error
+
+  tests-bdd-coverage:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+          include-prerelease: true
+
+      - name: Restore
+        run: dotnet restore FileClassifier.sln -v minimal
+
+      - name: BDD Tests + Coverage Gate (Single Run)
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/tests artifacts/coverage
+          TEST_BDD_OUTPUT_DIR="${{ github.workspace }}/artifacts/tests" \
+            bash tools/test-bdd-readable.sh -- \
+              /p:CollectCoverage=true \
+              /p:Include="[FileTypeDetectionLib]*" \
+              /p:CoverletOutputFormat=cobertura \
+              /p:CoverletOutput="${{ github.workspace }}/artifacts/coverage/coverage" \
+              /p:Threshold=85%2c69 \
+              /p:ThresholdType=line%2cbranch \
+              /p:ThresholdStat=total
+
+      - name: Upload Test Artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: bdd-test-results
-          path: artifacts/test-bdd/
+          path: artifacts/tests/
           if-no-files-found: error
 
-      - name: Upload Vulnerability Report
+      - name: Upload Coverage Artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: vuln-scan
-          path: artifacts/vuln-scan.txt
+          name: coverage-report
+          path: artifacts/coverage/
           if-no-files-found: error
+
+  summary:
+    runs-on: ubuntu-latest
+    needs: [security-nuget, tests-bdd-coverage]
+
+    steps:
+      - name: Download Coverage Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+          path: artifacts/coverage
+
+      - name: Download Security Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-security
+          path: artifacts/security
+
+      - name: CI Summary
+        run: |
+          set -euo pipefail
+          {
+            echo "## CI Summary"
+            echo ""
+            echo "### Coverage"
+            if [[ -f artifacts/coverage/coverage-summary.txt ]]; then
+              cat artifacts/coverage/coverage-summary.txt
+            else
+              echo "Coverage summary not found."
+            fi
+            echo ""
+            echo "### NuGet Vulnerabilities"
+            if [[ -f artifacts/security/nuget-vuln.txt ]]; then
+              tail -n 200 artifacts/security/nuget-vuln.txt
+            else
+              echo "NuGet vulnerability report not found."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
