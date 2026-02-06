@@ -12,37 +12,65 @@ jobs:
 
     permissions:
       contents: read
-      security-events: write   # nötig für Code Scanning SARIF upload
-      pull-requests: write     # nur nötig, wenn du PR-Kommentar willst
+      security-events: write
+      pull-requests: write
 
     steps:
-      - name: Checkout
+      - name: Checkout (full history for merge-base)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # Läuft auch ohne QODANA_TOKEN, wenn du nur GitHub Code Scanning willst.
       - name: Qodana Scan
         uses: JetBrains/qodana-action@v2025.3
 
-      # 1) GitHub Code Scanning füttern (damit Findings unter Security > Code scanning landen)
-      - name: Upload SARIF to GitHub Code Scanning
+      # Robust: SARIF unabhängig vom Pfad finden und als Output bereitstellen
+      - name: Locate SARIF
+        id: sarif
         if: always()
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Searching SARIF..."
+          # typische Orte + Fallback (workspace)
+          CANDIDATES=(
+            "${RUNNER_TEMP:-/tmp}/qodana/results/qodana.sarif.json"
+            "qodana/results/qodana.sarif.json"
+          )
+          FOUND=""
+          for p in "${CANDIDATES[@]}"; do
+            if [ -f "$p" ]; then FOUND="$p"; break; fi
+          done
+          if [ -z "$FOUND" ]; then
+            FOUND="$(find . -maxdepth 6 -type f -iname "*sarif*.json" | head -n 1 || true)"
+          fi
+          if [ -z "$FOUND" ]; then
+            echo "sarif_path=" >> "$GITHUB_OUTPUT"
+            echo "No SARIF found."
+            exit 0
+          fi
+          echo "Found SARIF at: $FOUND"
+          echo "sarif_path=$FOUND" >> "$GITHUB_OUTPUT"
 
-      # 2) Zusätzlich als Artifact (damit du per gh run download abrufen kannst)
+      - name: Upload SARIF to GitHub Code Scanning
+        if: always() && steps.sarif.outputs.sarif_path != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.sarif.outputs.sarif_path }}
+
       - name: Upload SARIF artifact
-        if: always()
+        if: always() && steps.sarif.outputs.sarif_path != ''
         uses: actions/upload-artifact@v4
         with:
           name: qodana-sarif
-          path: ${{ runner.temp }}/qodana/results/qodana.sarif.json
+          path: ${{ steps.sarif.outputs.sarif_path }}
           if-no-files-found: warn
 
-      # 3) Optional: Kurz-Report als PR-Kommentar (nur bei pull_request)
       - name: Comment SARIF summary on PR
-        if: always() && github.event_name == 'pull_request'
+        if: always() && github.event_name == 'pull_request' && steps.sarif.outputs.sarif_path != ''
         uses: actions/github-script@v7
+        env:
+          SARIF_PATH: ${{ steps.sarif.outputs.sarif_path }}
         with:
           script: |
             const fs = require('fs');
@@ -61,14 +89,12 @@ jobs:
             const top = [...byRule.entries()].sort((a,b)=>b[1]-a[1]).slice(0,15);
             const lines = top.map(([k,v])=>`- ${k}: ${v}`);
             const body =
-              `Qodana (SARIF) Summary\\n` +
-              `Total results: ${results.length}\\n\\n` +
-              (lines.length ? lines.join('\\n') : '(no results)');
+              `Qodana Summary\n` +
+              `Total results: ${results.length}\n\n` +
+              (lines.length ? lines.join('\n') : '(no results)');
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
               body
             });
-        env:
-          SARIF_PATH: ${{ runner.temp }}/qodana/results/qodana.sarif.json
