@@ -108,7 +108,9 @@ jobs:
         run: node tools/versioning/validate-label-decision.js tools/versioning/label-schema.json artifacts/labels/decision.json
 
       - name: Apply Deterministic Labels
+        id: apply_labels
         if: github.event.pull_request.head.repo.fork == false
+        continue-on-error: true
         uses: actions/github-script@v7
         with:
           script: |
@@ -132,6 +134,11 @@ jobs:
               issue_number,
               labels: decision.labels_to_add,
             });
+
+      - name: Label Apply Warning
+        if: always() && steps.apply_labels.outcome == 'failure'
+        run: |
+          echo "Auto-label apply failed; continuing (governance fail-open)." | tee artifacts/labels/apply-warning.txt
 
       - name: Labeling Summary
         run: |

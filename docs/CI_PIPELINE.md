@@ -53,6 +53,7 @@ Required in branch protection:
 
 Not required:
 - `pr-labeling` (governance automation, non-gating)
+`pr-labeling` is fail-open by design: label apply API failures are reported as artifacts but do not fail technical quality gates.
 
 ## 5. Stable Artifact Paths
 - `artifacts/labels/decision.json`
