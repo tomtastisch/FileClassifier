@@ -1,0 +1,38 @@
+name: quality
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+          include-prerelease: true
+
+      - name: Doc consistency check
+        run: python3 tools/check-docs.py
+
+      - name: NuGet vulnerability scan
+        run: dotnet list FileClassifier.sln package --vulnerable
+
+      - name: Coverage gate (85/69)
+        run: |
+          dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj \
+            -v minimal \
+            /p:CollectCoverage=true \
+            /p:Include="[FileTypeDetectionLib]*" \
+            /p:CoverletOutputFormat=cobertura \
+            /p:Threshold=85%2c69 \
+            /p:ThresholdType=line%2cbranch \
+            /p:ThresholdStat=total
