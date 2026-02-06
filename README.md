@@ -29,17 +29,28 @@ Professionelle, auditierbare und deterministische Dateityp-Erkennung mit sichere
 | Sichere Extraktion | Traversal/Kollision/Nesting abgefangen | [ArchiveExtractionUnitTests.cs](tests/FileTypeDetectionLib.Tests/Unit/ArchiveExtractionUnitTests.cs) |
 | API-Klarheit | Audit-Details + Archiv-Fassade | [DetectionDetailAndArchiveValidationUnitTests.cs](tests/FileTypeDetectionLib.Tests/Unit/DetectionDetailAndArchiveValidationUnitTests.cs), [ArchiveProcessingFacadeUnitTests.cs](tests/FileTypeDetectionLib.Tests/Unit/ArchiveProcessingFacadeUnitTests.cs) |
 
-## 6. Runbook (reproduzierbar)
+## 6. CI-Pipeline & Qualitätsnachweise
+Die CI ist deterministisch und auditierbar aufgebaut. Alle Checks laufen in separaten Steps und erzeugen Artefakte.
+- Details: [docs/CI_PIPELINE.md](docs/CI_PIPELINE.md)
+
+## 7. Runbook (reproduzierbar)
 ```bash
-python3 tools/check-markdown-links.py
+python3 tools/check-docs.py
 dotnet restore FileClassifier.sln -v minimal
 dotnet build FileClassifier.sln --no-restore -v minimal
-dotnet test FileClassifier.sln --no-build -v minimal
+TEST_BDD_OUTPUT_DIR=artifacts/tests bash tools/test-bdd-readable.sh -- \
+  /p:CollectCoverage=true \
+  /p:Include="[FileTypeDetectionLib]*" \
+  /p:CoverletOutputFormat=cobertura \
+  /p:CoverletOutput="$(pwd)/artifacts/coverage/coverage" \
+  /p:Threshold=85%2c69 \
+  /p:ThresholdType=line%2cbranch \
+  /p:ThresholdStat=total
 bash tools/sync-portable-filetypedetection.sh
 bash tools/check-portable-filetypedetection.sh --clean
 ```
 
-## 6.1 Versionierung (zentral)
+## 7.1 Versionierung (zentral)
 - Zentrale Versionsquelle: `Directory.Build.props`.
  - Aktueller Baseline-Stand: `3.0.24`.
 - Gilt konsistent für `FileTypeDetectionLib`, `FileClassifier.App` und `FileTypeDetectionLib.Tests`.
@@ -80,6 +91,6 @@ Detail-README je Unterordner:
 
 ## Dokumentpflege-Checkliste
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
+- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

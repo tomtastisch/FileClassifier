@@ -18,6 +18,7 @@ Diese Doku ist in drei Ebenen getrennt:
 9. [versioning/POLICY.md](./versioning/POLICY.md)
 10. [versioning/VERSIONS.md](./versioning/VERSIONS.md)
 11. [versioning/CHANGELOG.md](./versioning/CHANGELOG.md)
+12. [CI_PIPELINE.md](./CI_PIPELINE.md)
 
 ## 2.1 Change Playbooks (neu)
 - [Guides Index](./guides/README.md)
@@ -53,10 +54,10 @@ Wenn eine neue Public-Methode eingeführt wird, muss sie in allen drei Ebenen au
 - Methodenmatrix in `01_FUNCTIONS.md`
 - mindestens ein Ablauf in `02_ARCHITECTURE_AND_FLOWS.md`
 - Referenzzuordnung in `03_REFERENCES.md`
-- Lokale Markdown-Links und Abschnittsanker werden via `python3 tools/check-markdown-links.py` in CI geprüft.
+- Lokale Markdown-Links und Abschnittsanker werden via `python3 tools/check-docs.py` in CI geprüft.
 
 ## Dokumentpflege-Checkliste
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
+- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
