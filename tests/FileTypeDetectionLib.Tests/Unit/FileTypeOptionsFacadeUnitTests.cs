@@ -1,6 +1,5 @@
 using System.Text.Json;
 using FileTypeDetection;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 

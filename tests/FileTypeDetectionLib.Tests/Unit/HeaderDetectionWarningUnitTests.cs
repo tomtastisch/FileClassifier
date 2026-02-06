@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
 using Microsoft.Extensions.Logging;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 

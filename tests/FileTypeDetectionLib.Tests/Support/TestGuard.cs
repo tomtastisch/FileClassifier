@@ -1,4 +1,3 @@
-using System;
 
 namespace FileTypeDetectionLib.Tests.Support;
 

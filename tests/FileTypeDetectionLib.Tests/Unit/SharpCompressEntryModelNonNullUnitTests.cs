@@ -3,7 +3,6 @@ using FileTypeDetection;
 using SharpCompress.Archives;
 using SharpCompress.Common;
 using SharpCompress.Writers;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 

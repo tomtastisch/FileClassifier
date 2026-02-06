@@ -1,7 +1,6 @@
 using System.Reflection;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -18,7 +17,7 @@ public sealed class DeterministicHashingPrivateUnitTests
         var error = string.Empty;
 
         object[] args1 = { string.Empty, FileTypeProjectOptions.DefaultOptions(), bytes, error };
-        var ok1 = TestGuard.Unbox<bool>(method!.Invoke(null, args1));
+        var ok1 = TestGuard.Unbox<bool>(method.Invoke(null, args1));
         Assert.False(ok1);
 
         object[] args2 = { "missing", null!, bytes, error };
@@ -41,7 +40,7 @@ public sealed class DeterministicHashingPrivateUnitTests
         opt.MaxBytes = 4;
 
         object[] args = { path, opt, Array.Empty<byte>(), string.Empty };
-        var ok = TestGuard.Unbox<bool>(method!.Invoke(null, args));
+        var ok = TestGuard.Unbox<bool>(method.Invoke(null, args));
 
         Assert.False(ok);
     }

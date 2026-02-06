@@ -1,7 +1,6 @@
 using System.Reflection;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -13,7 +12,7 @@ public sealed class FileTypeDetectorReflectionUnitTests
         var method = typeof(FileTypeDetector).GetMethod("ReadHeader", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
-        var empty1 = TestGuard.NotNull(method!.Invoke(null, new object?[] { null, 128, 1024L }) as byte[]);
+        var empty1 = TestGuard.NotNull(method.Invoke(null, new object?[] { null, 128, 1024L }) as byte[]);
         Assert.Empty(empty1);
 
         using var scope = TestTempPaths.CreateScope("ftd-readheader");
@@ -36,7 +35,7 @@ public sealed class FileTypeDetectorReflectionUnitTests
         File.WriteAllBytes(path, new byte[] { 0x01, 0x02 });
 
         using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-        var data = TestGuard.NotNull(method!.Invoke(null, new object?[] { fs, -1, 1024L }) as byte[]);
+        var data = TestGuard.NotNull(method.Invoke(null, new object?[] { fs, -1, 1024L }) as byte[]);
 
         Assert.Equal(2, data.Length);
     }
@@ -52,7 +51,7 @@ public sealed class FileTypeDetectorReflectionUnitTests
         File.WriteAllBytes(path, new byte[10]);
 
         using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-        var data = TestGuard.NotNull(method!.Invoke(null, new object?[] { fs, 4, 5L }) as byte[]);
+        var data = TestGuard.NotNull(method.Invoke(null, new object?[] { fs, 4, 5L }) as byte[]);
 
         Assert.Empty(data);
     }

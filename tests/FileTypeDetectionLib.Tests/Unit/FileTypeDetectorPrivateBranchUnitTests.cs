@@ -1,7 +1,6 @@
 using System.Reflection;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -118,7 +117,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
         var descriptor = ArchiveDescriptor.ForContainerType(ArchiveContainerType.Zip);
 
-        var ok = TestGuard.Unbox<bool>(method!.Invoke(null, new object[] { fs, opt, descriptor }));
+        var ok = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { fs, opt, descriptor }));
 
         Assert.False(ok);
     }
@@ -135,7 +134,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
 
         var refined = FileTypeRegistry.Resolve(FileKind.Unknown);
-        var result = TestGuard.NotNull(method!.Invoke(null, new[] { refined, opt, trace! }) as FileType);
+        var result = TestGuard.NotNull(method.Invoke(null, new[] { refined, opt, trace! }) as FileType);
 
         Assert.Equal(FileKind.Zip, result.Kind);
     }
@@ -152,7 +151,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
 
         var refined = FileTypeRegistry.Resolve(FileKind.Docx);
-        var result = TestGuard.NotNull(method!.Invoke(null, new[] { refined, opt, trace! }) as FileType);
+        var result = TestGuard.NotNull(method.Invoke(null, new[] { refined, opt, trace! }) as FileType);
 
         Assert.Equal(FileKind.Docx, result.Kind);
     }
@@ -164,7 +163,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
             BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
-        method!.Invoke(null, new object[] { FileKind.Unknown, FileTypeProjectOptions.DefaultOptions() });
+        method.Invoke(null, new object[] { FileKind.Unknown, FileTypeProjectOptions.DefaultOptions() });
         method.Invoke(null, new object[] { FileKind.Pdf, FileTypeProjectOptions.DefaultOptions() });
     }
 
@@ -175,7 +174,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
             typeof(FileTypeDetector).GetMethod("ExtensionMatchesKind", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
-        var okEmpty = TestGuard.Unbox<bool>(method!.Invoke(null, new object[] { "file", FileKind.Pdf }));
+        var okEmpty = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { "file", FileKind.Pdf }));
         var okMismatch = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { "file.docx", FileKind.Pdf }));
         var okAlias = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { "file.jpeg", FileKind.Jpeg }));
 
@@ -195,7 +194,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
         File.WriteAllBytes(path, new byte[] { 0x01, 0x02 });
 
         using var fs = new FileStream(path, FileMode.Open, FileAccess.Write, FileShare.Read);
-        var data = TestGuard.NotNull(method!.Invoke(null, new object?[] { fs, 4, 1024L }) as byte[]);
+        var data = TestGuard.NotNull(method.Invoke(null, new object?[] { fs, 4, 1024L }) as byte[]);
 
         Assert.Empty(data);
     }
@@ -211,7 +210,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
         File.WriteAllBytes(path, Array.Empty<byte>());
 
         using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-        var data = TestGuard.NotNull(method!.Invoke(null, new object?[] { fs, 4, 1024L }) as byte[]);
+        var data = TestGuard.NotNull(method.Invoke(null, new object?[] { fs, 4, 1024L }) as byte[]);
 
         Assert.Empty(data);
     }

@@ -1,7 +1,6 @@
 using System.Reflection;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -20,7 +19,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
         Assert.NotNull(method);
 
         object[] args = { entry, opt, string.Empty, false };
-        var ok = TestGuard.Unbox<bool>(method!.Invoke(null, args));
+        var ok = TestGuard.Unbox<bool>(method.Invoke(null, args));
 
         Assert.False(ok);
     }
@@ -36,7 +35,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
         Assert.NotNull(method);
 
         object[] args = { entry, opt, string.Empty, false };
-        var ok = TestGuard.Unbox<bool>(method!.Invoke(null, args));
+        var ok = TestGuard.Unbox<bool>(method.Invoke(null, args));
 
         Assert.True(ok);
         Assert.Equal("dir/", args[2]);
@@ -54,7 +53,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
             typeof(ArchiveExtractor).GetMethod("ValidateEntrySize", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
-        var okSmall = TestGuard.Unbox<bool>(method!.Invoke(null, new object[] { new FakeEntry(uncompressedSize: 4), opt }));
+        var okSmall = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { new FakeEntry(uncompressedSize: 4), opt }));
         var okLarge = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { new FakeEntry(uncompressedSize: 6), opt }));
         var okUnknown = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { new FakeEntry(uncompressedSize: null), opt }));
 
@@ -79,7 +78,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
         Assert.NotNull(method);
 
         object[] args = { entry, opt, string.Empty, false };
-        var ok = TestGuard.Unbox<bool>(method!.Invoke(null, args));
+        var ok = TestGuard.Unbox<bool>(method.Invoke(null, args));
 
         Assert.False(ok);
     }
@@ -96,7 +95,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
         object[] argsEntryNull = { null!, opt, string.Empty, false };
         object[] argsOptNull = { new FakeEntry(relativePath: "a.txt"), null!, string.Empty, false };
 
-        Assert.False(TestGuard.Unbox<bool>(method!.Invoke(null, argsEntryNull)));
+        Assert.False(TestGuard.Unbox<bool>(method.Invoke(null, argsEntryNull)));
         Assert.False(TestGuard.Unbox<bool>(method.Invoke(null, argsOptNull)));
     }
 
@@ -112,7 +111,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
         var entry = new FakeEntry(relativePath: "a.txt", linkTarget: "b.txt");
 
         object[] args = { entry, opt, string.Empty, false };
-        var ok = TestGuard.Unbox<bool>(method!.Invoke(null, args));
+        var ok = TestGuard.Unbox<bool>(method.Invoke(null, args));
 
         Assert.True(ok);
         Assert.Equal("a.txt", args[2]);
@@ -126,7 +125,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
-        Assert.False(TestGuard.Unbox<bool>(method!.Invoke(null, new object?[] { null, opt })));
+        Assert.False(TestGuard.Unbox<bool>(method.Invoke(null, new object?[] { null, opt })));
         Assert.False(TestGuard.Unbox<bool>(method.Invoke(null, new object?[] { new FakeEntry(), null })));
     }
 
@@ -138,7 +137,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
             typeof(ArchiveExtractor).GetMethod("ValidateEntrySize", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
-        var ok = TestGuard.Unbox<bool>(method!.Invoke(null, new object[] { new FakeEntry(isDirectory: true), opt }));
+        var ok = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { new FakeEntry(isDirectory: true), opt }));
 
         Assert.True(ok);
     }
@@ -152,7 +151,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
         Assert.NotNull(method);
 
         opt.AllowUnknownArchiveEntrySize = false;
-        var deny = TestGuard.Unbox<bool>(method!.Invoke(null, new object[] { new FakeEntry(uncompressedSize: -1), opt }));
+        var deny = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { new FakeEntry(uncompressedSize: -1), opt }));
         Assert.False(deny);
 
         opt.AllowUnknownArchiveEntrySize = true;

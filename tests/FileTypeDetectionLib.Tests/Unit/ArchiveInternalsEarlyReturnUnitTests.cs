@@ -1,7 +1,6 @@
 using System.Reflection;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -56,7 +55,7 @@ public sealed class ArchiveInternalsEarlyReturnUnitTests
             typeof(ArchiveExtractor).GetMethod("EnsureTrailingSeparator", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
-        var value = TestGuard.NotNull(method!.Invoke(null, new object[] { "a/b" }) as string);
+        var value = TestGuard.NotNull(method.Invoke(null, new object[] { "a/b" }) as string);
         Assert.EndsWith(Path.DirectorySeparatorChar.ToString(), value);
     }
 
@@ -67,7 +66,7 @@ public sealed class ArchiveInternalsEarlyReturnUnitTests
             typeof(ArchiveExtractor).GetMethod("EnsureTrailingSeparator", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
-        var value = TestGuard.NotNull(method!.Invoke(null, new object[] { string.Empty }) as string);
+        var value = TestGuard.NotNull(method.Invoke(null, new object[] { string.Empty }) as string);
         Assert.Equal(Path.DirectorySeparatorChar.ToString(), value);
     }
 
@@ -79,7 +78,7 @@ public sealed class ArchiveInternalsEarlyReturnUnitTests
         Assert.NotNull(method);
 
         var suffix = Path.DirectorySeparatorChar.ToString();
-        var value = TestGuard.NotNull(method!.Invoke(null, new object[] { "a" + suffix }) as string);
+        var value = TestGuard.NotNull(method.Invoke(null, new object[] { "a" + suffix }) as string);
         Assert.Equal("a" + suffix, value);
     }
 }

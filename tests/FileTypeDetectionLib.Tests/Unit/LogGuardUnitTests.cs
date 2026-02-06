@@ -1,6 +1,5 @@
 using FileTypeDetection;
 using Microsoft.Extensions.Logging;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 

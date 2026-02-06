@@ -1,7 +1,6 @@
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
 using SharpCompress.Common;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 

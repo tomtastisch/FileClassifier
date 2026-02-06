@@ -5,7 +5,6 @@ using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using SharpCompress.Writers;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -22,7 +21,7 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
         var entries = new List<IArchiveEntry>();
         var nestedResult = false;
 
-        var handled = TestGuard.Unbox<bool>(method!.Invoke(null,
+        var handled = TestGuard.Unbox<bool>(method.Invoke(null,
             new object[] { entries, opt, 0, ArchiveContainerType.Zip, null!, nestedResult }));
 
         Assert.False(handled);
@@ -41,7 +40,7 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
         entries.Add(CreateZipArchiveEntry("b.txt", new byte[] { 2 }));
         var nestedResult = false;
 
-        var handled = TestGuard.Unbox<bool>(method!.Invoke(null,
+        var handled = TestGuard.Unbox<bool>(method.Invoke(null,
             new object[] { entries, opt, 0, ArchiveContainerType.GZip, null!, nestedResult }));
 
         Assert.False(handled);
@@ -59,7 +58,7 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
         entries.Add(CreateZipArchiveEntry("payload.bin", new byte[] { 0x01, 0x02 }));
         var nestedResult = true;
 
-        var handled = TestGuard.Unbox<bool>(method!.Invoke(null,
+        var handled = TestGuard.Unbox<bool>(method.Invoke(null,
             new object[] { entries, opt, 0, ArchiveContainerType.GZip, null!, nestedResult }));
 
         Assert.True(handled);
@@ -73,7 +72,7 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
             BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
-        Assert.False(TestGuard.Unbox<bool>(method!.Invoke(null, new object?[] { null, 10L, null })));
+        Assert.False(TestGuard.Unbox<bool>(method.Invoke(null, new object?[] { null, 10L, null })));
         Assert.False(TestGuard.Unbox<bool>(method.Invoke(null,
             new object?[] { CreateZipArchiveEntry("a.txt", new byte[] { 1 }), 0L, null })));
     }

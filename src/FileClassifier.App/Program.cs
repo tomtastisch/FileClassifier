@@ -1,4 +1,3 @@
-using System;
 using FileTypeDetection;
 
 if (args.Length != 1)

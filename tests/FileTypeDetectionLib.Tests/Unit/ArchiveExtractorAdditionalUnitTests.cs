@@ -1,7 +1,6 @@
 using System.Reflection;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -136,7 +135,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
         var entries = new List<ZipExtractedEntry>();
         var entry = new FakeEntry(relativePath: "folder/", isDirectory: true);
 
-        var ok = TestGuard.Unbox<bool>(method!.Invoke(null, new object[] { entry, entries, opt }));
+        var ok = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { entry, entries, opt }));
 
         Assert.True(ok);
         Assert.Empty(entries);
@@ -151,7 +150,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
 
         var opt = FileTypeProjectOptions.DefaultOptions();
         var entry = new FakeEntry();
-        var okEntriesNull = TestGuard.Unbox<bool>(method!.Invoke(null, new object?[] { entry, null, opt }));
+        var okEntriesNull = TestGuard.Unbox<bool>(method.Invoke(null, new object?[] { entry, null, opt }));
         var okOptNull = TestGuard.Unbox<bool>(method.Invoke(null, new object?[] { entry, new List<ZipExtractedEntry>(), null }));
 
         Assert.False(okEntriesNull);
@@ -168,7 +167,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
         var entries = new List<ZipExtractedEntry>();
 
-        var ok = TestGuard.Unbox<bool>(method!.Invoke(null, new object?[] { null, entries, opt }));
+        var ok = TestGuard.Unbox<bool>(method.Invoke(null, new object?[] { null, entries, opt }));
 
         Assert.False(ok);
     }
@@ -184,7 +183,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
         var entries = new List<ZipExtractedEntry>();
         var entry = new NullStreamEntry(relativePath: "file.bin", uncompressedSize: 1);
 
-        var ok = TestGuard.Unbox<bool>(method!.Invoke(null, new object[] { entry, entries, opt }));
+        var ok = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { entry, entries, opt }));
 
         Assert.False(ok);
     }
@@ -200,7 +199,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
         var entries = new List<ZipExtractedEntry>();
         var entry = new FakeEntry(relativePath: "../evil.txt");
 
-        var ok = TestGuard.Unbox<bool>(method!.Invoke(null, new object[] { entry, entries, opt }));
+        var ok = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { entry, entries, opt }));
 
         Assert.False(ok);
     }
@@ -213,7 +212,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
-        var okEntryNull = TestGuard.Unbox<bool>(method!.Invoke(null, new object?[] { null, "x", opt }));
+        var okEntryNull = TestGuard.Unbox<bool>(method.Invoke(null, new object?[] { null, "x", opt }));
         var okOptNull = TestGuard.Unbox<bool>(method.Invoke(null, new object?[] { new FakeEntry(), "x", null }));
 
         Assert.False(okEntryNull);
@@ -234,7 +233,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
 
         var entry = new FakeEntry(relativePath: "big.bin", uncompressedSize: 10);
 
-        var ok = TestGuard.Unbox<bool>(method!.Invoke(null, new object[] { entry, prefix, opt }));
+        var ok = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { entry, prefix, opt }));
 
         Assert.False(ok);
     }

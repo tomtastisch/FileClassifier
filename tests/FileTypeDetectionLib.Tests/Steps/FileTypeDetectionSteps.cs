@@ -1,7 +1,6 @@
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
 using Reqnroll;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Steps;
 

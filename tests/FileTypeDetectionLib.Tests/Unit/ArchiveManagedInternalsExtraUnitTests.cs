@@ -1,6 +1,5 @@
 using System.IO.Compression;
 using FileTypeDetection;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
