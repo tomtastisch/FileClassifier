@@ -104,10 +104,10 @@ jobs:
           node tools/versioning/compute-pr-labels.js
           cat artifacts/labels/decision.json
 
-      - name: Validate Label Decision Schema
+      - name: Validate Label Decision Contract
         run: node tools/versioning/validate-label-decision.js tools/versioning/label-schema.json artifacts/labels/decision.json
 
-      - name: Apply Deterministic Labels
+      - name: Apply Deterministic Labels (Repo-only)
         id: apply_labels
         if: github.event.pull_request.head.repo.fork == false
         continue-on-error: true
