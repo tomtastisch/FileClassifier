@@ -1,6 +1,4 @@
-using System;
 using System.Formats.Tar;
-using System.IO;
 using System.Text;
 using SharpCompress.Common;
 using SharpCompress.Writers;

@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 using FileTypeDetection;
 using Xunit;
@@ -14,8 +13,8 @@ public sealed class DeterministicHashingPrivateBranchUnitTests
             typeof(DeterministicHashing).GetMethod("NormalizeLabel", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
-        var label1 = (string)method!.Invoke(null, new object?[] { null })!;
-        var label2 = (string)method.Invoke(null, new object?[] { "   " })!;
+        var label1 = (string)method!.Invoke(null, new object?[] { null });
+        var label2 = (string)method.Invoke(null, new object?[] { "   " });
 
         Assert.Equal("payload.bin", label1);
         Assert.Equal("payload.bin", label2);
@@ -27,7 +26,7 @@ public sealed class DeterministicHashingPrivateBranchUnitTests
         var method = typeof(DeterministicHashing).GetMethod("CopyBytes", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
-        var empty1 = (byte[])method!.Invoke(null, new object?[] { null })!;
+        var empty1 = (byte[])method!.Invoke(null, new object?[] { null });
         var empty2 = (byte[])method.Invoke(null, new object?[] { Array.Empty<byte>() })!;
 
         Assert.Empty(empty1);
@@ -42,7 +41,7 @@ public sealed class DeterministicHashingPrivateBranchUnitTests
         Assert.NotNull(method);
 
         var options = new DeterministicHashOptions { IncludeFastHash = false };
-        var result = (string)method!.Invoke(null, new object?[] { new byte[] { 1, 2, 3 }, options })!;
+        var result = (string)method!.Invoke(null, new object?[] { new byte[] { 1, 2, 3 }, options });
 
         Assert.Equal(string.Empty, result);
     }

@@ -1,4 +1,3 @@
-using System;
 using Reqnroll;
 
 namespace FileTypeDetectionLib.Tests.Support;

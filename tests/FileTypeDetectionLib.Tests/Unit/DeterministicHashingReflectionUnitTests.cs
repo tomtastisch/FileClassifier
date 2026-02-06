@@ -13,7 +13,7 @@ public sealed class DeterministicHashingReflectionUnitTests
             typeof(DeterministicHashing).GetMethod("ResolveHashOptions", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
-        var result = (DeterministicHashOptions)method!.Invoke(null, new object?[] { null, null })!;
+        var result = (DeterministicHashOptions)method.Invoke(null, new object?[] { null, null });
 
         Assert.NotNull(result);
         Assert.Equal("deterministic-roundtrip.bin", result.MaterializedFileName);

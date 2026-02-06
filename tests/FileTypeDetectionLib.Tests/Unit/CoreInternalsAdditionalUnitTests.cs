@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using System.IO.Compression;
 using FileTypeDetection;
 using Xunit;
@@ -35,9 +33,9 @@ public sealed class CoreInternalsAdditionalUnitTests
         var root = Path.GetPathRoot(Environment.CurrentDirectory)!;
         var nonRoot = Path.Combine(root, "tmp", "x");
 
-        Assert.True((bool)DestinationPathGuard.IsRootPath(root));
-        Assert.False((bool)DestinationPathGuard.IsRootPath(nonRoot));
-        Assert.False((bool)DestinationPathGuard.IsRootPath(""));
+        Assert.True(DestinationPathGuard.IsRootPath(root));
+        Assert.False(DestinationPathGuard.IsRootPath(nonRoot));
+        Assert.False(DestinationPathGuard.IsRootPath(""));
     }
 
     [Fact]

@@ -1,6 +1,5 @@
-using System;
-using System.IO;
 using System.Text;
+using FileTypeDetection;
 using SharpCompress.Archives;
 using SharpCompress.Common;
 using SharpCompress.Writers;
@@ -20,13 +19,13 @@ public sealed class SharpCompressEntryModelNonNullUnitTests
         var entry = archive.Entries.First();
         var model = new SharpCompressEntryModel(entry);
 
-        Assert.Equal((string?)"note.txt", (string?)model.RelativePath);
-        Assert.False((bool)model.IsDirectory);
-        Assert.NotNull<long>(model.UncompressedSize);
-        Assert.NotNull<long>(model.CompressedSize);
-        Assert.Equal(string.Empty, (string?)model.LinkTarget);
+        Assert.Equal("note.txt", model.RelativePath);
+        Assert.False(model.IsDirectory);
+        Assert.NotNull(model.UncompressedSize);
+        Assert.NotNull(model.CompressedSize);
+        Assert.Equal(string.Empty, model.LinkTarget);
         using var opened = model.OpenStream();
-        Assert.True((bool)opened.CanRead);
+        Assert.True(opened.CanRead);
     }
 
     private static byte[] CreateTarWithEntry(string name, string content)

@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
@@ -136,9 +134,9 @@ public sealed class ArchiveExtractorAdditionalUnitTests
 
         var opt = FileTypeProjectOptions.DefaultOptions();
         var entries = new List<ZipExtractedEntry>();
-        var entry = new FakeEntry { RelativePath = "folder/", IsDirectory = true };
+        var entry = new FakeEntry(relativePath: "folder/", isDirectory: true);
 
-        var ok = (bool)method!.Invoke(null, new object[] { entry, entries, opt })!;
+        var ok = (bool)method!.Invoke(null, new object[] { entry, entries, opt });
 
         Assert.True(ok);
         Assert.Empty(entries);
@@ -153,8 +151,8 @@ public sealed class ArchiveExtractorAdditionalUnitTests
 
         var opt = FileTypeProjectOptions.DefaultOptions();
         var entry = new FakeEntry();
-        var okEntriesNull = (bool)method!.Invoke(null, new object?[] { entry, null, opt })!;
-        var okOptNull = (bool)method.Invoke(null, new object?[] { entry, new List<ZipExtractedEntry>(), null })!;
+        var okEntriesNull = (bool)method!.Invoke(null, new object?[] { entry, null, opt });
+        var okOptNull = (bool)method.Invoke(null, new object?[] { entry, new List<ZipExtractedEntry>(), null });
 
         Assert.False(okEntriesNull);
         Assert.False(okOptNull);
@@ -170,7 +168,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
         var entries = new List<ZipExtractedEntry>();
 
-        var ok = (bool)method!.Invoke(null, new object?[] { null, entries, opt })!;
+        var ok = (bool)method!.Invoke(null, new object?[] { null, entries, opt });
 
         Assert.False(ok);
     }
@@ -184,9 +182,9 @@ public sealed class ArchiveExtractorAdditionalUnitTests
 
         var opt = FileTypeProjectOptions.DefaultOptions();
         var entries = new List<ZipExtractedEntry>();
-        var entry = new NullStreamEntry { RelativePath = "file.bin", UncompressedSize = 1 };
+        var entry = new NullStreamEntry(relativePath: "file.bin", uncompressedSize: 1);
 
-        var ok = (bool)method!.Invoke(null, new object[] { entry, entries, opt })!;
+        var ok = (bool)method!.Invoke(null, new object[] { entry, entries, opt });
 
         Assert.False(ok);
     }
@@ -200,9 +198,9 @@ public sealed class ArchiveExtractorAdditionalUnitTests
 
         var opt = FileTypeProjectOptions.DefaultOptions();
         var entries = new List<ZipExtractedEntry>();
-        var entry = new FakeEntry { RelativePath = "../evil.txt" };
+        var entry = new FakeEntry(relativePath: "../evil.txt");
 
-        var ok = (bool)method!.Invoke(null, new object[] { entry, entries, opt })!;
+        var ok = (bool)method!.Invoke(null, new object[] { entry, entries, opt });
 
         Assert.False(ok);
     }
@@ -215,8 +213,8 @@ public sealed class ArchiveExtractorAdditionalUnitTests
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
-        var okEntryNull = (bool)method!.Invoke(null, new object?[] { null, "x", opt })!;
-        var okOptNull = (bool)method.Invoke(null, new object?[] { new FakeEntry(), "x", null })!;
+        var okEntryNull = (bool)method!.Invoke(null, new object?[] { null, "x", opt });
+        var okOptNull = (bool)method.Invoke(null, new object?[] { new FakeEntry(), "x", null });
 
         Assert.False(okEntryNull);
         Assert.False(okOptNull);
@@ -234,23 +232,28 @@ public sealed class ArchiveExtractorAdditionalUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
         opt.MaxZipEntryUncompressedBytes = 1;
 
-        var entry = new FakeEntry
-        {
-            RelativePath = "big.bin",
-            UncompressedSize = 10
-        };
+        var entry = new FakeEntry(relativePath: "big.bin", uncompressedSize: 10);
 
-        var ok = (bool)method!.Invoke(null, new object[] { entry, prefix, opt })!;
+        var ok = (bool)method!.Invoke(null, new object[] { entry, prefix, opt });
 
         Assert.False(ok);
     }
 
     private sealed class FakeEntry : IArchiveEntryModel
     {
-        public string RelativePath { get; set; } = "entry.txt";
-        public bool IsDirectory { get; set; }
-        public long? UncompressedSize { get; set; }
-        public long? CompressedSize { get; set; }
+        public FakeEntry(string? relativePath = null, long? uncompressedSize = null, long? compressedSize = null,
+            bool isDirectory = false)
+        {
+            RelativePath = relativePath ?? "entry.txt";
+            UncompressedSize = uncompressedSize;
+            CompressedSize = compressedSize;
+            IsDirectory = isDirectory;
+        }
+
+        public string RelativePath { get; }
+        public bool IsDirectory { get; }
+        public long? UncompressedSize { get; }
+        public long? CompressedSize { get; }
         public string LinkTarget { get; } = string.Empty;
 
         public Stream OpenStream()
@@ -261,15 +264,24 @@ public sealed class ArchiveExtractorAdditionalUnitTests
 
     private sealed class NullStreamEntry : IArchiveEntryModel
     {
-        public string RelativePath { get; set; } = "entry.txt";
-        public bool IsDirectory { get; set; }
-        public long? UncompressedSize { get; set; }
-        public long? CompressedSize { get; set; }
+        public NullStreamEntry(string? relativePath = null, long? uncompressedSize = null, long? compressedSize = null,
+            bool isDirectory = false)
+        {
+            RelativePath = relativePath ?? "entry.txt";
+            UncompressedSize = uncompressedSize;
+            CompressedSize = compressedSize;
+            IsDirectory = isDirectory;
+        }
+
+        public string RelativePath { get; }
+        public bool IsDirectory { get; }
+        public long? UncompressedSize { get; }
+        public long? CompressedSize { get; }
         public string LinkTarget { get; } = string.Empty;
 
         public Stream OpenStream()
         {
-            return null!;
+            return Stream.Null;
         }
     }
 

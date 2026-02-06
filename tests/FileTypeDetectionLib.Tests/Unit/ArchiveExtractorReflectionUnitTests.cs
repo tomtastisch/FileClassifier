@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
@@ -20,14 +17,10 @@ public sealed class ArchiveExtractorReflectionUnitTests
         using var scope = TestTempPaths.CreateScope("ftd-extract-dir");
         var prefix = Path.GetFullPath(scope.RootPath) + Path.DirectorySeparatorChar;
 
-        var entry = new FakeEntry(() => Stream.Null)
-        {
-            RelativePath = "folder/",
-            IsDirectory = true
-        };
+        var entry = new FakeEntry(() => Stream.Null, relativePath: "folder/", isDirectory: true);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
-        var ok = (bool)method!.Invoke(null, new object[] { entry, prefix, opt })!;
+        var ok = (bool)method!.Invoke(null, new object[] { entry, prefix, opt });
 
         Assert.True(ok);
         Assert.True(Directory.Exists(Path.Combine(scope.RootPath, "folder")));
@@ -44,15 +37,15 @@ public sealed class ArchiveExtractorReflectionUnitTests
         var prefix = Path.GetFullPath(scope.RootPath) + Path.DirectorySeparatorChar;
         var opt = FileTypeProjectOptions.DefaultOptions();
 
-        var traversal = new FakeEntry(() => Stream.Null) { RelativePath = "../evil.txt" };
-        Assert.False((bool)method!.Invoke(null, new object[] { traversal, prefix, opt })!);
+        var traversal = new FakeEntry(() => Stream.Null, relativePath: "../evil.txt");
+        Assert.False((bool)method!.Invoke(null, new object[] { traversal, prefix, opt }));
 
         var existing = Path.Combine(scope.RootPath, "exists.txt");
         File.WriteAllText(existing, "x");
 
-        var entry = new FakeEntry(() => new MemoryStream(new byte[] { 1 }))
-            { RelativePath = "exists.txt", UncompressedSize = 1 };
-        Assert.False((bool)method.Invoke(null, new object[] { entry, prefix, opt })!);
+        var entry = new FakeEntry(() => new MemoryStream(new byte[] { 1 }), relativePath: "exists.txt",
+            uncompressedSize: 1);
+        Assert.False((bool)method.Invoke(null, new object[] { entry, prefix, opt }));
     }
 
     [Fact]
@@ -66,13 +59,9 @@ public sealed class ArchiveExtractorReflectionUnitTests
         var prefix = Path.GetFullPath(scope.RootPath) + Path.DirectorySeparatorChar;
         var opt = FileTypeProjectOptions.DefaultOptions();
 
-        var entry = new FakeEntry(() => new UnreadableStream())
-        {
-            RelativePath = "file.bin",
-            UncompressedSize = 1
-        };
+        var entry = new FakeEntry(() => new UnreadableStream(), relativePath: "file.bin", uncompressedSize: 1);
 
-        Assert.False((bool)method!.Invoke(null, new object[] { entry, prefix, opt })!);
+        Assert.False((bool)method!.Invoke(null, new object[] { entry, prefix, opt }));
     }
 
     [Fact]
@@ -85,14 +74,11 @@ public sealed class ArchiveExtractorReflectionUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
         opt.MaxZipEntryUncompressedBytes = 2;
 
-        var entry = new FakeEntry(() => new MemoryStream(new byte[10]))
-        {
-            RelativePath = "big.bin",
-            UncompressedSize = 10
-        };
+        var entry = new FakeEntry(() => new MemoryStream(new byte[10]), relativePath: "big.bin",
+            uncompressedSize: 10);
 
         var list = new List<ZipExtractedEntry>();
-        var ok = (bool)method!.Invoke(null, new object[] { entry, list, opt })!;
+        var ok = (bool)method!.Invoke(null, new object[] { entry, list, opt });
 
         Assert.False(ok);
         Assert.Empty(list);
@@ -102,15 +88,20 @@ public sealed class ArchiveExtractorReflectionUnitTests
     {
         private readonly Func<Stream> _streamFactory;
 
-        public FakeEntry(Func<Stream> streamFactory)
+        public FakeEntry(Func<Stream> streamFactory, string? relativePath = null, long? uncompressedSize = null,
+            long? compressedSize = null, bool isDirectory = false)
         {
             _streamFactory = streamFactory;
+            RelativePath = relativePath ?? "entry.txt";
+            UncompressedSize = uncompressedSize;
+            CompressedSize = compressedSize;
+            IsDirectory = isDirectory;
         }
 
-        public string RelativePath { get; set; } = "entry.txt";
-        public bool IsDirectory { get; set; }
-        public long? UncompressedSize { get; set; }
-        public long? CompressedSize { get; set; }
+        public string RelativePath { get; }
+        public bool IsDirectory { get; }
+        public long? UncompressedSize { get; }
+        public long? CompressedSize { get; }
         public string LinkTarget { get; } = string.Empty;
 
         public Stream OpenStream()

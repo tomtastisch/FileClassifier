@@ -13,7 +13,7 @@ public sealed class DeterministicHashRoundTripReportReflectionUnitTests
             .GetMethod("EqualLogical", BindingFlags.NonPublic | BindingFlags.Static);
 
         Assert.NotNull(method);
-        var result = (bool)method!.Invoke(null, new object?[] { null, null })!;
+        var result = (bool)method.Invoke(null, new object?[] { null, null });
 
         Assert.False(result);
     }
@@ -25,7 +25,7 @@ public sealed class DeterministicHashRoundTripReportReflectionUnitTests
             .GetMethod("EqualPhysical", BindingFlags.NonPublic | BindingFlags.Static);
 
         Assert.NotNull(method);
-        var result = (bool)method!.Invoke(null, new object?[] { null, null })!;
+        var result = (bool)method.Invoke(null, new object?[] { null, null });
 
         Assert.False(result);
     }

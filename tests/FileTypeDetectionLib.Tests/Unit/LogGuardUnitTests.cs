@@ -1,4 +1,4 @@
-using System;
+using FileTypeDetection;
 using Microsoft.Extensions.Logging;
 using Xunit;
 

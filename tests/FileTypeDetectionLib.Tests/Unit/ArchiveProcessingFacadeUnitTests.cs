@@ -1,4 +1,3 @@
-using System.IO;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
 using Xunit;

@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-using System.Linq;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
 using Microsoft.Extensions.Logging;
@@ -39,10 +36,10 @@ public sealed class CoreAndArchiveInternalsFailClosedUnitTests
         var archiveBytes = ArchivePayloadFactory.CreateZipWithSingleEntry("inner/note.txt", "hello");
         var nonArchiveBytes = File.ReadAllBytes(TestResources.Resolve("sample.pdf"));
 
-        Assert.True((bool)ArchiveSignaturePayloadGuard.IsArchiveSignatureCandidate(archiveBytes));
-        Assert.False((bool)ArchiveSignaturePayloadGuard.IsArchiveSignatureCandidate(nonArchiveBytes));
-        Assert.False((bool)ArchiveSignaturePayloadGuard.IsArchiveSignatureCandidate(Array.Empty<byte>()));
-        Assert.False((bool)ArchiveSignaturePayloadGuard.IsArchiveSignatureCandidate(null!));
+        Assert.True(ArchiveSignaturePayloadGuard.IsArchiveSignatureCandidate(archiveBytes));
+        Assert.False(ArchiveSignaturePayloadGuard.IsArchiveSignatureCandidate(nonArchiveBytes));
+        Assert.False(ArchiveSignaturePayloadGuard.IsArchiveSignatureCandidate(Array.Empty<byte>()));
+        Assert.False(ArchiveSignaturePayloadGuard.IsArchiveSignatureCandidate(null!));
     }
 
     [Fact]

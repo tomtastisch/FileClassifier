@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using FileTypeDetection;
 using SharpCompress.Archives;
@@ -76,7 +72,7 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
             BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
-        Assert.False((bool)method!.Invoke(null, new object?[] { null, 10L, null })!);
+        Assert.False((bool)method!.Invoke(null, new object?[] { null, 10L, null }));
         Assert.False((bool)method.Invoke(null,
             new object?[] { CreateZipArchiveEntry("a.txt", new byte[] { 1 }), 0L, null })!);
     }

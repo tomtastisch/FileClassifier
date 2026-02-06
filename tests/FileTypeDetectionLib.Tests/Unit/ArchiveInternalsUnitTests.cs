@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
 using SharpCompress.Common;
@@ -28,7 +26,7 @@ public sealed class ArchiveInternalsUnitTests
         Assert.Equal(ArchiveContainerType.GZip, ArchiveTypeResolver.MapArchiveType(ArchiveType.GZip));
         Assert.Equal(ArchiveContainerType.SevenZip, ArchiveTypeResolver.MapArchiveType(ArchiveType.SevenZip));
         Assert.Equal(ArchiveContainerType.Rar, ArchiveTypeResolver.MapArchiveType(ArchiveType.Rar));
-        Assert.NotEqual(ArchiveContainerType.Zip, ArchiveTypeResolver.MapArchiveType((ArchiveType)0));
+        Assert.NotEqual(ArchiveContainerType.Zip, ArchiveTypeResolver.MapArchiveType(0));
     }
 
     [Fact]
