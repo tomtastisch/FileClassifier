@@ -42,11 +42,7 @@ benchmark_detect_ms.txt
 
 
 # local-only tools
-tools/*
-!tools/versioning/
-!tools/run-coverage.sh
-!tools/versioning/check-versioning.sh
-!tools/versioning/labels.json
+tools/
 
 # local secrets
 .secrets/
@@ -54,6 +50,9 @@ tools/*
 
 # --- Qodana / IDE / Build artifacts ---
 .qodana/
+!.qodana/
+!.qodana/profiles/
+!.qodana/profiles/*.yaml
 artifacts/
 .idea/
 .vscode/

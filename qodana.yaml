@@ -2,36 +2,4 @@ version: "1.0"
 linter: jetbrains/qodana-dotnet:2025.3
 
 profile:
-    name: qodana.recommended
-
-include:
-    - "src/**"
-    - "tests/**"
-
-exclude:
-    - "**/bin/**"
-    - "**/obj/**"
-    - "**/.qodana/**"
-    - "**/.idea/**"
-    - "**/.vs/**"
-    - "**/TestResults/**"
-    - "**/artifacts/**"
-    - "**/packages/**"
-    - "**/node_modules/**"
-    - "**/dist/**"
-    - "**/build/**"
-    - "**/out/**"
-    - "**/coverage/**"
-    - "**/generated/**"
-    - "**/Generated/**"
-    - "**/*Designer.cs"
-    - "**/*.g.cs"
-    - "**/*.g.i.cs"
-    - "**/*.AssemblyInfo.cs"
-    - "**/*.generated.*"
-    - "**/*.min.*"
-    - "**/*.snap"
-    - "**/*.lock"
-    - "**/*.sarif"
-    - "**/*.log"
-    - "**/*.tmp"
+    path: .qodana/profiles/fileclassifier.yaml
