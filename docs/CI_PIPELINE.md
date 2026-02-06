@@ -1,72 +1,83 @@
 # CI Pipeline - FileClassifier
 
-## 1. Zweck
-Diese CI-Pipeline liefert einen auditierbaren Nachweis der Produktionsreife:
-- Inkonsistenzen/Format
-- Build-Fehler/Warnungen
-- NuGet-Sicherheitslage (Vulnerabilities)
-- BDD-Readable Tests + Coverage-Gate
-- Dokumentationskonsistenz
-- Statische Analyse via Qodana (separater Workflow)
+## 1. Purpose
+This CI pipeline provides auditable production-readiness evidence for:
+- consistency/format
+- build correctness (`warnaserror`)
+- dependency security (NuGet vulnerabilities)
+- BDD-readable tests with coverage gate
+- documentation consistency
+- deterministic PR auto-labeling and auto-versioning evidence
 
-Alle Checks laufen deterministisch in getrennten Steps. Jeder Check schreibt Artefakte in stabile Pfade und wird pro Job hochgeladen (auch bei Fehlern).
+## 2. Workflow Structure
+The `CI` workflow contains two separated responsibility paths:
+- `pull_request_target` path: `pr-labeling` (label governance only)
+- `pull_request`/`push` path: technical quality jobs (`preflight`, `build`, `security-nuget`, `tests-bdd-coverage`, `summary`)
 
-## 2. Jobs und Checks (1 Step = 1 Check)
+## 3. Jobs (1 job = 1 concern)
+### Job: pr-labeling (governance)
+- Collect changed files and current PR labels
+- Derive `required/actual/reason` from versioning guard
+- Compute deterministic labels (`decision.json`)
+- Validate schema
+- Remove stale auto-labels and apply new labels
+- Upload labeling artifact
 
 ### Job: preflight (fail-fast)
-1. Docs-Check
-2. Versioning-Guard
-3. Format-Check
+1. Label engine golden tests
+2. Docs check
+3. Versioning guard
+4. Format check
 
 ### Job: build
 1. Restore
-2. Build (Warnings as Errors)
+2. Build (`--warnaserror`)
 
 ### Job: security-nuget
-1. NuGet Vulnerability Scan (inkl. transitive)
-2. NuGet Deprecated Packages
+1. Vulnerability scan (`--include-transitive`)
+2. Deprecated package report
 
 ### Job: tests-bdd-coverage
-1. BDD-Readable Tests + Coverage-Gate (Single Run)
+1. Single-run BDD tests + coverage gate (`Line >= 85`, `Branch >= 69`)
 
-### Job: summary (optional)
-- Job Summary (nur Report, kein Gate)
+### Job: summary
+- Coverage and security summary (report-only)
 
-## 3. Fail Conditions
-- Docs-Check: Fehlende lokale Links oder fehlende Versioning-Referenzen.
-- Versioning-Guard: Policy-Verletzungen.
-- Format-Check: Abweichungen von dotnet format.
-- Build: Fehler oder Warnungen (warnaserror).
-- NuGet Vulnerabilities: High/Critical in `dotnet list package --vulnerable`.
-- Tests + Coverage: Testfehler oder Unterschreiten der Coverage-Grenzen.
-Hinweis: `dotnet list package --deprecated` ist ein Report-Only Check (kein Gate).
+## 4. Required vs Non-Required Checks
+Required in branch protection:
+- `preflight`
+- `build`
+- `security-nuget`
+- `tests-bdd-coverage`
+- optional: Qodana (policy-dependent)
 
-## 4. Coverage-Gate
-- Line >= 85%
-- Branch >= 69%
-- Durchsetzung im BDD-Teststep (Single-Run) via Coverlet.
+Not required:
+- `pr-labeling` (governance automation, non-gating)
 
-## 5. Artefakt-Pfade (stabil)
+## 5. Stable Artifact Paths
+- `artifacts/labels/decision.json`
 - `artifacts/docs/doc-check.txt`
 - `artifacts/versioning/versioning-check.txt`
 - `artifacts/format/format-check.txt`
 - `artifacts/build/build-log.txt`
 - `artifacts/security/nuget-vuln.txt`
 - `artifacts/security/nuget-deprecated.txt`
-- `artifacts/tests/**` (TRX + readable Logs + dotnet-test.log)
+- `artifacts/tests/**` (TRX, readable output, raw test log)
 - `artifacts/coverage/coverage.cobertura.xml`
 - `artifacts/coverage/coverage-summary.txt`
 
-## 6. Qodana (separater Workflow)
-Qodana ist bewusst vom CI-Workflow getrennt und token-abhängig.
+## 6. Labeling and Versioning SSOT
+- Policy: `docs/versioning/POLICY.md`
+- Full behavior + charts: `docs/AUTO_LABELING_AND_VERSIONING.md`
+- Ownership: `docs/governance/LABELING_OWNERSHIP.md`
 
-Coverage in Qodana:
-- Die CI erzeugt den Cobertura-Report unter `artifacts/coverage/coverage.cobertura.xml`.
-- Der Qodana-Workflow versucht, dieses Artefakt zu importieren, indem er es nach `.qodana/code-coverage/coverage.cobertura.xml` lädt.
-- Falls Qodana Coverage dennoch als "Not set" anzeigt, ist CI die Source of Truth (SSOT). Das ist akzeptiert, solange das CI-Coverage-Gate greift und die Artefakte vorhanden sind.
+## 7. Qodana
+Qodana remains a separate workflow and complements CI quality gates.
+Coverage source of truth remains CI coverage artifacts and gate enforcement.
 
-## 7. Lokale Reproduktion
+## 8. Local Reproduction
 ```bash
+node tools/versioning/test-compute-pr-labels.js
 python3 tools/check-docs.py
 bash tools/versioning/check-versioning.sh
 dotnet format FileClassifier.sln --verify-no-changes

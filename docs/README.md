@@ -19,6 +19,8 @@ Diese Doku ist in drei Ebenen getrennt:
 10. [versioning/VERSIONS.md](./versioning/VERSIONS.md)
 11. [versioning/CHANGELOG.md](./versioning/CHANGELOG.md)
 12. [CI_PIPELINE.md](./CI_PIPELINE.md)
+13. [AUTO_LABELING_AND_VERSIONING.md](./AUTO_LABELING_AND_VERSIONING.md)
+14. [governance/LABELING_OWNERSHIP.md](./governance/LABELING_OWNERSHIP.md)
 
 ## 2.1 Change Playbooks (neu)
 - [Guides Index](./guides/README.md)

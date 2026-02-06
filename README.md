@@ -32,6 +32,7 @@ Professionelle, auditierbare und deterministische Dateityp-Erkennung mit sichere
 ## 6. CI-Pipeline & Qualitätsnachweise
 Die CI ist deterministisch und auditierbar aufgebaut. Alle Checks laufen in separaten Steps und erzeugen Artefakte.
 - Details: [docs/CI_PIPELINE.md](docs/CI_PIPELINE.md)
+- Auto-Labeling & Auto-Versionierung: [docs/AUTO_LABELING_AND_VERSIONING.md](docs/AUTO_LABELING_AND_VERSIONING.md)
 
 ## 7. Runbook (reproduzierbar)
 ```bash
@@ -57,14 +58,14 @@ bash tools/check-portable-filetypedetection.sh --clean
 - Semantik: `Version` (NuGet/Produkt), `AssemblyVersion`, `FileVersion`, `InformationalVersion`.
 - Policy und Historie: [docs/versioning/POLICY.md](docs/versioning/POLICY.md), [docs/versioning/VERSIONS.md](docs/versioning/VERSIONS.md), [docs/versioning/CHANGELOG.md](docs/versioning/CHANGELOG.md)
 
-## 7. Aktueller Strukturzustand
-### 7.1 Source
+## 8. Aktueller Strukturzustand
+### 8.1 Source
 Im Root von `src/FileTypeDetection` liegen nur die Public APIs.
 
-### 7.2 Portable
+### 8.2 Portable
 Die portable Spiegelstruktur wird lokal über die Tools erzeugt und ist nicht Teil des veröffentlichten Repository-Inhalts.
 
-### 7.3 Abstractions-Ordnerhierarchie
+### 8.3 Abstractions-Ordnerhierarchie
 Die Modellschicht unter `src/FileTypeDetection/Abstractions` ist nach Verantwortlichkeiten getrennt:
 
 ```mermaid
