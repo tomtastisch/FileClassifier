@@ -18,7 +18,6 @@ Namespace FileTypeDetection
     ''' - ZIP-Dateien laufen immer durch ZIP-Gate und optionales OOXML-Refinement.
     ''' </remarks>
     ''' </summary>
-    <System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage>
     Public NotInheritable Class FileTypeDetector
         Private Const ReasonUnknown As String = "Unknown"
         Private Const ReasonFileNotFound As String = "FileNotFound"

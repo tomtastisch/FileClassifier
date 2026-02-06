@@ -40,6 +40,36 @@ public sealed class OpenXmlRefinerUnitTests
         Assert.Equal(expected, result.Kind);
     }
 
+    [Fact]
+    public void TryRefineStream_ReturnsUnknown_WhenContentTypesMissing()
+    {
+        var payload = CreateZipWithEntries("word/document.xml");
+        using var stream = new MemoryStream(payload, writable: false);
+
+        var result = OpenXmlRefiner.TryRefineStream(stream);
+
+        Assert.Equal(FileKind.Unknown, result.Kind);
+    }
+
+    [Fact]
+    public void TryRefineStream_ReturnsUnknown_WhenMarkersMissing()
+    {
+        var payload = CreateZipWithEntries("[Content_Types].xml");
+        using var stream = new MemoryStream(payload, writable: false);
+
+        var result = OpenXmlRefiner.TryRefineStream(stream);
+
+        Assert.Equal(FileKind.Unknown, result.Kind);
+    }
+
+    [Fact]
+    public void TryRefine_ReturnsUnknown_WhenFactoryThrows()
+    {
+        FileType result = OpenXmlRefiner.TryRefine(() => throw new InvalidOperationException("boom"));
+
+        Assert.Equal(FileKind.Unknown, result.Kind);
+    }
+
     private static byte[] CreateOpenXmlPackage(string markerPath)
     {
         using var ms = new MemoryStream();
@@ -47,6 +77,20 @@ public sealed class OpenXmlRefinerUnitTests
         {
             zip.CreateEntry("[Content_Types].xml");
             zip.CreateEntry(markerPath);
+        }
+
+        return ms.ToArray();
+    }
+
+    private static byte[] CreateZipWithEntries(params string[] names)
+    {
+        using var ms = new MemoryStream();
+        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            foreach (var name in names)
+            {
+                zip.CreateEntry(name);
+            }
         }
 
         return ms.ToArray();

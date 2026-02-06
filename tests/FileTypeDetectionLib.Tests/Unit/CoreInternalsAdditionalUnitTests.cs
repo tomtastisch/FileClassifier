@@ -88,6 +88,7 @@ public sealed class CoreInternalsAdditionalUnitTests
         var isDirectory = false;
 
         Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath(null, allowDirectoryMarker: false, ref normalized, ref isDirectory));
+        Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath("a\0b", allowDirectoryMarker: false, ref normalized, ref isDirectory));
         Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath("/rooted.txt", allowDirectoryMarker: false, ref normalized, ref isDirectory));
         Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath("..", allowDirectoryMarker: false, ref normalized, ref isDirectory));
         Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath("a/../b", allowDirectoryMarker: false, ref normalized, ref isDirectory));

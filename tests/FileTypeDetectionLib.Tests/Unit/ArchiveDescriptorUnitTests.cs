@@ -38,4 +38,14 @@ public sealed class ArchiveDescriptorUnitTests
         Assert.Equal(ArchiveContainerType.Zip, updated.ContainerChain[0]);
         Assert.Equal(ArchiveContainerType.GZip, updated.ContainerChain[1]);
     }
+
+    [Fact]
+    public void WithChain_AllowsNullChain_AsEmpty()
+    {
+        var descriptor = ArchiveDescriptor.ForContainerType(ArchiveContainerType.Zip);
+        var updated = descriptor.WithChain(null!);
+
+        Assert.NotNull(updated.ContainerChain);
+        Assert.Empty(updated.ContainerChain);
+    }
 }

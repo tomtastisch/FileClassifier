@@ -13,9 +13,8 @@ Imports System.Text
 Namespace FileTypeDetection
 
     ''' <summary>
-    ''' Oeffentliche Fassade fuer deterministische Hash- und RoundTrip-Nachweise.
+    ''' Öffentliche Fassade für deterministische Hash- und RoundTrip-Nachweise.
     ''' </summary>
-    <System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage>
     Public NotInheritable Class DeterministicHashing
         Private Const LogicalManifestVersion As String = "FTD-LOGICAL-HASH-V1"
         Private Const DefaultPayloadLabel As String = "payload.bin"

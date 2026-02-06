@@ -3,11 +3,7 @@ Option Explicit On
 
 Imports System
 
-#If USE_ASPNETCORE_MIME Then
-Imports Microsoft.AspNetCore.StaticFiles
-#Else
 Imports HeyRed.Mime
-#End If
 
 Namespace FileTypeDetection
 
@@ -18,16 +14,10 @@ Namespace FileTypeDetection
     ''' - Alle MIME-Zuordnungen fuer die Registry laufen ausschliesslich ueber diese Klasse.
     ''' - Die eigentliche Dateityp-Erkennung darf niemals von MIME abhaengen.
     '''
-    ''' Toggle:
-    ''' - Default: HeyRed.Mime (Package "Mime").
-    ''' - Alternativ: ASP.NET Core ContentTypeProvider via Build-Define "USE_ASPNETCORE_MIME".
     ''' </summary>
     Friend NotInheritable Class MimeProvider
 
         Friend Shared ReadOnly Instance As New MimeProvider()
-#If USE_ASPNETCORE_MIME Then
-        Private Shared ReadOnly _aspNetProvider As New FileExtensionContentTypeProvider()
-#End If
 
         Private Sub New()
         End Sub
@@ -44,23 +34,11 @@ Namespace FileTypeDetection
             Dim ext = extWithDot
             If Not ext.StartsWith(".", StringComparison.Ordinal) Then ext = "." & ext
 
-#If USE_ASPNETCORE_MIME Then
-            Try
-                Dim mime As String = Nothing
-                If _aspNetProvider.TryGetContentType("x" & ext, mime) AndAlso Not String.IsNullOrWhiteSpace(mime) Then
-                    Return mime
-                End If
-                Return String.Empty
-            Catch
-                Return String.Empty
-            End Try
-#Else
             Try
                 Return MimeTypesMap.GetMimeType(ext)
             Catch
                 Return String.Empty
             End Try
-#End If
         End Function
 
     End Class
@@ -77,11 +55,7 @@ Namespace FileTypeDetection
         ''' </summary>
         Friend Shared ReadOnly Property ActiveBackendName As String
             Get
-#If USE_ASPNETCORE_MIME Then
-                Return "AspNetCore"
-#Else
                 Return "HeyRedMime"
-#End If
             End Get
         End Property
     End Class
