@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   docs-linkcheck:
     runs-on: ubuntu-latest
@@ -18,8 +22,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Markdown Link Check
-        run: python3 tools/check-markdown-links.py
+      - name: Doc Consistency Check
+        run: python3 tools/check-docs.py | tee artifacts/doc-check.txt
+
+      - name: Upload Doc Check Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc-check
+          path: artifacts/doc-check.txt
+          if-no-files-found: error
 
   versioning-guard:
     runs-on: ubuntu-latest
@@ -45,7 +56,8 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: "10.0.x"
+          include-prerelease: true
 
       - name: Restore
         run: dotnet restore FileClassifier.sln -v minimal
@@ -53,10 +65,37 @@ jobs:
       - name: Format Check
         run: dotnet format FileClassifier.sln --verify-no-changes
 
-      - name: Build
+      - name: Build (Warnings As Errors)
         run: dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal
 
-      - name: Test With Coverage Gates (Line + Branch)
+      - name: Vulnerability Check (NuGet)
+        run: dotnet list FileClassifier.sln package --vulnerable --include-transitive | tee artifacts/vuln-scan.txt
+
+      - name: Coverage Gate (85/69)
         run: tools/run-coverage.sh
-      - name: Vulnerability Check
-        run: dotnet list FileClassifier.sln package --vulnerable --include-transitive
+
+      - name: Upload Coverage Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-cobertura
+          path: tests/FileTypeDetectionLib.Tests/coverage.cobertura.xml
+          if-no-files-found: error
+
+      - name: BDD Tests (Readable)
+        run: |
+          TEST_BDD_OUTPUT_DIR="${{ github.workspace }}/artifacts/test-bdd" \
+            bash tools/test-bdd-readable.sh
+
+      - name: Upload BDD Test Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: bdd-test-results
+          path: artifacts/test-bdd/
+          if-no-files-found: error
+
+      - name: Upload Vulnerability Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: vuln-scan
+          path: artifacts/vuln-scan.txt
+          if-no-files-found: error
