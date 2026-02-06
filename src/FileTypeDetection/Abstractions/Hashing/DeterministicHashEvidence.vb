@@ -45,21 +45,21 @@ Namespace FileTypeDetection
         Friend Shared Function CreateFailure(sourceType As DeterministicHashSourceType, label As String, notes As String) _
             As DeterministicHashEvidence
             Return New DeterministicHashEvidence(
-                sourceType := sourceType,
-                label := label,
-                detectedType := FileTypeRegistry.Resolve(FileKind.Unknown),
-                entry := Nothing,
-                compressedBytes := Array.Empty (Of Byte)(),
-                uncompressedBytes := Array.Empty (Of Byte)(),
-                entryCount := 0,
-                totalUncompressedBytes := 0,
-                digests := DeterministicHashDigestSet.Empty,
-                notes := notes)
+                sourceType:=sourceType,
+                label:=label,
+                detectedType:=FileTypeRegistry.Resolve(FileKind.Unknown),
+                entry:=Nothing,
+                compressedBytes:=Array.Empty(Of Byte)(),
+                uncompressedBytes:=Array.Empty(Of Byte)(),
+                entryCount:=0,
+                totalUncompressedBytes:=0,
+                digests:=DeterministicHashDigestSet.Empty,
+                notes:=notes)
         End Function
 
         Private Shared Function ToImmutable(data As Byte()) As ImmutableArray(Of Byte)
             If data Is Nothing OrElse data.Length = 0 Then
-                Return ImmutableArray (Of Byte).Empty
+                Return ImmutableArray(Of Byte).Empty
             End If
             Return ImmutableArray.Create(data)
         End Function

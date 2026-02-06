@@ -52,8 +52,8 @@ Namespace FileTypeDetection
             If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then Return False
 
             Try
-                Using ms As New MemoryStream(data, writable := False)
-                    Return IsArchiveSafeStream(ms, opt, descriptor, depth := 0)
+                Using ms As New MemoryStream(data, writable:=False)
+                    Return IsArchiveSafeStream(ms, opt, descriptor, depth:=0)
                 End Using
             Catch ex As Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveGate] Bytes-Fehler: {ex.Message}")
@@ -119,7 +119,7 @@ Namespace FileTypeDetection
                 File.Delete(destinationFull)
             ElseIf Directory.Exists(destinationFull) Then
                 If Not overwrite Then Return False
-                Directory.Delete(destinationFull, recursive := True)
+                Directory.Delete(destinationFull, recursive:=True)
             End If
 
             Return True
@@ -251,7 +251,7 @@ Namespace FileTypeDetection
 
         Private Shared Function DetectKindFromArchivePackage(stream As Stream) As FileType
             Try
-                Using zip As New ZipArchive(stream, ZipArchiveMode.Read, leaveOpen := True)
+                Using zip As New ZipArchive(stream, ZipArchiveMode.Read, leaveOpen:=True)
                     Dim hasContentTypes = False
                     Dim hasDocxMarker = False
                     Dim hasXlsxMarker = False

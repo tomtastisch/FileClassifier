@@ -48,17 +48,15 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     [Fact]
     public void TryValidateArchive_ReturnsFalse_ForNonArchiveFile()
     {
-        var detector = new FileTypeDetector();
         var path = TestResources.Resolve("sample.pdf");
 
-        Assert.False(detector.TryValidateArchive(path));
+        Assert.False(FileTypeDetector.TryValidateArchive(path));
     }
 
     [Fact]
     public void TryValidateArchive_ReturnsFalse_ForWhitespacePath()
     {
-        var detector = new FileTypeDetector();
-        Assert.False(detector.TryValidateArchive(" "));
+        Assert.False(FileTypeDetector.TryValidateArchive(" "));
     }
 
     [Fact]
@@ -109,7 +107,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     public void ValidateArchiveStreamRaw_ReturnsFalse_WhenStreamUnreadable()
     {
         var method = typeof(FileTypeDetector).GetMethod("ValidateArchiveStreamRaw",
-            BindingFlags.NonPublic | BindingFlags.Instance);
+            BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         using var scope = TestTempPaths.CreateScope("ftd-validate-stream");
@@ -120,8 +118,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
         var descriptor = ArchiveDescriptor.ForContainerType(ArchiveContainerType.Zip);
 
-        var detector = new FileTypeDetector();
-        var ok = TestGuard.Unbox<bool>(method!.Invoke(detector, new object[] { fs, opt, descriptor }));
+        var ok = TestGuard.Unbox<bool>(method!.Invoke(null, new object[] { fs, opt, descriptor }));
 
         Assert.False(ok);
     }
@@ -130,16 +127,15 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     public void FinalizeArchiveDetection_ReturnsZip_ForUnknownRefinement()
     {
         var method = typeof(FileTypeDetector).GetMethod("FinalizeArchiveDetection",
-            BindingFlags.NonPublic | BindingFlags.Instance);
+            BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
-        var detector = new FileTypeDetector();
         var traceType = typeof(FileTypeDetector).GetNestedType("DetectionTrace", BindingFlags.NonPublic);
         var trace = Activator.CreateInstance(traceType!);
         var opt = FileTypeProjectOptions.DefaultOptions();
 
         var refined = FileTypeRegistry.Resolve(FileKind.Unknown);
-        var result = TestGuard.NotNull(method!.Invoke(detector, new[] { refined, opt, trace! }) as FileType);
+        var result = TestGuard.NotNull(method!.Invoke(null, new[] { refined, opt, trace! }) as FileType);
 
         Assert.Equal(FileKind.Zip, result.Kind);
     }
@@ -148,16 +144,15 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     public void FinalizeArchiveDetection_ReturnsRefined_WhenNotUnknown()
     {
         var method = typeof(FileTypeDetector).GetMethod("FinalizeArchiveDetection",
-            BindingFlags.NonPublic | BindingFlags.Instance);
+            BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
-        var detector = new FileTypeDetector();
         var traceType = typeof(FileTypeDetector).GetNestedType("DetectionTrace", BindingFlags.NonPublic);
         var trace = Activator.CreateInstance(traceType!);
         var opt = FileTypeProjectOptions.DefaultOptions();
 
         var refined = FileTypeRegistry.Resolve(FileKind.Docx);
-        var result = TestGuard.NotNull(method!.Invoke(detector, new[] { refined, opt, trace! }) as FileType);
+        var result = TestGuard.NotNull(method!.Invoke(null, new[] { refined, opt, trace! }) as FileType);
 
         Assert.Equal(FileKind.Docx, result.Kind);
     }

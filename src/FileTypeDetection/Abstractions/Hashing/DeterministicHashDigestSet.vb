@@ -31,12 +31,12 @@ Namespace FileTypeDetection
         Friend Shared ReadOnly Property Empty As DeterministicHashDigestSet
             Get
                 Return New DeterministicHashDigestSet(
-                    physicalSha256 := String.Empty,
-                    logicalSha256 := String.Empty,
-                    fastPhysicalXxHash3 := String.Empty,
-                    fastLogicalXxHash3 := String.Empty,
-                    hasPhysicalHash := False,
-                    hasLogicalHash := False)
+                    physicalSha256:=String.Empty,
+                    logicalSha256:=String.Empty,
+                    fastPhysicalXxHash3:=String.Empty,
+                    fastLogicalXxHash3:=String.Empty,
+                    hasPhysicalHash:=False,
+                    hasLogicalHash:=False)
             End Get
         End Property
 

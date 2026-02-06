@@ -80,14 +80,14 @@ Namespace FileTypeDetection
             Dim opt = GetDefaultOptions()
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(opt.Logger, "[Detect] Datei nicht gefunden.")
-                Return Array.Empty (Of Byte)()
+                Return Array.Empty(Of Byte)()
             End If
 
             Try
                 Dim fi As New FileInfo(path)
                 If fi.Length < 0 OrElse fi.Length > opt.MaxBytes Then
                     LogGuard.Warn(opt.Logger, $"[Detect] Datei zu gross ({fi.Length} > {opt.MaxBytes}).")
-                    Return Array.Empty (Of Byte)()
+                    Return Array.Empty(Of Byte)()
                 End If
 
                 Using _
@@ -101,7 +101,7 @@ Namespace FileTypeDetection
                 End Using
             Catch ex As Exception
                 LogGuard.Error(opt.Logger, "[Detect] ReadFileSafe Fehler.", ex)
-                Return Array.Empty (Of Byte)()
+                Return Array.Empty(Of Byte)()
             End Try
         End Function
 
@@ -115,7 +115,7 @@ Namespace FileTypeDetection
         ''' <param name="path">Dateipfad.</param>
         ''' <returns>Erkannter Typ oder Unknown.</returns>
         Public Function Detect(path As String) As FileType
-            Return Detect(path, verifyExtension := False)
+            Return Detect(path, verifyExtension:=False)
         End Function
 
         ''' <summary>
@@ -133,7 +133,7 @@ Namespace FileTypeDetection
         '''     Liefert ein detailliertes, auditierbares Detektionsergebnis.
         ''' </summary>
         Public Function DetectDetailed(path As String) As DetectionDetail
-            Return DetectDetailed(path, verifyExtension := False)
+            Return DetectDetailed(path, verifyExtension:=False)
         End Function
 
         ''' <summary>
@@ -174,7 +174,7 @@ Namespace FileTypeDetection
         ''' <summary>
         '''     Prueft, ob eine Datei ein sicherer Archiv-Container ist (inkl. ZIP).
         ''' </summary>
-        Public Function TryValidateArchive(path As String) As Boolean
+        Public Shared Function TryValidateArchive(path As String) As Boolean
             Dim opt = GetDefaultOptions()
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then Return False
 
@@ -186,7 +186,7 @@ Namespace FileTypeDetection
                     Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
                     If Not ArchiveTypeResolver.TryDescribeStream(fs, opt, descriptor) Then Return False
                     If fs.CanSeek Then fs.Position = 0
-                    Return ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, descriptor, depth := 0)
+                    Return ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, descriptor, depth:=0)
                 End Using
             Catch
                 Return False
@@ -270,7 +270,7 @@ Namespace FileTypeDetection
                 Dim payload = ReadFileSafe(path)
                 If payload.Length = 0 Then Return False
                 Return _
-                    FileMaterializer.Persist(payload, destinationDirectory, overwrite := False, secureExtract := True)
+                    FileMaterializer.Persist(payload, destinationDirectory, overwrite:=False, secureExtract:=True)
             Catch ex As Exception
                 LogGuard.Error(opt.Logger, "[ArchiveExtract] Ausnahme, fail-closed.", ex)
                 Return False
@@ -287,7 +287,7 @@ Namespace FileTypeDetection
         Public Function ExtractArchiveSafeToMemory(path As String, verifyBeforeExtract As Boolean) _
             As IReadOnlyList(Of ZipExtractedEntry)
             Dim opt = GetDefaultOptions()
-            Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty (Of ZipExtractedEntry)()
+            Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
 
             If Not CanExtractArchivePath(path, verifyBeforeExtract, opt) Then Return emptyResult
 
@@ -333,17 +333,17 @@ Namespace FileTypeDetection
                 header,
                 opt,
                 trace,
-                tryDescribe := Function()
-                    Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
-                    If Not ArchiveTypeResolver.TryDescribeStream(fs, opt, descriptor) Then Return Nothing
-                    Return descriptor
-                End Function,
-                tryValidate := Function(descriptor)
-                    Return ValidateArchiveStreamRaw(fs, opt, descriptor)
-                End Function,
-                tryRefine := Function()
-                    Return OpenXmlRefiner.TryRefineStream(fs)
-                End Function)
+                tryDescribe:=Function()
+                                 Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
+                                 If Not ArchiveTypeResolver.TryDescribeStream(fs, opt, descriptor) Then Return Nothing
+                                 Return descriptor
+                             End Function,
+                tryValidate:=Function(descriptor)
+                                 Return ValidateArchiveStreamRaw(fs, opt, descriptor)
+                             End Function,
+                tryRefine:=Function()
+                               Return OpenXmlRefiner.TryRefineStream(fs)
+                           End Function)
         End Function
 
         ''' <summary>
@@ -359,19 +359,19 @@ Namespace FileTypeDetection
                 header,
                 opt,
                 trace,
-                tryDescribe := Function()
-                    Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
-                    If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then Return Nothing
-                    Return descriptor
-                End Function,
-                tryValidate := Function(descriptor)
-                    Return ValidateArchiveBytesRaw(data, opt, descriptor)
-                End Function,
-                tryRefine := Function()
-                    Using ms = CreateReadOnlyMemoryStream(data)
-                        Return OpenXmlRefiner.TryRefineStream(ms)
-                    End Using
-                End Function)
+                tryDescribe:=Function()
+                                 Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
+                                 If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then Return Nothing
+                                 Return descriptor
+                             End Function,
+                tryValidate:=Function(descriptor)
+                                 Return ValidateArchiveBytesRaw(data, opt, descriptor)
+                             End Function,
+                tryRefine:=Function()
+                               Using ms = CreateReadOnlyMemoryStream(data)
+                                   Return OpenXmlRefiner.TryRefineStream(ms)
+                               End Using
+                           End Function)
         End Function
 
         Private Function ResolveByHeaderCommon(
@@ -414,17 +414,17 @@ Namespace FileTypeDetection
             Return ResolveAfterArchiveGate(magicKind, opt, trace, tryRefine)
         End Function
 
-        Private Function ValidateArchiveStreamRaw(
+        Private Shared Function ValidateArchiveStreamRaw(
                                                   fs As FileStream,
                                                   opt As FileTypeProjectOptions,
                                                   descriptor As ArchiveDescriptor
                                                   ) As Boolean
             If fs Is Nothing OrElse Not fs.CanRead Then Return False
             If fs.CanSeek Then fs.Position = 0
-            Return ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, descriptor, depth := 0)
+            Return ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, descriptor, depth:=0)
         End Function
 
-        Private Function ValidateArchiveBytesRaw(
+        Private Shared Function ValidateArchiveBytesRaw(
                                                  data As Byte(),
                                                  opt As FileTypeProjectOptions,
                                                  descriptor As ArchiveDescriptor
@@ -447,7 +447,7 @@ Namespace FileTypeDetection
             Return FinalizeArchiveDetection(refined, opt, trace)
         End Function
 
-        Private Function FinalizeArchiveDetection(refined As FileType, opt As FileTypeProjectOptions,
+        Private Shared Function FinalizeArchiveDetection(refined As FileType, opt As FileTypeProjectOptions,
                                                   ByRef trace As DetectionTrace) As FileType
             If refined.Kind <> FileKind.Unknown Then
                 WarnIfNoDirectContentDetection(refined.Kind, opt)
@@ -529,10 +529,10 @@ Namespace FileTypeDetection
 
         Private Shared Function ReadHeader(input As FileStream, sniffBytes As Integer, maxBytes As Long) As Byte()
             Try
-                If input Is Nothing OrElse Not input.CanRead Then Return Array.Empty (Of Byte)()
-                If maxBytes <= 0 Then Return Array.Empty (Of Byte)()
+                If input Is Nothing OrElse Not input.CanRead Then Return Array.Empty(Of Byte)()
+                If maxBytes <= 0 Then Return Array.Empty(Of Byte)()
                 If input.CanSeek Then
-                    If input.Length <= 0 OrElse input.Length > maxBytes Then Return Array.Empty (Of Byte)()
+                    If input.Length <= 0 OrElse input.Length > maxBytes Then Return Array.Empty(Of Byte)()
                     input.Position = 0
                 End If
 
@@ -542,7 +542,7 @@ Namespace FileTypeDetection
                 If input.CanSeek Then
                     take = CInt(Math.Min(input.Length, want))
                 End If
-                If take <= 0 Then Return Array.Empty (Of Byte)()
+                If take <= 0 Then Return Array.Empty(Of Byte)()
 
                 Dim buf(take - 1) As Byte
                 Dim off = 0
@@ -552,7 +552,7 @@ Namespace FileTypeDetection
                     off += n
                 End While
 
-                If off <= 0 Then Return Array.Empty (Of Byte)()
+                If off <= 0 Then Return Array.Empty(Of Byte)()
                 If off < take Then
                     Dim exact(off - 1) As Byte
                     Array.Copy(buf, exact, off)
@@ -561,7 +561,7 @@ Namespace FileTypeDetection
 
                 Return buf
             Catch
-                Return Array.Empty (Of Byte)()
+                Return Array.Empty(Of Byte)()
             End Try
         End Function
 
@@ -570,7 +570,7 @@ Namespace FileTypeDetection
         End Function
 
         Private Shared Function CreateReadOnlyMemoryStream(data As Byte()) As MemoryStream
-            Return New MemoryStream(data, 0, data.Length, writable := False, publiclyVisible := False)
+            Return New MemoryStream(data, 0, data.Length, writable:=False, publiclyVisible:=False)
         End Function
 
         Private Structure DetectionTrace

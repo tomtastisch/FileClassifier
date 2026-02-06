@@ -6,17 +6,7 @@ namespace FileTypeDetectionLib.Tests.Unit;
 
 public sealed class DeterministicHashingApiContractUnitTests
 {
-    [Fact]
-    public void PublicStaticSurface_MatchesApprovedContract()
-    {
-        var methods = typeof(DeterministicHashing)
-            .GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .Where(m => m.DeclaringType == typeof(DeterministicHashing))
-            .Select(Describe)
-            .OrderBy(x => x, StringComparer.Ordinal)
-            .ToArray();
-
-        var expected = new[]
+    private static readonly string[] sourceArray = new[]
         {
             "HashBytes(Byte[]):DeterministicHashEvidence",
             "HashBytes(Byte[],String):DeterministicHashEvidence",
@@ -28,7 +18,19 @@ public sealed class DeterministicHashingApiContractUnitTests
             "HashFile(String,DeterministicHashOptions):DeterministicHashEvidence",
             "VerifyRoundTrip(String):DeterministicHashRoundTripReport",
             "VerifyRoundTrip(String,DeterministicHashOptions):DeterministicHashRoundTripReport"
-        }.OrderBy(x => x, StringComparer.Ordinal).ToArray();
+        };
+
+    [Fact]
+    public void PublicStaticSurface_MatchesApprovedContract()
+    {
+        var methods = typeof(DeterministicHashing)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .Where(m => m.DeclaringType == typeof(DeterministicHashing))
+            .Select(Describe)
+            .OrderBy(x => x, StringComparer.Ordinal)
+            .ToArray();
+
+        var expected = sourceArray.OrderBy(x => x, StringComparer.Ordinal).ToArray();
 
         Assert.Equal(expected, methods);
     }

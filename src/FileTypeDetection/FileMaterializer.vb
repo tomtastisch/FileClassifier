@@ -12,11 +12,11 @@ Namespace FileTypeDetection
         End Sub
 
         Public Shared Function Persist(data As Byte(), destinationPath As String) As Boolean
-            Return Persist(data, destinationPath, overwrite := False, secureExtract := False)
+            Return Persist(data, destinationPath, overwrite:=False, secureExtract:=False)
         End Function
 
         Public Shared Function Persist(data As Byte(), destinationPath As String, overwrite As Boolean) As Boolean
-            Return Persist(data, destinationPath, overwrite, secureExtract := False)
+            Return Persist(data, destinationPath, overwrite, secureExtract:=False)
         End Function
 
         Public Shared Function Persist(data As Byte(), destinationPath As String, overwrite As Boolean,
@@ -88,7 +88,7 @@ Namespace FileTypeDetection
                 If Not DestinationPathGuard.PrepareMaterializationTarget(destinationFull, overwrite, opt) Then _
                     Return False
 
-                Using ms As New MemoryStream(data, writable := False)
+                Using ms As New MemoryStream(data, writable:=False)
                     Return ArchiveExtractor.TryExtractArchiveStream(ms, destinationFull, opt, descriptor)
                 End Using
             Catch ex As Exception

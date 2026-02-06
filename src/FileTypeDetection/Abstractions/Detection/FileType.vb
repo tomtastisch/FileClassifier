@@ -46,7 +46,7 @@ Namespace FileTypeDetection
             End If
 
             If dedup.Count = 0 Then
-                Me.Aliases = ImmutableArray (Of String).Empty
+                Me.Aliases = ImmutableArray(Of String).Empty
             Else
                 Dim orderedAliases = dedup.ToList()
                 orderedAliases.Sort(StringComparer.Ordinal)

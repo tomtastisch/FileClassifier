@@ -14,7 +14,7 @@ Namespace FileTypeDetection
         '''     Prueft fail-closed, ob ein Dateipfad ein sicherer Archiv-Container ist.
         ''' </summary>
         Public Shared Function TryValidate(path As String) As Boolean
-            Return New FileTypeDetector().TryValidateArchive(path)
+            Return FileTypeDetector.TryValidateArchive(path)
         End Function
 
         ''' <summary>
@@ -38,11 +38,11 @@ Namespace FileTypeDetection
         ''' </summary>
         Public Shared Function TryExtractToMemory(data As Byte()) As IReadOnlyList(Of ZipExtractedEntry)
             Dim opt = FileTypeOptions.GetSnapshot()
-            Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty (Of ZipExtractedEntry)()
+            Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
 
             If data Is Nothing OrElse data.Length = 0 Then Return emptyResult
 
-            Dim entries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty (Of ZipExtractedEntry)()
+            Dim entries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             If Not ArchiveEntryCollector.TryCollectFromBytes(data, opt, entries) Then Return emptyResult
             Return entries
         End Function

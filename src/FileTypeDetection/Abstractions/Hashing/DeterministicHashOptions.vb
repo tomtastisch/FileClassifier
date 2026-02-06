@@ -52,7 +52,7 @@ Namespace FileTypeDetection
             If String.IsNullOrWhiteSpace(normalized) Then Return "deterministic-roundtrip.bin"
 
             For Each c In Path.GetInvalidFileNameChars()
-                If normalized.IndexOf(c) >= 0 Then
+                If normalized.Contains(c) Then
                     Return "deterministic-roundtrip.bin"
                 End If
             Next

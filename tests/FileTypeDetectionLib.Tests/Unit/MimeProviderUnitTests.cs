@@ -8,20 +8,16 @@ public sealed class MimeProviderUnitTests
     [Fact]
     public void GetMime_ReturnsEmpty_ForNullOrWhitespace()
     {
-        var provider = MimeProvider.Instance;
-
-        Assert.Equal(string.Empty, (string?)provider.GetMime(null));
-        Assert.Equal(string.Empty, (string?)provider.GetMime(""));
-        Assert.Equal(string.Empty, (string?)provider.GetMime("   "));
+        Assert.Equal(string.Empty, (string?)MimeProvider.GetMime(null));
+        Assert.Equal(string.Empty, (string?)MimeProvider.GetMime(""));
+        Assert.Equal(string.Empty, (string?)MimeProvider.GetMime("   "));
     }
 
     [Fact]
     public void GetMime_HandlesDotPrefix_Consistently()
     {
-        var provider = MimeProvider.Instance;
-
-        var withDot = provider.GetMime(".txt");
-        var withoutDot = provider.GetMime("txt");
+        var withDot = MimeProvider.GetMime(".txt");
+        var withoutDot = MimeProvider.GetMime("txt");
 
         Assert.Equal((string?)withDot, (string?)withoutDot);
         Assert.False(string.IsNullOrWhiteSpace(withDot));

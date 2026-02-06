@@ -16,7 +16,7 @@ Namespace FileTypeDetection
         Friend Sub New(entryPath As String, payload As Byte())
             RelativePath = If(entryPath, String.Empty)
             If payload Is Nothing OrElse payload.Length = 0 Then
-                Content = ImmutableArray (Of Byte).Empty
+                Content = ImmutableArray(Of Byte).Empty
                 Size = 0
             Else
                 Content = ImmutableArray.Create(payload)
@@ -25,8 +25,8 @@ Namespace FileTypeDetection
         End Sub
 
         Public Function OpenReadOnlyStream() As MemoryStream
-            Dim data = If(Content.IsDefaultOrEmpty, Array.Empty (Of Byte)(), Content.ToArray())
-            Return New MemoryStream(data, writable := False)
+            Dim data = If(Content.IsDefaultOrEmpty, Array.Empty(Of Byte)(), Content.ToArray())
+            Return New MemoryStream(data, writable:=False)
         End Function
     End Class
 End Namespace

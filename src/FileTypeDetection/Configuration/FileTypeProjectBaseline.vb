@@ -14,14 +14,14 @@ Namespace FileTypeDetection
         ''' </summary>
         Private Shared Function CreateDeterministicDefaults() As FileTypeProjectOptions
             Return New FileTypeProjectOptions With {
-                .MaxBytes = 128L*1024L*1024L,
-                .SniffBytes = 64*1024,
+                .MaxBytes = 128L * 1024L * 1024L,
+                .SniffBytes = 64 * 1024,
                 .MaxZipEntries = 3000,
-                .MaxZipTotalUncompressedBytes = 300L*1024L*1024L,
-                .MaxZipEntryUncompressedBytes = 64L*1024L*1024L,
+                .MaxZipTotalUncompressedBytes = 300L * 1024L * 1024L,
+                .MaxZipEntryUncompressedBytes = 64L * 1024L * 1024L,
                 .MaxZipCompressionRatio = 30,
                 .MaxZipNestingDepth = 2,
-                .MaxZipNestedBytes = 32L*1024L*1024L,
+                .MaxZipNestedBytes = 32L * 1024L * 1024L,
                 .RejectArchiveLinks = True,
                 .AllowUnknownArchiveEntrySize = False,
                 .DeterministicHash = New DeterministicHashOptions With {

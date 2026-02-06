@@ -33,7 +33,7 @@ Namespace FileTypeDetection
             Try
                 If stream.CanSeek Then stream.Position = 0
 
-                Using zip As New ZipArchive(stream, ZipArchiveMode.Read, leaveOpen := True)
+                Using zip As New ZipArchive(stream, ZipArchiveMode.Read, leaveOpen:=True)
                     If zip.Entries.Count > opt.MaxZipEntries Then Return False
 
                     Dim totalUncompressed As Long = 0
@@ -49,7 +49,7 @@ Namespace FileTypeDetection
                         If totalUncompressed > opt.MaxZipTotalUncompressedBytes Then Return False
 
                         If c > 0 AndAlso opt.MaxZipCompressionRatio > 0 Then
-                            Dim ratio As Double = CDbl(u)/CDbl(c)
+                            Dim ratio As Double = CDbl(u) / CDbl(c)
                             If ratio > opt.MaxZipCompressionRatio Then Return False
                         End If
 
@@ -162,7 +162,7 @@ Namespace FileTypeDetection
             Get
                 If _entry Is Nothing Then Return False
                 Dim name = If(_entry.FullName, String.Empty)
-                Return name.EndsWith("/", StringComparison.Ordinal)
+                Return name.EndsWith("/"c)
             End Get
         End Property
 

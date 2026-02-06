@@ -10,7 +10,7 @@ public sealed class ArchiveManagedBackendUnitTests
     public void Process_FailsForNonZipContainer()
     {
         var backend = new ArchiveManagedBackend();
-        using var stream = new MemoryStream(new byte[0]);
+        using var stream = new MemoryStream(Array.Empty<byte>());
         var opt = FileTypeProjectOptions.DefaultOptions();
 
         var ok = backend.Process(stream, opt, 0, ArchiveContainerType.Rar, null);

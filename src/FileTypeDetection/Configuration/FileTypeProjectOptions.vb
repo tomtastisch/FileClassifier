@@ -26,21 +26,21 @@ Namespace FileTypeDetection
         '''     Harte Obergrenze fuer Datei-/Byte-Payloads.
         '''     Alles darueber wird fail-closed verworfen.
         ''' </summary>
-        Public Property MaxBytes As Long = 200L*1024L*1024L
+        Public Property MaxBytes As Long = 200L * 1024L * 1024L
 
         ''' <summary>
         '''     Maximale Header-Laenge fuer Sniffing/Magic.
         ''' </summary>
-        Public Property SniffBytes As Integer = 64*1024
+        Public Property SniffBytes As Integer = 64 * 1024
 
         ''' <summary>Maximal erlaubte Anzahl ZIP-Entries.</summary>
         Public Property MaxZipEntries As Integer = 5000
 
         ''' <summary>Maximale Summe unkomprimierter ZIP-Bytes.</summary>
-        Public Property MaxZipTotalUncompressedBytes As Long = 500L*1024L*1024L
+        Public Property MaxZipTotalUncompressedBytes As Long = 500L * 1024L * 1024L
 
         ''' <summary>Maximal erlaubte unkomprimierte Bytes pro ZIP-Entry.</summary>
-        Public Property MaxZipEntryUncompressedBytes As Long = 200L*1024L*1024L
+        Public Property MaxZipEntryUncompressedBytes As Long = 200L * 1024L * 1024L
 
         ''' <summary>
         '''     Maximal erlaubtes Kompressionsverhaeltnis (u/c).
@@ -56,7 +56,7 @@ Namespace FileTypeDetection
         ''' <summary>
         '''     Harte In-Memory-Grenze fuer verschachtelte ZIP-Entries.
         ''' </summary>
-        Public Property MaxZipNestedBytes As Long = 50L*1024L*1024L
+        Public Property MaxZipNestedBytes As Long = 50L * 1024L * 1024L
 
         ''' <summary>
         '''     Standard-Policy: Link-Entries (symlink/hardlink) werden fail-closed verworfen.
