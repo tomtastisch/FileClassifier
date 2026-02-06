@@ -7,6 +7,7 @@ internal sealed class FixtureManifestCatalog
 {
     private const string ManifestFileName = "fixtures.manifest.json";
     private static readonly StringComparer KeyComparer = StringComparer.OrdinalIgnoreCase;
+    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
     private readonly Dictionary<string, FixtureManifestEntry> _byFileName;
     private readonly Dictionary<string, FixtureManifestEntry> _byFixtureId;
 
@@ -34,7 +35,7 @@ internal sealed class FixtureManifestCatalog
 
         var doc = JsonSerializer.Deserialize<FixtureManifestDocument>(
             File.ReadAllText(manifestPath),
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            JsonOptions);
         if (doc is null || doc.Fixtures is null || doc.Fixtures.Count == 0)
             throw new InvalidOperationException("Fixture manifest is empty.");
 

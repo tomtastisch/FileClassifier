@@ -33,12 +33,14 @@ public sealed class FileTypeDetectionSteps
     [Given("die Ressource {string} existiert")]
     public void GivenTheResourceExists(string name)
     {
+        _ = _scenarioContext;
         AssertResourceExists(name);
     }
 
     [Given("die folgenden Ressourcen existieren")]
     public void GivenTheFollowingResourcesExist(Table table)
     {
+        _ = _scenarioContext;
         Assert.NotNull(table);
         Assert.NotEmpty(table.Rows);
         Assert.True(table.ContainsColumn(ResourceColumn), $"Expected table column '{ResourceColumn}'.");
@@ -91,6 +93,7 @@ public sealed class FileTypeDetectionSteps
     [Given("die maximale Dateigroesse ist {long} Bytes")]
     public void GivenTheMaximumSizeInBytes(long maxBytes)
     {
+        _ = _scenarioContext;
         var options = FileTypeDetector.GetDefaultOptions();
         options.MaxBytes = maxBytes;
         FileTypeDetector.SetDefaultOptions(options);
@@ -311,6 +314,7 @@ public sealed class FileTypeDetectionSteps
     [Then("ist der MIME-Provider build-konform aktiv")]
     public void ThenTheMimeProviderIsBuildConform()
     {
+        _ = _scenarioContext;
 #if USE_ASPNETCORE_MIME
         const string expectedBackend = "AspNetCore";
 #else

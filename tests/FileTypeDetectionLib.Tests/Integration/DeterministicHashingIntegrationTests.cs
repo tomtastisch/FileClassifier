@@ -5,27 +5,36 @@ namespace FileTypeDetectionLib.Tests.Integration;
 
 public sealed class DeterministicHashingIntegrationTests
 {
-    public static IEnumerable<object[]> ArchiveFixtureCases()
+    public static TheoryData<string> ArchiveFixtureCases()
     {
-        yield return new object[] { "fx.sample_zip" };
-        yield return new object[] { "fx.sample_rar" };
-        yield return new object[] { "fx.sample_7z" };
+        return new TheoryData<string>
+        {
+            "fx.sample_zip",
+            "fx.sample_rar",
+            "fx.sample_7z"
+        };
     }
 
-    public static IEnumerable<object[]> RoundTripCases()
+    public static TheoryData<string, bool> RoundTripCases()
     {
-        yield return new object[] { "fx.sample_zip", true };
-        yield return new object[] { "fx.sample_7z", true };
-        yield return new object[] { "fx.sample_rar", true };
-        yield return new object[] { "fx.sample_pdf", false };
+        return new TheoryData<string, bool>
+        {
+            { "fx.sample_zip", true },
+            { "fx.sample_7z", true },
+            { "fx.sample_rar", true },
+            { "fx.sample_pdf", false }
+        };
     }
 
-    public static IEnumerable<object[]> DeterminismCases()
+    public static TheoryData<string> DeterminismCases()
     {
-        yield return new object[] { "fx.sample_zip" };
-        yield return new object[] { "fx.sample_7z" };
-        yield return new object[] { "fx.sample_rar" };
-        yield return new object[] { "fx.sample_pdf" };
+        return new TheoryData<string>
+        {
+            "fx.sample_zip",
+            "fx.sample_7z",
+            "fx.sample_rar",
+            "fx.sample_pdf"
+        };
     }
 
     [Fact]

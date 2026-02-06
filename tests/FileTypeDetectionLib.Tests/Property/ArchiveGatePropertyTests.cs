@@ -88,9 +88,7 @@ public sealed class ArchiveGatePropertyTests
     [Fact]
     public void Detect_Respects_MaxArchiveNestedBytes_ForInnerArchive()
     {
-        var fixture = ArchiveEntryPayloadFactory.CreateNestedZipWithInnerLength(2048);
-        var zip = fixture.zipBytes;
-        var innerBytes = fixture.innerUncompressedBytes;
+        var (zip, innerBytes) = ArchiveEntryPayloadFactory.CreateNestedZipWithInnerLength(2048);
 
         using (var passScope = new DetectorOptionsScope())
         {

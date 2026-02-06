@@ -69,14 +69,15 @@ public sealed class FileMaterializerPropertyTests
                 var state = rng.Next(0, 3); // 0:none, 1:file, 2:dir
                 var overwrite = rng.Next(0, 2) == 1;
 
-                if (state == 1)
+                switch (state)
                 {
-                    File.WriteAllBytes(destination, new byte[] { 0xAA, 0xBB });
-                }
-                else if (state == 2)
-                {
-                    Directory.CreateDirectory(destination);
-                    File.WriteAllBytes(Path.Combine(destination, "marker.txt"), new byte[] { 0x01 });
+                    case 1:
+                        File.WriteAllBytes(destination, new byte[] { 0xAA, 0xBB });
+                        break;
+                    case 2:
+                        Directory.CreateDirectory(destination);
+                        File.WriteAllBytes(Path.Combine(destination, "marker.txt"), new byte[] { 0x01 });
+                        break;
                 }
 
                 var ok = FileMaterializer.Persist(payload, destination, overwrite, false);
@@ -92,15 +93,16 @@ public sealed class FileMaterializerPropertyTests
                 }
                 else
                 {
-                    if (state == 1)
+                    switch (state)
                     {
-                        Assert.True(File.Exists(destination));
-                        Assert.Equal(new byte[] { 0xAA, 0xBB }, File.ReadAllBytes(destination));
-                    }
-                    else if (state == 2)
-                    {
-                        Assert.True(Directory.Exists(destination));
-                        Assert.True(File.Exists(Path.Combine(destination, "marker.txt")));
+                        case 1:
+                            Assert.True(File.Exists(destination));
+                            Assert.Equal(new byte[] { 0xAA, 0xBB }, File.ReadAllBytes(destination));
+                            break;
+                        case 2:
+                            Assert.True(Directory.Exists(destination));
+                            Assert.True(File.Exists(Path.Combine(destination, "marker.txt")));
+                            break;
                     }
                 }
             }

@@ -19,10 +19,9 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
 
         var opt = FileTypeProjectOptions.DefaultOptions();
         var entries = new List<IArchiveEntry>();
-        var nestedResult = false;
 
         var handled = TestGuard.Unbox<bool>(method.Invoke(null,
-            new object[] { entries, opt, 0, ArchiveContainerType.Zip, null!, nestedResult }));
+            new object[] { entries, opt, 0, ArchiveContainerType.Zip, null!, false }));
 
         Assert.False(handled);
     }
@@ -35,13 +34,14 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
-        var entries = new List<IArchiveEntry>();
-        entries.Add(CreateZipArchiveEntry("a.txt", new byte[] { 1 }));
-        entries.Add(CreateZipArchiveEntry("b.txt", new byte[] { 2 }));
-        var nestedResult = false;
+        var entries = new List<IArchiveEntry>
+        {
+            CreateZipArchiveEntry("a.txt", new byte[] { 1 }),
+            CreateZipArchiveEntry("b.txt", new byte[] { 2 })
+        };
 
         var handled = TestGuard.Unbox<bool>(method.Invoke(null,
-            new object[] { entries, opt, 0, ArchiveContainerType.GZip, null!, nestedResult }));
+            new object[] { entries, opt, 0, ArchiveContainerType.GZip, null!, false }));
 
         Assert.False(handled);
     }
@@ -54,15 +54,15 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
-        var entries = new List<IArchiveEntry>();
-        entries.Add(CreateZipArchiveEntry("payload.bin", new byte[] { 0x01, 0x02 }));
-        var nestedResult = true;
+        var entries = new List<IArchiveEntry>
+        {
+            CreateZipArchiveEntry("payload.bin", new byte[] { 0x01, 0x02 })
+        };
 
         var handled = TestGuard.Unbox<bool>(method.Invoke(null,
-            new object[] { entries, opt, 0, ArchiveContainerType.GZip, null!, nestedResult }));
+            new object[] { entries, opt, 0, ArchiveContainerType.GZip, null!, true }));
 
         Assert.True(handled);
-        Assert.True(nestedResult);
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
             new object?[] { CreateZipArchiveEntry("a.txt", new byte[] { 1 }), 0L, null })));
     }
 
-    private static IArchiveEntry CreateZipArchiveEntry(string name, byte[] payload)
+    private static ZipArchiveEntry CreateZipArchiveEntry(string name, byte[] payload)
     {
         using var ms = new MemoryStream();
         using (var writer = WriterFactory.Open(ms, ArchiveType.Zip, new WriterOptions(CompressionType.Deflate)))

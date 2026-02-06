@@ -299,7 +299,7 @@ Namespace FileTypeDetection
         Friend Shared Sub Debug(logger As ILogger, message As String)
             If logger Is Nothing Then Return
             Try
-                logger.LogDebug(message)
+                logger.LogDebug("{Message}", message)
             Catch
             End Try
         End Sub
@@ -307,7 +307,7 @@ Namespace FileTypeDetection
         Friend Shared Sub Warn(logger As ILogger, message As String)
             If logger Is Nothing Then Return
             Try
-                logger.LogWarning(message)
+                logger.LogWarning("{Message}", message)
             Catch
             End Try
         End Sub
@@ -315,7 +315,7 @@ Namespace FileTypeDetection
         Friend Shared Sub [Error](logger As ILogger, message As String, ex As Exception)
             If logger Is Nothing Then Return
             Try
-                logger.LogError(ex, message)
+                logger.LogError(ex, "{Message}", message)
             Catch
             End Try
         End Sub

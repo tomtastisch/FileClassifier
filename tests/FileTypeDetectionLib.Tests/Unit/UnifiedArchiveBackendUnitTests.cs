@@ -6,22 +6,22 @@ namespace FileTypeDetectionLib.Tests.Unit;
 
 public sealed class UnifiedArchiveBackendUnitTests
 {
-    public static IEnumerable<object[]> GeneratedArchivePayloadCases()
+    public static TheoryData<string, byte[], string, string> GeneratedArchivePayloadCases()
     {
-        yield return new object[]
+        return new TheoryData<string, byte[], string, string>
         {
-            "tar",
-            ArchivePayloadFactory.CreateTarWithSingleEntry("inner/note.txt", "hello"),
-            "inner/note.txt",
-            "hello"
-        };
-
-        yield return new object[]
-        {
-            "tar.gz",
-            ArchivePayloadFactory.CreateTarGzWithSingleEntry("inner/note.txt", "hello"),
-            "inner/note.txt",
-            "hello"
+            {
+                "tar",
+                ArchivePayloadFactory.CreateTarWithSingleEntry("inner/note.txt", "hello"),
+                "inner/note.txt",
+                "hello"
+            },
+            {
+                "tar.gz",
+                ArchivePayloadFactory.CreateTarGzWithSingleEntry("inner/note.txt", "hello"),
+                "inner/note.txt",
+                "hello"
+            }
         };
     }
 
