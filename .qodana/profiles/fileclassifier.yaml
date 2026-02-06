@@ -1,2 +1,17 @@
 name: "FileClassifier"
 baseProfile: qodana.recommended
+
+# Testcode wird weiterhin analysiert; nur klarer Redundanz-Noise wird dort gedrosselt.
+exclude:
+  - name: RedundantUsingDirective
+    paths:
+      - tests
+  - name: RedundantCast
+    paths:
+      - tests
+  - name: RedundantSuppressNullableWarningExpression
+    paths:
+      - tests
+  - name: ReplaceAutoPropertyWithComputedProperty
+    paths:
+      - tests

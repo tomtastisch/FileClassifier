@@ -77,6 +77,7 @@ Qodana bleibt ein separater Workflow und ergänzt die CI-Qualitätsgates.
 Coverage-SSOT bleibt CI (Coverage-Artefakte + Gate-Enforcement).
 Für `pull_request` wird SARIF als Workflow-Artefakt veröffentlicht.
 Code-Scanning-SARIF-Upload erfolgt nur auf non-PR-Runs, um PR-Noise zu vermeiden.
+Profil-Hinweis: In `.qodana/profiles/fileclassifier.yaml` sind nur testpfad-spezifische Excludes für reine Redundanz-Inspections gesetzt (`tests/**`), Produktionscode bleibt unverändert streng.
 
 ## 8. Lokale Reproduktion
 ```bash
