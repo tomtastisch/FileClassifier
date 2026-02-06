@@ -87,7 +87,7 @@ Die aktuelle Version ergibt sich deterministisch aus der Historie.
 - GitHub-Label-Setup ist in `tools/versioning/labels.json` dokumentiert.
 
 ## 8.2 Code-Analyse
-- Aktuell kein Qodana im Einsatz.
+- Qodana ist seit dem 6. Februar 2026 in CI integriert und dient als statische Qualitätsprüfung.
 
 ## 9. Version-Anker (retroaktiv festgelegt)
 - `1.0.0` -> `d9a6015` (Initial Commit)
