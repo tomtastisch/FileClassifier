@@ -432,7 +432,7 @@ Namespace FileTypeDetection
             Return ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor)
         End Function
 
-        Private Function ResolveAfterArchiveGate(
+        Private Shared Function ResolveAfterArchiveGate(
                                                  magicKind As FileKind,
                                                  opt As FileTypeProjectOptions,
                                                  ByRef trace As DetectionTrace,
