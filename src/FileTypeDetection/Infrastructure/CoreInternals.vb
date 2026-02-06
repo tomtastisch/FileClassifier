@@ -1,13 +1,11 @@
 Option Strict On
 Option Explicit On
 
-Imports System
 Imports System.IO
 Imports System.IO.Compression
 Imports Microsoft.Extensions.Logging
 
 Namespace FileTypeDetection
-
     Friend NotInheritable Class InternalIoDefaults
         Friend Const CopyBufferSize As Integer = 8192
         Friend Const FileStreamBufferSize As Integer = 81920
@@ -18,8 +16,8 @@ Namespace FileTypeDetection
     End Class
 
     ''' <summary>
-    ''' Zentrale IO-Helfer fuer harte Grenzen.
-    ''' SSOT-Regel: bounded copy wird nur hier gepflegt.
+    '''     Zentrale IO-Helfer fuer harte Grenzen.
+    '''     SSOT-Regel: bounded copy wird nur hier gepflegt.
     ''' </summary>
     Friend NotInheritable Class StreamBounds
         Private Sub New()
@@ -41,13 +39,14 @@ Namespace FileTypeDetection
     End Class
 
     ''' <summary>
-    ''' Sicherheits-Gate fuer Archive-Container.
+    '''     Sicherheits-Gate fuer Archive-Container.
     ''' </summary>
     Friend NotInheritable Class ArchiveSafetyGate
         Private Sub New()
         End Sub
 
-        Friend Shared Function IsArchiveSafeBytes(data As Byte(), opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor) As Boolean
+        Friend Shared Function IsArchiveSafeBytes(data As Byte(), opt As FileTypeProjectOptions,
+                                                  descriptor As ArchiveDescriptor) As Boolean
             If data Is Nothing OrElse data.Length = 0 Then Return False
             If opt Is Nothing Then Return False
             If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then Return False
@@ -62,7 +61,8 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Friend Shared Function IsArchiveSafeStream(stream As Stream, opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor, depth As Integer) As Boolean
+        Friend Shared Function IsArchiveSafeStream(stream As Stream, opt As FileTypeProjectOptions,
+                                                   descriptor As ArchiveDescriptor, depth As Integer) As Boolean
             If stream Is Nothing OrElse Not stream.CanRead Then Return False
             If opt Is Nothing Then Return False
             Return ArchiveProcessingEngine.ValidateArchiveStream(stream, opt, depth, descriptor)
@@ -70,7 +70,7 @@ Namespace FileTypeDetection
     End Class
 
     ''' <summary>
-    ''' Gemeinsame Guards fuer signaturbasierte Archiv-Byte-Payloads.
+    '''     Gemeinsame Guards fuer signaturbasierte Archiv-Byte-Payloads.
     ''' </summary>
     Friend NotInheritable Class ArchiveSignaturePayloadGuard
         Private Sub New()
@@ -80,11 +80,10 @@ Namespace FileTypeDetection
             If data Is Nothing OrElse data.Length = 0 Then Return False
             Return FileTypeRegistry.DetectByMagic(data) = FileKind.Zip
         End Function
-
     End Class
 
     ''' <summary>
-    ''' Gemeinsame Guards fuer beliebige Archive-Byte-Payloads.
+    '''     Gemeinsame Guards fuer beliebige Archive-Byte-Payloads.
     ''' </summary>
     Friend NotInheritable Class ArchivePayloadGuard
         Private Sub New()
@@ -102,13 +101,14 @@ Namespace FileTypeDetection
     End Class
 
     ''' <summary>
-    ''' Gemeinsame Zielpfad-Policy fuer Materialisierung und Archiv-Extraktion.
+    '''     Gemeinsame Zielpfad-Policy fuer Materialisierung und Archiv-Extraktion.
     ''' </summary>
     Friend NotInheritable Class DestinationPathGuard
         Private Sub New()
         End Sub
 
-        Friend Shared Function PrepareMaterializationTarget(destinationFull As String, overwrite As Boolean, opt As FileTypeProjectOptions) As Boolean
+        Friend Shared Function PrepareMaterializationTarget(destinationFull As String, overwrite As Boolean,
+                                                            opt As FileTypeProjectOptions) As Boolean
             If IsRootPath(destinationFull) Then
                 LogGuard.Warn(opt.Logger, "[PathGuard] Ziel darf kein Root-Verzeichnis sein.")
                 Return False
@@ -125,7 +125,8 @@ Namespace FileTypeDetection
             Return True
         End Function
 
-        Friend Shared Function ValidateNewExtractionTarget(destinationFull As String, opt As FileTypeProjectOptions) As Boolean
+        Friend Shared Function ValidateNewExtractionTarget(destinationFull As String, opt As FileTypeProjectOptions) _
+            As Boolean
             If IsRootPath(destinationFull) Then
                 LogGuard.Warn(opt.Logger, "[PathGuard] Ziel darf kein Root-Verzeichnis sein.")
                 Return False
@@ -165,18 +166,18 @@ Namespace FileTypeDetection
     End Class
 
     ''' <summary>
-    ''' Gemeinsame Normalisierung fuer relative Archiv-Entry-Pfade.
+    '''     Gemeinsame Normalisierung fuer relative Archiv-Entry-Pfade.
     ''' </summary>
     Friend NotInheritable Class ArchiveEntryPathPolicy
         Private Sub New()
         End Sub
 
         Friend Shared Function TryNormalizeRelativePath(
-            rawPath As String,
-            allowDirectoryMarker As Boolean,
-            ByRef normalizedPath As String,
-            ByRef isDirectory As Boolean
-        ) As Boolean
+                                                        rawPath As String,
+                                                        allowDirectoryMarker As Boolean,
+                                                        ByRef normalizedPath As String,
+                                                        ByRef isDirectory As Boolean
+                                                        ) As Boolean
             normalizedPath = String.Empty
             isDirectory = False
 
@@ -214,11 +215,10 @@ Namespace FileTypeDetection
     End Class
 
     ''' <summary>
-    ''' Verfeinert Archivpakete zu OOXML-Typen anhand kanonischer Paket-Pfade.
-    '''
-    ''' Implementationsprinzip:
-    ''' - reduziert False-Positives bei generischen ZIP-Dateien
-    ''' - bleibt fail-closed (Fehler => Unknown)
+    '''     Verfeinert Archivpakete zu OOXML-Typen anhand kanonischer Paket-Pfade.
+    '''     Implementationsprinzip:
+    '''     - reduziert False-Positives bei generischen ZIP-Dateien
+    '''     - bleibt fail-closed (Fehler => Unknown)
     ''' </summary>
     Friend NotInheritable Class OpenXmlRefiner
         Private Sub New()
@@ -252,10 +252,10 @@ Namespace FileTypeDetection
         Private Shared Function DetectKindFromArchivePackage(stream As Stream) As FileType
             Try
                 Using zip As New ZipArchive(stream, ZipArchiveMode.Read, leaveOpen:=True)
-                    Dim hasContentTypes As Boolean = False
-                    Dim hasDocxMarker As Boolean = False
-                    Dim hasXlsxMarker As Boolean = False
-                    Dim hasPptxMarker As Boolean = False
+                    Dim hasContentTypes = False
+                    Dim hasDocxMarker = False
+                    Dim hasXlsxMarker = False
+                    Dim hasPptxMarker = False
 
                     For Each entry In zip.Entries
                         Dim name = If(entry.FullName, String.Empty)
@@ -286,12 +286,11 @@ Namespace FileTypeDetection
 
             Return FileTypeRegistry.Resolve(FileKind.Unknown)
         End Function
-
     End Class
 
     ''' <summary>
-    ''' Defensiver Logger-Schutz.
-    ''' Logging darf niemals zu Erkennungsfehlern oder Exceptions fuehren.
+    '''     Defensiver Logger-Schutz.
+    '''     Logging darf niemals zu Erkennungsfehlern oder Exceptions fuehren.
     ''' </summary>
     Friend NotInheritable Class LogGuard
         Private Sub New()
@@ -300,7 +299,7 @@ Namespace FileTypeDetection
         Friend Shared Sub Debug(logger As ILogger, message As String)
             If logger Is Nothing Then Return
             Try
-                logger.LogDebug(message)
+                logger.LogDebug("{Message}", message)
             Catch
             End Try
         End Sub
@@ -308,7 +307,7 @@ Namespace FileTypeDetection
         Friend Shared Sub Warn(logger As ILogger, message As String)
             If logger Is Nothing Then Return
             Try
-                logger.LogWarning(message)
+                logger.LogWarning("{Message}", message)
             Catch
             End Try
         End Sub
@@ -316,10 +315,9 @@ Namespace FileTypeDetection
         Friend Shared Sub [Error](logger As ILogger, message As String, ex As Exception)
             If logger Is Nothing Then Return
             Try
-                logger.LogError(ex, message)
+                logger.LogError(ex, "{Message}", message)
             Catch
             End Try
         End Sub
     End Class
-
 End Namespace

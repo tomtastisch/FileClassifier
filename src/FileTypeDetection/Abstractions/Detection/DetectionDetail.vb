@@ -2,12 +2,10 @@ Option Strict On
 Option Explicit On
 
 Namespace FileTypeDetection
-
     ''' <summary>
-    ''' Detailliertes, auditierbares Ergebnis einer Detektion.
+    '''     Detailliertes, auditierbares Ergebnis einer Detektion.
     ''' </summary>
     Public NotInheritable Class DetectionDetail
-
         Public ReadOnly Property DetectedType As FileType
         Public ReadOnly Property ReasonCode As String
         Public ReadOnly Property UsedZipContentCheck As Boolean
@@ -15,11 +13,11 @@ Namespace FileTypeDetection
         Public ReadOnly Property ExtensionVerified As Boolean
 
         Friend Sub New(
-            detectedType As FileType,
-            reasonCode As String,
-            usedZipContentCheck As Boolean,
-            usedStructuredRefinement As Boolean,
-            extensionVerified As Boolean)
+                       detectedType As FileType,
+                       reasonCode As String,
+                       usedZipContentCheck As Boolean,
+                       usedStructuredRefinement As Boolean,
+                       extensionVerified As Boolean)
 
             Me.DetectedType = If(detectedType, FileTypeRegistry.Resolve(FileKind.Unknown))
             Me.ReasonCode = If(reasonCode, String.Empty)
@@ -27,7 +25,5 @@ Namespace FileTypeDetection
             Me.UsedStructuredRefinement = usedStructuredRefinement
             Me.ExtensionVerified = extensionVerified
         End Sub
-
     End Class
-
 End Namespace

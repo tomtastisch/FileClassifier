@@ -1,8 +1,5 @@
-using System;
-using System.IO;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -34,10 +31,7 @@ public sealed class ExtensionCheckUnitTests
         }
         finally
         {
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
+            if (File.Exists(path)) File.Delete(path);
         }
     }
 
@@ -59,10 +53,7 @@ public sealed class ExtensionCheckUnitTests
         }
         finally
         {
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
+            if (File.Exists(path)) File.Delete(path);
         }
     }
 }

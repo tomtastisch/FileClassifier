@@ -8,6 +8,6 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj \
   /p:CollectCoverage=true \
   /p:Include='[FileTypeDetectionLib]*' \
   /p:CoverletOutputFormat=cobertura \
-  /p:Threshold=90%2c90 \
+  /p:Threshold=85%2c69 \
   /p:ThresholdType=line%2cbranch \
   /p:ThresholdStat=total

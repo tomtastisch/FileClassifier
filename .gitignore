@@ -43,10 +43,41 @@ benchmark_detect_ms.txt
 
 # local-only tools
 tools/*
-!tools/versioning/
+!tools/check-docs.py
+!tools/check-quality.sh
 !tools/run-coverage.sh
+!tools/test-bdd-readable.sh
+!tools/versioning/
 !tools/versioning/check-versioning.sh
 !tools/versioning/labels.json
 
 # local secrets
 .secrets/
+.qodana_reports/
+
+# --- Qodana / IDE / Build artifacts ---
+.qodana/
+!.qodana/
+!.qodana/profiles/
+!.qodana/profiles/*.yaml
+artifacts/
+.idea/
+.vscode/
+**/node_modules/
+**/dist/
+**/build/
+**/out/
+**/.venv/
+**/venv/
+**/__pycache__/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.cache/
+**/coverage/
+**/.coverage*
+
+# --- local temp / qodana downloads ---
+.tmp/
+qodana-artifacts/
+qodana-results/

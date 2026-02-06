@@ -2,7 +2,7 @@
 
 ## 1. Build and Test Gate
 - [ ] `dotnet restore FileClassifier.sln -v minimal`
-- [ ] `python3 tools/check-markdown-links.py` (prüft lokale Markdown-Dateilinks und Heading-Anker fail-closed)
+- [ ] `python3 tools/check-docs.py` (prüft lokale Markdown-Dateilinks und Heading-Anker fail-closed)
 - [ ] `dotnet format FileClassifier.sln --verify-no-changes`
 - [ ] `dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal`
 - [ ] `dotnet test FileClassifier.sln -v minimal`
@@ -44,7 +44,7 @@
 ## 7. Quick Commands
 ```bash
 dotnet restore FileClassifier.sln -v minimal
-python3 tools/check-markdown-links.py
+python3 tools/check-docs.py
 dotnet format FileClassifier.sln --verify-no-changes
 dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal
 dotnet test FileClassifier.sln -v minimal
@@ -55,6 +55,6 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 
 ## Dokumentpflege-Checkliste
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
+- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

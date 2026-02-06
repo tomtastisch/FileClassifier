@@ -1,35 +1,40 @@
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Integration;
 
 public sealed class DeterministicHashingIntegrationTests
 {
-    public static IEnumerable<object[]> ArchiveFixtureCases()
+    public static TheoryData<string> ArchiveFixtureCases()
     {
-        yield return new object[] { "fx.sample_zip" };
-        yield return new object[] { "fx.sample_rar" };
-        yield return new object[] { "fx.sample_7z" };
+        return new TheoryData<string>
+        {
+            "fx.sample_zip",
+            "fx.sample_rar",
+            "fx.sample_7z"
+        };
     }
 
-    public static IEnumerable<object[]> RoundTripCases()
+    public static TheoryData<string, bool> RoundTripCases()
     {
-        yield return new object[] { "fx.sample_zip", true };
-        yield return new object[] { "fx.sample_7z", true };
-        yield return new object[] { "fx.sample_rar", true };
-        yield return new object[] { "fx.sample_pdf", false };
+        return new TheoryData<string, bool>
+        {
+            { "fx.sample_zip", true },
+            { "fx.sample_7z", true },
+            { "fx.sample_rar", true },
+            { "fx.sample_pdf", false }
+        };
     }
 
-    public static IEnumerable<object[]> DeterminismCases()
+    public static TheoryData<string> DeterminismCases()
     {
-        yield return new object[] { "fx.sample_zip" };
-        yield return new object[] { "fx.sample_7z" };
-        yield return new object[] { "fx.sample_rar" };
-        yield return new object[] { "fx.sample_pdf" };
+        return new TheoryData<string>
+        {
+            "fx.sample_zip",
+            "fx.sample_7z",
+            "fx.sample_rar",
+            "fx.sample_pdf"
+        };
     }
 
     [Fact]
@@ -77,12 +82,13 @@ public sealed class DeterministicHashingIntegrationTests
 
     [Theory]
     [MemberData(nameof(ArchiveFixtureCases))]
-    public void ArchivePipeline_PreservesCombinedAndPerFileHashes_AfterExtractByteMaterializeAndRecheck(string fixtureId)
+    public void ArchivePipeline_PreservesCombinedAndPerFileHashes_AfterExtractByteMaterializeAndRecheck(
+        string fixtureId)
     {
         var path = TestResources.Resolve(fixtureId);
         Assert.True(ArchiveProcessing.TryValidate(path));
 
-        var extractedEntries = ArchiveProcessing.ExtractToMemory(path, verifyBeforeExtract: true);
+        var extractedEntries = ArchiveProcessing.ExtractToMemory(path, true);
         Assert.NotEmpty(extractedEntries);
 
         var archiveEvidence = DeterministicHashing.HashFile(path);
@@ -105,7 +111,7 @@ public sealed class DeterministicHashingIntegrationTests
             originalPerFileLogical[entry.RelativePath] = fromBytes.Digests.LogicalSha256;
 
             var destinationPath = Path.Combine(scope.RootPath, ToPlatformRelativePath(entry.RelativePath));
-            Assert.True(FileMaterializer.Persist(entryBytes, destinationPath, overwrite: false, secureExtract: false));
+            Assert.True(FileMaterializer.Persist(entryBytes, destinationPath, false, false));
 
             var fromMaterializedFile = DeterministicHashing.HashFile(destinationPath);
             Assert.True(fromMaterializedFile.Digests.HasLogicalHash);
@@ -116,9 +122,11 @@ public sealed class DeterministicHashingIntegrationTests
             rematerializedEntries.Add(new ZipExtractedEntry(entry.RelativePath, File.ReadAllBytes(destinationPath)));
         }
 
-        var rematerializedCombinedEvidence = DeterministicHashing.HashEntries(rematerializedEntries, $"{fixtureId}-materialized");
+        var rematerializedCombinedEvidence =
+            DeterministicHashing.HashEntries(rematerializedEntries, $"{fixtureId}-materialized");
         Assert.True(rematerializedCombinedEvidence.Digests.HasLogicalHash);
-        Assert.Equal(extractedCombinedEvidence.Digests.LogicalSha256, rematerializedCombinedEvidence.Digests.LogicalSha256);
+        Assert.Equal(extractedCombinedEvidence.Digests.LogicalSha256,
+            rematerializedCombinedEvidence.Digests.LogicalSha256);
         Assert.Equal(archiveEvidence.Digests.LogicalSha256, rematerializedCombinedEvidence.Digests.LogicalSha256);
 
         foreach (var entry in rematerializedEntries.OrderBy(e => e.RelativePath, StringComparer.Ordinal))
@@ -154,7 +162,7 @@ public sealed class DeterministicHashingIntegrationTests
             var entryBytes = entry.Content.ToArray();
             var perEntryEvidence = DeterministicHashing.HashBytes(entryBytes, entry.RelativePath);
             var destinationPath = Path.Combine(scope.RootPath, ToPlatformRelativePath(entry.RelativePath));
-            Assert.True(FileMaterializer.Persist(entryBytes, destinationPath, overwrite: false, secureExtract: false));
+            Assert.True(FileMaterializer.Persist(entryBytes, destinationPath, false, false));
 
             var perMaterializedFileEvidence = DeterministicHashing.HashFile(destinationPath);
             Assert.Equal(perEntryEvidence.Digests.LogicalSha256, perMaterializedFileEvidence.Digests.LogicalSha256);
@@ -163,9 +171,12 @@ public sealed class DeterministicHashingIntegrationTests
             rematerializedEntries.Add(new ZipExtractedEntry(entry.RelativePath, File.ReadAllBytes(destinationPath)));
         }
 
-        var rematerializedCombinedEvidence = DeterministicHashing.HashEntries(rematerializedEntries, $"{fixtureId}-bytes-materialized");
-        Assert.Equal(extractedCombinedEvidence.Digests.LogicalSha256, rematerializedCombinedEvidence.Digests.LogicalSha256);
-        Assert.Equal(archiveFromBytesEvidence.Digests.LogicalSha256, rematerializedCombinedEvidence.Digests.LogicalSha256);
+        var rematerializedCombinedEvidence =
+            DeterministicHashing.HashEntries(rematerializedEntries, $"{fixtureId}-bytes-materialized");
+        Assert.Equal(extractedCombinedEvidence.Digests.LogicalSha256,
+            rematerializedCombinedEvidence.Digests.LogicalSha256);
+        Assert.Equal(archiveFromBytesEvidence.Digests.LogicalSha256,
+            rematerializedCombinedEvidence.Digests.LogicalSha256);
     }
 
     [Fact]

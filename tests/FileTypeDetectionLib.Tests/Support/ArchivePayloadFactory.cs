@@ -1,6 +1,4 @@
-using System;
 using System.Formats.Tar;
-using System.IO;
 using System.Text;
 using SharpCompress.Common;
 using SharpCompress.Writers;
@@ -37,7 +35,7 @@ internal static class ArchivePayloadFactory
     {
         using var ms = new MemoryStream();
         using (var writer = WriterFactory.Open(ms, ArchiveType.GZip, new WriterOptions(CompressionType.GZip)))
-        using (var source = new MemoryStream(payload, writable: false))
+        using (var source = new MemoryStream(payload, false))
         {
             writer.Write(string.IsNullOrWhiteSpace(entryName) ? "payload.bin" : entryName, source, DateTime.UnixEpoch);
         }
@@ -54,15 +52,17 @@ internal static class ArchivePayloadFactory
     internal static byte[] CreateTarWithSymlink(string fileName, string fileContent, string linkName, string linkTarget)
     {
         using var ms = new MemoryStream();
-        using (var writer = new TarWriter(ms, leaveOpen: true))
+        using (var writer = new TarWriter(ms, true))
         {
-            var regular = new PaxTarEntry(TarEntryType.RegularFile, string.IsNullOrWhiteSpace(fileName) ? "note.txt" : fileName)
+            var regular = new PaxTarEntry(TarEntryType.RegularFile,
+                string.IsNullOrWhiteSpace(fileName) ? "note.txt" : fileName)
             {
                 DataStream = new MemoryStream(Encoding.UTF8.GetBytes(fileContent))
             };
             writer.WriteEntry(regular);
 
-            var symbolic = new PaxTarEntry(TarEntryType.SymbolicLink, string.IsNullOrWhiteSpace(linkName) ? "link.txt" : linkName)
+            var symbolic = new PaxTarEntry(TarEntryType.SymbolicLink,
+                string.IsNullOrWhiteSpace(linkName) ? "link.txt" : linkName)
             {
                 LinkName = string.IsNullOrWhiteSpace(linkTarget) ? "note.txt" : linkTarget
             };

@@ -1,5 +1,4 @@
 using FileTypeDetection;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Property;
 

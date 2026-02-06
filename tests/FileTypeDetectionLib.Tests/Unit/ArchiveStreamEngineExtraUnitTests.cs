@@ -1,7 +1,5 @@
-using System.IO;
 using System.IO.Compression;
 using FileTypeDetection;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -14,7 +12,7 @@ public sealed class ArchiveStreamEngineExtraUnitTests
         opt.MaxZipEntryUncompressedBytes = 1;
         var payload = CreateZipWithSingleEntry("a.txt", new byte[] { 0x01, 0x02, 0x03 });
 
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
         var ok = ArchiveStreamEngine.ProcessArchiveStream(stream, opt, depth: 0, extractEntry: null);
 
         Assert.False(ok);
@@ -29,7 +27,7 @@ public sealed class ArchiveStreamEngineExtraUnitTests
             ("a.txt", new byte[] { 0x01, 0x02 }),
             ("b.txt", new byte[] { 0x03 }));
 
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
         var ok = ArchiveStreamEngine.ProcessArchiveStream(stream, opt, depth: 0, extractEntry: null);
 
         Assert.False(ok);
@@ -41,7 +39,7 @@ public sealed class ArchiveStreamEngineExtraUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
         var payload = CreateZipWithSingleEntry("a.txt", new byte[] { 0x01 });
 
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
         var ok = ArchiveStreamEngine.ProcessArchiveStream(stream, opt, depth: 0, extractEntry: _ => false);
 
         Assert.False(ok);
@@ -57,7 +55,7 @@ public sealed class ArchiveStreamEngineExtraUnitTests
         var nested = CreateZipWithSingleEntry("inner.txt", new byte[] { 0x01, 0x02 });
         var payload = CreateZipWithSingleEntry("inner.zip", nested);
 
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
         var ok = ArchiveStreamEngine.ProcessArchiveStream(stream, opt, depth: 0, extractEntry: null);
 
         Assert.True(ok);
@@ -69,7 +67,7 @@ public sealed class ArchiveStreamEngineExtraUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
         var payload = CreateZipWithSingleEntry("tiny.bin", new byte[] { 0x01 });
 
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
         var ok = ArchiveStreamEngine.ProcessArchiveStream(stream, opt, depth: 0, extractEntry: null);
 
         Assert.True(ok);
@@ -83,18 +81,16 @@ public sealed class ArchiveStreamEngineExtraUnitTests
     private static byte[] CreateZipWithEntries(params (string name, byte[] content)[] entries)
     {
         using var ms = new MemoryStream();
-        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
+        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, true))
         {
             foreach (var (name, content) in entries)
             {
                 var entry = zip.CreateEntry(name, CompressionLevel.SmallestSize);
                 using var s = entry.Open();
-                if (content.Length > 0)
-                {
-                    s.Write(content, 0, content.Length);
-                }
+                if (content.Length > 0) s.Write(content, 0, content.Length);
             }
         }
+
         return ms.ToArray();
     }
 }

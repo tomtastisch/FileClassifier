@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-using System.Threading;
 
 namespace FileTypeDetectionLib.Tests.Support;
 
@@ -21,17 +18,13 @@ internal static class TestTempPaths
 
     internal static void CleanupTempRoot(string? path)
     {
-        if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
-        {
-            return;
-        }
+        if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) return;
 
         // Retry briefly to absorb transient file handle timing on CI/macOS.
         for (var i = 0; i < 3; i++)
-        {
             try
             {
-                Directory.Delete(path, recursive: true);
+                Directory.Delete(path, true);
                 return;
             }
             catch (IOException) when (i < 2)
@@ -42,7 +35,6 @@ internal static class TestTempPaths
             {
                 Thread.Sleep(20);
             }
-        }
     }
 
     internal sealed class TempRootScope : IDisposable

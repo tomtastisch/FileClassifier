@@ -1,12 +1,8 @@
-using System;
-using System.IO;
-using System.Linq;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
 using Microsoft.Extensions.Logging;
 using SharpCompress.Archives;
 using SharpCompress.Common;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -60,7 +56,8 @@ public sealed class CoreAndArchiveInternalsFailClosedUnitTests
     [InlineData("fx.sample_zip", (int)ArchiveContainerType.Zip)]
     [InlineData("fx.sample_7z", (int)ArchiveContainerType.SevenZip)]
     [InlineData("fx.sample_rar", (int)ArchiveContainerType.Rar)]
-    public void ArchiveTypeResolver_TryDescribeBytes_MapsContainerTypeDeterministically(string fixtureId, int expectedTypeValue)
+    public void ArchiveTypeResolver_TryDescribeBytes_MapsContainerTypeDeterministically(string fixtureId,
+        int expectedTypeValue)
     {
         var options = FileTypeOptions.GetSnapshot();
         var payload = File.ReadAllBytes(TestResources.Resolve(fixtureId));
@@ -104,7 +101,8 @@ public sealed class CoreAndArchiveInternalsFailClosedUnitTests
         Assert.False(ArchiveSafetyGate.IsArchiveSafeBytes(null!, options, descriptor));
         Assert.False(ArchiveSafetyGate.IsArchiveSafeBytes(Array.Empty<byte>(), options, descriptor));
         Assert.False(ArchiveSafetyGate.IsArchiveSafeBytes(new byte[] { 1 }, null!, descriptor));
-        Assert.False(ArchiveSafetyGate.IsArchiveSafeBytes(new byte[] { 1 }, options, ArchiveDescriptor.UnknownDescriptor()));
+        Assert.False(ArchiveSafetyGate.IsArchiveSafeBytes(new byte[] { 1 }, options,
+            ArchiveDescriptor.UnknownDescriptor()));
 
         using var unreadable = new NonReadableMemoryStream(new byte[] { 1, 2, 3 });
         Assert.False(ArchiveSafetyGate.IsArchiveSafeStream(unreadable, options, descriptor, depth: 0));
@@ -118,17 +116,18 @@ public sealed class CoreAndArchiveInternalsFailClosedUnitTests
         var payload = ArchivePayloadFactory.CreateZipWithSingleEntry("inner/note.txt", "hello");
 
         Assert.False(ArchiveProcessingEngine.ProcessArchiveStream(null!, options, 0, descriptor, null));
-        using (var stream = new MemoryStream(payload, writable: false))
+        using (var stream = new MemoryStream(payload, false))
         {
             Assert.False(ArchiveProcessingEngine.ProcessArchiveStream(stream, null!, 0, descriptor, null));
         }
 
-        using (var stream = new MemoryStream(payload, writable: false))
+        using (var stream = new MemoryStream(payload, false))
         {
-            Assert.False(ArchiveProcessingEngine.ProcessArchiveStream(stream, options, 0, ArchiveDescriptor.UnknownDescriptor(), null));
+            Assert.False(ArchiveProcessingEngine.ProcessArchiveStream(stream, options, 0,
+                ArchiveDescriptor.UnknownDescriptor(), null));
         }
 
-        using (var stream = new MemoryStream(payload, writable: false))
+        using (var stream = new MemoryStream(payload, false))
         {
             Assert.True(ArchiveProcessingEngine.ValidateArchiveStream(stream, options, depth: 0, descriptor));
         }
@@ -151,7 +150,7 @@ public sealed class CoreAndArchiveInternalsFailClosedUnitTests
     public void SharpCompressEntryModel_MapsArchiveEntryFields_ForConcreteEntry()
     {
         var payload = ArchivePayloadFactory.CreateTarWithSingleEntry("inner/note.txt", "hello");
-        using var ms = new MemoryStream(payload, writable: false);
+        using var ms = new MemoryStream(payload, false);
         using var archive = ArchiveFactory.Open(ms);
         var entry = archive.Entries.First(e => !e.IsDirectory);
         var model = new SharpCompressEntryModel(entry);
@@ -201,7 +200,8 @@ public sealed class CoreAndArchiveInternalsFailClosedUnitTests
             return true;
         }
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
+            Func<TState, Exception?, string> formatter)
         {
             throw new InvalidOperationException("logger failure");
         }

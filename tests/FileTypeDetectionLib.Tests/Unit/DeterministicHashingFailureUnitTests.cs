@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -47,7 +43,7 @@ public sealed class DeterministicHashingFailureUnitTests
     public void HashEntries_ReturnsFailure_ForNullEntryElement()
     {
         var entries = new List<ZipExtractedEntry?> { null };
-        var evidence = DeterministicHashing.HashEntries(entries!, "entries");
+        var evidence = DeterministicHashing.HashEntries(entries, "entries");
 
         Assert.False(evidence.Digests.HasLogicalHash);
         Assert.Contains("Entry", evidence.Notes, StringComparison.OrdinalIgnoreCase);

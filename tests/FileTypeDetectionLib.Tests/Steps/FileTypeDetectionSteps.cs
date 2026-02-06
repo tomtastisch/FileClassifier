@@ -1,9 +1,6 @@
-using System;
-using System.IO;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
 using Reqnroll;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Steps;
 
@@ -36,20 +33,19 @@ public sealed class FileTypeDetectionSteps
     [Given("die Ressource {string} existiert")]
     public void GivenTheResourceExists(string name)
     {
+        _ = _scenarioContext;
         AssertResourceExists(name);
     }
 
     [Given("die folgenden Ressourcen existieren")]
     public void GivenTheFollowingResourcesExist(Table table)
     {
+        _ = _scenarioContext;
         Assert.NotNull(table);
         Assert.NotEmpty(table.Rows);
         Assert.True(table.ContainsColumn(ResourceColumn), $"Expected table column '{ResourceColumn}'.");
 
-        foreach (var row in table.Rows)
-        {
-            AssertResourceExists(row[ResourceColumn]);
-        }
+        foreach (var row in table.Rows) AssertResourceExists(row[ResourceColumn]);
     }
 
     [Given("die Datei {string}")]
@@ -97,6 +93,7 @@ public sealed class FileTypeDetectionSteps
     [Given("die maximale Dateigroesse ist {long} Bytes")]
     public void GivenTheMaximumSizeInBytes(long maxBytes)
     {
+        _ = _scenarioContext;
         var options = FileTypeDetector.GetDefaultOptions();
         options.MaxBytes = maxBytes;
         FileTypeDetector.SetDefaultOptions(options);
@@ -170,7 +167,7 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         Assert.False(string.IsNullOrWhiteSpace(state.CurrentPath));
-        var entries = ArchiveProcessing.ExtractToMemory(state.CurrentPath!, verifyBeforeExtract: true);
+        var entries = ArchiveProcessing.ExtractToMemory(state.CurrentPath!, true);
         state.LastExtractedEntries = entries;
     }
 
@@ -200,7 +197,7 @@ public sealed class FileTypeDetectionSteps
         Assert.False(string.IsNullOrWhiteSpace(state.TempRoot));
 
         var destination = Path.Combine(state.TempRoot!, fileName);
-        var ok = FileMaterializer.Persist(state.CurrentPayload!, destination, overwrite: false, secureExtract: false);
+        var ok = FileMaterializer.Persist(state.CurrentPayload!, destination, false, false);
         Assert.True(ok);
         state.LastPersistResult = ok;
         state.LastMaterializedPath = destination;
@@ -215,7 +212,7 @@ public sealed class FileTypeDetectionSteps
         Assert.False(string.IsNullOrWhiteSpace(state.TempRoot));
 
         var destination = Path.Combine(state.TempRoot!, fileName);
-        state.LastPersistResult = FileMaterializer.Persist(state.CurrentPayload!, destination, overwrite: false, secureExtract: false);
+        state.LastPersistResult = FileMaterializer.Persist(state.CurrentPayload!, destination, false, false);
         state.LastMaterializedPath = destination;
     }
 
@@ -225,7 +222,7 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         Assert.NotNull(state.CurrentPayload);
-        state.LastPersistResult = FileMaterializer.Persist(state.CurrentPayload!, destinationPath, overwrite: false, secureExtract: false);
+        state.LastPersistResult = FileMaterializer.Persist(state.CurrentPayload!, destinationPath, false, false);
         state.LastMaterializedPath = destinationPath;
     }
 
@@ -237,7 +234,7 @@ public sealed class FileTypeDetectionSteps
         Assert.False(string.IsNullOrWhiteSpace(state.TempRoot));
 
         var destination = Path.Combine(state.TempRoot!, directoryName);
-        state.LastPersistResult = FileMaterializer.Persist(state.CurrentPayload!, destination, overwrite: false, secureExtract: true);
+        state.LastPersistResult = FileMaterializer.Persist(state.CurrentPayload!, destination, false, true);
         state.LastMaterializedPath = destination;
     }
 
@@ -257,7 +254,7 @@ public sealed class FileTypeDetectionSteps
         Assert.False(string.IsNullOrWhiteSpace(state.CurrentPath));
 
         var detector = new FileTypeDetector();
-        state.LastResult = detector.Detect(state.CurrentPath!, verifyExtension: true);
+        state.LastResult = detector.Detect(state.CurrentPath!, true);
     }
 
     [When("ich die Endung gegen den erkannten Typ pruefe")]
@@ -284,7 +281,7 @@ public sealed class FileTypeDetectionSteps
         var state = State();
         Assert.NotNull(state.CurrentPayload);
         Assert.True(
-            Enum.TryParse<FileKind>(expectedKind, ignoreCase: true, out var kind),
+            Enum.TryParse<FileKind>(expectedKind, true, out var kind),
             $"Unknown FileKind literal in feature: {expectedKind}");
 
         var detector = new FileTypeDetector();
@@ -298,7 +295,7 @@ public sealed class FileTypeDetectionSteps
         Assert.NotNull(state.LastResult);
 
         Assert.True(
-            Enum.TryParse<FileKind>(expectedKind, ignoreCase: true, out var expected),
+            Enum.TryParse<FileKind>(expectedKind, true, out var expected),
             $"Unknown FileKind literal in feature: {expectedKind}");
 
         Assert.Equal(expected, state.LastResult!.Kind);
@@ -309,13 +306,15 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         Assert.NotNull(state.ExtensionMatchResult);
-        Assert.True(bool.TryParse(expectedBoolean, out var expected), $"Expected boolean literal but got: {expectedBoolean}");
+        Assert.True(bool.TryParse(expectedBoolean, out var expected),
+            $"Expected boolean literal but got: {expectedBoolean}");
         Assert.Equal(expected, state.ExtensionMatchResult.Value);
     }
 
     [Then("ist der MIME-Provider build-konform aktiv")]
     public void ThenTheMimeProviderIsBuildConform()
     {
+        _ = _scenarioContext;
 #if USE_ASPNETCORE_MIME
         const string expectedBackend = "AspNetCore";
 #else
@@ -338,7 +337,8 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         Assert.NotNull(state.LastIsOfTypeResult);
-        Assert.True(bool.TryParse(expectedBoolean, out var expected), $"Expected boolean literal but got: {expectedBoolean}");
+        Assert.True(bool.TryParse(expectedBoolean, out var expected),
+            $"Expected boolean literal but got: {expectedBoolean}");
         Assert.Equal(expected, state.LastIsOfTypeResult.Value);
     }
 
@@ -347,7 +347,8 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         Assert.NotNull(state.LastArchiveValidateResult);
-        Assert.True(bool.TryParse(expectedBoolean, out var expected), $"Expected boolean literal but got: {expectedBoolean}");
+        Assert.True(bool.TryParse(expectedBoolean, out var expected),
+            $"Expected boolean literal but got: {expectedBoolean}");
         Assert.Equal(expected, state.LastArchiveValidateResult.Value);
     }
 
@@ -430,7 +431,8 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         Assert.NotNull(state.LastRoundTripReport);
-        Assert.True(bool.TryParse(expectedBoolean, out var expected), $"Expected boolean literal but got: {expectedBoolean}");
+        Assert.True(bool.TryParse(expectedBoolean, out var expected),
+            $"Expected boolean literal but got: {expectedBoolean}");
         Assert.Equal(expected, state.LastRoundTripReport!.IsArchiveInput);
     }
 
@@ -458,11 +460,13 @@ public sealed class FileTypeDetectionSteps
         var state = State();
         Assert.NotNull(state.LastHashEvidence);
         var evidence = state.LastHashEvidence!;
-        Assert.True(bool.TryParse(expectedBoolean, out var expected), $"Expected boolean literal but got: {expectedBoolean}");
+        Assert.True(bool.TryParse(expectedBoolean, out var expected),
+            $"Expected boolean literal but got: {expectedBoolean}");
 
         var actual = evidence.Digests.HasLogicalHash &&
                      evidence.Digests.HasPhysicalHash &&
-                     string.Equals(evidence.Digests.LogicalSha256, evidence.Digests.PhysicalSha256, StringComparison.Ordinal);
+                     string.Equals(evidence.Digests.LogicalSha256, evidence.Digests.PhysicalSha256,
+                         StringComparison.Ordinal);
         Assert.Equal(expected, actual);
     }
 
@@ -508,10 +512,7 @@ public sealed class FileTypeDetectionSteps
     public void ThenNoFileExistsAtInvalidDestination()
     {
         var state = State();
-        if (string.IsNullOrWhiteSpace(state.LastMaterializedPath))
-        {
-            return;
-        }
+        if (string.IsNullOrWhiteSpace(state.LastMaterializedPath)) return;
 
         Assert.False(File.Exists(state.LastMaterializedPath), $"Unexpected file exists: {state.LastMaterializedPath}");
     }
@@ -525,7 +526,10 @@ public sealed class FileTypeDetectionSteps
         Assert.False(File.Exists(path), $"Unexpected file exists: {path}");
     }
 
-    private DetectionScenarioState State() => _scenarioContext.Get<DetectionScenarioState>(StateKey);
+    private DetectionScenarioState State()
+    {
+        return _scenarioContext.Get<DetectionScenarioState>(StateKey);
+    }
 
     private static void AssertResourceExists(string name)
     {

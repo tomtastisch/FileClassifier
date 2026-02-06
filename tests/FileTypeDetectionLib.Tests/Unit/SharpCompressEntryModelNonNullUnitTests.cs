@@ -1,11 +1,8 @@
-using System;
-using System.IO;
 using System.Text;
 using FileTypeDetection;
 using SharpCompress.Archives;
 using SharpCompress.Common;
 using SharpCompress.Writers;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -15,7 +12,7 @@ public sealed class SharpCompressEntryModelNonNullUnitTests
     public void Properties_ReturnValues_ForRealArchiveEntry()
     {
         var payload = CreateTarWithEntry("note.txt", "hello");
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
         using var archive = ArchiveFactory.Open(stream);
 
         var entry = archive.Entries.First();

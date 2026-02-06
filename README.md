@@ -29,31 +29,43 @@ Professionelle, auditierbare und deterministische Dateityp-Erkennung mit sichere
 | Sichere Extraktion | Traversal/Kollision/Nesting abgefangen | [ArchiveExtractionUnitTests.cs](tests/FileTypeDetectionLib.Tests/Unit/ArchiveExtractionUnitTests.cs) |
 | API-Klarheit | Audit-Details + Archiv-Fassade | [DetectionDetailAndArchiveValidationUnitTests.cs](tests/FileTypeDetectionLib.Tests/Unit/DetectionDetailAndArchiveValidationUnitTests.cs), [ArchiveProcessingFacadeUnitTests.cs](tests/FileTypeDetectionLib.Tests/Unit/ArchiveProcessingFacadeUnitTests.cs) |
 
-## 6. Runbook (reproduzierbar)
+## 6. CI-Pipeline & Qualitätsnachweise
+Die CI ist deterministisch und auditierbar aufgebaut. Alle Checks laufen in separaten Steps und erzeugen Artefakte.
+- Details: [docs/CI_PIPELINE.md](docs/CI_PIPELINE.md)
+- Auto-Labeling & Auto-Versionierung: [docs/AUTO_LABELING_AND_VERSIONING.md](docs/AUTO_LABELING_AND_VERSIONING.md)
+
+## 7. Runbook (reproduzierbar)
 ```bash
-python3 tools/check-markdown-links.py
+python3 tools/check-docs.py
 dotnet restore FileClassifier.sln -v minimal
 dotnet build FileClassifier.sln --no-restore -v minimal
-dotnet test FileClassifier.sln --no-build -v minimal
+TEST_BDD_OUTPUT_DIR=artifacts/tests bash tools/test-bdd-readable.sh -- \
+  /p:CollectCoverage=true \
+  /p:Include="[FileTypeDetectionLib]*" \
+  /p:CoverletOutputFormat=cobertura \
+  /p:CoverletOutput="$(pwd)/artifacts/coverage/coverage" \
+  /p:Threshold=85%2c69 \
+  /p:ThresholdType=line%2cbranch \
+  /p:ThresholdStat=total
 bash tools/sync-portable-filetypedetection.sh
 bash tools/check-portable-filetypedetection.sh --clean
 ```
 
-## 6.1 Versionierung (zentral)
+## 7.1 Versionierung (zentral)
 - Zentrale Versionsquelle: `Directory.Build.props`.
- - Aktueller Baseline-Stand: `3.0.24`.
+- Aktueller Baseline-Stand: `4.0.0`.
 - Gilt konsistent für `FileTypeDetectionLib`, `FileClassifier.App` und `FileTypeDetectionLib.Tests`.
 - Semantik: `Version` (NuGet/Produkt), `AssemblyVersion`, `FileVersion`, `InformationalVersion`.
 - Policy und Historie: [docs/versioning/POLICY.md](docs/versioning/POLICY.md), [docs/versioning/VERSIONS.md](docs/versioning/VERSIONS.md), [docs/versioning/CHANGELOG.md](docs/versioning/CHANGELOG.md)
 
-## 7. Aktueller Strukturzustand
-### 7.1 Source
+## 8. Aktueller Strukturzustand
+### 8.1 Source
 Im Root von `src/FileTypeDetection` liegen nur die Public APIs.
 
-### 7.2 Portable
+### 8.2 Portable
 Die portable Spiegelstruktur wird lokal über die Tools erzeugt und ist nicht Teil des veröffentlichten Repository-Inhalts.
 
-### 7.3 Abstractions-Ordnerhierarchie
+### 8.3 Abstractions-Ordnerhierarchie
 Die Modellschicht unter `src/FileTypeDetection/Abstractions` ist nach Verantwortlichkeiten getrennt:
 
 ```mermaid
@@ -80,6 +92,6 @@ Detail-README je Unterordner:
 
 ## Dokumentpflege-Checkliste
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
+- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

@@ -1,8 +1,5 @@
-using System;
-using System.IO;
 using System.IO.Compression;
 using FileTypeDetection;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -57,7 +54,7 @@ public sealed class CoreInternalsAdditionalUnitTests
         }
         finally
         {
-            if (Directory.Exists(tempDir)) Directory.Delete(tempDir, recursive: true);
+            if (Directory.Exists(tempDir)) Directory.Delete(tempDir, true);
         }
     }
 
@@ -77,7 +74,7 @@ public sealed class CoreInternalsAdditionalUnitTests
         }
         finally
         {
-            if (Directory.Exists(tempDir)) Directory.Delete(tempDir, recursive: true);
+            if (Directory.Exists(tempDir)) Directory.Delete(tempDir, true);
         }
     }
 
@@ -87,14 +84,21 @@ public sealed class CoreInternalsAdditionalUnitTests
         var normalized = string.Empty;
         var isDirectory = false;
 
-        Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath(null, allowDirectoryMarker: false, ref normalized, ref isDirectory));
-        Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath("a\0b", allowDirectoryMarker: false, ref normalized, ref isDirectory));
-        Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath("/rooted.txt", allowDirectoryMarker: false, ref normalized, ref isDirectory));
-        Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath("..", allowDirectoryMarker: false, ref normalized, ref isDirectory));
-        Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath("a/../b", allowDirectoryMarker: false, ref normalized, ref isDirectory));
-        Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath("a/", allowDirectoryMarker: false, ref normalized, ref isDirectory));
+        Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath(null, allowDirectoryMarker: false, ref normalized,
+            ref isDirectory));
+        Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath("a\0b", allowDirectoryMarker: false,
+            ref normalized, ref isDirectory));
+        Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath("/rooted.txt", allowDirectoryMarker: false,
+            ref normalized, ref isDirectory));
+        Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath("..", allowDirectoryMarker: false, ref normalized,
+            ref isDirectory));
+        Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath("a/../b", allowDirectoryMarker: false,
+            ref normalized, ref isDirectory));
+        Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath("a/", allowDirectoryMarker: false, ref normalized,
+            ref isDirectory));
 
-        Assert.True(ArchiveEntryPathPolicy.TryNormalizeRelativePath("a/", allowDirectoryMarker: true, ref normalized, ref isDirectory));
+        Assert.True(ArchiveEntryPathPolicy.TryNormalizeRelativePath("a/", allowDirectoryMarker: true, ref normalized,
+            ref isDirectory));
         Assert.Equal("a/", normalized);
         Assert.True(isDirectory);
     }
@@ -131,7 +135,7 @@ public sealed class CoreInternalsAdditionalUnitTests
     private static byte[] CreateZipBytes(params (string path, byte[] content)[] entries)
     {
         using var ms = new MemoryStream();
-        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
+        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, true))
         {
             foreach (var (path, content) in entries)
             {
@@ -141,6 +145,7 @@ public sealed class CoreInternalsAdditionalUnitTests
                 s.Write(content, 0, content.Length);
             }
         }
+
         return ms.ToArray();
     }
 }

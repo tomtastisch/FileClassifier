@@ -2,16 +2,15 @@ Option Strict On
 Option Explicit On
 
 Namespace FileTypeDetection
-
     ''' <summary>
-    ''' Liefert ein konservatives, deterministisches Sicherheitsprofil für die Dateityp-Erkennung.
+    '''     Liefert ein konservatives, deterministisches Sicherheitsprofil für die Dateityp-Erkennung.
     ''' </summary>
     Public NotInheritable Class FileTypeProjectBaseline
         Private Sub New()
         End Sub
 
         ''' <summary>
-        ''' Erzeugt ein hartes Default-Profil fuer produktive, fail-closed Szenarien.
+        '''     Erzeugt ein hartes Default-Profil fuer produktive, fail-closed Szenarien.
         ''' </summary>
         Private Shared Function CreateDeterministicDefaults() As FileTypeProjectOptions
             Return New FileTypeProjectOptions With {
@@ -29,16 +28,15 @@ Namespace FileTypeDetection
                     .IncludePayloadCopies = False,
                     .IncludeFastHash = True,
                     .MaterializedFileName = "deterministic-roundtrip.bin"
+                    }
                 }
-            }
         End Function
 
         ''' <summary>
-        ''' Aktiviert das Sicherheitsprofil global als neue Default-Optionen.
+        '''     Aktiviert das Sicherheitsprofil global als neue Default-Optionen.
         ''' </summary>
         Public Shared Sub ApplyDeterministicDefaults()
             FileTypeOptions.SetSnapshot(CreateDeterministicDefaults())
         End Sub
     End Class
-
 End Namespace

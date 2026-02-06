@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using FileTypeDetection;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 

@@ -7,6 +7,9 @@ Heuristik fuer die Rueckwirkungs-Zuordnung:
 - `feat:` oder `Add ...` (nicht-Doku) => Minor
 - `docs|test|ci|chore|tooling|refactor|fix` => Patch
 
+Aktueller Entwicklungsstand:
+- `Unreleased` fuehrt auf Version `4.0.0` (siehe `Directory.Build.props` und `docs/versioning/CHANGELOG.md`).
+
 | Version | Kurzbeschreibung | Commit | Keyword |
 |---|---|---|---|
 | `1.0.0` | Add initial implementation of FileTypeDetection library and tests | [d9a6015](https://github.com/tomtastisch/FileClassifier/commit/d9a6015) | initial |

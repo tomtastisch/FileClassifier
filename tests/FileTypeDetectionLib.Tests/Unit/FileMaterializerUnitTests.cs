@@ -1,8 +1,5 @@
-using System;
-using System.IO;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -52,7 +49,7 @@ public sealed class FileMaterializerUnitTests
         var destination = Path.Combine(tempRoot.RootPath, "unzipped");
         var payload = File.ReadAllBytes(TestResources.Resolve("sample.zip"));
 
-        var ok = FileMaterializer.Persist(payload, destination, overwrite: false, secureExtract: true);
+        var ok = FileMaterializer.Persist(payload, destination, false, true);
 
         Assert.True(ok);
         Assert.True(File.Exists(Path.Combine(destination, "note.txt")));
@@ -65,7 +62,7 @@ public sealed class FileMaterializerUnitTests
         var destination = Path.Combine(tempRoot.RootPath, "unzipped");
         var traversalZip = ArchiveEntryPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8);
 
-        var ok = FileMaterializer.Persist(traversalZip, destination, overwrite: false, secureExtract: true);
+        var ok = FileMaterializer.Persist(traversalZip, destination, false, true);
 
         Assert.False(ok);
         Assert.False(Directory.Exists(destination));
@@ -81,7 +78,7 @@ public sealed class FileMaterializerUnitTests
         File.WriteAllBytes(destination, new byte[] { 0x01 });
 
         var withoutOverwrite = FileMaterializer.Persist(new byte[] { 0x02 }, destination);
-        var withOverwrite = FileMaterializer.Persist(new byte[] { 0x03 }, destination, overwrite: true);
+        var withOverwrite = FileMaterializer.Persist(new byte[] { 0x03 }, destination, true);
 
         Assert.False(withoutOverwrite);
         Assert.True(withOverwrite);
@@ -96,7 +93,7 @@ public sealed class FileMaterializerUnitTests
         var original = new byte[] { 0xAA, 0xBB, 0xCC };
 
         File.WriteAllBytes(destination, original);
-        var ok = FileMaterializer.Persist(new byte[] { 0x10, 0x20 }, destination, overwrite: false, secureExtract: false);
+        var ok = FileMaterializer.Persist(new byte[] { 0x10, 0x20 }, destination, false, false);
 
         Assert.False(ok);
         Assert.Equal(original, File.ReadAllBytes(destination));
@@ -108,7 +105,7 @@ public sealed class FileMaterializerUnitTests
         using var tempRoot = TestTempPaths.CreateScope("ftd-materialize-test");
         var destination = Path.Combine(tempRoot.RootPath, "raw.bin");
 
-        var ok = FileMaterializer.Persist(new byte[] { 0x10 }, destination, overwrite: false);
+        var ok = FileMaterializer.Persist(new byte[] { 0x10 }, destination, false);
 
         Assert.True(ok);
     }
@@ -120,7 +117,7 @@ public sealed class FileMaterializerUnitTests
         var destination = Path.Combine(tempRoot.RootPath, "raw.bin");
         var payload = new byte[] { 0x01, 0x23, 0x45, 0x67 };
 
-        var ok = FileMaterializer.Persist(payload, destination, overwrite: false, secureExtract: true);
+        var ok = FileMaterializer.Persist(payload, destination, false, true);
 
         Assert.True(ok);
         Assert.Equal(payload, File.ReadAllBytes(destination));
@@ -133,7 +130,7 @@ public sealed class FileMaterializerUnitTests
         var destination = Path.Combine(tempRoot.RootPath, "unzipped");
         var malformedZipLikePayload = new byte[] { 0x50, 0x4B, 0x03, 0x04, 0xAA, 0xBB, 0xCC, 0xDD };
 
-        var ok = FileMaterializer.Persist(malformedZipLikePayload, destination, overwrite: false, secureExtract: true);
+        var ok = FileMaterializer.Persist(malformedZipLikePayload, destination, false, true);
 
         Assert.False(ok);
         Assert.False(Directory.Exists(destination));
@@ -146,7 +143,7 @@ public sealed class FileMaterializerUnitTests
         var rootPath = Path.GetPathRoot(Path.GetTempPath());
         Assert.False(string.IsNullOrWhiteSpace(rootPath));
 
-        var ok = FileMaterializer.Persist(payload, rootPath, overwrite: true, secureExtract: false);
+        var ok = FileMaterializer.Persist(payload, rootPath, true, false);
         Assert.False(ok);
     }
 
@@ -154,7 +151,7 @@ public sealed class FileMaterializerUnitTests
     public void Persist_Fails_ForWhitespaceDestinationPath()
     {
         var payload = new byte[] { 0x41 };
-        var ok = FileMaterializer.Persist(payload, "   ", overwrite: false, secureExtract: false);
+        var ok = FileMaterializer.Persist(payload, "   ", false, false);
         Assert.False(ok);
     }
 
@@ -172,7 +169,7 @@ public sealed class FileMaterializerUnitTests
             using var tempRoot = TestTempPaths.CreateScope("ftd-materialize-test");
             var destination = Path.Combine(tempRoot.RootPath, "too-large.bin");
 
-            var ok = FileMaterializer.Persist(payload, destination, overwrite: false, secureExtract: false);
+            var ok = FileMaterializer.Persist(payload, destination, false, false);
             Assert.False(ok);
             Assert.False(File.Exists(destination));
         }
@@ -181,5 +178,4 @@ public sealed class FileMaterializerUnitTests
             FileTypeOptions.SetSnapshot(original);
         }
     }
-
 }

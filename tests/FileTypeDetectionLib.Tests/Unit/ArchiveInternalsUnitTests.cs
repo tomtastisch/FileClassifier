@@ -1,9 +1,6 @@
-using System;
-using System.IO;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
 using SharpCompress.Common;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -28,14 +25,14 @@ public sealed class ArchiveInternalsUnitTests
         Assert.Equal(ArchiveContainerType.GZip, ArchiveTypeResolver.MapArchiveType(ArchiveType.GZip));
         Assert.Equal(ArchiveContainerType.SevenZip, ArchiveTypeResolver.MapArchiveType(ArchiveType.SevenZip));
         Assert.Equal(ArchiveContainerType.Rar, ArchiveTypeResolver.MapArchiveType(ArchiveType.Rar));
-        Assert.NotEqual(ArchiveContainerType.Zip, ArchiveTypeResolver.MapArchiveType((ArchiveType)0));
+        Assert.NotEqual(ArchiveContainerType.Zip, ArchiveTypeResolver.MapArchiveType(0));
     }
 
     [Fact]
     public void ArchiveTypeResolver_TryDescribeBytes_DetectsArchives()
     {
         var opt = FileTypeProjectOptions.DefaultOptions();
-        ArchiveDescriptor descriptor = ArchiveDescriptor.UnknownDescriptor();
+        var descriptor = ArchiveDescriptor.UnknownDescriptor();
 
         Assert.False(ArchiveTypeResolver.TryDescribeBytes(Array.Empty<byte>(), opt, ref descriptor));
 
@@ -55,8 +52,10 @@ public sealed class ArchiveInternalsUnitTests
         var descriptor = ArchiveDescriptor.UnknownDescriptor();
 
         Assert.False(ArchiveProcessingEngine.ProcessArchiveStream(null, opt, depth: 0, descriptor, extractEntry: null));
-        Assert.False(ArchiveProcessingEngine.ProcessArchiveStream(new MemoryStream(), null, depth: 0, descriptor, extractEntry: null));
-        Assert.False(ArchiveProcessingEngine.ProcessArchiveStream(new MemoryStream(), opt, depth: 0, descriptor, extractEntry: null));
+        Assert.False(ArchiveProcessingEngine.ProcessArchiveStream(new MemoryStream(), null, depth: 0, descriptor,
+            extractEntry: null));
+        Assert.False(ArchiveProcessingEngine.ProcessArchiveStream(new MemoryStream(), opt, depth: 0, descriptor,
+            extractEntry: null));
     }
 
     [Fact]

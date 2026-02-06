@@ -1,11 +1,7 @@
-using System;
-using System.IO;
-using System.Text;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
 using SharpCompress.Common;
 using SharpCompress.Writers;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -19,7 +15,8 @@ public sealed class SharpCompressArchiveBackendUnitTests
 
         Assert.False(backend.Process(null!, opt, 0, ArchiveContainerType.Tar, _ => true));
         Assert.False(backend.Process(new MemoryStream(), null!, 0, ArchiveContainerType.Tar, _ => true));
-        Assert.False(backend.Process(new MemoryStream(), opt, opt.MaxZipNestingDepth + 1, ArchiveContainerType.Tar, _ => true));
+        Assert.False(backend.Process(new MemoryStream(), opt, opt.MaxZipNestingDepth + 1, ArchiveContainerType.Tar,
+            _ => true));
         Assert.False(backend.Process(new MemoryStream(), opt, 0, ArchiveContainerType.Unknown, _ => true));
     }
 
@@ -30,7 +27,7 @@ public sealed class SharpCompressArchiveBackendUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
         var tar = CreateTarWithEntries(1, 4);
 
-        using var stream = new MemoryStream(tar, writable: false);
+        using var stream = new MemoryStream(tar, false);
         var ok = backend.Process(stream, opt, 0, ArchiveContainerType.GZip, _ => true);
 
         Assert.False(ok);
@@ -44,7 +41,7 @@ public sealed class SharpCompressArchiveBackendUnitTests
         opt.MaxZipEntries = 1;
 
         var tar = CreateTarWithEntries(2, 4);
-        using var stream = new MemoryStream(tar, writable: false);
+        using var stream = new MemoryStream(tar, false);
 
         var ok = backend.Process(stream, opt, 0, ArchiveContainerType.Tar, _ => true);
 
@@ -59,7 +56,7 @@ public sealed class SharpCompressArchiveBackendUnitTests
         opt.RejectArchiveLinks = true;
 
         var tarWithLink = ArchivePayloadFactory.CreateTarWithSymlink("safe.txt", "ok", "ln.txt", "safe.txt");
-        using var stream = new MemoryStream(tarWithLink, writable: false);
+        using var stream = new MemoryStream(tarWithLink, false);
 
         var ok = backend.Process(stream, opt, 0, ArchiveContainerType.Tar, _ => true);
 
@@ -74,7 +71,7 @@ public sealed class SharpCompressArchiveBackendUnitTests
         opt.MaxZipEntryUncompressedBytes = 1;
 
         var tar = CreateTarWithEntries(1, 8);
-        using var stream = new MemoryStream(tar, writable: false);
+        using var stream = new MemoryStream(tar, false);
 
         var ok = backend.Process(stream, opt, 0, ArchiveContainerType.Tar, _ => true);
 
@@ -88,7 +85,7 @@ public sealed class SharpCompressArchiveBackendUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
 
         var tar = CreateTarWithEntries(1, 4);
-        using var stream = new MemoryStream(tar, writable: false);
+        using var stream = new MemoryStream(tar, false);
 
         var ok = backend.Process(stream, opt, 0, ArchiveContainerType.Tar, _ => true);
 
@@ -102,7 +99,7 @@ public sealed class SharpCompressArchiveBackendUnitTests
         var opt = FileTypeProjectOptions.DefaultOptions();
 
         var tar = CreateTarWithEntries(1, 4);
-        using var stream = new MemoryStream(tar, writable: false);
+        using var stream = new MemoryStream(tar, false);
 
         var ok = backend.Process(stream, opt, 0, ArchiveContainerType.Tar, _ => false);
 
@@ -118,12 +115,9 @@ public sealed class SharpCompressArchiveBackendUnitTests
             {
                 var name = $"entry_{i}.txt";
                 var payload = new byte[Math.Max(0, entrySize)];
-                for (var p = 0; p < payload.Length; p++)
-                {
-                    payload[p] = (byte)('A' + (i % 20));
-                }
+                for (var p = 0; p < payload.Length; p++) payload[p] = (byte)('A' + i % 20);
 
-                using var data = new MemoryStream(payload, writable: false);
+                using var data = new MemoryStream(payload, false);
                 writer.Write(name, data, DateTime.UnixEpoch);
             }
         }

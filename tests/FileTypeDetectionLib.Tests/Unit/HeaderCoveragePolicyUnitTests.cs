@@ -1,7 +1,4 @@
-using System;
-using System.Linq;
 using FileTypeDetection;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 

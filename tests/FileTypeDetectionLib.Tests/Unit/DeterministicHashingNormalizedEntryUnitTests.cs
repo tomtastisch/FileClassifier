@@ -1,8 +1,5 @@
-using System;
-using System.Linq;
 using System.Reflection;
 using FileTypeDetection;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -18,8 +15,10 @@ public sealed class DeterministicHashingNormalizedEntryUnitTests
             .First();
 
         var instance = ctor.Invoke(new object?[] { null, null });
-        var relativePath = (string)type.GetField("RelativePath", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(instance)!;
-        var content = (byte[])type.GetField("Content", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(instance)!;
+        var relativePath =
+            (string)type.GetField("RelativePath", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(instance)!;
+        var content =
+            (byte[])type.GetField("Content", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(instance)!;
 
         Assert.Equal(string.Empty, relativePath);
         Assert.NotNull(content);

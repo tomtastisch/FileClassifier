@@ -1,8 +1,5 @@
-using System;
-using System.IO;
 using System.Text.Json;
 using FileTypeDetection;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -107,7 +104,8 @@ public sealed class FileTypeOptionsFacadeUnitTests
         var original = FileTypeOptions.GetSnapshot();
         try
         {
-            var ok = FileTypeOptions.LoadOptions("{\"rejectArchiveLinks\":false,\"allowUnknownArchiveEntrySize\":true}");
+            var ok = FileTypeOptions.LoadOptions(
+                "{\"rejectArchiveLinks\":false,\"allowUnknownArchiveEntrySize\":true}");
             var snapshot = FileTypeOptions.GetSnapshot();
 
             Assert.True(ok);
@@ -165,12 +163,14 @@ public sealed class FileTypeOptionsFacadeUnitTests
         try
         {
             var defaults = FileTypeProjectOptions.DefaultOptions();
-            var ok = FileTypeOptions.LoadOptions("{\"unknownKey\":true,\"maxBytes\":\"oops\",\"deterministicHash\":false}");
+            var ok = FileTypeOptions.LoadOptions(
+                "{\"unknownKey\":true,\"maxBytes\":\"oops\",\"deterministicHash\":false}");
             var snapshot = FileTypeOptions.GetSnapshot();
 
             Assert.True(ok);
             Assert.Equal(defaults.MaxBytes, snapshot.MaxBytes);
-            Assert.Equal(defaults.DeterministicHash.MaterializedFileName, snapshot.DeterministicHash.MaterializedFileName);
+            Assert.Equal(defaults.DeterministicHash.MaterializedFileName,
+                snapshot.DeterministicHash.MaterializedFileName);
         }
         finally
         {
@@ -184,7 +184,8 @@ public sealed class FileTypeOptionsFacadeUnitTests
         var original = FileTypeOptions.GetSnapshot();
         try
         {
-            var ok = FileTypeOptions.LoadOptions("{\"deterministicHashIncludePayloadCopies\":true,\"deterministicHashIncludeFastHash\":false,\"deterministicHashMaterializedFileName\":\"x.bin\"}");
+            var ok = FileTypeOptions.LoadOptions(
+                "{\"deterministicHashIncludePayloadCopies\":true,\"deterministicHashIncludeFastHash\":false,\"deterministicHashMaterializedFileName\":\"x.bin\"}");
             var snapshot = FileTypeOptions.GetSnapshot();
 
             Assert.True(ok);

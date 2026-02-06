@@ -1,8 +1,4 @@
-using System;
-using System.IO;
 using FileTypeDetection;
-using FileTypeDetectionLib.Tests.Support;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -54,9 +50,11 @@ public sealed class CoreInternalsBranchUnitTests
         var normalized = string.Empty;
         var isDir = false;
 
-        Assert.True(ArchiveEntryPathPolicy.TryNormalizeRelativePath("a\\b.txt", allowDirectoryMarker: false, ref normalized, ref isDir));
+        Assert.True(ArchiveEntryPathPolicy.TryNormalizeRelativePath("a\\b.txt", allowDirectoryMarker: false,
+            ref normalized, ref isDir));
         Assert.Equal("a/b.txt", normalized);
 
-        Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath("a//b.txt", allowDirectoryMarker: false, ref normalized, ref isDir));
+        Assert.False(ArchiveEntryPathPolicy.TryNormalizeRelativePath("a//b.txt", allowDirectoryMarker: false,
+            ref normalized, ref isDir));
     }
 }

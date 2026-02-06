@@ -4,24 +4,22 @@ Option Explicit On
 Imports System.IO
 
 Namespace FileTypeDetection
-
     ''' <summary>
-    ''' Steuerung fuer deterministic hashing APIs.
+    '''     Steuerung fuer deterministic hashing APIs.
     ''' </summary>
     Public NotInheritable Class DeterministicHashOptions
-
         ''' <summary>
-        ''' Wenn True, werden komprimierte und unkomprimierte Bytes in Evidence als Kopie mitgefuehrt.
+        '''     Wenn True, werden komprimierte und unkomprimierte Bytes in Evidence als Kopie mitgefuehrt.
         ''' </summary>
         Public Property IncludePayloadCopies As Boolean = False
 
         ''' <summary>
-        ''' Wenn True, wird zusaetzlich ein schneller XxHash3-Digest berechnet.
+        '''     Wenn True, wird zusaetzlich ein schneller XxHash3-Digest berechnet.
         ''' </summary>
         Public Property IncludeFastHash As Boolean = True
 
         ''' <summary>
-        ''' Dateiname fuer den Materialisierungs-Schritt im RoundTrip-Report.
+        '''     Dateiname fuer den Materialisierungs-Schritt im RoundTrip-Report.
         ''' </summary>
         Public Property MaterializedFileName As String = "deterministic-roundtrip.bin"
 
@@ -30,7 +28,7 @@ Namespace FileTypeDetection
                 .IncludePayloadCopies = IncludePayloadCopies,
                 .IncludeFastHash = IncludeFastHash,
                 .MaterializedFileName = If(MaterializedFileName, String.Empty)
-            }
+                }
         End Function
 
         Friend Shared Function Normalize(options As DeterministicHashOptions) As DeterministicHashOptions
@@ -54,7 +52,7 @@ Namespace FileTypeDetection
             If String.IsNullOrWhiteSpace(normalized) Then Return "deterministic-roundtrip.bin"
 
             For Each c In Path.GetInvalidFileNameChars()
-                If normalized.IndexOf(c) >= 0 Then
+                If normalized.Contains(c) Then
                     Return "deterministic-roundtrip.bin"
                 End If
             Next
@@ -62,5 +60,4 @@ Namespace FileTypeDetection
             Return normalized
         End Function
     End Class
-
 End Namespace

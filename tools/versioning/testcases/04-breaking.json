@@ -1,0 +1,14 @@
+{
+  "name": "breaking-change",
+  "files": ["src/FileTypeDetection/ArchiveProcessing.vb"],
+  "required": "major",
+  "actual": "major",
+  "version_reason": "breaking-change-required",
+  "pr_title": "refactor!: rename public api",
+  "expect": {
+    "version_label": "version:major",
+    "primary": "breaking",
+    "impl": "impl:quality",
+    "area_contains": ["area:archive"]
+  }
+}

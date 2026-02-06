@@ -1,7 +1,5 @@
-using System.IO;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -14,7 +12,7 @@ public sealed class ArchiveExtractionUnitTests
         using var tempRoot = TestTempPaths.CreateScope("ftd-extract-test");
         var destination = Path.Combine(tempRoot.RootPath, "out");
 
-        var ok = new FileTypeDetector().ExtractArchiveSafe(source, destination, verifyBeforeExtract: true);
+        var ok = new FileTypeDetector().ExtractArchiveSafe(source, destination, true);
 
         Assert.True(ok);
         Assert.True(File.Exists(Path.Combine(destination, "note.txt")));
@@ -28,7 +26,7 @@ public sealed class ArchiveExtractionUnitTests
         var destination = Path.Combine(tempRoot.RootPath, "out");
         File.WriteAllBytes(zipPath, ArchiveEntryPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8));
 
-        var ok = new FileTypeDetector().ExtractArchiveSafe(zipPath, destination, verifyBeforeExtract: false);
+        var ok = new FileTypeDetector().ExtractArchiveSafe(zipPath, destination, false);
 
         Assert.False(ok);
         Assert.False(Directory.Exists(destination));
@@ -43,7 +41,7 @@ public sealed class ArchiveExtractionUnitTests
         var destination = Path.Combine(tempRoot.RootPath, "out");
         Directory.CreateDirectory(destination);
 
-        var ok = new FileTypeDetector().ExtractArchiveSafe(source, destination, verifyBeforeExtract: false);
+        var ok = new FileTypeDetector().ExtractArchiveSafe(source, destination, false);
 
         Assert.False(ok);
     }
@@ -55,7 +53,7 @@ public sealed class ArchiveExtractionUnitTests
         using var tempRoot = TestTempPaths.CreateScope("ftd-extract-test");
         var destination = Path.Combine(tempRoot.RootPath, "out");
 
-        var ok = new FileTypeDetector().ExtractArchiveSafe(source, destination, verifyBeforeExtract: true);
+        var ok = new FileTypeDetector().ExtractArchiveSafe(source, destination, true);
 
         Assert.False(ok);
         Assert.False(Directory.Exists(destination));
@@ -68,7 +66,7 @@ public sealed class ArchiveExtractionUnitTests
         var rootPath = Path.GetPathRoot(Path.GetTempPath());
         Assert.False(string.IsNullOrWhiteSpace(rootPath));
 
-        var ok = new FileTypeDetector().ExtractArchiveSafe(source, rootPath, verifyBeforeExtract: false);
+        var ok = new FileTypeDetector().ExtractArchiveSafe(source, rootPath, false);
         Assert.False(ok);
     }
 
@@ -76,7 +74,7 @@ public sealed class ArchiveExtractionUnitTests
     public void ExtractArchiveSafeToMemory_Succeeds_ForValidArchive_WithVerification()
     {
         var source = TestResources.Resolve("sample.zip");
-        var entries = new FileTypeDetector().ExtractArchiveSafeToMemory(source, verifyBeforeExtract: true);
+        var entries = new FileTypeDetector().ExtractArchiveSafeToMemory(source, true);
 
         Assert.NotNull(entries);
         Assert.Single(entries);
@@ -91,10 +89,9 @@ public sealed class ArchiveExtractionUnitTests
         var zipPath = Path.Combine(tempRoot.RootPath, "traversal.zip");
         File.WriteAllBytes(zipPath, ArchiveEntryPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8));
 
-        var entries = new FileTypeDetector().ExtractArchiveSafeToMemory(zipPath, verifyBeforeExtract: false);
+        var entries = new FileTypeDetector().ExtractArchiveSafeToMemory(zipPath, false);
         Assert.NotNull(entries);
         Assert.Empty(entries);
         Assert.False(File.Exists(Path.Combine(tempRoot.RootPath, "evil.txt")));
     }
-
 }

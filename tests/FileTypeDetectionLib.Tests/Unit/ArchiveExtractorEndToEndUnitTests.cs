@@ -1,7 +1,5 @@
-using System.IO;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -14,7 +12,7 @@ public sealed class ArchiveExtractorEndToEndUnitTests
         var destination = Path.Combine(scope.RootPath, "out");
         var payload = ArchiveEntryPayloadFactory.CreateZipWithSingleEntry("note.txt", 8);
 
-        using var stream = new MemoryStream(payload, writable: false);
+        using var stream = new MemoryStream(payload, false);
         var opt = FileTypeProjectOptions.DefaultOptions();
 
         var ok = ArchiveExtractor.TryExtractArchiveStream(stream, destination, opt);

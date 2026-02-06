@@ -1,8 +1,5 @@
-using System.IO;
-using System.Linq;
 using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
-using Xunit;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -85,8 +82,10 @@ public sealed class DeterministicHashingUnitTests
     public void HashBytes_RespectsIncludePayloadCopiesOption()
     {
         var payload = File.ReadAllBytes(TestResources.Resolve("sample.pdf"));
-        var withoutCopies = DeterministicHashing.HashBytes(payload, "sample.pdf", new DeterministicHashOptions { IncludePayloadCopies = false });
-        var withCopies = DeterministicHashing.HashBytes(payload, "sample.pdf", new DeterministicHashOptions { IncludePayloadCopies = true });
+        var withoutCopies = DeterministicHashing.HashBytes(payload, "sample.pdf",
+            new DeterministicHashOptions { IncludePayloadCopies = false });
+        var withCopies = DeterministicHashing.HashBytes(payload, "sample.pdf",
+            new DeterministicHashOptions { IncludePayloadCopies = true });
 
         Assert.True(withoutCopies.CompressedBytes.IsDefaultOrEmpty);
         Assert.True(withoutCopies.UncompressedBytes.IsDefaultOrEmpty);
@@ -99,8 +98,10 @@ public sealed class DeterministicHashingUnitTests
     public void HashBytes_RespectsIncludeFastHashOption()
     {
         var payload = File.ReadAllBytes(TestResources.Resolve("sample.pdf"));
-        var withoutFast = DeterministicHashing.HashBytes(payload, "sample.pdf", new DeterministicHashOptions { IncludeFastHash = false });
-        var withFast = DeterministicHashing.HashBytes(payload, "sample.pdf", new DeterministicHashOptions { IncludeFastHash = true });
+        var withoutFast = DeterministicHashing.HashBytes(payload, "sample.pdf",
+            new DeterministicHashOptions { IncludeFastHash = false });
+        var withFast = DeterministicHashing.HashBytes(payload, "sample.pdf",
+            new DeterministicHashOptions { IncludeFastHash = true });
 
         Assert.True(string.IsNullOrWhiteSpace(withoutFast.Digests.FastPhysicalXxHash3));
         Assert.True(string.IsNullOrWhiteSpace(withoutFast.Digests.FastLogicalXxHash3));
@@ -123,7 +124,8 @@ public sealed class DeterministicHashingUnitTests
 
         var payload = File.ReadAllBytes(TestResources.Resolve("sample.pdf"));
         var evidence = DeterministicHashing.HashBytes(payload, "sample.pdf");
-        var overrideEvidence = DeterministicHashing.HashBytes(payload, "sample.pdf", new DeterministicHashOptions { IncludeFastHash = true });
+        var overrideEvidence = DeterministicHashing.HashBytes(payload, "sample.pdf",
+            new DeterministicHashOptions { IncludeFastHash = true });
 
         Assert.True(string.IsNullOrWhiteSpace(evidence.Digests.FastPhysicalXxHash3));
         Assert.True(string.IsNullOrWhiteSpace(evidence.Digests.FastLogicalXxHash3));
