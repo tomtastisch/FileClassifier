@@ -1,0 +1,14 @@
+{
+  "name": "ci-only",
+  "files": [".github/workflows/ci.yml"],
+  "required": "patch",
+  "actual": "patch",
+  "version_reason": "pipeline-or-tooling-changed",
+  "pr_title": "ci: adjust pipeline",
+  "expect": {
+    "version_label": "version:patch",
+    "primary": "ci",
+    "impl": "impl:config",
+    "area_contains": ["area:pipeline"]
+  }
+}

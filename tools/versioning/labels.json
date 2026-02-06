@@ -4,13 +4,29 @@
   "version:patch": {"color": "1D76DB", "description": "Fix/Refactor/Docs/CI/Tooling; requires PATCH bump"},
   "version:none": {"color": "D4C5F9", "description": "No version bump required (meta-only change)"},
 
-  "breaking": {"color": "B60205", "description": "Public API/behavior breaking change"},
-  "feature": {"color": "0E8A16", "description": "New compatible feature or datatype"},
-  "fix": {"color": "1D76DB", "description": "Bugfix"},
-  "refactor": {"color": "FBCA04", "description": "Refactoring without behavior change"},
-  "docs": {"color": "0075CA", "description": "Documentation change"},
-  "test": {"color": "C2E0C6", "description": "Test change"},
-  "ci": {"color": "5319E7", "description": "CI/workflow change"},
-  "tooling": {"color": "F9D0C4", "description": "Tooling/scripts change"},
-  "chore": {"color": "C5DEF5", "description": "Maintenance chore"}
+  "breaking": {"color": "B60205", "description": "Primary label: public API/behavior breaking change"},
+  "feature": {"color": "0E8A16", "description": "Primary label: new compatible feature or datatype"},
+  "fix": {"color": "1D76DB", "description": "Primary label: bugfix"},
+  "refactor": {"color": "FBCA04", "description": "Primary label: refactoring without behavior change"},
+  "docs": {"color": "0075CA", "description": "Primary label: documentation change"},
+  "test": {"color": "C2E0C6", "description": "Primary label: test change"},
+  "ci": {"color": "5319E7", "description": "Primary label: CI/workflow change"},
+  "tooling": {"color": "F9D0C4", "description": "Primary label: tooling/scripts change"},
+  "chore": {"color": "C5DEF5", "description": "Primary label: maintenance chore"},
+
+  "impl:quality": {"color": "BFD4F2", "description": "Implementation focus: quality/refactoring/cleanup"},
+  "impl:security": {"color": "A2EEEF", "description": "Implementation focus: security/vulnerability hardening"},
+  "impl:docs": {"color": "C5E1A5", "description": "Implementation focus: documentation and guidance"},
+  "impl:config": {"color": "FFE082", "description": "Implementation focus: configuration/pipeline/tooling"},
+
+  "area:pipeline": {"color": "D1C4E9", "description": "Area focus: CI/CD pipeline"},
+  "area:qodana": {"color": "F8BBD0", "description": "Area focus: Qodana static analysis"},
+  "area:archive": {"color": "B2DFDB", "description": "Area focus: archive processing and safety"},
+  "area:hashing": {"color": "DCEDC8", "description": "Area focus: deterministic hashing"},
+  "area:detection": {"color": "BBDEFB", "description": "Area focus: file type detection"},
+  "area:materializer": {"color": "FFCCBC", "description": "Area focus: file materialization"},
+  "area:versioning": {"color": "D7CCC8", "description": "Area focus: versioning and release policy"},
+  "area:tests": {"color": "C8E6C9", "description": "Area focus: test suite and coverage"},
+  "area:docs": {"color": "B3E5FC", "description": "Area focus: documentation"},
+  "area:tooling": {"color": "FFE0B2", "description": "Area focus: scripts and tooling"}
 }

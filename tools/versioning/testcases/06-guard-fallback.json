@@ -1,0 +1,14 @@
+{
+  "name": "guard-fallback",
+  "files": ["Directory.Build.props"],
+  "required": "none",
+  "actual": "none",
+  "version_reason": "guard-unavailable-fallback",
+  "pr_title": "chore: metadata",
+  "expect": {
+    "version_label": "version:none",
+    "primary": "chore",
+    "impl": "impl:config",
+    "area_contains": ["area:versioning"]
+  }
+}

@@ -5,6 +5,8 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
 
 permissions:
@@ -15,7 +17,137 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  pr-labeling:
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout Base Branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Fetch PR Head Commit
+        run: git fetch --no-tags --prune origin ${{ github.event.pull_request.head.sha }}
+
+      - name: Derive Versioning Decision
+        id: versioning
+        run: |
+          set +e
+          guard_output=$(BASE_REF=origin/main HEAD_REF=${{ github.event.pull_request.head.sha }} tools/versioning/check-versioning.sh 2>&1)
+          guard_exit=$?
+          set -e
+
+          echo "$guard_output"
+
+          required=$(printf '%s\n' "$guard_output" | sed -n 's/.*required=\([a-z]*\).*/\1/p' | tail -n1)
+          actual=$(printf '%s\n' "$guard_output" | sed -n 's/.*actual=\([a-z]*\).*/\1/p' | tail -n1)
+
+          if [[ -z "$required" ]]; then
+            required=$(MODE=required BASE_REF=origin/main HEAD_REF=${{ github.event.pull_request.head.sha }} tools/versioning/check-versioning.sh 2>/dev/null || echo "none")
+          fi
+
+          if [[ -z "$actual" ]]; then
+            actual="none"
+          fi
+
+          reason="guard-derived"
+          if [[ "$guard_exit" -ne 0 ]]; then
+            reason="guard-unavailable-fallback"
+          fi
+
+          echo "required=$required" >> "$GITHUB_OUTPUT"
+          echo "actual=$actual" >> "$GITHUB_OUTPUT"
+          echo "reason=$reason" >> "$GITHUB_OUTPUT"
+          echo "guard_exit=$guard_exit" >> "$GITHUB_OUTPUT"
+
+      - name: Collect PR Metadata
+        id: prmeta
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pr = context.payload.pull_request;
+
+            const files = await github.paginate(
+              github.rest.pulls.listFiles,
+              { owner, repo, pull_number: pr.number, per_page: 100 }
+            );
+
+            const paths = files.map((f) => f.filename);
+            const labels = pr.labels.map((l) => l.name);
+
+            core.setOutput('files_json', JSON.stringify(paths));
+            core.setOutput('existing_labels_json', JSON.stringify(labels));
+            core.setOutput('pr_title', pr.title || '');
+
+      - name: Compute Deterministic Labels (Dry Run)
+        env:
+          FILES_JSON: ${{ steps.prmeta.outputs.files_json }}
+          EXISTING_LABELS_JSON: ${{ steps.prmeta.outputs.existing_labels_json }}
+          PR_TITLE: ${{ steps.prmeta.outputs.pr_title }}
+          VERSION_REQUIRED: ${{ steps.versioning.outputs.required }}
+          VERSION_ACTUAL: ${{ steps.versioning.outputs.actual }}
+          VERSION_REASON: ${{ steps.versioning.outputs.reason }}
+          VERSION_GUARD_EXIT: ${{ steps.versioning.outputs.guard_exit }}
+          OUTPUT_PATH: artifacts/labels/decision.json
+        run: |
+          mkdir -p artifacts/labels
+          node tools/versioning/compute-pr-labels.js
+          cat artifacts/labels/decision.json
+
+      - name: Validate Label Decision Schema
+        run: node tools/versioning/validate-label-decision.js tools/versioning/label-schema.json artifacts/labels/decision.json
+
+      - name: Apply Deterministic Labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const decision = JSON.parse(fs.readFileSync('artifacts/labels/decision.json', 'utf-8'));
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue_number = context.payload.pull_request.number;
+
+            for (const label of decision.labels_to_remove) {
+              try {
+                await github.rest.issues.removeLabel({ owner, repo, issue_number, name: label });
+              } catch (error) {
+                // ignore missing labels to keep idempotency
+              }
+            }
+
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number,
+              labels: decision.labels_to_add,
+            });
+
+      - name: Labeling Summary
+        run: |
+          node -e 'const fs=require("fs");const d=JSON.parse(fs.readFileSync("artifacts/labels/decision.json","utf-8"));const lines=["## PR Labeling Summary","",`- version required: ${d.version_required}`,`- version actual: ${d.version_actual}`,`- version reason: ${d.version_reason}`,`- labels to add: ${d.labels_to_add.join(", ")}`,`- labels to remove: ${d.labels_to_remove.join(", ") || "none"}`,"","### Decision Trace",`- changed files: ${d.decision_trace.changed_files_count}`,`- selected primary: ${d.decision_trace.selected_primary}`,`- selected impl: ${d.decision_trace.selected_impl || "none"}`,`- selected areas: ${(d.decision_trace.selected_areas || []).join(", ") || "none"}`];fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\n")+"\n");'
+
+      - name: Upload Label Decision Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-label-decision
+          path: artifacts/labels/
+          if-no-files-found: error
+
   preflight:
+    if: github.event_name != 'pull_request_target'
     runs-on: ubuntu-latest
 
     steps:
@@ -29,6 +161,14 @@ jobs:
         with:
           dotnet-version: "10.0.x"
           include-prerelease: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Label Engine Golden Tests
+        run: node tools/versioning/test-compute-pr-labels.js
 
       - name: Docs Check
         run: |
@@ -73,6 +213,7 @@ jobs:
           if-no-files-found: error
 
   build:
+    if: github.event_name != 'pull_request_target'
     runs-on: ubuntu-latest
     needs: preflight
 
@@ -104,6 +245,7 @@ jobs:
           if-no-files-found: error
 
   security-nuget:
+    if: github.event_name != 'pull_request_target'
     runs-on: ubuntu-latest
     needs: build
 
@@ -145,6 +287,7 @@ jobs:
           if-no-files-found: error
 
   tests-bdd-coverage:
+    if: github.event_name != 'pull_request_target'
     runs-on: ubuntu-latest
     needs: build
 
@@ -192,6 +335,7 @@ jobs:
           if-no-files-found: error
 
   summary:
+    if: github.event_name != 'pull_request_target'
     runs-on: ubuntu-latest
     needs: [security-nuget, tests-bdd-coverage]
 

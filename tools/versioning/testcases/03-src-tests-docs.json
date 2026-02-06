@@ -1,0 +1,18 @@
+{
+  "name": "src-tests-docs",
+  "files": [
+    "src/FileTypeDetection/FileTypeDetector.vb",
+    "tests/FileTypeDetectionLib.Tests/Unit/FileTypeDetectorPrivateBranchUnitTests.cs",
+    "docs/01_FUNCTIONS.md"
+  ],
+  "required": "minor",
+  "actual": "minor",
+  "version_reason": "code-surface-changed",
+  "pr_title": "feat: improve detector behavior",
+  "expect": {
+    "version_label": "version:minor",
+    "primary": "feature",
+    "impl": "impl:quality",
+    "area_exact": ["area:detection", "area:tests"]
+  }
+}
