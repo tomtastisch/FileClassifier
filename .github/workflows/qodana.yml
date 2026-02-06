@@ -4,7 +4,8 @@ on:
   pull_request:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
+    # Für jeden Branch durchführen
+    branches: [ "**" ]
 
 jobs:
   qodana:
@@ -13,7 +14,6 @@ jobs:
     permissions:
       contents: read
       security-events: write
-      pull-requests: write
 
     steps:
       - name: Checkout (full history for merge-base)
@@ -24,33 +24,48 @@ jobs:
       - name: Qodana Scan
         uses: JetBrains/qodana-action@v2025.3
 
-      # Robust: SARIF unabhängig vom Pfad finden und als Output bereitstellen
-      - name: Locate SARIF
+      - name: Locate SARIF (debug)
         id: sarif
         if: always()
         shell: bash
         run: |
           set -euo pipefail
-          echo "Searching SARIF..."
-          # typische Orte + Fallback (workspace)
-          CANDIDATES=(
-            "${RUNNER_TEMP:-/tmp}/qodana/results/qodana.sarif.json"
-            "qodana/results/qodana.sarif.json"
-          )
+          echo "## SARIF search" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Runner temp: ${RUNNER_TEMP:-<unset>}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "### Candidate paths" >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' \
+            "${RUNNER_TEMP:-/tmp}/qodana/results/qodana.sarif.json" \
+            "qodana/results/qodana.sarif.json" \
+            >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
           FOUND=""
-          for p in "${CANDIDATES[@]}"; do
+          for p in \
+            "${RUNNER_TEMP:-/tmp}/qodana/results/qodana.sarif.json" \
+            "qodana/results/qodana.sarif.json"
+          do
             if [ -f "$p" ]; then FOUND="$p"; break; fi
           done
+
           if [ -z "$FOUND" ]; then
-            FOUND="$(find . -maxdepth 6 -type f -iname "*sarif*.json" | head -n 1 || true)"
+            FOUND="$(find . -maxdepth 8 -type f -iname "*sarif*.json" | head -n 1 || true)"
           fi
+
+          echo "### find(.) hits (maxdepth 8)" >> "$GITHUB_STEP_SUMMARY"
+          (find . -maxdepth 8 -type f -iname "*sarif*.json" -print || true) >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
           if [ -z "$FOUND" ]; then
             echo "sarif_path=" >> "$GITHUB_OUTPUT"
-            echo "No SARIF found."
+            echo "Result: NOT FOUND" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          echo "Found SARIF at: $FOUND"
+
           echo "sarif_path=$FOUND" >> "$GITHUB_OUTPUT"
+          echo "Result: FOUND at $FOUND" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload SARIF to GitHub Code Scanning
         if: always() && steps.sarif.outputs.sarif_path != ''
@@ -58,43 +73,13 @@ jobs:
         with:
           sarif_file: ${{ steps.sarif.outputs.sarif_path }}
 
-      - name: Upload SARIF artifact
-        if: always() && steps.sarif.outputs.sarif_path != ''
+      - name: Upload artifacts (sarif + qodana dirs)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: qodana-sarif
-          path: ${{ steps.sarif.outputs.sarif_path }}
+          name: qodana-debug
+          path: |
+            ${{ runner.temp }}/qodana/**
+            qodana/**
+            **/*sarif*.json
           if-no-files-found: warn
-
-      - name: Comment SARIF summary on PR
-        if: always() && github.event_name == 'pull_request' && steps.sarif.outputs.sarif_path != ''
-        uses: actions/github-script@v7
-        env:
-          SARIF_PATH: ${{ steps.sarif.outputs.sarif_path }}
-        with:
-          script: |
-            const fs = require('fs');
-            const p = process.env.SARIF_PATH;
-            if (!fs.existsSync(p)) {
-              core.warning(`SARIF not found at ${p}`);
-              return;
-            }
-            const sarif = JSON.parse(fs.readFileSync(p, 'utf8'));
-            const results = (((sarif.runs||[])[0]||{}).results)||[];
-            const byRule = new Map();
-            for (const r of results) {
-              const k = r.ruleId || 'unknown';
-              byRule.set(k, (byRule.get(k)||0) + 1);
-            }
-            const top = [...byRule.entries()].sort((a,b)=>b[1]-a[1]).slice(0,15);
-            const lines = top.map(([k,v])=>`- ${k}: ${v}`);
-            const body =
-              `Qodana Summary\n` +
-              `Total results: ${results.length}\n\n` +
-              (lines.length ? lines.join('\n') : '(no results)');
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body
-            });
