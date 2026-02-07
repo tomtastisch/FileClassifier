@@ -8,10 +8,12 @@ python3 tools/check-docs.py
 
 dotnet list FileClassifier.sln package --vulnerable --include-transitive
 
+dotnet build FileClassifier.sln -c Release --no-restore
+
 bash tools/run-coverage.sh
 
 TEST_BDD_OUTPUT_DIR="${ROOT_DIR}/artifacts/test-bdd" \
-  bash tools/test-bdd-readable.sh
+  bash tools/test-bdd-readable.sh -- -c Release --no-restore
 
 if [[ -z "${QODANA_TOKEN:-}" ]]; then
   echo "ERROR: QODANA_TOKEN is not set."
