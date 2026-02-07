@@ -8,7 +8,7 @@ Heuristik fuer die Rueckwirkungs-Zuordnung:
 - `docs|test|ci|chore|tooling|refactor|fix` => Patch
 
 Aktueller Entwicklungsstand:
-- `Unreleased` fuehrt auf Version `4.0.0` (siehe `Directory.Build.props` und `docs/versioning/CHANGELOG.md`).
+- `Unreleased` fuehrt auf Version `4.1.2` (siehe `Directory.Build.props` und `docs/versioning/CHANGELOG.md`).
 
 | Version | Kurzbeschreibung | Commit | Keyword |
 |---|---|---|---|
