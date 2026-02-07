@@ -15,25 +15,43 @@ FileClassifier liefert deterministische Dateityperkennung, sichere Archivverarbe
 
 ## 4. Architekturüberblick
 ```mermaid
-graph TD
-    API["Public API"] --> DET["FileTypeDetector"]
-    API --> ARC["ArchiveProcessing"]
-    API --> MAT["FileMaterializer"]
-    API --> OPT["FileTypeOptions"]
-    API --> HSH["DeterministicHashing"]
+flowchart LR
+    API["Public API"]
 
-    ABS["Abstractions"] --> B["Detection"]
-    ABS --> C["Archive"]
-    ABS --> D["Hashing"]
-    B --> B1["FileKind / FileType / DetectionDetail"]
-    C --> C1["ZipExtractedEntry"]
-    D --> D1["DeterministicHash* Modelle"]
+    subgraph API_LAYER["API-Schicht"]
+        DET["FileTypeDetector"]
+        ARC["ArchiveProcessing"]
+        MAT["FileMaterializer"]
+        OPT["FileTypeOptions"]
+        HSH["DeterministicHashing"]
+    end
 
-    DET --> ABS
-    ARC --> C
-    MAT --> C
-    HSH --> D
+    subgraph MODEL_LAYER["Abstractions"]
+        DETM["Detection"]
+        ARCM["Archive"]
+        HASHM["Hashing"]
+    end
+
+    DETOUT["FileKind / FileType / DetectionDetail"]
+    ARCOUT["ZipExtractedEntry"]
+    HASHOUT["DeterministicHash* Modelle"]
+
+    API --> DET
+    API --> ARC
+    API --> MAT
+    API --> OPT
+    API --> HSH
+
+    DET --> DETM
+    ARC --> ARCM
+    MAT --> ARCM
+    HSH --> HASHM
+
+    DETM --> DETOUT
+    ARCM --> ARCOUT
+    HASHM --> HASHOUT
 ```
+
 
 ## 5. Dokumentationspfad
 - [Dokumentationsindex](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/001_INDEX_CORE.MD)
