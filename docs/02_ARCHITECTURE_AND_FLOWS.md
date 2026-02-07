@@ -44,66 +44,71 @@ flowchart LR
 
 ## 3. Architekturübersicht (Systemkontext)
 ### 3.1 E2E-Systemkontext (kompakt)
-Dieses Diagramm zeigt nur Verantwortungsbereiche und Hauptdatenflüsse:
-Input -> Public API -> Core Pipeline -> Outputs.
-Detailentscheidungen (Archivfall, Refinement, Persistenzzweig) folgen in Abschnitt 4.
+Dieses Diagramm zeigt nur Verantwortungsbereiche und den linearen Hauptfluss.
+Detailentscheidungen (Archivfall, Refinement, Persistenzzweig) folgen separat in 3.2 und Abschnitt 4.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 80, "rankSpacing": 90}, "themeVariables": {"fontSize": "16px"}}}%%
 flowchart LR
   subgraph INPUT["Input"]
-    direction TB
-    INP["File Path"]
-    INB["Byte Payload"]
+    FP["File Path"]
+    BP["Byte Payload"]
   end
 
   subgraph API["Public API"]
-    direction TB
-    A1["FileTypeDetector"]
-    A2["ArchiveProcessing"]
-    A3["FileMaterializer"]
-    A4["FileTypeOptions / Baseline"]
+    FTD["FileTypeDetector"]
+    AP["ArchiveProcessing"]
+    FM["FileMaterializer"]
   end
 
   subgraph CORE["Core Pipeline"]
-    direction TB
-    C1["ReadHeader"]
-    C1B["DetectByMagic"]
-    C2["ArchiveSafetyGate"]
-    C3["OpenXmlRefiner"]
-    C4["ArchiveExtractor"]
+    RH["ReadHeader"]
+    DM["DetectByMagic"]
+    ASG["ArchiveSafetyGate"]
+    OXR["OpenXmlRefiner"]
+    AX["ArchiveExtractor"]
   end
 
   subgraph OUT["Outputs"]
-    direction TB
-    O1["FileType / DetectionDetail"]
-    O2["Bool (Validate/Persist)"]
-    O3["Entries (Memory Extract)"]
-    O4["Files/Directories"]
+    T["FileType / DetectionDetail"]
+    V["Bool (Validate/Persist)"]
+    E["Entries (Memory Extract)"]
+    F["File/Directory (Materialized)"]
   end
 
-  INP --> A1
-  INB --> A1
-  INP --> A2
-  INB --> A2
-  INP --> A3
-  INB --> A3
+  FP --> FTD
+  BP --> FTD
+  BP --> AP
+  BP --> FM
 
-  A1 --> C1 --> C1B --> C2 --> C3 --> O1
-  A2 --> C2 --> O2
-  A2 --> C4 --> O3
-  A3 --> C2
-  A3 --> C4 --> O4
-  A3 --> O2
-
-  A4 -.-> A1
-  A4 -.-> A2
-  A4 -.-> A3
+  FTD --> RH --> DM --> ASG --> OXR --> T
+  AP --> ASG --> V
+  AP --> AX --> E
+  FM --> AX --> F
 ```
 
 Kurzlesehilfe:
-- `FileTypeOptions/Baseline` ist Konfigurationskontext (gestrichelt), kein Datenfluss.
-- `ArchiveSafetyGate` ist das zentrale fail-closed-Gate für archivbezogene Pfade.
+- Nur Hauptfluss, keine Detailzweige.
+- `ArchiveSafetyGate` bleibt das zentrale fail-closed-Gate für archivbezogene Pfade.
+
+### 3.2 Entscheidungsübersicht (kompakt)
+Dieses Diagramm zeigt die zentrale Entscheidungslogik in einer vertikalen Lesespur.
+
+```mermaid
+%%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 80, "rankSpacing": 90}, "themeVariables": {"fontSize": "16px"}}}%%
+flowchart TD
+  A["Input lesen"] --> B{"Magic erkannt?"}
+  B -- "Nein" --> U["Unknown / fail-closed"]
+  B -- "Ja" --> C{"Archivtyp?"}
+  C -- "Nein" --> T["Direkter Typ-Output"]
+  C -- "Ja" --> G["ArchiveSafetyGate"]
+  G -- "Fail" --> U
+  G -- "Pass" --> R{"OOXML Marker?"}
+  R -- "Ja" --> O["OpenXmlRefiner"]
+  R -- "Nein" --> Z["Archive Generic"]
+  O --> T
+  Z --> T
+```
 
 ## 4. Flussdiagramme (entscheidungsrelevante Abläufe)
 ### 4.1 Ablauf A: Detektion und Archiv-Validierung
