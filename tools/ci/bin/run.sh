@@ -17,6 +17,8 @@ OUT_DIR="artifacts/ci/${CHECK_ID}"
 
 if [[ "$CHECK_ID" == "artifact_contract" ]]; then
   cd "$ROOT_DIR"
+  dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
+  dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
   dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/PolicyRunner/PolicyRunner.csproj"
   dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/PolicyRunner/PolicyRunner.csproj"
   exec dotnet "${ROOT_DIR}/tools/ci/checks/PolicyRunner/bin/Release/net10.0/PolicyRunner.dll" --check-id artifact_contract --repo-root "${ROOT_DIR}" --out-dir "${OUT_DIR}"

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Diagnostics;
 using YamlDotNet.RepresentationModel;
 
 var argsList = args.ToList();
@@ -157,8 +158,82 @@ void EvaluateArtifactContractRule(PolicyRule rule)
                     $"missing required artifact {relTargetPath}",
                     new[] { relTargetPath }));
                 logger.Add($"VIOLATION|rule_id={rule.RuleId}|path={relTargetPath}");
+                continue;
+            }
+
+            if (string.Equals(requiredArtifact, "result.json", StringComparison.Ordinal))
+            {
+                ValidateResultSchema(targetPath, relTargetPath);
             }
         }
+    }
+}
+
+void ValidateResultSchema(string resultPathAbsolute, string resultPathRelative)
+{
+    var validatorDllPath = Path.Combine(
+        repoRootPath,
+        "tools",
+        "ci",
+        "checks",
+        "ResultSchemaValidator",
+        "bin",
+        "Release",
+        "net10.0",
+        "ResultSchemaValidator.dll");
+
+    if (!File.Exists(validatorDllPath))
+    {
+        AddPolicyFailure("result schema validator missing", Rel(repoRootPath, validatorDllPath));
+        return;
+    }
+
+    var process = new Process
+    {
+        StartInfo = new ProcessStartInfo
+        {
+            FileName = "dotnet",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false
+        }
+    };
+
+    process.StartInfo.ArgumentList.Add(validatorDllPath);
+    process.StartInfo.ArgumentList.Add("--schema");
+    process.StartInfo.ArgumentList.Add(resultSchemaPath);
+    process.StartInfo.ArgumentList.Add("--result");
+    process.StartInfo.ArgumentList.Add(resultPathAbsolute);
+
+    process.Start();
+    var stdout = process.StandardOutput.ReadToEnd();
+    var stderr = process.StandardError.ReadToEnd();
+    process.WaitForExit();
+
+    if (!string.IsNullOrWhiteSpace(stdout))
+    {
+        foreach (var line in stdout.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        {
+            logger.Add($"SCHEMA_STDOUT|{line.TrimEnd()}");
+        }
+    }
+
+    if (!string.IsNullOrWhiteSpace(stderr))
+    {
+        foreach (var line in stderr.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        {
+            logger.Add($"SCHEMA_STDERR|{line.TrimEnd()}");
+        }
+    }
+
+    if (process.ExitCode != 0)
+    {
+        violations.Add(new Violation(
+            "CI-SCHEMA-001",
+            "fail",
+            $"result.json schema validation failed for {resultPathRelative}",
+            new[] { resultPathRelative }));
+        logger.Add($"VIOLATION|rule_id=CI-SCHEMA-001|path={resultPathRelative}");
     }
 }
 
