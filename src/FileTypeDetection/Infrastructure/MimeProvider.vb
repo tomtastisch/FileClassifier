@@ -1,8 +1,6 @@
 Option Strict On
 Option Explicit On
 
-Imports HeyRed.Mime
-
 Namespace FileTypeDetection
     ''' <summary>
     '''     Kapselt das MIME-Mapping als austauschbares Infrastrukturdetail.
@@ -29,7 +27,7 @@ Namespace FileTypeDetection
             If Not ext.StartsWith("."c) Then ext = "." & ext
 
             Try
-                Return MimeTypesMap.GetMimeType(ext)
+                Return HeyRed.Mime.MimeTypesMap.GetMimeType(ext)
             Catch
                 Return String.Empty
             End Try

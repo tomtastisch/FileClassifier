@@ -2,9 +2,6 @@ Option Strict On
 Option Explicit On
 
 Imports System.IO
-Imports Microsoft.IO
-Imports SharpCompress.Archives
-Imports SharpCompress.Common
 
 Namespace FileTypeDetection
     Friend Enum ArchiveContainerType
@@ -113,7 +110,7 @@ Namespace FileTypeDetection
 
             Try
                 If stream.CanSeek Then stream.Position = 0
-                Using archive = ArchiveFactory.Open(stream)
+                Using archive = SharpCompress.Archives.ArchiveFactory.Open(stream)
                     If archive Is Nothing Then Return False
 
                     Dim mapped = MapArchiveType(archive.Type)
@@ -136,17 +133,17 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Friend Shared Function MapArchiveType(type As ArchiveType) As ArchiveContainerType
+        Friend Shared Function MapArchiveType(type As SharpCompress.Common.ArchiveType) As ArchiveContainerType
             Select Case type
-                Case ArchiveType.Zip
+                Case SharpCompress.Common.ArchiveType.Zip
                     Return ArchiveContainerType.Zip
-                Case ArchiveType.Tar
+                Case SharpCompress.Common.ArchiveType.Tar
                     Return ArchiveContainerType.Tar
-                Case ArchiveType.GZip
+                Case SharpCompress.Common.ArchiveType.GZip
                     Return ArchiveContainerType.GZip
-                Case ArchiveType.SevenZip
+                Case SharpCompress.Common.ArchiveType.SevenZip
                     Return ArchiveContainerType.SevenZip
-                Case ArchiveType.Rar
+                Case SharpCompress.Common.ArchiveType.Rar
                     Return ArchiveContainerType.Rar
                 Case Else
                     Return ArchiveContainerType.Unknown
@@ -181,7 +178,7 @@ Namespace FileTypeDetection
     End Class
 
     Friend NotInheritable Class ArchiveExtractor
-        Private Shared ReadOnly _recyclableStreams As New RecyclableMemoryStreamManager()
+        Private Shared ReadOnly _recyclableStreams As New Microsoft.IO.RecyclableMemoryStreamManager()
 
         Private Sub New()
         End Sub
@@ -503,7 +500,7 @@ Namespace FileTypeDetection
             Try
                 If stream.CanSeek Then stream.Position = 0
 
-                Using archive = ArchiveFactory.Open(stream)
+                Using archive = SharpCompress.Archives.ArchiveFactory.Open(stream)
                     If archive Is Nothing Then Return False
                     Dim mapped = ArchiveTypeResolver.MapArchiveType(archive.Type)
                     If mapped <> containerTypeValue Then Return False
@@ -553,7 +550,7 @@ Namespace FileTypeDetection
         End Function
 
         Private Shared Function TryProcessNestedGArchive(
-                                                         entries As List(Of IArchiveEntry),
+                                                         entries As List(Of SharpCompress.Archives.IArchiveEntry),
                                                          opt As FileTypeProjectOptions,
                                                          depth As Integer,
                                                          containerType As ArchiveContainerType,
@@ -598,8 +595,8 @@ Namespace FileTypeDetection
             Return True
         End Function
 
-        Private Shared Function TryReadEntryPayloadBounded(entry As IArchiveEntry, maxBytes As Long,
-                                                           ByRef payload As Byte()) As Boolean
+        Private Shared Function TryReadEntryPayloadBounded(entry As SharpCompress.Archives.IArchiveEntry, maxBytes As Long,
+                                                            ByRef payload As Byte()) As Boolean
             payload = Array.Empty(Of Byte)()
             If entry Is Nothing Then Return False
             If maxBytes <= 0 Then Return False
@@ -669,9 +666,9 @@ Namespace FileTypeDetection
     Friend NotInheritable Class SharpCompressEntryModel
         Implements IArchiveEntryModel
 
-        Private ReadOnly _entry As IArchiveEntry
+        Private ReadOnly _entry As SharpCompress.Archives.IArchiveEntry
 
-        Friend Sub New(entry As IArchiveEntry)
+        Friend Sub New(entry As SharpCompress.Archives.IArchiveEntry)
             _entry = entry
         End Sub
 

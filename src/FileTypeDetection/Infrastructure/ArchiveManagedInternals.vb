@@ -3,7 +3,6 @@ Option Explicit On
 
 Imports System.IO
 Imports System.IO.Compression
-Imports Microsoft.IO
 
 Namespace FileTypeDetection
     ''' <summary>
@@ -11,7 +10,7 @@ Namespace FileTypeDetection
     '''     Eine Iterationslogik fuer Validierung und sichere Extraktion.
     ''' </summary>
     Friend NotInheritable Class ArchiveStreamEngine
-        Private Shared ReadOnly _recyclableStreams As New RecyclableMemoryStreamManager()
+        Private Shared ReadOnly _recyclableStreams As New Microsoft.IO.RecyclableMemoryStreamManager()
 
         Private Sub New()
         End Sub

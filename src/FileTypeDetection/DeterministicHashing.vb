@@ -3,7 +3,6 @@ Option Explicit On
 
 Imports System.Globalization
 Imports System.IO
-Imports System.IO.Hashing
 Imports System.Linq
 Imports System.Security.Cryptography
 Imports System.Text
@@ -398,7 +397,7 @@ Namespace FileTypeDetection
         Private Shared Function ComputeFastHash(payload As Byte(), options As DeterministicHashOptions) As String
             If options Is Nothing OrElse Not options.IncludeFastHash Then Return String.Empty
             Dim data = If(payload, Array.Empty(Of Byte)())
-            Dim value = XxHash3.HashToUInt64(data)
+            Dim value = System.IO.Hashing.XxHash3.HashToUInt64(data)
             Return value.ToString("x16", CultureInfo.InvariantCulture)
         End Function
 

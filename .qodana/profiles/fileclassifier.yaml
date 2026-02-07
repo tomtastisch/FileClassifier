@@ -3,6 +3,34 @@ baseProfile: qodana.recommended
 
 # Testcode wird weiterhin analysiert; nur klarer Redundanz-Noise wird dort gedrosselt.
 exclude:
+  # Projektweite Namespace-Policy ist absichtlich flach (oeffentliche API unter FileTypeDetection).
+  - name: CheckNamespace
+    paths:
+      - src/FileTypeDetection
+
+  # Qodana meldet diese VB-Imports in unserer Toolchain als falsch-positiv;
+  # der normale dotnet-Build ist hier fehlerfrei.
+  - name: VBWarnings__BC40056
+    paths:
+      - src/FileTypeDetection
+
+  # Produktionscode: utilitaere statische Klassen/Member werden absichtlich nicht instantiiert.
+  - name: ClassNeverInstantiated.Global
+    paths:
+      - src/FileTypeDetection
+  - name: MemberCanBePrivate.Global
+    paths:
+      - src/FileTypeDetection
+  - name: MemberCanBeMadeStatic.Global
+    paths:
+      - src/FileTypeDetection
+  - name: UnusedMember.Global
+    paths:
+      - src/FileTypeDetection
+  - name: CA1822
+    paths:
+      - src/FileTypeDetection
+
   - name: RedundantUsingDirective
     paths:
       - tests
@@ -13,5 +41,35 @@ exclude:
     paths:
       - tests
   - name: ReplaceAutoPropertyWithComputedProperty
+    paths:
+      - tests
+  - name: UnusedType.Global
+    paths:
+      - tests
+  - name: UnusedMember.Global
+    paths:
+      - tests
+  - name: UnusedMember.Local
+    paths:
+      - tests
+  - name: UnusedParameter.Local
+    paths:
+      - tests
+  - name: AutoPropertyCanBeMadeGetOnly.Global
+    paths:
+      - tests
+  - name: PropertyCanBeMadeInitOnly.Global
+    paths:
+      - tests
+  - name: ConvertToPrimaryConstructor
+    paths:
+      - tests
+  - name: UseCollectionExpression
+    paths:
+      - tests
+  - name: CA1859
+    paths:
+      - tests
+  - name: CA1822
     paths:
       - tests
