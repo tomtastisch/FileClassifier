@@ -2,15 +2,18 @@
   "allowed_jobs": [
     "pr-labeling",
     "preflight",
+    "docs-links-full",
     "build",
     "security-nuget",
     "tests-bdd-coverage",
     "summary"
   ],
   "required_needs_edges": [
+    {"from": "docs-links-full", "to": "preflight"},
     {"from": "build", "to": "preflight"},
     {"from": "security-nuget", "to": "build"},
     {"from": "tests-bdd-coverage", "to": "build"},
+    {"from": "summary", "to": "docs-links-full"},
     {"from": "summary", "to": "security-nuget"},
     {"from": "summary", "to": "tests-bdd-coverage"}
   ]
