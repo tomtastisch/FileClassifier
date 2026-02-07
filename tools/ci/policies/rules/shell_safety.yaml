@@ -8,6 +8,31 @@ rules:
     applies_to:
       - preflight
     params:
+      binary_extensions: &binary_extensions
+        - dll
+        - exe
+        - pdb
+        - so
+        - dylib
+        - a
+        - o
+        - class
+        - jar
+        - zip
+        - gz
+        - 7z
+        - tar
+        - png
+        - jpg
+        - jpeg
+        - gif
+        - bmp
+        - ico
+        - pdf
+        - woff
+        - woff2
+        - ttf
+        - otf
       scan_paths:
         - .github/workflows
       regex_pattern: 'continue-on-error:\s*true'
@@ -20,6 +45,7 @@ rules:
     applies_to:
       - preflight
     params:
+      binary_extensions: *binary_extensions
       scan_paths:
         - .github/workflows
       regex_pattern: '\|\|\s*true'
@@ -32,6 +58,7 @@ rules:
     applies_to:
       - preflight
     params:
+      binary_extensions: *binary_extensions
       scan_paths:
         - .github/workflows
         - tools/ci

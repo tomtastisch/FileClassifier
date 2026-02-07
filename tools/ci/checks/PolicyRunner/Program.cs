@@ -259,9 +259,9 @@ void EvaluateRegexLineRule(PolicyRule rule)
     foreach (var file in files)
     {
         var relFile = Rel(repoRootPath, file);
-        if (IsKnownBinaryPath(file))
+        if (IsConfiguredBinaryPath(file, rule.Params.BinaryExtensions))
         {
-            logger.Add($"SCAN_SKIP|rule_id={rule.RuleId}|file={relFile}|reason=known_binary_extension");
+            logger.Add($"SCAN_SKIP|rule_id={rule.RuleId}|file={relFile}|reason=configured_binary_extension");
             continue;
         }
 
@@ -692,42 +692,21 @@ static int LeadingSpaces(string input)
     return count;
 }
 
-static bool IsKnownBinaryPath(string path)
+static bool IsConfiguredBinaryPath(string path, IReadOnlyList<string> configuredExtensions)
 {
+    if (configuredExtensions.Count == 0)
+    {
+        return false;
+    }
+
     var ext = Path.GetExtension(path);
     if (string.IsNullOrWhiteSpace(ext))
     {
         return false;
     }
 
-    return ext.ToLowerInvariant() switch
-    {
-        ".dll" => true,
-        ".exe" => true,
-        ".pdb" => true,
-        ".so" => true,
-        ".dylib" => true,
-        ".a" => true,
-        ".o" => true,
-        ".class" => true,
-        ".jar" => true,
-        ".zip" => true,
-        ".gz" => true,
-        ".7z" => true,
-        ".tar" => true,
-        ".png" => true,
-        ".jpg" => true,
-        ".jpeg" => true,
-        ".gif" => true,
-        ".bmp" => true,
-        ".ico" => true,
-        ".pdf" => true,
-        ".woff" => true,
-        ".woff2" => true,
-        ".ttf" => true,
-        ".otf" => true,
-        _ => false
-    };
+    var normalized = ext.StartsWith(".", StringComparison.Ordinal) ? ext.ToLowerInvariant() : $".{ext.ToLowerInvariant()}";
+    return configuredExtensions.Any(configured => string.Equals(configured, normalized, StringComparison.Ordinal));
 }
 
 static (bool Ok, string[] Lines, string? ErrorCode) TryReadUtf8Lines(string filePath)
@@ -904,6 +883,7 @@ static (bool Ok, List<PolicyRule> Rules, List<string> ValidationErrors, string? 
                     "check_ids" or
                     "artifact_root" or
                     "scan_paths" or
+                    "binary_extensions" or
                     "regex_pattern" or
                     "max_inline_run_lines" or
                     "docs_paths" or
@@ -922,6 +902,11 @@ static (bool Ok, List<PolicyRule> Rules, List<string> ValidationErrors, string? 
                 CheckIds: GetStringSequence(paramsNode, "check_ids").OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList(),
                 ArtifactRoot: GetScalar(paramsNode, "artifact_root"),
                 ScanPaths: GetStringSequence(paramsNode, "scan_paths").OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList(),
+                BinaryExtensions: GetStringSequence(paramsNode, "binary_extensions")
+                    .Select(static extension => extension.StartsWith(".", StringComparison.Ordinal) ? extension.ToLowerInvariant() : $".{extension.ToLowerInvariant()}")
+                    .OrderBy(static x => x, StringComparer.Ordinal)
+                    .Distinct(StringComparer.Ordinal)
+                    .ToList(),
                 RegexPattern: GetScalar(paramsNode, "regex_pattern"),
                 MaxInlineRunLines: GetIntScalar(paramsNode, "max_inline_run_lines"),
                 DocsPaths: GetStringSequence(paramsNode, "docs_paths").OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList(),
@@ -991,6 +976,7 @@ internal sealed record RuleParams(
     IReadOnlyList<string> CheckIds,
     string? ArtifactRoot,
     IReadOnlyList<string> ScanPaths,
+    IReadOnlyList<string> BinaryExtensions,
     string? RegexPattern,
     int? MaxInlineRunLines,
     IReadOnlyList<string> DocsPaths,

@@ -46,6 +46,57 @@ run_or_fail() {
   fi
 }
 
+run_policy_runner_bridge() {
+  local policy_check_id="$1"
+  local policy_out_dir="$2"
+  local summary_message="$3"
+  local fallback_evidence="$4"
+
+  mkdir -p "${ROOT_DIR}/${policy_out_dir}"
+
+  local policy_exit=0
+  if ! ci_run_capture "${summary_message}" dotnet "${ROOT_DIR}/tools/ci/checks/PolicyRunner/bin/Release/net10.0/PolicyRunner.dll" --check-id "${policy_check_id}" --repo-root "${ROOT_DIR}" --out-dir "${policy_out_dir}"; then
+    policy_exit=1
+  fi
+
+  local policy_result_json="${ROOT_DIR}/${policy_out_dir}/result.json"
+  if [[ ! -f "${policy_result_json}" ]]; then
+    ci_result_add_violation "CI-POLICY-001" "fail" "PolicyRunner did not produce result.json" "${policy_out_dir}/result.json"
+    ci_result_append_summary "${summary_message} failed (missing result.json)."
+    return 1
+  fi
+
+  local findings=0
+  local has_fail=0
+  while IFS= read -r violation; do
+    local rule_id severity message
+    rule_id="$(jq -r '.rule_id' <<< "$violation")"
+    severity="$(jq -r '.severity' <<< "$violation")"
+    message="$(jq -r '.message' <<< "$violation")"
+
+    mapfile -t evidence_paths < <(jq -r '.evidence_paths[]' <<< "$violation")
+    if [[ "${#evidence_paths[@]}" -eq 0 ]]; then
+      evidence_paths=("${fallback_evidence}")
+    fi
+
+    ci_result_add_violation "$rule_id" "$severity" "$message" "${evidence_paths[@]}"
+    findings=$((findings + 1))
+    if [[ "$severity" == "fail" ]]; then
+      has_fail=1
+    fi
+  done < <(jq -c '.rule_violations[]' "${policy_result_json}")
+
+  if [[ "$findings" -eq 0 ]]; then
+    ci_result_append_summary "${summary_message} passed."
+  else
+    ci_result_append_summary "${summary_message} violations: ${findings}"
+  fi
+
+  if [[ "$policy_exit" -ne 0 || "$has_fail" -eq 1 ]]; then
+    return 1
+  fi
+}
+
 build_validators() {
   run_or_fail "CI-SETUP-001" "Restore validator projects (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
   run_or_fail "CI-SETUP-001" "Build ResultSchemaValidator" dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
@@ -63,7 +114,7 @@ run_preflight() {
   run_or_fail "CI-PREFLIGHT-001" "Docs check" python3 "${ROOT_DIR}/tools/check-docs.py"
   run_or_fail "CI-PREFLIGHT-001" "Versioning guard" bash "${ROOT_DIR}/tools/versioning/check-versioning.sh"
   run_or_fail "CI-PREFLIGHT-001" "Format check" dotnet format "${ROOT_DIR}/FileClassifier.sln" --verify-no-changes
-  if ! ci_run_capture "Policy shell safety" bash "${ROOT_DIR}/tools/ci/policies/policy_shell_safety.sh"; then
+  if ! run_policy_runner_bridge "preflight" "artifacts/ci/_policy_preflight" "Policy shell safety" "tools/ci/bin/run.sh"; then
     return 1
   fi
   run_or_fail "CI-GRAPH-001" "CI graph assertion" bash "${ROOT_DIR}/tools/ci/bin/assert_ci_graph.sh"
