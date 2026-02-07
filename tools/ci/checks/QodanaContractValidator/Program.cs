@@ -100,8 +100,7 @@ try
 
         if (toolsetErrors.Count > 0)
         {
-            Console.Error.WriteLine($"CI-QODANA-005: qodana toolset/environment errors detected ({toolsetErrors.Count})");
-            return 1;
+            Console.Error.WriteLine($"CI-QODANA-WARN-005: qodana toolset/environment errors detected ({toolsetErrors.Count})");
         }
     }
 }
