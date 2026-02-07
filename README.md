@@ -18,7 +18,7 @@ FileClassifier liefert deterministische Dateityperkennung, sichere Archivverarbe
 | Kernklasse | Primäre Inputs | Primäre Outputs | Kernlogik |
 |---|---|---|---|
 | `FileTypeDetector` | `path`, `byte[]`, `verifyExtension` | `FileType`, `DetectionDetail`, `bool`, `IReadOnlyList<ZipExtractedEntry>` | Header/Magic (`FileTypeRegistry`) plus Archiv-Gate (`ArchiveTypeResolver` + `ArchiveSafetyGate`) und optionales OOXML-Refinement (`OpenXmlRefiner`). |
-| `ArchiveProcessing` | `path`, `byte[]` | `bool`, `IReadOnlyList<ZipExtractedEntry>` | Fassade auf `FileTypeDetector.TryValidateArchive`, `ArchivePayloadGuard`, `ArchiveEntryCollector` und sichere In-Memory-Extraktion. |
+| `ArchiveProcessing` | `path`, `byte[]` | `bool`, `IReadOnlyList<ZipExtractedEntry>` | Fassade: path-basierte Validierung/Extraktion delegiert an `FileTypeDetector` (`TryValidateArchive` / `ExtractArchiveSafeToMemory`); byte-basierte Pfade nutzen `ArchivePayloadGuard` und `ArchiveEntryCollector`. |
 | `FileMaterializer` | `byte[]`, `destinationPath`, `overwrite`, `secureExtract` | `bool` | Nur Byte-basierte Persistenz: raw write oder (bei `secureExtract=true` und archivfähigem Payload) sichere Extraktion via `ArchiveExtractor`. |
 | `DeterministicHashing` | `path`, `byte[]`, `IReadOnlyList<ZipExtractedEntry>`, optionale Hash-Optionen | `DeterministicHashEvidence`, `DeterministicHashRoundTripReport` | Erkennung + Archivsammlung (`ArchiveEntryCollector`) und deterministische Manifest-/Payload-Hashes, inkl. RoundTrip über `FileMaterializer`. |
 
@@ -27,27 +27,95 @@ Hinweis zur Typdomäne: `DetectedType.Kind` ist nicht nur "Datei roh", sondern k
 ### 4.2 Diagramm (kompakt)
 ```mermaid
 flowchart LR
-    P["Input: path"] --> DET["FileTypeDetector"]
-    B["Input: byte[]"] --> DET
-    P --> AP["ArchiveProcessing"]
-    B --> AP
-    B --> MAT["FileMaterializer"]
-    P --> DH["DeterministicHashing"]
-    B --> DH
-    E["Input: entries"] --> DH
 
-    DET --> O1["Output: FileType / DetectionDetail / bool"]
-    AP --> O2["Output: bool / IReadOnlyList<ZipExtractedEntry>"]
-    MAT --> O3["Output: bool"]
-    DH --> O4["Output: HashEvidence / RoundTripReport"]
+%% =========================
+%% Spalte 1: NUR Kernklassen
+%% =========================
+subgraph C["Kernklassen"]
+direction TB
+  OPT["FileTypeOptions"]
+  DET["FileTypeDetector"]
+  AP["ArchiveProcessing"]
+  MAT["FileMaterializer"]
+  DH["DeterministicHashing"]
+end
 
-    OPT["FileTypeOptions snapshot"] -. read .-> DET
-    OPT -. read .-> AP
-    OPT -. read .-> MAT
-    OPT -. read .-> DH
+%% =========================================
+%% Spalte 2: Output-Art (ohne Datentyp-Text)
+%% =========================================
+subgraph O["Output-Art"]
+direction TB
+  O_OPT_LOAD["Load options (JSON)"]
+  O_OPT_EXPORT["Export options (JSON)"]
+
+  O_DET_READ["Read file safe (bounded)"]
+  O_DET_DETECT["Detect type (path|bytes)"]
+  O_DET_DETAIL["Detect detailed"]
+  O_DET_EXT["Verify extension"]
+  O_DET_ARCH["Validate archive (path)"]
+
+  O_AP_VALIDATE["Validate archive (path|bytes)"]
+  O_AP_EXTRACT["Extract to memory (path|bytes)"]
+
+  O_MAT_PERSIST["Persist bytes (raw|secureExtract)"]
+
+  O_DH_HASH["Hash (file|bytes|entries)"]
+  O_DH_RTR["Verify round-trip"]
+end
+
+%% =========================
+%% Spalte 3: Datentypen (LETZTE Spalte)
+%% =========================
+subgraph T["Datentypen"]
+direction TB
+  T_BOOL["Boolean"]
+  T_BYTES["Byte[]"]
+  T_STR["String (JSON)"]
+
+  T_FILETYPE["FileType (inkl. Archive/Container-Kinds)"]
+  T_DETAIL["DetectionDetail"]
+  T_ENTRIES["IReadOnlyList<ZipExtractedEntry>"]
+
+  T_HASH["DeterministicHashEvidence"]
+  T_RTR["DeterministicHashRoundTripReport"]
+end
+
+%% =======
+%% Kanten
+%% =======
+
+%% FileTypeOptions
+OPT --> O_OPT_LOAD --> T_BOOL
+OPT --> O_OPT_EXPORT --> T_STR
+
+%% FileTypeDetector
+DET --> O_DET_READ --> T_BYTES
+DET --> O_DET_DETECT --> T_FILETYPE
+DET --> O_DET_DETAIL --> T_DETAIL
+DET --> O_DET_EXT --> T_BOOL
+DET --> O_DET_ARCH --> T_BOOL
+
+%% ArchiveProcessing
+AP --> O_AP_VALIDATE --> T_BOOL
+AP --> O_AP_EXTRACT --> T_ENTRIES
+
+%% FileMaterializer
+MAT --> O_MAT_PERSIST --> T_BOOL
+
+%% DeterministicHashing
+DH --> O_DH_HASH --> T_HASH
+DH --> O_DH_RTR --> T_RTR
+
+%% Options werden gelesen (Snapshot)
+OPT -. snapshot/read .-> DET
+OPT -. snapshot/read .-> AP
+OPT -. snapshot/read .-> MAT
+OPT -. snapshot/read .-> DH
 ```
 
 Detailierte Ablaufdiagramme liegen in [Architektur und Flows (Detail)](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/020_ARCH_CORE.MD).
+
+Delegationshinweis: `ArchiveProcessing` ist bei path-basierten Archivpfaden eine Fassade auf `FileTypeDetector`; nur die byte-basierten Archivpfade laufen direkt über `ArchivePayloadGuard`/`ArchiveEntryCollector`.
 
 
 ## 5. Dokumentationspfad
