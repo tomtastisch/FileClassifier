@@ -145,9 +145,23 @@ jobs:
       - name: Download CI Artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: ci-*
-          path: .
-          merge-multiple: true
+          name: ci-preflight
+          path: artifacts/ci/preflight
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ci-build
+          path: artifacts/ci/build
+      - name: Download Security Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ci-security-nuget
+          path: artifacts/ci/security-nuget
+      - name: Download Test Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ci-tests-bdd-coverage
+          path: artifacts/ci/tests-bdd-coverage
       - name: Run Entry Check
         run: bash tools/ci/bin/run.sh summary
       - name: Upload Artifact
