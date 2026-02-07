@@ -12,6 +12,7 @@ rules:
       artifact_root: artifacts/ci
       check_ids:
         - preflight
+        - docs-links-full
         - build
         - security-nuget
         - tests-bdd-coverage

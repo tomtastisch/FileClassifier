@@ -83,5 +83,7 @@ artifacts/
 
 # --- local temp / qodana downloads ---
 .tmp/
+.tmp/**
+/.tmp/
 qodana-artifacts/
 qodana-results/

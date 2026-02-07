@@ -128,7 +128,6 @@ build_validators() {
 run_preflight() {
   build_validators
   run_or_fail "CI-PREFLIGHT-001" "Label engine tests" node "${ROOT_DIR}/tools/versioning/test-compute-pr-labels.js"
-  run_or_fail "CI-PREFLIGHT-001" "Docs check" python3 "${ROOT_DIR}/tools/check-docs.py"
   run_or_fail "CI-PREFLIGHT-001" "Versioning guard" bash "${ROOT_DIR}/tools/versioning/check-versioning.sh"
   run_or_fail "CI-PREFLIGHT-001" "Format check" dotnet format "${ROOT_DIR}/FileClassifier.sln" --verify-no-changes
   if ! run_policy_runner_bridge "preflight" "artifacts/ci/_policy_preflight" "Policy shell safety" "tools/ci/bin/run.sh"; then
@@ -137,6 +136,11 @@ run_preflight() {
   run_or_fail "CI-GRAPH-001" "CI graph assertion" bash "${ROOT_DIR}/tools/ci/bin/assert_ci_graph.sh"
 
   ci_result_append_summary "Preflight checks completed."
+}
+
+run_docs_links_full() {
+  run_or_fail "CI-DOCS-LINKS-001" "Full docs/link validation" python3 "${ROOT_DIR}/tools/check-docs.py"
+  ci_result_append_summary "Docs links full validation completed."
 }
 
 run_build() {
@@ -223,6 +227,7 @@ main() {
   cd "$ROOT_DIR"
   case "$CHECK_ID" in
     preflight) run_preflight ;;
+    docs-links-full) run_docs_links_full ;;
     build) run_build ;;
     security-nuget) run_security_nuget ;;
     tests-bdd-coverage) run_tests_bdd_coverage ;;
