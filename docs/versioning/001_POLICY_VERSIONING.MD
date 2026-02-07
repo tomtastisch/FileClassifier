@@ -74,10 +74,15 @@ Primary-Prioritaet ist fix:
 `breaking > feature > fix > refactor > ci > test > docs > tooling > chore`
 
 ## 10. Zugehoerige SSOT-Dokumente
-- `docs/AUTO_LABELING_AND_VERSIONING.md`
-- `docs/CI_PIPELINE.md`
-- `docs/governance/LABELING_OWNERSHIP.md`
-- `docs/DOCUMENTATION_STANDARDS.md`
+- `docs/versioning/004_POLICY_LABELING.MD`
+- `docs/ci/001_PIPELINE_CI.MD`
+- `docs/governance/002_POLICY_LABELING.MD`
+- `docs/governance/004_POLICY_DOCUMENTATION.MD`
 
 ## 11. Qodana
 Qodana ist zusaetzliche Static-Analysis und ersetzt keine CI-Quality-Gates fuer Build/Test/Coverage/Versioning.
+
+## RoC-Bezug
+- [Artifact-Contract-Regel](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tools/ci/policies/rules/artifact_contract.yaml)
+- [Docs-Drift-Regel](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tools/ci/policies/rules/docs_drift.yaml)
+- [Shell-Safety-Regeln](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tools/ci/policies/rules/shell_safety.yaml)

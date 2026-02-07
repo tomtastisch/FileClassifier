@@ -1,49 +1,29 @@
-# Index - Abstractions
+# Abstractions Modul
 
 ## 1. Zweck
+Dieses Verzeichnis enthält immutable Rückgabemodelle der öffentlichen API.
 
-Immutable Rückgabemodelle für stabile API-Verträge.
+## 2. Inhalt
+- Detection-Modelle (`FileKind`, `FileType`, `DetectionDetail`).
+- Archive-Modell (`ZipExtractedEntry`).
+- Hashing-Modelle (`DeterministicHash*`).
 
-## 1.1 Ordnerstruktur (kanonisch)
+## 3. API und Verhalten
+- Modelle führen keine I/O aus und dienen als stabile Vertragsobjekte.
+- `Unknown` bleibt fail-closed Standardrückgabe für unsichere/unklare Pfade.
 
-- `Detection/` -> Detektions-Rückgabemodelle (`FileKind`, `FileType`, `DetectionDetail`)
-- `Archive/` -> Archiv-Eintragsmodell (`ZipExtractedEntry`, Typname historisch)
-- `Hashing/` -> deterministische Hash-Evidence-Modelle (`DeterministicHash*`)
+## 4. Verifikation
+- Unit-Tests prüfen Modell-Defaults, Normalisierung und Null-/Edge-Verhalten.
 
-## 1.2 Unterordner-README (verpflichtend)
+## 5. Diagramm
+```mermaid
+flowchart LR
+    A[Detector and Processing] --> B[Abstractions Models]
+    B --> C[Consumer]
+```
 
-- [Detection/README.md](./Detection/README.md)
-- [Archive/README.md](./Archive/README.md)
-- [Hashing/README.md](./Hashing/README.md)
-
-## 2. Dateien und Rollen
-
-| Datei                                                                                        | Rolle                                         | Typische Verwendung               |
-|----------------------------------------------------------------------------------------------|-----------------------------------------------|-----------------------------------|
-| [Detection/FileKind.vb](./Detection/FileKind.vb)                                             | kanonische Typ-Enum                           | Vergleich/Branching in Consumers  |
-| [Detection/FileType.vb](./Detection/FileType.vb)                                             | Detektionsergebnis (Kind, Allowed, Metadaten) | Ergebnis von `Detect*`            |
-| [Detection/DetectionDetail.vb](./Detection/DetectionDetail.vb)                               | auditierbares Detailergebnis                  | Logging, UI, Audit                |
-| [Archive/ZipExtractedEntry.vb](./Archive/ZipExtractedEntry.vb)                               | In-Memory Archiv-Eintrag (Typname historisch) | sichere Weiterverarbeitung        |
-| [Hashing/DeterministicHashSourceType.vb](./Hashing/DeterministicHashSourceType.vb)           | Quelltyp für Hash-Evidence                    | Trace/Audit                       |
-| [Hashing/DeterministicHashDigestSet.vb](./Hashing/DeterministicHashDigestSet.vb)             | Physical/Logical/Fast Digests                 | Integritätsnachweis               |
-| [Hashing/DeterministicHashEvidence.vb](./Hashing/DeterministicHashEvidence.vb)               | Hash-Nachweis pro API-Schritt                 | Hashing/Forensik                  |
-| [Hashing/DeterministicHashRoundTripReport.vb](./Hashing/DeterministicHashRoundTripReport.vb) | h1-h4 Vergleichsreport                        | RoundTrip-Verifikation            |
-| [Hashing/DeterministicHashOptions.vb](./Hashing/DeterministicHashOptions.vb)                 | API-Optionen für Hash-Berechnung              | Steürung fast hash/payload copies |
-
-## 3. Garantie
-
-- Keine Seiteneffekte oder I/O in Modellen.
-- `Unknown` bleibt fail-closed Fallback.
-
-## 4. Siehe auch
-
-- [Modulindex](../README.md)
-- [Funktionsreferenz](../../../docs/01_FUNCTIONS.md)
-- [Referenzen](../../../docs/03_REFERENCES.md)
-
-## Dokumentpflege-Checkliste
-
-- [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
-- [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
+## 6. Verweise
+- [Modulübersicht](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/README.md)
+- [Detection-Modelle](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/Detection/README.md)
+- [Archive-Modelle](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/Archive/README.md)
+- [Hashing-Modelle](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/Hashing/README.md)

@@ -63,9 +63,9 @@ TEST_BDD_OUTPUT_DIR=artifacts/tests bash tools/test-bdd-readable.sh -- \
 
 ## 8. Rückverfolgbarkeit
 Diese Spezifikation ist rückverfolgbar auf:
-- Funktionsreferenz: `docs/01_FUNCTIONS.md`
-- Architektur- und Ablaufreferenz: `docs/02_ARCHITECTURE_AND_FLOWS.md`
-- Referenzdokument: `docs/03_REFERENCES.md`
+- Funktionsreferenz: `docs/010_API_CORE.MD`
+- Architektur- und Ablaufreferenz: `docs/020_ARCH_CORE.MD`
+- Referenzdokument: `docs/references/001_REFERENCES_CORE.MD`
 - Modulindex: `src/FileTypeDetection/README.md`
 - Unit-/Property-Tests: `tests/FileTypeDetectionLib.Tests`
 
@@ -73,4 +73,4 @@ Diese Spezifikation ist rückverfolgbar auf:
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.
 - [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
+- [ ] Begriffe mit `docs/010_API_CORE.MD` abgeglichen.

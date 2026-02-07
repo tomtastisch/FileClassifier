@@ -18,12 +18,12 @@ Verwende dieses Dokument, wenn mindestens einer der folgenden Punkte zutrifft:
 ## 3. Zentral betroffene Stellen (Datei-Map)
 | Bereich | Datei | Muss angepasst werden bei |
 |---|---|---|
-| Option-Definition und Normalize | [`../../src/FileTypeDetection/Configuration/FileTypeProjectOptions.vb`](../../src/FileTypeDetection/Configuration/FileTypeProjectOptions.vb) | neue Property, Default, Normalisierungsregel |
-| JSON Load/Parse und Snapshot-Set | [`../../src/FileTypeDetection/FileTypeOptions.vb`](../../src/FileTypeDetection/FileTypeOptions.vb) | JSON key mapping, parse guard, `SetSnapshot` |
-| JSON Export | [`../../src/FileTypeDetection/FileTypeOptions.vb`](../../src/FileTypeDetection/FileTypeOptions.vb) | `GetOptions()` für Snapshot-Sicht |
-| Baseline-Werte | [`../../src/FileTypeDetection/Configuration/FileTypeProjectBaseline.vb`](../../src/FileTypeDetection/Configuration/FileTypeProjectBaseline.vb) | produktive Defaults (`ApplyDeterministicDefaults`) |
-| Unit Tests (Options) | [`../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeOptionsFacadeUnitTests.cs`](../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeOptionsFacadeUnitTests.cs) | parse/export/normalize behavior |
-| Unit Tests (Baseline) | [`../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeProjectBaselineUnitTests.cs`](../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeProjectBaselineUnitTests.cs) | Baseline-Defaultwerte |
+| Option-Definition und Normalize | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Configuration/FileTypeProjectOptions.vb) | neue Property, Default, Normalisierungsregel |
+| JSON Load/Parse und Snapshot-Set | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/FileTypeOptions.vb) | JSON key mapping, parse guard, `SetSnapshot` |
+| JSON Export | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/FileTypeOptions.vb) | `GetOptions()` für Snapshot-Sicht |
+| Baseline-Werte | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Configuration/FileTypeProjectBaseline.vb) | produktive Defaults (`ApplyDeterministicDefaults`) |
+| Unit Tests (Options) | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tests/FileTypeDetectionLib.Tests/Unit/FileTypeOptionsFacadeUnitTests.cs) | parse/export/normalize behavior |
+| Unit Tests (Baseline) | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tests/FileTypeDetectionLib.Tests/Unit/FileTypeProjectBaselineUnitTests.cs) | Baseline-Defaultwerte |
 
 ## 4. Schritt-für-Schritt-Checkliste (Vorgehen)
 Arbeite die Schritte in dieser Reihenfolge ab:
@@ -138,4 +138,4 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.
 - [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
+- [ ] Begriffe mit `docs/010_API_CORE.MD` abgeglichen.

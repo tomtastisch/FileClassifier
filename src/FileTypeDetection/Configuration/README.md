@@ -1,56 +1,27 @@
-# Index - Configuration
+# Configuration Modul
 
 ## 1. Zweck
+Dieses Verzeichnis definiert die deterministische Laufzeitkonfiguration und konservative Sicherheits-Baselines.
 
-Deterministische Konfiguration der öffentlichen API inklusive Sicherheitsbaseline.
+## 2. Inhalt
+- `FileTypeProjectOptions.vb`.
+- `FileTypeProjectBaseline.vb`.
 
-## 2. Dateien
+## 3. API und Verhalten
+- Steuert globale Grenzen und Schalter für Detection, Archive und Hashing.
+- Baseline setzt reproduzierbare Defaultwerte für produktive Nutzung.
 
-- [FileTypeProjectOptions.vb](./FileTypeProjectOptions.vb)
-- [FileTypeProjectBaseline.vb](./FileTypeProjectBaseline.vb)
+## 4. Verifikation
+- Unit-Tests prüfen Normalisierung, Snapshot-Verhalten und Baseline-Konsistenz.
 
-## 3. Optionen (wann relevant)
-
-| Option                         | Wirkung                                                                                              | Typischer Trigger                |
-|--------------------------------|------------------------------------------------------------------------------------------------------|----------------------------------|
-| `MaxBytes`                     | maximale Dateigrösse für Detect/Read                                                                 | Upload-Limits, DoS-Schutz        |
-| `SniffBytes`                   | Header-Länge für Magic-Prüfung                                                                       | Dateiformate mit spätem Marker   |
-| `MaxZipEntries`                | Begrenzung Entry-Anzahl                                                                              | Archiv-Bomb/Many-entry Schutz    |
-| `MaxZipTotalUncompressedBytes` | Gesamtgrenze Archiv                                                                                  | Speicher-/CPU-Schutz             |
-| `MaxZipEntryUncompressedBytes` | pro-Entry-Grenze                                                                                     | grosse Einzeldateien abfangen    |
-| `MaxZipCompressionRatio`       | Kompressionsratio-Limit                                                                              | stark komprimierte Bomben        |
-| `MaxZipNestingDepth`           | maximale Archiv-Verschachtelung                                                                      | rekursive Angriffe begrenzen     |
-| `MaxZipNestedBytes`            | Nested-Archiv Byte-Limit                                                                             | Memory-Schutz bei Nested-Content |
-| `HeaderOnlyNonZip`             | Header-only für Nicht-Archiv-Typen (Property-Name historisch)                                        | konsistente Erkennungsstrategie  |
-| `DeterministicHash`            | Default-Policy für Hash-Evidence (`IncludeFastHash`, `IncludePayloadCopies`, `MaterializedFileName`) | reproduzierbare h1-h4 Nachweise  |
-
-## 4. Baseline-Strategie
-
-- `FileTypeProjectBaseline.ApplyDeterministicDefaults()` setzt konservative Werte für produktive Umgebungen.
-- `FileTypeOptions.LoadOptions(json)` setzt Optionen via JSON (partiell, default-basiert).
-
-## 5. Diagramm: Konfigurationsfluss
-
+## 5. Diagramm
 ```mermaid
 flowchart LR
-    A[Startup] --> B[ApplyDeterministicDefaults]
-    B --> C[LoadOptions]
-    C --> D[Detect/Extract Laufzeit]
+    A[Config JSON or Baseline] --> B[Options Normalization]
+    B --> C[Global Snapshot]
 ```
 
-## 6. Testverknüpfung
-
-- [FileTypeProjectBaselineUnitTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeProjectBaselineUnitTests.cs)
-
-## 7. Siehe auch
-
-- [Modulindex](../README.md)
-- [Funktionsreferenz](../../../docs/01_FUNCTIONS.md)
-- [Architektur und Ablaufe](../../../docs/02_ARCHITECTURE_AND_FLOWS.md)
-
-## Dokumentpflege-Checkliste
-
-- [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
-- [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
+## 6. Verweise
+- [Modulübersicht](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/README.md)
+- [API-Kernübersicht](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/010_API_CORE.MD)
+- [Options-Guide](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/guides/001_GUIDE_OPTIONS.MD)

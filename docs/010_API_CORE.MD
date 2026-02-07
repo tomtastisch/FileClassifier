@@ -17,17 +17,17 @@ Dieses Dokument beschreibt alle öffentlichen Einstiegspunkte der API mit Signat
 ## 2.2 Weiterführende Detailquellen pro Familie
 | API-Familie | Detailquelle | Zweck |
 |---|---|---|
-| `FileTypeDetector` / `ArchiveProcessing` | [`../src/FileTypeDetection/Detection/README.md`](../src/FileTypeDetection/Detection/README.md) | SSOT-Detektion, Header-Magic, Aliaslogik |
-| `FileTypeDetector` / `ArchiveProcessing` / `FileMaterializer` | [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md) | Archive-Gate, Guards, Extraktions-Engine |
-| `FileTypeOptions` / `FileTypeProjectBaseline` | [`../src/FileTypeDetection/Configuration/README.md`](../src/FileTypeDetection/Configuration/README.md) | globale Optionen und Baseline |
-| Rückgabemodelle (`FileType`, `DetectionDetail`, `ZipExtractedEntry`, `DeterministicHash*`) | [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md) | Modellverträge der Public API |
-| Modulnavigation | [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md) | Übersicht und Einstieg je Leserrolle |
+| `FileTypeDetector` / `ArchiveProcessing` | [Detection Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Detection/README.md) | SSOT-Detektion, Header-Magic, Aliaslogik |
+| `FileTypeDetector` / `ArchiveProcessing` / `FileMaterializer` | [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Infrastructure/README.md) | Archive-Gate, Guards, Extraktions-Engine |
+| `FileTypeOptions` / `FileTypeProjectBaseline` | [Configuration Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Configuration/README.md) | globale Optionen und Baseline |
+| Rückgabemodelle (`FileType`, `DetectionDetail`, `ZipExtractedEntry`, `DeterministicHash*`) | [Abstractions Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/README.md) | Modellverträge der Public API |
+| Modulnavigation | [FileTypeDetection Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/README.md) | Übersicht und Einstieg je Leserrolle |
 
 ## 2.2.1 Physische Modellablage (ohne Funktionsänderung)
 Die Rückgabemodelle sind rein organisatorisch in Unterordner aufgeteilt; die API-Semantik bleibt unverändert:
-- Detection-Modelle: [`../src/FileTypeDetection/Abstractions/Detection/README.md`](../src/FileTypeDetection/Abstractions/Detection/README.md)
-- Archive-Modelle: [`../src/FileTypeDetection/Abstractions/Archive/README.md`](../src/FileTypeDetection/Abstractions/Archive/README.md)
-- Hashing-Modelle: [`../src/FileTypeDetection/Abstractions/Hashing/README.md`](../src/FileTypeDetection/Abstractions/Hashing/README.md)
+- Detection-Modelle: [Abstractions Detection Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/Detection/README.md)
+- Archive-Modelle: [Abstractions Archive Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/Archive/README.md)
+- Hashing-Modelle: [Abstractions Hashing Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/Hashing/README.md)
 
 ## 2.3 Glossar (kanonische Begriffe)
 | Begriff | Bedeutung |
@@ -77,7 +77,7 @@ Die Rückgabemodelle sind rein organisatorisch in Unterordner aufgeteilt; die AP
 
 ## 4. Methodenfamilien
 ### 4.1 FileTypeDetector
-Details: [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md), [`../src/FileTypeDetection/Detection/README.md`](../src/FileTypeDetection/Detection/README.md), [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md).
+Details: [FileTypeDetection Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/README.md), [Detection Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Detection/README.md), [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Infrastructure/README.md).
 
 **Wichtiger Semantikhinweis:** `TryValidateArchive(path)` validiert generische Archivcontainer über dieselbe fail-closed Pipeline wie Extraktion und Materialisierung.
 
@@ -110,7 +110,7 @@ Console.WriteLine($"{t.Kind} / {d.ReasonCode} / {archiveOk} / {entries.Count}");
 
 ### 4.2 ArchiveProcessing
 API-Name bleibt aus Kompatibilitätsgründen erhalten; intern werden Archivcontainer einheitlich behandelt.
-Details: [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md), [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md).
+Details: [FileTypeDetection Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/README.md), [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Infrastructure/README.md).
 
 ```mermaid
 flowchart LR
@@ -133,7 +133,7 @@ var entriesBytes = ArchiveProcessing.TryExtractToMemory(File.ReadAllBytes("/data
 ```
 
 ### 4.3 FileMaterializer
-Details: [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md), [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md).
+Details: [FileTypeDetection Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/README.md), [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Infrastructure/README.md).
 
 ```mermaid
 flowchart TD
@@ -160,7 +160,7 @@ bool archiveExtractOk = FileMaterializer.Persist(archivePayload, "/data/out/unpa
 ```
 
 ### 4.4 FileTypeOptions + FileTypeProjectBaseline
-Details: [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md), [`../src/FileTypeDetection/Configuration/README.md`](../src/FileTypeDetection/Configuration/README.md).
+Details: [FileTypeDetection Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/README.md), [Configuration Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Configuration/README.md).
 
 ```mermaid
 flowchart LR
@@ -185,8 +185,8 @@ Console.WriteLine($"Loaded={loaded}; Snapshot={snapshot}");
 ```
 
 ### 4.5 DeterministicHashing
-Details: [`../src/FileTypeDetection/README.md`](../src/FileTypeDetection/README.md), [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md).
-Formaler API-Contract: [`./04_DETERMINISTIC_HASHING_API_CONTRACT.md`](./04_DETERMINISTIC_HASHING_API_CONTRACT.md).
+Details: [FileTypeDetection Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/README.md), [Abstractions Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/README.md).
+Formaler API-Contract: [04 - DeterministicHashing API Contract](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/contracts/001_CONTRACT_HASHING.MD).
 
 ```mermaid
 flowchart LR
@@ -267,4 +267,4 @@ Portabilität/Struktur:
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.
 - [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
+- [ ] Begriffe mit `docs/010_API_CORE.MD` abgeglichen.

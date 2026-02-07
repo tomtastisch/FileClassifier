@@ -1,14 +1,14 @@
 # Versionslinie (Commit → Version)
 
 Diese Tabelle wurde aus der Commit-Historie anhand der Policy in
-`docs/versioning/POLICY.md` abgeleitet.
+`docs/versioning/001_POLICY_VERSIONING.MD` abgeleitet.
 Heuristik fuer die Rueckwirkungs-Zuordnung:
 - Major-Overrides: `5255724`, `fd03389`
 - `feat:` oder `Add ...` (nicht-Doku) => Minor
 - `docs|test|ci|chore|tooling|refactor|fix` => Patch
 
 Aktueller Entwicklungsstand:
-- Aktuelle Release-Linie enthält `4.x` (siehe `Directory.Build.props` und `docs/versioning/CHANGELOG.md`).
+- Aktuelle Release-Linie enthält `4.x` (siehe `Directory.Build.props` und `docs/versioning/003_CHANGELOG_RELEASES.MD`).
 
 | Version | Kurzbeschreibung | Commit | Keyword |
 |---|---|---|---|

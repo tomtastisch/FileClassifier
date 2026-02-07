@@ -20,8 +20,8 @@ Beide Guides folgen derselben Struktur:
 6. Verifikation + Done-Kriterien
 
 ## 3. Playbooks
-1. [OPTIONS_CHANGE_GUIDE.md](./OPTIONS_CHANGE_GUIDE.md)
-2. [DATATYPE_EXTENSION_GUIDE.md](./DATATYPE_EXTENSION_GUIDE.md)
+1. [Playbook: Options anlegen und anpassen](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/guides/001_GUIDE_OPTIONS.MD)
+2. [Playbook: Neue Datatypes und API-Modelle erweitern](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/guides/002_GUIDE_DATATYPE.MD)
 
 ## 4. Wann welcher Guide?
 | Frage | Guide |
@@ -32,10 +32,10 @@ Beide Guides folgen derselben Struktur:
 | Kombination aus Option + Datatype? | beide Guides, zuerst Options-Guide, dann Datatype-Guide |
 
 ## 5. Verknüpfungen
-- [Doku-Index](../README.md)
-- [01 - Funktionen](../01_FUNCTIONS.md)
-- [02 - Gesamtarchitektur und Ablaufflüsse](../02_ARCHITECTURE_AND_FLOWS.md)
-- [03 - Referenzen](../03_REFERENCES.md)
+- [Doku-Index](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/001_INDEX_CORE.MD)
+- [01 - Funktionen](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/010_API_CORE.MD)
+- [02 - Gesamtarchitektur und Ablaufflüsse](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/020_ARCH_CORE.MD)
+- [03 - Referenzen](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/references/001_REFERENCES_CORE.MD)
 
 ## 6. Pflegehinweis
 Die Guides sind verbindliche Arbeitsvorlagen. Bei strukturellen API-Änderungen müssen die betroffenen Abschnitte zeitgleich mitgepflegt werden.
@@ -44,4 +44,4 @@ Die Guides sind verbindliche Arbeitsvorlagen. Bei strukturellen API-Änderungen 
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.
 - [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
+- [ ] Begriffe mit `docs/010_API_CORE.MD` abgeglichen.
