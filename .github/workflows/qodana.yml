@@ -21,28 +21,106 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Fail if QODANA_TOKEN Missing
+        run: |
+          set -euo pipefail
+          if [[ -z "${QODANA_TOKEN:-}" ]]; then
+            echo "QODANA_TOKEN is required for this workflow."
+            exit 1
+          fi
+
       - name: Run Qodana
-        if: env.QODANA_TOKEN != ''
         uses: JetBrains/qodana-action@v2025.3
         with:
           args: --linter,jetbrains/qodana-dotnet:2025.3
           results-dir: qodana-results
           upload-result: false
 
+      - name: Dead Code Gate
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/qodana
+          if [[ ! -f qodana-results/qodana.sarif.json ]]; then
+            echo "SARIF file missing: qodana-results/qodana.sarif.json" | tee artifacts/qodana/dead-code-summary.txt
+            exit 1
+          fi
+
+          node <<'NODE'
+          const fs = require("fs");
+          const sarifPath = "qodana-results/qodana.sarif.json";
+          const outPath = "artifacts/qodana/dead-code-summary.txt";
+          const deadRules = new Set([
+            "UnusedMember.Global",
+            "UnusedMember.Local",
+            "UnusedType.Global",
+            "UnusedType.Local",
+            "UnusedParameter.Global",
+            "UnusedParameter.Local",
+          ]);
+
+          let sarif;
+          try {
+            sarif = JSON.parse(fs.readFileSync(sarifPath, "utf8"));
+          } catch (error) {
+            fs.writeFileSync(outPath, `Failed to parse SARIF: ${error.message}\n`, "utf8");
+            console.error(`Failed to parse SARIF: ${error.message}`);
+            process.exit(1);
+          }
+
+          const findings = [];
+          const runs = Array.isArray(sarif.runs) ? sarif.runs : [];
+          for (const run of runs) {
+            const results = Array.isArray(run.results) ? run.results : [];
+            for (const result of results) {
+              const ruleId = result.ruleId || "";
+              if (!deadRules.has(ruleId)) continue;
+
+              const location = (result.locations && result.locations[0] && result.locations[0].physicalLocation) || {};
+              const artifactLocation = location.artifactLocation || {};
+              const region = location.region || {};
+              findings.push({
+                ruleId,
+                file: artifactLocation.uri || "unknown",
+                line: region.startLine || 0,
+                message: (result.message && result.message.text) || "",
+              });
+            }
+          }
+
+          const lines = [];
+          lines.push("Qodana Dead Code Gate Summary");
+          lines.push(`Rule set: ${Array.from(deadRules).join(", ")}`);
+          lines.push(`Dead-code findings: ${findings.length}`);
+          lines.push("");
+          for (const finding of findings.slice(0, 200)) {
+            lines.push(`${finding.ruleId}\t${finding.file}:${finding.line}\t${finding.message}`);
+          }
+          fs.writeFileSync(outPath, `${lines.join("\n")}\n`, "utf8");
+          console.log(lines.join("\n"));
+
+          if (findings.length > 0) {
+            process.exit(1);
+          }
+          NODE
+
       - name: Upload SARIF To Code Scanning
-        if: env.QODANA_TOKEN != '' && github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request'
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: qodana-results/qodana.sarif.json
 
       - name: Upload SARIF Artifact
-        if: env.QODANA_TOKEN != ''
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: qodana-sarif
           path: qodana-results/qodana.sarif.json
           if-no-files-found: error
 
-      - name: Skip Message (No Token)
-        if: env.QODANA_TOKEN == ''
-        run: echo "QODANA_TOKEN not set; qodana scan skipped."
+      - name: Upload Dead Code Gate Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qodana-dead-code-summary
+          path: artifacts/qodana/dead-code-summary.txt
+          if-no-files-found: error
