@@ -1,0 +1,25 @@
+# Testdokumentation (BDD)
+
+## 1. Zweck
+Diese Seite ist der Einstieg fuer die testbezogene SSOT-Dokumentation im Bereich BDD/Reqnroll.
+
+## 2. Geltungsbereich
+- `tests/FileTypeDetectionLib.Tests/Features/*.feature`
+- `tests/FileTypeDetectionLib.Tests/Steps/FileTypeDetectionSteps.cs`
+- Testlauf in CI via `tools/test-bdd-readable.sh`
+- Runner/Adapter: Reqnroll mit `Reqnroll.xunit.v3` (xUnit v3)
+
+## 3. Dokumente
+1. [BDD-Satzkatalog (Deutsch, kanonisch)](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/tests/003_CATALOG_BDD.MD)
+2. [BDD-Ausfuehrung und Gherkin-Flow](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/tests/002_FLOW_BDD.MD)
+
+## 4. Verifikation
+```bash
+python3 tools/check-docs.py
+bash tools/test-bdd-readable.sh
+```
+
+## 5. Verlinkte SSOT-Quellen
+- [CI-Pipeline (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/ci/001_PIPELINE_CI.MD)
+- [Dokumentationsstandard (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/governance/004_POLICY_DOCUMENTATION.MD)
+- [Readme](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/tests/FileTypeDetectionLib.Tests/README.md)

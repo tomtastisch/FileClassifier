@@ -1,6 +1,6 @@
 {
   "name": "docs-only",
-  "files": ["docs/CI_PIPELINE.md", "README.md"],
+  "files": ["docs/ci/001_PIPELINE_CI.MD", "README.md"],
   "required": "none",
   "actual": "none",
   "version_reason": "docs-or-meta-only",

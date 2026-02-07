@@ -1,27 +1,25 @@
-# Index - Abstractions/Archive
+# Abstractions Archive Modul
 
 ## 1. Zweck
+Dieses Verzeichnis stellt das einheitliche In-Memory-Archiv-Entry-Modell bereit.
 
-Archiv-Eintragsmodell für sichere In-Memory-Extraktion.
+## 2. Inhalt
+- `ZipExtractedEntry.vb`
 
-## 2. Datei
+## 3. API und Verhalten
+- Modellname bleibt aus Kompatibilitätsgründen historisch.
+- Semantik ist archivformat-generisch für die einheitliche Pipeline.
 
-- [ZipExtractedEntry.vb](./ZipExtractedEntry.vb)
+## 4. Verifikation
+- Unit-Tests prüfen Konstruktion, Stream-Zugriff und Invarianten.
 
-## 3. Vertragsregeln
+## 5. Diagramm
+```mermaid
+flowchart LR
+    A[Archive Extractor] --> B[ZipExtractedEntry]
+    B --> C[Consumer Processing]
+```
 
-- Typname `ZipExtractedEntry` ist historisch und bleibt aus Kompatibilitätsgründen bestehen.
-- Verwendung ist archivformat-generisch (ZIP/TAR/GZIP/7z/RAR via einheitliche Pipeline).
-- Modell stellt Entry-Pfad, Content und Grösse deterministisch bereit.
-
-## 4. Siehe auch
-
-- [Abstractions-Index](../README.md)
-- [Funktionsreferenz](../../../../docs/01_FUNCTIONS.md)
-
-## Dokumentpflege-Checkliste
-
-- [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
-- [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
+## 6. Verweise
+- [Abstractions-Übersicht](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/src/FileTypeDetection/Abstractions/README.md)
+- [Architektur und Flows](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/020_ARCH_CORE.MD)

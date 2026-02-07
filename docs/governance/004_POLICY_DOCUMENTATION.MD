@@ -33,9 +33,9 @@ Jedes fachliche Dokument folgt dieser Reihenfolge:
 - Aussagen möglichst deterministisch und prüfbar formulieren.
 
 ## 6. Verlinkungsregeln
-- `README.md` verlinkt auf `docs/README.md` als zentralen Einstieg.
-- `docs/README.md` verlinkt auf alle SSOT-Dokumente.
-- Jede Spezialdoku verlinkt zurück auf `docs/README.md`.
+- `README.md` verlinkt auf `docs/001_INDEX_CORE.MD` als zentralen Einstieg.
+- `docs/001_INDEX_CORE.MD` verlinkt auf alle SSOT-Dokumente.
+- Jede Spezialdoku verlinkt zurück auf `docs/001_INDEX_CORE.MD`.
 
 ## 7. Diagrammstandard
 - Für Abläufe: `flowchart` oder `sequenceDiagram` (Mermaid).
@@ -57,3 +57,8 @@ python3 tools/check-docs.py
 - Keine doppelte Pflege derselben Regel in mehreren SSOT-Dateien.
 - Keine veralteten Backup-/Deprecated-Dokumente im aktiven Pfad.
 - Keine gemischten Benennungsschemata (`kebab-case`/`snake_case`) innerhalb derselben Doku-Ebene.
+
+## RoC-Bezug
+- [Artifact-Contract-Regel](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/tools/ci/policies/rules/artifact_contract.yaml)
+- [Docs-Drift-Regel](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/tools/ci/policies/rules/docs_drift.yaml)
+- [Shell-Safety-Regeln](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/tools/ci/policies/rules/shell_safety.yaml)

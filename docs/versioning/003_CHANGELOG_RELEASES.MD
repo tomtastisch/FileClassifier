@@ -18,7 +18,7 @@ Alle Aenderungen werden hier technisch dokumentiert. Die Version selbst ist in
 - Docs/CI/Tooling:
   - CI in getrennte, auditierbare Jobs refaktoriert (Preflight, Build, Security, Tests+Coverage, Summary).
   - BDD-Readable Testlauf liefert TRX + lesbare Ausgabe + Coverage + Gate im Single-Run.
-  - Dokumentation fuer CI-Nachweise unter `docs/CI_PIPELINE.md` ergaenzt.
+  - Dokumentation fuer CI-Nachweise unter `docs/ci/001_PIPELINE_CI.MD` ergaenzt.
   - Migrations-DoD und Fortschrittstracking in der PR-Beschreibung gepflegt.
 
 ## [3.0.0]

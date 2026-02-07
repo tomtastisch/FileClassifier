@@ -3,7 +3,7 @@
   "files": [
     "src/FileTypeDetection/FileTypeDetector.vb",
     "tests/FileTypeDetectionLib.Tests/Unit/FileTypeDetectorPrivateBranchUnitTests.cs",
-    "docs/01_FUNCTIONS.md"
+    "docs/010_API_CORE.MD"
   ],
   "required": "minor",
   "actual": "minor",

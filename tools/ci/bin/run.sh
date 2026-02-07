@@ -129,6 +129,7 @@ run_preflight() {
   build_validators
   run_or_fail "CI-PREFLIGHT-001" "Label engine tests" node "${ROOT_DIR}/tools/versioning/test-compute-pr-labels.js"
   run_or_fail "CI-PREFLIGHT-001" "Docs check" python3 "${ROOT_DIR}/tools/check-docs.py"
+  run_or_fail "CI-PREFLIGHT-001" "Policy/RoC bijection" python3 "${ROOT_DIR}/tools/check-policy-roc.py" --out "${ROOT_DIR}/artifacts/policy_roc_matrix.tsv"
   run_or_fail "CI-PREFLIGHT-001" "Versioning guard" bash "${ROOT_DIR}/tools/versioning/check-versioning.sh"
   run_or_fail "CI-PREFLIGHT-001" "Format check" dotnet format "${ROOT_DIR}/FileClassifier.sln" --verify-no-changes
   if ! run_policy_runner_bridge "preflight" "artifacts/ci/_policy_preflight" "Policy shell safety" "tools/ci/bin/run.sh"; then

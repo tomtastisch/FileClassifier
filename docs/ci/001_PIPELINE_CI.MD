@@ -69,8 +69,8 @@ Wenn Label-API-Aufrufe fehlschlagen, wird dies als Artefakt protokolliert, ohne 
 - `artifacts/coverage/coverage-summary.txt`
 
 ## 6. Labeling- und Versioning-SSOT
-- Policy: `docs/versioning/POLICY.md`
-- Verhalten + Diagramme: `docs/AUTO_LABELING_AND_VERSIONING.md`
+- Policy: `docs/versioning/001_POLICY_VERSIONING.MD`
+- Verhalten + Diagramme: `docs/versioning/004_POLICY_LABELING.MD`
 - Ownership: `docs/governance/LABELING_OWNERSHIP.md`
 
 ## 7. Qodana

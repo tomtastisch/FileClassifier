@@ -42,7 +42,7 @@ is_public_path() {
 
 is_api_doc() {
   case "$1" in
-    docs/01_FUNCTIONS.md|docs/03_REFERENCES.md|docs/04_DETERMINISTIC_HASHING_API_CONTRACT.md) return 0;;
+    docs/010_API_CORE.MD|docs/references/001_REFERENCES_CORE.MD|docs/contracts/001_CONTRACT_HASHING.MD) return 0;;
     *) return 1;;
   esac
 }
@@ -87,7 +87,7 @@ while IFS=$'\t' read -r status a b; do
 done <<< "${changes}"
 
 breaking_changelog=0
-if [[ -f docs/versioning/CHANGELOG.md ]]; then
+if [[ -f docs/versioning/003_CHANGELOG_RELEASES.MD ]]; then
   in_unreleased=0
   while IFS= read -r line; do
     if [[ "${line}" =~ ^##\ \[Unreleased\] ]]; then
@@ -101,7 +101,7 @@ if [[ -f docs/versioning/CHANGELOG.md ]]; then
       breaking_changelog=1
       break
     fi
-  done < docs/versioning/CHANGELOG.md
+  done < docs/versioning/003_CHANGELOG_RELEASES.MD
 fi
 
 required="none"

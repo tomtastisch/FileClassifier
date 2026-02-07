@@ -1,29 +1,27 @@
-# Index - Abstractions/Detection
+# Abstractions Detection Modul
 
 ## 1. Zweck
+Dieses Verzeichnis bündelt die Detection-Rückgabemodelle für die Public API.
 
-Detektions-Rückgabemodelle der Public API.
+## 2. Inhalt
+- `FileKind.vb`
+- `FileType.vb`
+- `DetectionDetail.vb`
 
-## 2. Dateien
+## 3. API und Verhalten
+- Modelle bilden Typ, Zulässigkeit und auditierbare Details deterministisch ab.
+- Kein I/O und keine Seiteneffekte.
 
-- [FileKind.vb](./FileKind.vb)
-- [FileType.vb](./FileType.vb)
-- [DetectionDetail.vb](./DetectionDetail.vb)
+## 4. Verifikation
+- Modelltests prüfen Defaults, Stabilität und Konsistenz.
 
-## 3. Vertragsregeln
+## 5. Diagramm
+```mermaid
+flowchart LR
+    A[Detection Pipeline] --> B[FileKind and FileType]
+    B --> C[DetectionDetail]
+```
 
-- `FileKind.Unknown` bleibt fail-closed Fallback.
-- Modelle sind immutable ausgelegt und enthalten keine I/O-Logik.
-- `DetectionDetail` ist der auditierbare Trace für `DetectDetailed(...)`.
-
-## 4. Siehe auch
-
-- [Abstractions-Index](../README.md)
-- [Funktionsreferenz](../../../../docs/01_FUNCTIONS.md)
-
-## Dokumentpflege-Checkliste
-
-- [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
-- [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
+## 6. Verweise
+- [Abstractions-Übersicht](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/src/FileTypeDetection/Abstractions/README.md)
+- [API-Kernübersicht](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/010_API_CORE.MD)
