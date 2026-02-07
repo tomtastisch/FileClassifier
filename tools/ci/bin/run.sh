@@ -46,6 +46,23 @@ run_or_fail() {
   fi
 }
 
+log_contains_code() {
+  local code="$1"
+  if command -v rg >/dev/null 2>&1; then
+    rg -q --fixed-strings "$code" "$CI_RAW_LOG"
+  else
+    grep -Fq -- "$code" "$CI_RAW_LOG"
+  fi
+}
+
+log_contains_high_or_critical() {
+  if command -v rg >/dev/null 2>&1; then
+    rg -n "\\b(High|Critical)\\b" "$CI_RAW_LOG" >/dev/null
+  else
+    grep -En "(^|[^[:alnum:]_])(High|Critical)([^[:alnum:]_]|$)" "$CI_RAW_LOG" >/dev/null
+  fi
+}
+
 run_policy_runner_bridge() {
   local policy_check_id="$1"
   local policy_out_dir="$2"
@@ -132,7 +149,7 @@ run_security_nuget() {
   run_or_fail "CI-SECURITY-002" "Restore solution (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/FileClassifier.sln" -v minimal
   run_or_fail "CI-SECURITY-002" "NuGet vulnerability scan" dotnet list "${ROOT_DIR}/FileClassifier.sln" package --vulnerable --include-transitive
 
-  if rg -n "\\b(High|Critical)\\b" "$CI_RAW_LOG" >/dev/null; then
+  if log_contains_high_or_critical; then
     ci_result_add_violation "CI-SECURITY-001" "fail" "High/Critical NuGet vulnerabilities detected" "$CI_RAW_LOG"
     ci_result_append_summary "High/Critical NuGet vulnerabilities detected."
     return 1
@@ -184,15 +201,15 @@ run_qodana_contract() {
   build_validators
   local sarif_path="${OUT_DIR}/qodana.sarif.json"
   if ! ci_run_capture "Qodana contract validator" dotnet "${ROOT_DIR}/tools/ci/checks/QodanaContractValidator/bin/Release/net10.0/QodanaContractValidator.dll" --sarif "$sarif_path"; then
-    if rg -q "CI-QODANA-001" "$CI_RAW_LOG"; then
+    if log_contains_code "CI-QODANA-001"; then
       ci_result_add_violation "CI-QODANA-001" "fail" "QODANA_TOKEN missing" "$CI_RAW_LOG"
-    elif rg -q "CI-QODANA-002" "$CI_RAW_LOG"; then
+    elif log_contains_code "CI-QODANA-002"; then
       ci_result_add_violation "CI-QODANA-002" "fail" "Qodana SARIF missing" "$CI_RAW_LOG"
-    elif rg -q "CI-QODANA-003" "$CI_RAW_LOG"; then
+    elif log_contains_code "CI-QODANA-003"; then
       ci_result_add_violation "CI-QODANA-003" "fail" "Qodana SARIF invalid" "$CI_RAW_LOG"
-    elif rg -q "CI-QODANA-004" "$CI_RAW_LOG"; then
+    elif log_contains_code "CI-QODANA-004"; then
       ci_result_add_violation "CI-QODANA-004" "fail" "Qodana blocking findings detected (High+)" "$CI_RAW_LOG"
-    elif rg -q "CI-QODANA-005" "$CI_RAW_LOG"; then
+    elif log_contains_code "CI-QODANA-005"; then
       ci_result_add_violation "CI-QODANA-005" "fail" "Qodana toolset/environment errors detected" "$CI_RAW_LOG"
     else
       ci_result_add_violation "CI-QODANA-001" "fail" "Qodana contract validation failed" "$CI_RAW_LOG"
