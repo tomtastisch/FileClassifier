@@ -6,8 +6,8 @@ This governance policy applies to deterministic PR auto-labeling and auto-versio
 ## 2. Owned Files
 - `.github/workflows/ci.yml`
 - `tools/versioning/*`
-- `docs/versioning/POLICY.md`
-- `docs/AUTO_LABELING_AND_VERSIONING.md`
+- `docs/versioning/001_POLICY_VERSIONING.MD`
+- `docs/versioning/004_POLICY_LABELING.MD`
 
 ## 3. Change Requirements
 Any change to taxonomy, priority, caps, or versioning decision logic must include:
@@ -20,3 +20,8 @@ At least one maintainer owner review is required for the owned files.
 
 ## 5. Non-Goals
 This policy does not change product runtime behavior; it governs repository automation only.
+
+## RoC-Bezug
+- [Artifact-Contract-Regel](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tools/ci/policies/rules/artifact_contract.yaml)
+- [Docs-Drift-Regel](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tools/ci/policies/rules/docs_drift.yaml)
+- [Shell-Safety-Regeln](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tools/ci/policies/rules/shell_safety.yaml)

@@ -1,32 +1,31 @@
-# Index - Abstractions/Hashing
+# Abstractions Hashing Modul
 
 ## 1. Zweck
+Dieses Verzeichnis bündelt Modelle für deterministische Hash-Evidence und RoundTrip-Nachweise.
 
-Deterministische Hash-Evidence-Modelle für Physical/Logical-Nachweise und RoundTrip-Reports.
+## 2. Inhalt
+- `DeterministicHashSourceType.vb`
+- `DeterministicHashDigestSet.vb`
+- `DeterministicHashEvidence.vb`
+- `DeterministicHashRoundTripReport.vb`
+- `DeterministicHashOptions.vb`
 
-## 2. Dateien
+## 3. API und Verhalten
+- Physical/Logical SHA-256 sind die zentralen Integritätsnachweise.
+- Optionaler FastHash bleibt nicht-kryptografisch.
 
-- [DeterministicHashSourceType.vb](./DeterministicHashSourceType.vb)
-- [DeterministicHashDigestSet.vb](./DeterministicHashDigestSet.vb)
-- [DeterministicHashEvidence.vb](./DeterministicHashEvidence.vb)
-- [DeterministicHashRoundTripReport.vb](./DeterministicHashRoundTripReport.vb)
-- [DeterministicHashOptions.vb](./DeterministicHashOptions.vb)
+## 4. Verifikation
+- Unit- und Integrationstests prüfen Stage-Konsistenz und RoundTrip-Verhalten.
 
-## 3. Vertragsregeln
+## 5. Diagramm
+```mermaid
+flowchart LR
+    A[Hash Input] --> B[Digest Set]
+    B --> C[Evidence]
+    C --> D[RoundTrip Report]
+```
 
-- `PhysicalSha256` und `LogicalSha256` sind SSOT für Integritätsnachweise.
-- Fast-Hash-Felder sind optional und nicht-kryptografisch.
-- RoundTrip-Report bildet h1-h4 konsistent für Audit/Tests ab.
-
-## 4. Siehe auch
-
-- [Abstractions-Index](../README.md)
-- [API-Contract](../../../../docs/04_DETERMINISTIC_HASHING_API_CONTRACT.md)
-- [Test-Matrix Hashing](../../../../docs/TEST_MATRIX_HASHING.md)
-
-## Dokumentpflege-Checkliste
-
-- [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
-- [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
+## 6. Verweise
+- [Abstractions-Übersicht](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/README.md)
+- [Hashing-Contract](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/contracts/001_CONTRACT_HASHING.MD)
+- [Hashing-Testmatrix](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/tests/004_MATRIX_HASHING.MD)

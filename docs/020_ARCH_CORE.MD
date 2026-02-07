@@ -33,14 +33,14 @@ flowchart LR
 ```
 
 ### 2.4 Detailquellen für tieferes Drill-Down
-- Detection-Details: [`../src/FileTypeDetection/Detection/README.md`](../src/FileTypeDetection/Detection/README.md)
-- Infrastructure-Details (Guards/Archive internals): [`../src/FileTypeDetection/Infrastructure/README.md`](../src/FileTypeDetection/Infrastructure/README.md)
-- Konfigurationsdetails: [`../src/FileTypeDetection/Configuration/README.md`](../src/FileTypeDetection/Configuration/README.md)
-- Rückgabemodelle: [`../src/FileTypeDetection/Abstractions/README.md`](../src/FileTypeDetection/Abstractions/README.md)
-- Rückgabemodelle Detection: [`../src/FileTypeDetection/Abstractions/Detection/README.md`](../src/FileTypeDetection/Abstractions/Detection/README.md)
-- Rückgabemodelle Archive: [`../src/FileTypeDetection/Abstractions/Archive/README.md`](../src/FileTypeDetection/Abstractions/Archive/README.md)
-- Rückgabemodelle Hashing: [`../src/FileTypeDetection/Abstractions/Hashing/README.md`](../src/FileTypeDetection/Abstractions/Hashing/README.md)
-- Funktionskatalog mit Beispielen: [`./01_FUNCTIONS.md`](./01_FUNCTIONS.md)
+- Detection-Details: [Detection Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Detection/README.md)
+- Infrastructure-Details (Guards/Archive internals): [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Infrastructure/README.md)
+- Konfigurationsdetails: [Configuration Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Configuration/README.md)
+- Rückgabemodelle: [Abstractions Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/README.md)
+- Rückgabemodelle Detection: [Abstractions Detection Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/Detection/README.md)
+- Rückgabemodelle Archive: [Abstractions Archive Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/Archive/README.md)
+- Rückgabemodelle Hashing: [Abstractions Hashing Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/Hashing/README.md)
+- Funktionskatalog mit Beispielen: [01 - Funktionen](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/010_API_CORE.MD)
 
 ## 3. Architekturübersicht (Systemkontext)
 ### 3.1 E2E-Systemkontext (kompakt)
@@ -360,4 +360,4 @@ flowchart TD
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.
 - [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
+- [ ] Begriffe mit `docs/010_API_CORE.MD` abgeglichen.

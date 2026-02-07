@@ -116,7 +116,12 @@ Validierung:
 - `tools/versioning/validate-label-decision.js`
 
 ## 11. Verlinkte SSOT-Quellen
-- `docs/versioning/POLICY.md`
-- `docs/CI_PIPELINE.md`
-- `docs/governance/LABELING_OWNERSHIP.md`
-- `docs/DOCUMENTATION_STANDARDS.md`
+- `docs/versioning/001_POLICY_VERSIONING.MD`
+- `docs/ci/001_PIPELINE_CI.MD`
+- `docs/governance/002_POLICY_LABELING.MD`
+- `docs/governance/004_POLICY_DOCUMENTATION.MD`
+
+## RoC-Bezug
+- [Artifact-Contract-Regel](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tools/ci/policies/rules/artifact_contract.yaml)
+- [Docs-Drift-Regel](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tools/ci/policies/rules/docs_drift.yaml)
+- [Shell-Safety-Regeln](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tools/ci/policies/rules/shell_safety.yaml)

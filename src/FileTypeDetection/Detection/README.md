@@ -1,58 +1,27 @@
-# Index - Detection
+# Detection Modul
 
 ## 1. Zweck
+Dieses Verzeichnis ist die SSOT für Header-Magic, Aliasauflösung und kanonische Typzuordnung.
 
-Single Source of Truth (SSOT) für Dateitypen, Aliase, MIME-Metadaten und Header-Signaturen.
+## 2. Inhalt
+- `FileTypeRegistry.vb` mit Typdefinitionen, Alias-Mapping und Magic-Pattern-Katalog.
 
-## 2. Datei
+## 3. API und Verhalten
+- Liefert deterministische Zuordnung `Header -> FileKind`.
+- Stellt fail-closed Fallback für unbekannte Eingaben sicher.
+- Unterstützt Aliasnormalisierung ohne duplizierte Consumer-Logik.
 
-- [FileTypeRegistry.vb](./FileTypeRegistry.vb)
+## 4. Verifikation
+- Unit-Tests prüfen Mapping, Aliasregeln und Header-Coverage-Policy.
 
-## 3. Kernfunktionen und Einsatz
-
-| Funktion                                | Wann wird sie verwendet?            | Warum                                                |
-|-----------------------------------------|-------------------------------------|------------------------------------------------------|
-| `DetectByMagic(header)`                 | in jeder Detektion nach Header-Read | erste deterministische Klassifikation                |
-| `Resolve(kind)`                         | nach erfolgreicher Klassifikation   | kanonische Metadaten (Extension/MIME/Aliases)        |
-| `ResolveByAlias(alias)`                 | bei Alias-/Endungsnormalisierung    | robustes Mapping ohne Duplikatlogik                  |
-| `NormalizeAlias(raw)`                   | bei Endungs-/Aliasvergleich         | case-insensitive, punkt-unabhängige Normalisierung   |
-| `HasDirectHeaderDetection(kind)`        | Policy-/Coverage-Prüfungen          | erkennt reine Header-Matches                         |
-| `HasStructuredContainerDetection(kind)` | OOXML-Refinement-Kontext            | strukturierte Archiv-Typisierung (u. a. ZIP-basiert) |
-| `KindsWithoutDirectContentDetection()`  | Test-/Qualitätsreporting            | entdeckt Coverage-Lücken                             |
-
-## 4. Datenmodell-Regeln
-
-| Feld                 | Regel                                                |
-|----------------------|------------------------------------------------------|
-| `FileKind.Unknown`   | immer fail-closed, `Allowed=False`                   |
-| `CanonicalExtension` | Metadatum, kein Sicherheitsbeweis                    |
-| `Aliases`            | normalisiert, deterministisch, case-insensitive      |
-| `Mime`               | informative Zuordnung, nicht sicherheitsentscheidend |
-
-## 5. Ablaufdiagramm
-
+## 5. Diagramm
 ```mermaid
-flowchart TD
-    H[Header Bytes] --> M[DetectByMagic]
-    M -->|Unknown| U[Unknown]
-    M -->|Direkter Typ| R[Resolve(kind)]
-    M -->|Archive| Z[Archiv-Gate + Refinement ausserhalb Registry]
+flowchart LR
+    A[Header Bytes] --> B[Registry Match]
+    B --> C[Resolved FileKind]
 ```
 
-## 6. Testverknüpfungen
-
-- [FileTypeRegistryUnitTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeRegistryUnitTests.cs)
-- [HeaderCoveragePolicyUnitTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/HeaderCoveragePolicyUnitTests.cs)
-
-## 7. Siehe auch
-
-- [Modulindex](../README.md)
-- [Architektur und Ablaufe](../../../docs/02_ARCHITECTURE_AND_FLOWS.md)
-- [Referenzen](../../../docs/03_REFERENCES.md)
-
-## Dokumentpflege-Checkliste
-
-- [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
-- [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
+## 6. Verweise
+- [Modulübersicht](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/README.md)
+- [API-Kernübersicht](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/010_API_CORE.MD)
+- [Architektur und Flows](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/020_ARCH_CORE.MD)

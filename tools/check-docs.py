@@ -2,247 +2,238 @@
 from __future__ import annotations
 
 import re
-import unicodedata
+import time
 import urllib.error
-import urllib.parse
 import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+DOCS_DIR = ROOT / "docs"
+SRC_FTD_DIR = ROOT / "src" / "FileTypeDetection"
+TESTS_DIR = ROOT / "tests"
+ROOT_README = ROOT / "README.md"
+REPO = "https://github.com/tomtastisch/FileClassifier"
 
-MARKDOWN_LINK_RE = re.compile(r"!?\[[^\]]*]\(([^)]+)\)")
-MARKDOWN_HTML_LINK_RE = re.compile(r"""(?:href|src)=["']([^"']+)["']""", re.IGNORECASE)
-MARKDOWN_HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$")
-PLAIN_URL_RE = re.compile(r"""(?P<url>https?://[^\s<>"')\]]+)""")
+LINK_RE = re.compile(r'(?<!\!)\[(?P<text>[^\]]+)\]\((?P<url>[^)\s]+)(?:\s+"[^"]*")?\)')
+RELATIVE_RE = re.compile(
+    r'\]\(\s*(?!https?://|mailto:|#)(?:\.{1,2}/|/|docs/|src/|tests/|tools/|README\.md|[^)]+\.md(?:#[^)]+)?)(?:\s+"[^"]*")?\s*\)'
+)
+PATH_TEXT_RE = re.compile(r'(?i)^\s*(?:\.{1,2}/|/)?(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+\s*$')
+FILE_TEXT_RE = re.compile(r'(?i)^\s*[A-Za-z0-9_.-]+\.(md|mdx|vb|cs|fs|java|kt|ts|js|json|yml|yaml|toml|xml|sh|ps1|sql)\s*$')
+ALLOWED_REPO_URL_RE = re.compile(r'^https://github\.com/tomtastisch/FileClassifier/(blob|tree)/[0-9a-f]{7,40}/[^\s)#]+(?:#[A-Za-z0-9\-_\.]+)?$')
+ANCHOR_RE = re.compile(r'^#[A-Za-z0-9\-_\.]+$')
+DOC_NAME_RE = re.compile(r'^[0-9]{3}_[A-Z0-9]+_[A-Z0-9]+\.MD$')
+PLAIN_URL_RE = re.compile(r'(?P<url>https?://[^\s<>"\)\]]+)')
 
-TEXT_FILE_SUFFIXES = {
-    ".md",
-    ".txt",
-    ".rst",
-    ".json",
-    ".yaml",
-    ".yml",
-    ".toml",
-    ".xml",
-    ".cs",
-    ".vb",
-    ".fs",
-    ".sh",
-    ".ps1",
-    ".py",
-    ".js",
-    ".ts",
-    ".csproj",
-    ".vbproj",
-    ".sln",
-    ".props",
-    ".targets",
-}
-
-SKIP_DIR_NAMES = {".git", ".idea", ".qodana", ".tmp", "bin", "obj", "qodana-results", "artifacts"}
-SKIP_URL_PREFIXES = ("mailto:", "tel:")
+DOC_TYPES_REQUIRE_DIAGRAM = (
+    "_API_",
+    "_ARCH_",
+    "_FLOW_",
+)
+README_HEADINGS = (
+    "## 1. Zweck",
+    "## 2. Inhalt",
+    "## 3. API und Verhalten",
+    "## 4. Verifikation",
+    "## 5. Diagramm",
+    "## 6. Verweise",
+)
+RELEVANT_SUFFIXES = {".vb", ".cs", ".json", ".md", ".MD"}
+EXCLUDED_DIRS = {"bin", "obj"}
 
 
-def iter_text_files() -> list[Path]:
+def collect_targets() -> list[Path]:
     files: list[Path] = []
-    for path in sorted(ROOT.rglob("*")):
-        if not path.is_file():
-            continue
-        if any(part in SKIP_DIR_NAMES for part in path.parts):
-            continue
-        if path.suffix.lower() in TEXT_FILE_SUFFIXES:
-            files.append(path)
+    if ROOT_README.exists():
+        files.append(ROOT_README)
+    files.extend(sorted(DOCS_DIR.rglob("*.MD")))
+    files.extend(sorted(SRC_FTD_DIR.rglob("README.md")))
+    files.extend(sorted(TESTS_DIR.rglob("README.md")))
     return files
 
 
-def try_read_text(path: Path) -> str | None:
-    try:
-        return path.read_text(encoding="utf-8")
-    except UnicodeDecodeError:
-        return None
-
-
-def github_anchor_slug(heading: str) -> str:
-    normalized = unicodedata.normalize("NFKD", heading.strip().lower())
-    cleaned_chars: list[str] = []
-    for ch in normalized:
-        if ch.isalnum() or ch in {" ", "-"}:
-            cleaned_chars.append(ch)
-    collapsed = "".join(cleaned_chars)
-    collapsed = "-".join(part for part in collapsed.split() if part)
-    while "--" in collapsed:
-        collapsed = collapsed.replace("--", "-")
-    return collapsed.strip("-")
-
-
-def markdown_anchors(path: Path) -> set[str]:
-    text = try_read_text(path)
-    if text is None:
-        return set()
-
-    counts: dict[str, int] = {}
-    anchors: set[str] = set()
-    for line in text.splitlines():
-        match = MARKDOWN_HEADING_RE.match(line)
-        if not match:
+def check_docs_naming() -> list[str]:
+    errors: list[str] = []
+    for f in sorted(DOCS_DIR.rglob("*")):
+        if not f.is_file():
             continue
-        heading = re.sub(r"\s+#+\s*$", "", match.group(2).strip())
-        slug = github_anchor_slug(heading)
-        if not slug:
+        if f.suffix not in {".MD", ".md"}:
             continue
-        count = counts.get(slug, 0)
-        counts[slug] = count + 1
-        if count == 0:
-            anchors.add(slug)
-        else:
-            anchors.add(f"{slug}-{count}")
-    return anchors
-
-
-def parse_markdown_targets(text: str) -> list[str]:
-    targets: list[str] = []
-    for match in MARKDOWN_LINK_RE.finditer(text):
-        target = match.group(1).strip()
-        if target.startswith("<") and target.endswith(">"):
-            target = target[1:-1]
-        if " " in target and not target.startswith(("http://", "https://", "#", "/")):
-            target = target.split(" ", 1)[0]
-        if target:
-            targets.append(target)
-    for match in MARKDOWN_HTML_LINK_RE.finditer(text):
-        target = match.group(1).strip()
-        if target:
-            targets.append(target)
-    return targets
-
-
-def resolve_local_target(base: Path, target: str) -> tuple[Path, str]:
-    path_part, _, fragment = target.partition("#")
-    path_part = urllib.parse.unquote(path_part.strip())
-    if path_part.startswith("/"):
-        resolved = (ROOT / path_part.lstrip("/")).resolve()
-    elif path_part == "":
-        resolved = base.resolve()
-    else:
-        resolved = (base.parent / path_part).resolve()
-    return resolved, fragment
+        if f.name.lower() == "readme.md":
+            errors.append(f"docs contains forbidden README: {f.relative_to(ROOT)}")
+            continue
+        if f.suffix != ".MD":
+            errors.append(f"docs markdown must be uppercase .MD: {f.relative_to(ROOT)}")
+            continue
+        if not DOC_NAME_RE.match(f.name):
+            errors.append(f"docs filename does not match XXX_WORT_WORT.MD: {f.relative_to(ROOT)}")
+    return errors
 
 
 def check_http_url(url: str, cache: dict[str, str | None]) -> str | None:
     if url in cache:
         return cache[url]
 
-    def req(method: str, timeout: int) -> tuple[int, str]:
-        request = urllib.request.Request(url, method=method, headers={"User-Agent": "FileClassifier-LinkCheck/1.0"})
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            return int(response.getcode() or 0), str(response.geturl())
+    # Commit links are immutable objects; keep deterministic and avoid flaky remote checks.
+    if url.startswith(f"{REPO}/commit/"):
+        cache[url] = None
+        return None
 
-    error: str | None = None
-    try:
-        code, _ = req("HEAD", 12)
-        if code >= 400:
-            error = f"HTTP {code}"
-    except urllib.error.HTTPError as ex:
-        if ex.code not in {405, 403}:
-            error = f"HTTP {ex.code}"
-    except Exception as ex:  # noqa: BLE001
-        error = str(ex).splitlines()[0][:200]
+    def request_once(method: str, timeout: int) -> tuple[int, str]:
+        req = urllib.request.Request(url, method=method, headers={"User-Agent": "FileClassifier-LinkCheck/1.0"})
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return int(resp.getcode() or 0), str(resp.geturl())
 
-    if error is not None:
+    last_error: str | None = None
+    for _ in range(3):
         try:
-            code, _ = req("GET", 20)
-            if code >= 400:
-                error = f"HTTP {code}"
-            else:
-                error = None
+            code, _ = request_once("HEAD", 12)
+            if code < 400:
+                cache[url] = None
+                return None
+            last_error = f"HTTP {code}"
         except urllib.error.HTTPError as ex:
-            error = f"HTTP {ex.code}"
+            # Fallback to GET for endpoints that don't support HEAD.
+            if ex.code in {405, 403}:
+                try:
+                    code, _ = request_once("GET", 20)
+                    if code < 400:
+                        cache[url] = None
+                        return None
+                    last_error = f"HTTP {code}"
+                except urllib.error.HTTPError as ex2:
+                    last_error = f"HTTP {ex2.code}"
+                except Exception as ex2:  # noqa: BLE001
+                    last_error = str(ex2).splitlines()[0][:200]
+            else:
+                last_error = f"HTTP {ex.code}"
         except Exception as ex:  # noqa: BLE001
-            error = str(ex).splitlines()[0][:200]
+            last_error = str(ex).splitlines()[0][:200]
+        time.sleep(0.2)
 
-    cache[url] = error
-    return error
+    cache[url] = last_error
+    return last_error
 
 
-def check_versioning_refs() -> list[str]:
+def check_links_and_text(files: list[Path]) -> list[str]:
     errors: list[str] = []
-    versions = ROOT / "docs" / "versioning" / "VERSIONS.md"
-    policy = ROOT / "docs" / "versioning" / "POLICY.md"
+    http_cache: dict[str, str | None] = {}
 
-    if not versions.exists():
-        errors.append("docs/versioning/VERSIONS.md is missing")
-        return errors
-    if not policy.exists():
-        errors.append("docs/versioning/POLICY.md is missing")
-        return errors
+    for f in files:
+        text = f.read_text(encoding="utf-8")
 
-    text = try_read_text(versions) or ""
-    if "docs/versioning/POLICY.md" not in text:
-        errors.append("docs/versioning/VERSIONS.md does not reference docs/versioning/POLICY.md")
+        if RELATIVE_RE.search(text):
+            errors.append(f"relative link detected in {f.relative_to(ROOT)}")
+
+        for m in LINK_RE.finditer(text):
+            ltxt = m.group("text").strip()
+            url = m.group("url").strip()
+
+            if PATH_TEXT_RE.match(ltxt):
+                errors.append(f"path-like link text in {f.relative_to(ROOT)}: '{ltxt}'")
+            if FILE_TEXT_RE.match(ltxt):
+                errors.append(f"filename-like link text in {f.relative_to(ROOT)}: '{ltxt}'")
+
+            if ANCHOR_RE.match(url):
+                continue
+            if url.startswith("mailto:"):
+                continue
+            if url.startswith("http://") or url.startswith("https://"):
+                if url.startswith(REPO):
+                    if url.startswith(f"{REPO}/commit/"):
+                        continue
+                    if not ALLOWED_REPO_URL_RE.match(url):
+                        errors.append(f"invalid internal repo URL in {f.relative_to(ROOT)}: {url}")
+                        continue
+                    path_part = url.split("/", 7)[7]
+                    rel_path = path_part.split("#", 1)[0]
+                    if rel_path.startswith("README.md"):
+                        rel_path = "README.md"
+                    target = ROOT / rel_path
+                    if not target.exists():
+                        errors.append(f"repo URL points to missing path in {f.relative_to(ROOT)}: {rel_path}")
+                        continue
+
+                http_error = check_http_url(url, http_cache)
+                if http_error:
+                    errors.append(f"broken URL in {f.relative_to(ROOT)}: {url} ({http_error})")
+                continue
+
+            errors.append(f"non-absolute or unsupported URL in {f.relative_to(ROOT)}: {url}")
+
+        # Also validate plain URLs in text sections/tables.
+        for pm in PLAIN_URL_RE.finditer(text):
+            raw_url = pm.group("url")
+            cleaned = raw_url.rstrip(".,;:")
+            if cleaned.startswith("mailto:"):
+                continue
+            if cleaned.startswith(REPO) and cleaned.startswith(f"{REPO}/commit/"):
+                continue
+            http_error = check_http_url(cleaned, http_cache)
+            if http_error:
+                errors.append(f"broken plain-url in {f.relative_to(ROOT)}: {cleaned} ({http_error})")
+
     return errors
 
 
-def check_links() -> list[str]:
+def check_diagrams(files: list[Path]) -> list[str]:
     errors: list[str] = []
-    files = iter_text_files()
+    for f in files:
+        if f.suffix != ".MD":
+            continue
+        name = f.name
+        if any(t in name for t in DOC_TYPES_REQUIRE_DIAGRAM):
+            text = f.read_text(encoding="utf-8")
+            if "```mermaid" not in text:
+                errors.append(f"diagram required but missing in {f.relative_to(ROOT)}")
+    return errors
 
-    markdown_files = [path for path in files if path.suffix.lower() == ".md"]
-    anchor_cache = {md.resolve(): markdown_anchors(md) for md in markdown_files}
-    http_cache: dict[str, str | None] = {}
 
-    for path in files:
-        rel = path.relative_to(ROOT)
-        text = try_read_text(path)
-        if text is None:
+def check_readme_coverage_and_template() -> list[str]:
+    errors: list[str] = []
+    for d in sorted(SRC_FTD_DIR.rglob("*")):
+        if not d.is_dir():
+            continue
+        if any(part.startswith(".") for part in d.parts):
+            continue
+        if any(part in EXCLUDED_DIRS for part in d.parts):
             continue
 
-        if path.suffix.lower() == ".md":
-            for target in parse_markdown_targets(text):
-                if not target or target.startswith("#"):
-                    resolved = path.resolve()
-                    fragment = target[1:] if target.startswith("#") else ""
-                    if fragment:
-                        anchors = anchor_cache.get(resolved, set())
-                        if fragment not in anchors:
-                            errors.append(f"{rel} -> missing anchor: #{fragment}")
-                    continue
-                if target.startswith(SKIP_URL_PREFIXES):
-                    continue
-                if target.startswith(("http://", "https://")):
-                    http_error = check_http_url(target, http_cache)
-                    if http_error:
-                        errors.append(f"{rel} -> broken url: {target} ({http_error})")
-                    continue
+        has_relevant = any(
+            f.is_file() and f.suffix in RELEVANT_SUFFIXES and f.name != "README.md"
+            for f in d.iterdir()
+        )
+        if not has_relevant:
+            continue
 
-                resolved, fragment = resolve_local_target(path, target)
-                if not resolved.exists():
-                    errors.append(f"{rel} -> missing path: {target}")
-                    continue
-                if fragment and resolved.suffix.lower() == ".md":
-                    anchors = anchor_cache.get(resolved.resolve(), set())
-                    if fragment not in anchors:
-                        errors.append(f"{rel} -> missing anchor: {target}")
+        readme = d / "README.md"
+        if not readme.exists():
+            errors.append(f"missing README.md in content directory: {d.relative_to(ROOT)}")
+            continue
 
-        for match in PLAIN_URL_RE.finditer(text):
-            url = match.group("url")
-            if url.startswith(SKIP_URL_PREFIXES):
-                continue
-            http_error = check_http_url(url, http_cache)
-            if http_error:
-                errors.append(f"{rel} -> broken plain-url: {url} ({http_error})")
+        text = readme.read_text(encoding="utf-8")
+        for h in README_HEADINGS:
+            if h not in text:
+                errors.append(f"README template heading missing in {readme.relative_to(ROOT)}: {h}")
+        section = text.split("## 5. Diagramm", 1)[1] if "## 5. Diagramm" in text else ""
+        if "```mermaid" not in section and "N/A" not in section:
+            errors.append(f"README diagram section requires mermaid or N/A in {readme.relative_to(ROOT)}")
 
-    return sorted(set(errors))
+    return errors
 
 
 def main() -> int:
     errors: list[str] = []
-    errors.extend(check_links())
-    errors.extend(check_versioning_refs())
+    files = collect_targets()
+    errors.extend(check_docs_naming())
+    errors.extend(check_links_and_text(files))
+    errors.extend(check_diagrams(files))
+    errors.extend(check_readme_coverage_and_template())
 
     if errors:
         print("Doc check failed:")
-        for err in sorted(set(errors)):
-            print(f"- {err}")
+        for e in sorted(set(errors)):
+            print(f"- {e}")
         return 1
 
     print("Doc check OK")

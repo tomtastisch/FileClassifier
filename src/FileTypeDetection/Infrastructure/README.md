@@ -1,64 +1,27 @@
-# Index - Infrastructure
+# Infrastructure Modul
 
 ## 1. Zweck
+Dieses Verzeichnis kapselt sicherheitskritische interne Ausführungslogik für Archive, Bounds, Guards und Extraktion.
 
-Interne, sicherheitskritische Implementierung (kein Public Surface).
+## 2. Inhalt
+- `CoreInternals.vb`, `ArchiveInternals.vb`, `ArchiveManagedInternals.vb`, `MimeProvider.vb`.
 
-## 2. Dateien und Verantwortungen
+## 3. API und Verhalten
+- Erzwingt fail-closed bei Traversal, Link-Entries, Größenlimits und ungültigen Archiven.
+- Stellt einheitliche Archiv-Backends und sichere Extraktion bereit.
 
-| Datei                                                      | Verantwortungsbereich                                       | Wichtige Funktionen                                                                                                                                                                                           |
-|------------------------------------------------------------|-------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [CoreInternals.vb](./CoreInternals.vb)                     | Bounds, Gate, Payload-/Path-Guards, Refiner, Logging-Schutz | `CopyBounded`, `IsArchiveSafe*`, `IsArchiveSignatureCandidate`, `IsSafeArchivePayload`, `TryNormalizeRelativePath`, `PrepareMaterializationTarget`, `ValidateNewExtractionTarget`, `TryRefine*`, `LogGuard.*` |
-| [ArchiveManagedInternals.vb](./ArchiveManagedInternals.vb) | managed Archiv-Iteration und Backend-Adapter (u. a. ZIP)    | `ProcessArchiveStream`, `ArchiveManagedBackend`                                                                                                                                                               |
-| [ArchiveInternals.vb](./ArchiveInternals.vb)               | Unified Archive Backend, Entry-Adapter, Archiv-Dispatch     | `ArchiveTypeResolver`, `ArchiveBackendRegistry`, `ArchiveProcessingEngine`, `ArchiveExtractor`, `ArchiveEntryCollector`                                                                                       |
-| [MimeProvider.vb](./MimeProvider.vb)                       | MIME-Map aus Extension                                      | `GetMime`                                                                                                                                                                                                     |
+## 4. Verifikation
+- Unit-/Property-Tests decken adversariale Archive, Grenzen und Fehlerpfade ab.
 
-## 3. Sicherheits-Trigger
-
-| Condition                                                        | Komponente                                                             | Ergebnis                                        |
-|------------------------------------------------------------------|------------------------------------------------------------------------|-------------------------------------------------|
-| Byte-Limit überschritten                                         | `StreamBounds.CopyBounded`                                             | Exception -> fail-closed                        |
-| Archiv zu tief/zu gross/zu viele Entries                         | `ArchiveProcessingEngine.ProcessArchiveStream`                         | `False`                                         |
-| Link-Entry (symlink/hardlink) bei `RejectArchiveLinks=true`      | `ArchiveExtractor.TryGetSafeEntryName` / `SharpCompressArchiveBackend` | `False`                                         |
-| Unbekannte Entry-Grösse bei `AllowUnknownArchiveEntrySize=false` | `SharpCompressArchiveBackend.TryMeasureEntrySize`                      | bounded measurement, bei Überschreitung `False` |
-| Traversal-Versuch (`../`, root path)                             | `ArchiveExtractor.TryGetSafeEntryName` + Pfadprefix-Check              | `False`                                         |
-| Refiner-Fehler                                                   | `OpenXmlRefiner.TryRefine*`                                            | `Unknown`                                       |
-| Logger wirft Exception                                           | `LogGuard`                                                             | Fehler wird geschluckt                          |
-
-Hinweis zur Terminologie: `ContainerType` in der Codebasis beschreibt das physische Archivformat (z. B.
-ZIP/TAR/GZIP/7z/RAR). Die öffentliche Typausgabe bleibt aus Kompatibilitätsgründen bei `FileKind.Zip`.
-
-## 4. Sequenz: Archiv-Extraktion intern
-
+## 5. Diagramm
 ```mermaid
-sequenceDiagram
-    participant API as FileTypeDetector/ArchiveProcessing
-    participant Gate as ArchiveSafetyGate
-    participant Engine as ArchiveProcessingEngine
-    participant Extractor as ArchiveExtractor
-
-    API->>Gate: IsArchiveSafe*(...)
-    Gate->>Engine: ValidateArchiveStream(...)
-    API->>Extractor: TryExtractArchiveStream*(...)
-    Extractor->>Engine: ProcessArchiveStream(..., extractEntry)
-    Engine-->>Extractor: ordered entries / fail
+flowchart LR
+    A[Archive Payload] --> B[Safety Gate]
+    B --> C[Extractor Engine]
+    C --> D[Memory or Disk Output]
 ```
 
-## 5. Testverknüpfungen
-
-- [ArchiveAdversarialTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/ArchiveAdversarialTests.cs)
-- [ArchiveExtractionUnitTests.cs](../../../tests/FileTypeDetectionLib.Tests/Unit/ArchiveExtractionUnitTests.cs)
-- [ArchiveGatePropertyTests.cs](../../../tests/FileTypeDetectionLib.Tests/Property/ArchiveGatePropertyTests.cs)
-
-## 6. Siehe auch
-
-- [Modulindex](../README.md)
-- [Architektur und Ablaufe](../../../docs/02_ARCHITECTURE_AND_FLOWS.md)
-- [Referenzen](../../../docs/03_REFERENCES.md)
-
-## Dokumentpflege-Checkliste
-
-- [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
-- [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
+## 6. Verweise
+- [Modulübersicht](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/README.md)
+- [Architektur und Flows](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/020_ARCH_CORE.MD)
+- [Policy CI](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/governance/001_POLICY_CI.MD)

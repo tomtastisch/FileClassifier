@@ -21,10 +21,10 @@ Zielgruppe:
 ### 3.1 Pflichtdateien
 | Bereich | Datei | Aufgabe |
 |---|---|---|
-| Öffentliche Typliste | [`../../src/FileTypeDetection/Abstractions/Detection/FileKind.vb`](../../src/FileTypeDetection/Abstractions/Detection/FileKind.vb) | Enum-Wert ergänzen |
-| SSOT Metadaten und Magic | [`../../src/FileTypeDetection/Detection/FileTypeRegistry.vb`](../../src/FileTypeDetection/Detection/FileTypeRegistry.vb) | Extension/Alias/Magic und Resolve-Verhalten |
-| Detection-Details | [`../../src/FileTypeDetection/Detection/README.md`](../../src/FileTypeDetection/Detection/README.md) | fachliche Erklärung nachziehen |
-| Registry-Tests | [`../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeRegistryUnitTests.cs`](../../tests/FileTypeDetectionLib.Tests/Unit/FileTypeRegistryUnitTests.cs) | Resolve/Alias/Magic validieren |
+| Öffentliche Typliste | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/Detection/FileKind.vb) | Enum-Wert ergänzen |
+| SSOT Metadaten und Magic | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Detection/FileTypeRegistry.vb) | Extension/Alias/Magic und Resolve-Verhalten |
+| Detection-Details | [Detection Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Detection/README.md) | fachliche Erklärung nachziehen |
+| Registry-Tests | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tests/FileTypeDetectionLib.Tests/Unit/FileTypeRegistryUnitTests.cs) | Resolve/Alias/Magic validieren |
 
 ### 3.2 Registry-Punkte, die geprüft werden müssen
 - `ExtensionOverrides` (nur falls CanonicalExtension vom Enum-Namen abweicht)
@@ -34,7 +34,7 @@ Zielgruppe:
 - indirekte Auswirkungen auf `KindsWithoutDirectContentDetection()`
 
 ### 3.3 Bei neuen Containerarten zusätzlich
-- [`../../src/FileTypeDetection/Infrastructure/README.md`](../../src/FileTypeDetection/Infrastructure/README.md) prüfen, ob Gate/Extractor den Container bereits trägt.
+- [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Infrastructure/README.md) prüfen, ob Gate/Extractor den Container bereits trägt.
 - Falls nein: Infrastrukturpfad erweitern und Security-Gates (Depth, Size, Traversal, Links) mitziehen.
 
 ## 4. Schritt-für-Schritt-Checkliste für neue `FileKind`
@@ -42,18 +42,18 @@ Zielgruppe:
 - [ ] Schritt 2: `FileTypeRegistry.vb` (Extension/Alias/Magic) aktualisieren.
 - [ ] Schritt 3: Bei Bedarf `HasStructuredContainerDetection()` erweitern.
 - [ ] Schritt 4: Tests für Resolve/Alias/Magic/fail-closed ergänzen.
-- [ ] Schritt 5: Doku in `docs/01_FUNCTIONS.md`, `docs/02_ARCHITECTURE_AND_FLOWS.md`, `docs/03_REFERENCES.md` aktualisieren.
+- [ ] Schritt 5: Doku in `docs/010_API_CORE.MD`, `docs/020_ARCH_CORE.MD`, `docs/references/001_REFERENCES_CORE.MD` aktualisieren.
 - [ ] Schritt 6: Verifikation laufen lassen (Abschnitt 9).
 
 ## 5. Neue API-Modelle (`Abstractions/*`): zentrale Stellen
 ### 5.1 Pflichtdateien
 | Bereich | Datei | Aufgabe |
 |---|---|---|
-| Modell-Übersicht | [`../../src/FileTypeDetection/Abstractions/README.md`](../../src/FileTypeDetection/Abstractions/README.md) | passenden Modellbereich bestimmen (`Detection`, `Archive`, `Hashing`) |
+| Modell-Übersicht | [Abstractions Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/README.md) | passenden Modellbereich bestimmen (`Detection`, `Archive`, `Hashing`) |
 | Modellklasse/enum | `src/FileTypeDetection/Abstractions/<Bereich>/<Typ>.vb` | neuen Typ definieren |
 | Teilbereich README | `src/FileTypeDetection/Abstractions/<Bereich>/README.md` | Typ in Index aufnehmen |
-| API-Katalog | [`../01_FUNCTIONS.md`](../01_FUNCTIONS.md) | neue/veränderte Rückgabemodelle eintragen |
-| Referenzen | [`../03_REFERENCES.md`](../03_REFERENCES.md) | Modell- und Pfadreferenzen aktualisieren |
+| API-Katalog | [01 - Funktionen](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/010_API_CORE.MD) | neue/veränderte Rückgabemodelle eintragen |
+| Referenzen | [03 - Referenzen](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/references/001_REFERENCES_CORE.MD) | Modell- und Pfadreferenzen aktualisieren |
 | Contract-Doku (falls relevant) | `docs/04_*.md` | nur bei Contract-relevanten Signatur-/Vertragsänderungen |
 
 ### 5.2 Modellregeln
@@ -64,7 +64,7 @@ Zielgruppe:
 ## 6. Schritt-für-Schritt-Checkliste für neue API-Modelle
 - [ ] Schritt 1: Modell im passenden Abstractions-Unterordner anlegen.
 - [ ] Schritt 2: Teilbereich-README und `Abstractions/README.md` aktualisieren.
-- [ ] Schritt 3: Verwendungen in Public API eintragen (`docs/01_FUNCTIONS.md`, `docs/03_REFERENCES.md`).
+- [ ] Schritt 3: Verwendungen in Public API eintragen (`docs/010_API_CORE.MD`, `docs/references/001_REFERENCES_CORE.MD`).
 - [ ] Schritt 4: Falls API-Contract betroffen, `docs/04_*.md` aktualisieren.
 - [ ] Schritt 5: Unit-/Integration-Tests für neues Modellverhalten ergänzen.
 - [ ] Schritt 6: Verifikation laufen lassen (Abschnitt 9).
@@ -74,12 +74,12 @@ Zielgruppe:
 1. `FileKind.vb`: Enum-Wert `Tiff` hinzufügen.
 2. `FileTypeRegistry.vb`: TIFF-Magic und Alias `tif`/`tiff` aufnehmen.
 3. `FileTypeRegistryUnitTests.cs`: neue Assertions für `ResolveByAlias("tif")` und Magic-Match.
-4. Doku in `docs/01_FUNCTIONS.md` und `docs/03_REFERENCES.md` ergänzen.
+4. Doku in `docs/010_API_CORE.MD` und `docs/references/001_REFERENCES_CORE.MD` ergänzen.
 
 ### 7.2 Beispiel B: Neues Modell `ArchiveScanEvidence`
 1. Datei `src/FileTypeDetection/Abstractions/Hashing/ArchiveScanEvidence.vb` anlegen.
 2. `src/FileTypeDetection/Abstractions/Hashing/README.md` und `src/FileTypeDetection/Abstractions/README.md` ergänzen.
-3. In `docs/01_FUNCTIONS.md` und `docs/03_REFERENCES.md` Modell ergänzen.
+3. In `docs/010_API_CORE.MD` und `docs/references/001_REFERENCES_CORE.MD` Modell ergänzen.
 4. Wenn öffentliche Signaturen betroffen sind: passendes `docs/04_*.md` aktualisieren.
 
 ## 8. Aktivierung und Einlesen
@@ -158,4 +158,4 @@ Eine Datatype-/Modelländerung ist nur dann fertig, wenn:
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.
 - [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.
+- [ ] Begriffe mit `docs/010_API_CORE.MD` abgeglichen.
