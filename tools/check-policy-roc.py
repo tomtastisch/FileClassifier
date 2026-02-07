@@ -9,7 +9,12 @@ ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 RULES = ROOT / "tools" / "ci" / "policies" / "rules"
 LINK_RE = re.compile(r'(?<!\!)\[(?P<text>[^\]]+)\]\((?P<url>[^)\s]+)(?:\s+"[^"]*")?\)')
-RULE_URL_RE = re.compile(r'^https://github\.com/tomtastisch/FileClassifier/blob/[0-9a-f]{7,40}/tools/ci/policies/rules/.+\.(?:yml|yaml)(?:#[A-Za-z0-9\-_\.]+)?$')
+RULE_URL_RE = re.compile(
+    r"^https://github\.com/tomtastisch/FileClassifier/blob/"
+    r"(?P<ref>[A-Za-z0-9._-]+)/"
+    r"(?P<path>tools/ci/policies/rules/.+\.(?:yml|yaml))"
+    r"(?:#[A-Za-z0-9\-_\.]+)?$"
+)
 
 
 def main() -> int:
@@ -27,9 +32,10 @@ def main() -> int:
         text = policy.read_text(encoding="utf-8")
         for m in LINK_RE.finditer(text):
             url = m.group("url")
-            if not RULE_URL_RE.match(url):
+            rule_match = RULE_URL_RE.match(url)
+            if not rule_match:
                 continue
-            path_part = url.split("/blob/", 1)[1].split("/", 1)[1].split("#", 1)[0]
+            path_part = rule_match.group("path")
             rule_path = (ROOT / path_part).resolve()
             policy_to_rules[policy.resolve()].add(rule_path)
             mappings.append((str(policy.relative_to(ROOT)), str(rule_path.relative_to(ROOT))))
