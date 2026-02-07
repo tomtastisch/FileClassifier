@@ -78,18 +78,18 @@ flowchart LR
 ## 6. Referenz-Index (wo finde ich was?)
 | Thema | Primardokument |
 |---|---|
-| Public Signaturen + Beispiele | `01_FUNCTIONS.md` |
-| E2E-Architektur + Sequenzen | `02_ARCHITECTURE_AND_FLOWS.md` |
-| Normative Anforderungen | `DIN_SPECIFICATION_DE.md` |
+| Public Signaturen + Beispiele | `docs/010_API_CORE.MD` |
+| E2E-Architektur + Sequenzen | `docs/020_ARCH_CORE.MD` |
+| Normative Anforderungen | `docs/specs/001_SPEC_DIN.MD` |
 | Modul-Übersicht | `../src/FileTypeDetection/README.md` |
 | Unterordner-Details | `../src/FileTypeDetection/Detection/README.md`, `../src/FileTypeDetection/Infrastructure/README.md`, `../src/FileTypeDetection/Configuration/README.md`, `../src/FileTypeDetection/Abstractions/README.md`, `../src/FileTypeDetection/Abstractions/Detection/README.md`, `../src/FileTypeDetection/Abstractions/Archive/README.md`, `../src/FileTypeDetection/Abstractions/Hashing/README.md`, `../src/FileClassifier.App/README.md` |
 
 ## 6.1 Change Playbooks
 | Thema | Guide |
 |---|---|
-| Optionen anlegen/anpassen | `guides/OPTIONS_CHANGE_GUIDE.md` |
-| Neue Datatypes/API-Modelle erweitern | `guides/DATATYPE_EXTENSION_GUIDE.md` |
-| Guide-Index | `guides/README.md` |
+| Optionen anlegen/anpassen | `docs/guides/001_GUIDE_OPTIONS.MD` |
+| Neue Datatypes/API-Modelle erweitern | `docs/guides/002_GUIDE_DATATYPE.MD` |
+| Guide-Index | `docs/guides/000_INDEX_GUIDES.MD` |
 
 ## 7. Verifikationsreferenzen
 Empfohlene Freigabe-Checks:

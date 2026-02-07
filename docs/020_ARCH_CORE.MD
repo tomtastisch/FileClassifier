@@ -76,15 +76,17 @@ flowchart LR
     F["File/Directory (Materialized)"]
   end
 
-  FP --> FTD
-  BP --> FTD
-  BP --> AP
-  BP --> FM
+	  FP --> FTD
+	  BP --> FTD
+	  FP --> AP
+	  BP --> AP
+	  BP --> FM
 
-  FTD --> RH --> DM --> ASG --> OXR --> T
-  AP --> ASG --> V
-  AP --> AX --> E
-  FM --> AX --> F
+	  FTD --> RH --> DM --> ASG --> OXR --> T
+	  AP --> ASG --> V
+	  AP --> AX --> E
+	  FM --> AX --> F
+	  FM --> V
 ```
 
 Kurzlesehilfe:

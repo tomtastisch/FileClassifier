@@ -6,13 +6,13 @@ Dieses Dokument beschreibt alle öffentlichen Einstiegspunkte der API mit Signat
 ## 2. Definitionen
 - Fail-closed: Fehlerpfade liefern nur sichere Rückgaben (`Unknown`, `False`, leere Liste).
 - Side-Effects: Dateisystemschreibvorgänge oder globale Optionsänderungen.
-- Flow-ID: Verweis auf Architekturabläufe in `02_ARCHITECTURE_AND_FLOWS.md`.
+- Flow-ID: Verweis auf Architekturabläufe in `docs/020_ARCH_CORE.MD`.
 
 ## 2.1 API-Semantik (prominent)
 - `TryValidateArchive(...)` ist die kanonische Validierungs-API.
 - Die Methode validiert **alle intern unterstützten Archivformate** fail-closed (u. a. ZIP/TAR/GZIP/7z/RAR).
 - Technisch passiert die Typfeststellung über `ArchiveTypeResolver` + `ArchiveSafetyGate`; OOXML-Refinement bleibt container-spezifisch für ZIP-basierte OOXML-Dateien.
-- Begriffsklärung: `ContainerType` bezeichnet das **physische Archivformat** (z. B. ZIP/TAR/GZIP/7z/RAR), während `FileKind.Zip` aus Kompatibilitätsgründen der logische Archiv-Rückgabetyp bleibt.
+- Begriffsklärung: `ContainerType` bezeichnet das **physische Archivformat** (z. B. ZIP/TAR/GZIP/7z/RAR). Generische Archive werden kompatibel als `FileKind.Zip` zurückgegeben; ZIP-basierte OOXML-Container können auf `Docx`/`Xlsx`/`Pptx` verfeinert werden.
 
 ## 2.2 Weiterführende Detailquellen pro Familie
 | API-Familie | Detailquelle | Zweck |
@@ -34,7 +34,7 @@ Die Rückgabemodelle sind rein organisatorisch in Unterordner aufgeteilt; die AP
 |---|---|
 | Archivformat | Physischer Container wie ZIP, TAR, TAR.GZ, 7z oder RAR. |
 | ContainerType | Interner technischer Typ für das physische Archivformat. |
-| FileKind.Zip | Öffentlicher, kompatibler logischer Rückgabetyp für erkannte Archive. |
+| FileKind.Zip | Öffentlicher, kompatibler logischer Rückgabetyp für generische Archive (z. B. TAR/TAR.GZ/7z/RAR). |
 | PhysicalHash | SHA-256 über die unveränderten Rohbytes einer Datei oder eines Byte-Arrays. |
 | LogicalHash | SHA-256 über kanonisierten Inhaltszustand (Entry-Pfad + Inhalt), unabhängig von Containerdetails. |
 | FastHash | Optionaler, nicht-kryptografischer Vergleichsdigest (`XxHash3`) für Performance-Shortcuts. |
@@ -102,7 +102,7 @@ using FileTypeDetection;
 var detector = new FileTypeDetector();
 var t = detector.Detect("/data/invoice.pdf", verifyExtension: true);
 var d = detector.DetectDetailed("/data/archive.docx", verifyExtension: true);
-bool archiveOk = detector.TryValidateArchive("/data/archive.zip");
+bool archiveOk = FileTypeDetector.TryValidateArchive("/data/archive.zip");
 var entries = detector.ExtractArchiveSafeToMemory("/data/archive.zip", verifyBeforeExtract: true);
 
 Console.WriteLine($"{t.Kind} / {d.ReasonCode} / {archiveOk} / {entries.Count}");
@@ -218,8 +218,8 @@ Hinweis:
 - Overloads ohne `options` verwenden die globale Policy `FileTypeOptions.GetSnapshot().DeterministicHash`.
 
 ## 5. Nicht-Ziele
-- Keine interne Low-Level-Implementierung im Detail (siehe `03_REFERENCES.md`).
-- Keine Norm/Compliance-Herleitung (siehe `DIN_SPECIFICATION_DE.md`).
+- Keine interne Low-Level-Implementierung im Detail (siehe `docs/references/001_REFERENCES_CORE.MD`).
+- Keine Norm/Compliance-Herleitung (siehe `docs/specs/001_SPEC_DIN.MD`).
 
 ## 6. Security-Gate Mini-Contract (neutral)
 Die folgenden Regeln gelten für `ArchiveSafetyGate` + `ArchiveExtractor`:
@@ -242,7 +242,7 @@ Implementiert bedeutet hier: Archivformat wird geöffnet, Gate angewendet und Ex
 | 7z | Ja (Container-Erkennung + Gate, logisches `FileKind.Zip`) | Ja | Ja | Ja |
 | RAR | Ja (Container-Erkennung + Gate, logisches `FileKind.Zip`) | Ja | Ja | Ja |
 
-Hinweis zur Typausgabe: In Phase 1 bleibt der öffentliche Rückgabetyp kompatibel; erkannte Archive werden als logischer `FileKind.Zip` gemeldet.
+Hinweis zur Typausgabe: Für generische Archive bleibt der öffentliche Rückgabetyp kompatibel (`FileKind.Zip`); ZIP-basierte OOXML-Container können auf `Docx`/`Xlsx`/`Pptx` verfeinert werden.
 
 ## 8. Nachweis Umwandlung/Absicherung + Testabdeckung
 Die Byte-Pfade (Detect/Validate/Extract/Persist) sind auf die gleiche Gate-Pipeline gelegt.

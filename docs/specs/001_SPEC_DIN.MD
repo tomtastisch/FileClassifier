@@ -9,7 +9,7 @@
 ## 2. Zweck und Anwendungsbereich
 Diese Spezifikation beschreibt Anforderungen und Nachweise für die öffentliche API des Moduls nach einem normorientierten Aufbau (Anforderungen, Architektur, Verifikation, Rückverfolgbarkeit).
 Dieses Dokument dient als normativer Nachweis für Freigabe-, Audit- und Compliance-Prozesse.
-Die technische Detailbeschreibung der öffentlichen Schnittstellen ist in `01_FUNCTIONS.md`, `02_ARCHITECTURE_AND_FLOWS.md` und `03_REFERENCES.md` dokumentiert.
+Die technische Detailbeschreibung der öffentlichen Schnittstellen ist in `docs/010_API_CORE.MD`, `docs/020_ARCH_CORE.MD` und `docs/references/001_REFERENCES_CORE.MD` dokumentiert.
 
 ## 3. Begriffe und Definitionen
 - `fail-closed`: Fehlerpfad liefert nur sichere Standardwerte.

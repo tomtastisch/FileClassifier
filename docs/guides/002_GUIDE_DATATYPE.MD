@@ -54,7 +54,7 @@ Zielgruppe:
 | Teilbereich README | `src/FileTypeDetection/Abstractions/<Bereich>/README.md` | Typ in Index aufnehmen |
 | API-Katalog | [01 - Funktionen](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/010_API_CORE.MD) | neue/veränderte Rückgabemodelle eintragen |
 | Referenzen | [03 - Referenzen](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/references/001_REFERENCES_CORE.MD) | Modell- und Pfadreferenzen aktualisieren |
-| Contract-Doku (falls relevant) | `docs/04_*.md` | nur bei Contract-relevanten Signatur-/Vertragsänderungen |
+| Contract-Doku (falls relevant) | `docs/contracts/*.MD` | nur bei Contract-relevanten Signatur-/Vertragsänderungen |
 
 ### 5.2 Modellregeln
 - Modelle bleiben immutable orientiert und ohne I/O-Logik.
@@ -65,7 +65,7 @@ Zielgruppe:
 - [ ] Schritt 1: Modell im passenden Abstractions-Unterordner anlegen.
 - [ ] Schritt 2: Teilbereich-README und `Abstractions/README.md` aktualisieren.
 - [ ] Schritt 3: Verwendungen in Public API eintragen (`docs/010_API_CORE.MD`, `docs/references/001_REFERENCES_CORE.MD`).
-- [ ] Schritt 4: Falls API-Contract betroffen, `docs/04_*.md` aktualisieren.
+- [ ] Schritt 4: Falls API-Contract betroffen, passende Datei unter `docs/contracts/*.MD` aktualisieren.
 - [ ] Schritt 5: Unit-/Integration-Tests für neues Modellverhalten ergänzen.
 - [ ] Schritt 6: Verifikation laufen lassen (Abschnitt 9).
 
@@ -80,7 +80,7 @@ Zielgruppe:
 1. Datei `src/FileTypeDetection/Abstractions/Hashing/ArchiveScanEvidence.vb` anlegen.
 2. `src/FileTypeDetection/Abstractions/Hashing/README.md` und `src/FileTypeDetection/Abstractions/README.md` ergänzen.
 3. In `docs/010_API_CORE.MD` und `docs/references/001_REFERENCES_CORE.MD` Modell ergänzen.
-4. Wenn öffentliche Signaturen betroffen sind: passendes `docs/04_*.md` aktualisieren.
+4. Wenn öffentliche Signaturen betroffen sind: passende Datei unter `docs/contracts/*.MD` aktualisieren.
 
 ## 8. Aktivierung und Einlesen
 ### 8.1 Flowchart (Code -> Runtime)
@@ -148,7 +148,7 @@ Eine Datatype-/Modelländerung ist nur dann fertig, wenn:
 | Neuer `FileKind` ohne bestehende Signaturen zu ändern | meist additive Erweiterung | non-breaking, aber Test- und Doku-Pflicht |
 | Alias ändert bestehendes Mapping | bestehende Consumer können anderes Ergebnis sehen | potentiell breaking |
 | Öffentliche Modellproperties entfernen/umbenennen | Binary/Source-Consumer brechen | breaking |
-| Contract-Dokument (`docs/04_*`) nicht aktualisiert trotz Surface-Änderung | Drift zwischen Code und Doku/Tests | release-blocking für API-Governance |
+| Contract-Dokument (`docs/contracts/*.MD`) nicht aktualisiert trotz Surface-Änderung | Drift zwischen Code und Doku/Tests | release-blocking für API-Governance |
 
 ## 12. Nicht-Ziele
 - Keine stillen API-Surface-Änderungen ohne Contract-Dokumentation.
