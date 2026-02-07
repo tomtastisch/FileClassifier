@@ -14,7 +14,7 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
     public void TryProcessNestedGArchive_ReturnsFalse_WhenNotGzip()
     {
         var method = typeof(SharpCompressArchiveBackend).GetMethod("TryProcessNestedGArchive",
-            BindingFlags.NonPublic | BindingFlags.Static);
+            BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -30,7 +30,7 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
     public void TryProcessNestedGArchive_ReturnsFalse_WhenEntryCountNotOne()
     {
         var method = typeof(SharpCompressArchiveBackend).GetMethod("TryProcessNestedGArchive",
-            BindingFlags.NonPublic | BindingFlags.Static);
+            BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -50,7 +50,7 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
     public void TryProcessNestedGArchive_ReturnsTrue_WithInvalidNestedDescriptor()
     {
         var method = typeof(SharpCompressArchiveBackend).GetMethod("TryProcessNestedGArchive",
-            BindingFlags.NonPublic | BindingFlags.Static);
+            BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -69,7 +69,7 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
     public void TryReadEntryPayloadBounded_ReturnsFalse_ForInvalidInputs()
     {
         var method = typeof(SharpCompressArchiveBackend).GetMethod("TryReadEntryPayloadBounded",
-            BindingFlags.NonPublic | BindingFlags.Static);
+            BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         Assert.False(TestGuard.Unbox<bool>(method.Invoke(null, new object?[] { null, 10L, null })));

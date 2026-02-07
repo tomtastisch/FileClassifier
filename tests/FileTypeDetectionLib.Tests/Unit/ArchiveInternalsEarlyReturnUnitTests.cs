@@ -52,7 +52,7 @@ public sealed class ArchiveInternalsEarlyReturnUnitTests
     public void EnsureTrailingSeparator_AppendsSeparator_WhenMissing()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("EnsureTrailingSeparator", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("EnsureTrailingSeparator", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var value = TestGuard.NotNull(method.Invoke(null, new object[] { "a/b" }) as string);
@@ -63,7 +63,7 @@ public sealed class ArchiveInternalsEarlyReturnUnitTests
     public void EnsureTrailingSeparator_ReturnsSeparator_ForEmpty()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("EnsureTrailingSeparator", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("EnsureTrailingSeparator", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var value = TestGuard.NotNull(method.Invoke(null, new object[] { string.Empty }) as string);
@@ -74,7 +74,7 @@ public sealed class ArchiveInternalsEarlyReturnUnitTests
     public void EnsureTrailingSeparator_PreservesExistingSeparator()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("EnsureTrailingSeparator", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("EnsureTrailingSeparator", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var suffix = Path.DirectorySeparatorChar.ToString();

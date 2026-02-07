@@ -106,7 +106,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     public void ValidateArchiveStreamRaw_ReturnsFalse_WhenStreamUnreadable()
     {
         var method = typeof(FileTypeDetector).GetMethod("ValidateArchiveStreamRaw",
-            BindingFlags.NonPublic | BindingFlags.Static);
+            BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         using var scope = TestTempPaths.CreateScope("ftd-validate-stream");
@@ -126,7 +126,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     public void FinalizeArchiveDetection_ReturnsZip_ForUnknownRefinement()
     {
         var method = typeof(FileTypeDetector).GetMethod("FinalizeArchiveDetection",
-            BindingFlags.NonPublic | BindingFlags.Static);
+            BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var traceType = typeof(FileTypeDetector).GetNestedType("DetectionTrace", BindingFlags.NonPublic);
@@ -143,7 +143,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     public void FinalizeArchiveDetection_ReturnsRefined_WhenNotUnknown()
     {
         var method = typeof(FileTypeDetector).GetMethod("FinalizeArchiveDetection",
-            BindingFlags.NonPublic | BindingFlags.Static);
+            BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var traceType = typeof(FileTypeDetector).GetNestedType("DetectionTrace", BindingFlags.NonPublic);
@@ -160,7 +160,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     public void WarnIfNoDirectContentDetection_SwallowsUnknownAndDirectKinds()
     {
         var method = typeof(FileTypeDetector).GetMethod("WarnIfNoDirectContentDetection",
-            BindingFlags.NonPublic | BindingFlags.Static);
+            BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         method.Invoke(null, new object[] { FileKind.Unknown, FileTypeProjectOptions.DefaultOptions() });
@@ -171,7 +171,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     public void ExtensionMatchesKind_HandlesEmptyAndMismatch()
     {
         var method =
-            typeof(FileTypeDetector).GetMethod("ExtensionMatchesKind", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(FileTypeDetector).GetMethod("ExtensionMatchesKind", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var okEmpty = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { "file", FileKind.Pdf }));
@@ -186,7 +186,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     [Fact]
     public void ReadHeader_ReturnsEmpty_ForWriteOnlyStream()
     {
-        var method = typeof(FileTypeDetector).GetMethod("ReadHeader", BindingFlags.NonPublic | BindingFlags.Static);
+        var method = typeof(FileTypeDetector).GetMethod("ReadHeader", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         using var scope = TestTempPaths.CreateScope("ftd-readheader-write");
@@ -202,7 +202,7 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     [Fact]
     public void ReadHeader_ReturnsEmpty_ForZeroLengthFile()
     {
-        var method = typeof(FileTypeDetector).GetMethod("ReadHeader", BindingFlags.NonPublic | BindingFlags.Static);
+        var method = typeof(FileTypeDetector).GetMethod("ReadHeader", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         using var scope = TestTempPaths.CreateScope("ftd-readheader-zero");

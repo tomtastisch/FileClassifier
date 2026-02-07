@@ -15,7 +15,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
         var entry = new FakeEntry(relativePath: "a.txt", linkTarget: "b.txt");
 
         var method =
-            typeof(ArchiveExtractor).GetMethod("TryGetSafeEntryName", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("TryGetSafeEntryName", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         object[] args = { entry, opt, string.Empty, false };
@@ -31,7 +31,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
         var entry = new FakeEntry(relativePath: "dir/");
 
         var method =
-            typeof(ArchiveExtractor).GetMethod("TryGetSafeEntryName", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("TryGetSafeEntryName", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         object[] args = { entry, opt, string.Empty, false };
@@ -50,7 +50,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
         opt.AllowUnknownArchiveEntrySize = false;
 
         var method =
-            typeof(ArchiveExtractor).GetMethod("ValidateEntrySize", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("ValidateEntrySize", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var okSmall = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { new FakeEntry(uncompressedSize: 4), opt }));
@@ -74,7 +74,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
         var entry = new FakeEntry(relativePath: "../evil.txt");
 
         var method =
-            typeof(ArchiveExtractor).GetMethod("TryGetSafeEntryName", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("TryGetSafeEntryName", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         object[] args = { entry, opt, string.Empty, false };
@@ -87,7 +87,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
     public void TryGetSafeEntryName_ReturnsFalse_ForNullEntryOrOptions()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("TryGetSafeEntryName", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("TryGetSafeEntryName", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -103,7 +103,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
     public void TryGetSafeEntryName_AllowsLink_WhenNotRejected()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("TryGetSafeEntryName", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("TryGetSafeEntryName", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -121,7 +121,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
     public void ValidateEntrySize_ReturnsFalse_ForNullInputs()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("ValidateEntrySize", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("ValidateEntrySize", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -134,7 +134,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
     {
         var opt = FileTypeProjectOptions.DefaultOptions();
         var method =
-            typeof(ArchiveExtractor).GetMethod("ValidateEntrySize", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("ValidateEntrySize", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var ok = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { new FakeEntry(isDirectory: true), opt }));
@@ -147,7 +147,7 @@ public sealed class ArchiveInternalsReflectionUnitTests
     {
         var opt = FileTypeProjectOptions.DefaultOptions();
         var method =
-            typeof(ArchiveExtractor).GetMethod("ValidateEntrySize", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("ValidateEntrySize", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         opt.AllowUnknownArchiveEntrySize = false;

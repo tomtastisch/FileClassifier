@@ -14,7 +14,17 @@ public sealed class CoreAndArchiveInternalsFailClosedUnitTests
         using var input = new MemoryStream(new byte[] { 1, 2, 3, 4, 5 });
         using var output = new MemoryStream();
 
-        Assert.Throws<InvalidOperationException>(() => StreamBounds.CopyBounded(input, output, maxBytes: 4));
+        var threw = false;
+        try
+        {
+            StreamBounds.CopyBounded(input, output, maxBytes: 4);
+        }
+        catch (InvalidOperationException)
+        {
+            threw = true;
+        }
+
+        Assert.True(threw);
     }
 
     [Fact]
@@ -157,8 +167,9 @@ public sealed class CoreAndArchiveInternalsFailClosedUnitTests
 
         Assert.Equal("inner/note.txt", model.RelativePath);
         Assert.False(model.IsDirectory);
-        Assert.True(model.UncompressedSize.HasValue);
-        Assert.True(model.UncompressedSize.Value >= 5);
+        var uncompressedSize = model.UncompressedSize;
+        Assert.True(uncompressedSize.HasValue);
+        Assert.True(uncompressedSize.GetValueOrDefault() >= 5);
 
         using var source = model.OpenStream();
         using var reader = new StreamReader(source);

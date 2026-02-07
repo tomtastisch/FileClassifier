@@ -10,7 +10,7 @@ public sealed class ArchiveExtractorReflectionUnitTests
     public void ExtractEntryToDirectory_CreatesDirectoryEntry()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("ExtractEntryToDirectory", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToDirectory", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         using var scope = TestTempPaths.CreateScope("ftd-extract-dir");
@@ -29,7 +29,7 @@ public sealed class ArchiveExtractorReflectionUnitTests
     public void ExtractEntryToDirectory_FailsForTraversalOrExistingTarget()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("ExtractEntryToDirectory", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToDirectory", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         using var scope = TestTempPaths.CreateScope("ftd-extract-traversal");
@@ -51,7 +51,7 @@ public sealed class ArchiveExtractorReflectionUnitTests
     public void ExtractEntryToDirectory_FailsWhenStreamUnreadable()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("ExtractEntryToDirectory", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToDirectory", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         using var scope = TestTempPaths.CreateScope("ftd-extract-unreadable");
@@ -67,7 +67,7 @@ public sealed class ArchiveExtractorReflectionUnitTests
     public void ExtractEntryToMemory_ReturnsFalse_WhenEntryTooLarge()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();

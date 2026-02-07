@@ -9,7 +9,7 @@ public sealed class FileTypeDetectorReflectionUnitTests
     [Fact]
     public void ReadHeader_ReturnsEmpty_ForNullStreamOrZeroLimits()
     {
-        var method = typeof(FileTypeDetector).GetMethod("ReadHeader", BindingFlags.NonPublic | BindingFlags.Static);
+        var method = typeof(FileTypeDetector).GetMethod("ReadHeader", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var empty1 = TestGuard.NotNull(method.Invoke(null, new object?[] { null, 128, 1024L }) as byte[]);
@@ -27,7 +27,7 @@ public sealed class FileTypeDetectorReflectionUnitTests
     [Fact]
     public void ReadHeader_UsesDefaultSniffBytes_AndTruncatesWhenShorter()
     {
-        var method = typeof(FileTypeDetector).GetMethod("ReadHeader", BindingFlags.NonPublic | BindingFlags.Static);
+        var method = typeof(FileTypeDetector).GetMethod("ReadHeader", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         using var scope = TestTempPaths.CreateScope("ftd-readheader-short");
@@ -43,7 +43,7 @@ public sealed class FileTypeDetectorReflectionUnitTests
     [Fact]
     public void ReadHeader_ReturnsEmpty_WhenLengthExceedsMaxBytes()
     {
-        var method = typeof(FileTypeDetector).GetMethod("ReadHeader", BindingFlags.NonPublic | BindingFlags.Static);
+        var method = typeof(FileTypeDetector).GetMethod("ReadHeader", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         using var scope = TestTempPaths.CreateScope("ftd-readheader-max");
