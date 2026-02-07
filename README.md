@@ -45,9 +45,8 @@ end
 %% =========================================
 subgraph O["Output-Art"]
 direction TB
-  O_OPT_LOAD["Load options (JSON)"]
+  
   O_OPT_EXPORT["Export options (JSON)"]
-
   O_DET_READ["Read file safe (bounded)"]
   O_DET_DETECT["Detect type (path|bytes)"]
   O_DET_DETAIL["Detect detailed"]
@@ -85,7 +84,6 @@ end
 %% =======
 
 %% FileTypeOptions
-OPT --> O_OPT_LOAD --> T_BOOL
 OPT --> O_OPT_EXPORT --> T_STR
 
 %% FileTypeDetector
