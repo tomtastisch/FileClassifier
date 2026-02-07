@@ -190,6 +190,8 @@ run_qodana_contract() {
       ci_result_add_violation "CI-QODANA-002" "fail" "Qodana SARIF missing" "$CI_RAW_LOG"
     elif rg -q "CI-QODANA-003" "$CI_RAW_LOG"; then
       ci_result_add_violation "CI-QODANA-003" "fail" "Qodana SARIF invalid" "$CI_RAW_LOG"
+    elif rg -q "CI-QODANA-004" "$CI_RAW_LOG"; then
+      ci_result_add_violation "CI-QODANA-004" "fail" "Qodana blocking findings detected (High+)" "$CI_RAW_LOG"
     else
       ci_result_add_violation "CI-QODANA-001" "fail" "Qodana contract validation failed" "$CI_RAW_LOG"
     fi
