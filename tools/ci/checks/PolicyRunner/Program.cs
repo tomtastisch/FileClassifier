@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using YamlDotNet.RepresentationModel;
@@ -257,7 +258,21 @@ void EvaluateRegexLineRule(PolicyRule rule)
 
     foreach (var file in files)
     {
-        var lines = File.ReadAllLines(file);
+        var relFile = Rel(repoRootPath, file);
+        if (IsKnownBinaryPath(file))
+        {
+            logger.Add($"SCAN_SKIP|rule_id={rule.RuleId}|file={relFile}|reason=known_binary_extension");
+            continue;
+        }
+
+        var readLines = TryReadUtf8Lines(file);
+        if (!readLines.Ok)
+        {
+            logger.Add($"SCAN_SKIP|rule_id={rule.RuleId}|file={relFile}|reason={readLines.ErrorCode}");
+            continue;
+        }
+
+        var lines = readLines.Lines;
         for (var i = 0; i < lines.Length; i++)
         {
             if (!regex.IsMatch(lines[i]))
@@ -675,6 +690,68 @@ static int LeadingSpaces(string input)
     }
 
     return count;
+}
+
+static bool IsKnownBinaryPath(string path)
+{
+    var ext = Path.GetExtension(path);
+    if (string.IsNullOrWhiteSpace(ext))
+    {
+        return false;
+    }
+
+    return ext.ToLowerInvariant() switch
+    {
+        ".dll" => true,
+        ".exe" => true,
+        ".pdb" => true,
+        ".so" => true,
+        ".dylib" => true,
+        ".a" => true,
+        ".o" => true,
+        ".class" => true,
+        ".jar" => true,
+        ".zip" => true,
+        ".gz" => true,
+        ".7z" => true,
+        ".tar" => true,
+        ".png" => true,
+        ".jpg" => true,
+        ".jpeg" => true,
+        ".gif" => true,
+        ".bmp" => true,
+        ".ico" => true,
+        ".pdf" => true,
+        ".woff" => true,
+        ".woff2" => true,
+        ".ttf" => true,
+        ".otf" => true,
+        _ => false
+    };
+}
+
+static (bool Ok, string[] Lines, string? ErrorCode) TryReadUtf8Lines(string filePath)
+{
+    try
+    {
+        using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        using var reader = new StreamReader(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true), detectEncodingFromByteOrderMarks: true);
+        var content = reader.ReadToEnd();
+        var normalized = content.Replace("\r\n", "\n").Replace('\r', '\n');
+        return (true, normalized.Split('\n'), null);
+    }
+    catch (DecoderFallbackException)
+    {
+        return (false, Array.Empty<string>(), "invalid_utf8");
+    }
+    catch (IOException)
+    {
+        return (false, Array.Empty<string>(), "io_error");
+    }
+    catch (UnauthorizedAccessException)
+    {
+        return (false, Array.Empty<string>(), "access_denied");
+    }
 }
 
 static (bool Ok, int SchemaVersion, string? Error) LoadRulesSchema(string schemaPath)

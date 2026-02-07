@@ -15,13 +15,13 @@ fi
 
 OUT_DIR="artifacts/ci/${CHECK_ID}"
 
-if [[ "$CHECK_ID" == "artifact_contract" ]]; then
+if [[ "$CHECK_ID" == "artifact_contract" || "$CHECK_ID" == "summary" ]]; then
   cd "$ROOT_DIR"
   dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
   dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
   dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/PolicyRunner/PolicyRunner.csproj"
   dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/PolicyRunner/PolicyRunner.csproj"
-  exec dotnet "${ROOT_DIR}/tools/ci/checks/PolicyRunner/bin/Release/net10.0/PolicyRunner.dll" --check-id artifact_contract --repo-root "${ROOT_DIR}" --out-dir "${OUT_DIR}"
+  exec dotnet "${ROOT_DIR}/tools/ci/checks/PolicyRunner/bin/Release/net10.0/PolicyRunner.dll" --check-id "${CHECK_ID}" --repo-root "${ROOT_DIR}" --out-dir "${OUT_DIR}"
 fi
 
 ci_result_init "$CHECK_ID" "$OUT_DIR"
@@ -101,12 +101,6 @@ run_tests_bdd_coverage() {
   ci_result_append_summary "BDD coverage checks completed."
 }
 
-run_summary() {
-  build_validators
-  run_or_fail "CI-ARTIFACT-001" "Artifact contract policy" bash "${ROOT_DIR}/tools/ci/policies/policy_artifact_contract.sh" preflight build security-nuget tests-bdd-coverage
-  ci_result_append_summary "Summary contract checks completed."
-}
-
 run_pr_labeling() {
   run_or_fail "CI-LABEL-001" "Fetch PR head" git fetch --no-tags --prune origin "${GITHUB_SHA}"
 
@@ -160,7 +154,10 @@ main() {
     build) run_build ;;
     security-nuget) run_security_nuget ;;
     tests-bdd-coverage) run_tests_bdd_coverage ;;
-    summary) run_summary ;;
+    summary)
+      ci_result_add_violation "CI-RUNNER-001" "fail" "summary must be executed via PolicyRunner bridge" "tools/ci/bin/run.sh"
+      return 2
+      ;;
     pr-labeling) run_pr_labeling ;;
     qodana) run_qodana_contract ;;
     *)
