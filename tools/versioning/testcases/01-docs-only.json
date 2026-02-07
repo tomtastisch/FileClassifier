@@ -1,14 +1,19 @@
 {
   "name": "docs-only",
-  "files": ["docs/ci/001_PIPELINE_CI.MD", "README.md"],
-  "required": "none",
-  "actual": "none",
-  "version_reason": "docs-or-meta-only",
+  "files": [
+    "docs/ci/001_PIPELINE_CI.MD",
+    "README.md"
+  ],
+  "required": "patch",
+  "actual": "patch",
+  "version_reason": "docs-test-ci-tooling",
   "pr_title": "docs: update ci docs",
   "expect": {
-    "version_label": "version:none",
+    "version_label": "version:patch",
     "primary": "docs",
     "impl": "impl:docs",
-    "area_contains": ["area:docs"]
+    "area_contains": [
+      "area:docs"
+    ]
   }
 }

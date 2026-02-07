@@ -7,6 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DOCS_DIR = ROOT / "docs"
 SRC_FTD_DIR = ROOT / "src" / "FileTypeDetection"
+TESTS_DIR = ROOT / "tests"
 ROOT_README = ROOT / "README.md"
 REPO = "https://github.com/tomtastisch/FileClassifier"
 
@@ -43,6 +44,7 @@ def collect_targets() -> list[Path]:
         files.append(ROOT_README)
     files.extend(sorted(DOCS_DIR.rglob("*.MD")))
     files.extend(sorted(SRC_FTD_DIR.rglob("README.md")))
+    files.extend(sorted(TESTS_DIR.rglob("README.md")))
     return files
 
 def check_docs_naming() -> list[str]:
