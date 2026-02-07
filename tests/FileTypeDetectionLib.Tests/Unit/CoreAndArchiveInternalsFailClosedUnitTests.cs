@@ -181,8 +181,14 @@ public sealed class CoreAndArchiveInternalsFailClosedUnitTests
     public void LogGuard_SwallowsLoggerExceptions_AndNeverThrows()
     {
         var logger = new ThrowingLogger();
+        var rawLogger = (ILogger)logger;
         var ex = Record.Exception(() =>
         {
+            using var scope = rawLogger.BeginScope("scope");
+            Assert.True(rawLogger.IsEnabled(LogLevel.Debug));
+            Assert.Throws<InvalidOperationException>(() =>
+                rawLogger.Log(LogLevel.Error, new EventId(42, "test"), "state", null, (state, _) => state));
+
             LogGuard.Debug(logger, "debug");
             LogGuard.Warn(logger, "warn");
             LogGuard.Error(logger, "error", new InvalidOperationException("boom"));
