@@ -7,34 +7,57 @@ namespace FileTypeDetectionLib.Tests.Unit;
 public sealed class FileTypeDetectorPrivateBranchUnitTests
 {
     [Fact]
-    public void LoadOptions_ReturnsDefaults_ForWhitespacePath()
+    public void LoadOptionsFromPath_ReturnsFalse_ForWhitespacePath()
     {
-        var options = FileTypeDetector.LoadOptions(" ");
-        Assert.Equal(FileTypeProjectOptions.DefaultOptions().MaxBytes, options.MaxBytes);
+        var original = FileTypeOptions.GetSnapshot();
+        try
+        {
+            Assert.False(FileTypeOptions.LoadOptionsFromPath(" "));
+            Assert.Equal(original.MaxBytes, FileTypeOptions.GetSnapshot().MaxBytes);
+        }
+        finally
+        {
+            FileTypeOptions.SetSnapshot(original);
+        }
     }
 
     [Fact]
-    public void LoadOptions_ReturnsDefaults_ForExistingNonJsonFile()
+    public void LoadOptionsFromPath_ReturnsFalse_ForExistingNonJsonFile()
     {
+        var original = FileTypeOptions.GetSnapshot();
         using var scope = TestTempPaths.CreateScope("ftd-options-nonjson");
         var path = Path.Combine(scope.RootPath, "config.txt");
         File.WriteAllText(path, "{}");
 
-        var options = FileTypeDetector.LoadOptions(path);
-
-        Assert.Equal(FileTypeProjectOptions.DefaultOptions().MaxBytes, options.MaxBytes);
+        try
+        {
+            Assert.False(FileTypeOptions.LoadOptionsFromPath(path));
+            Assert.Equal(original.MaxBytes, FileTypeOptions.GetSnapshot().MaxBytes);
+        }
+        finally
+        {
+            FileTypeOptions.SetSnapshot(original);
+        }
     }
 
     [Fact]
-    public void LoadOptions_ReturnsParsedOptions_ForValidJson()
+    public void LoadOptionsFromPath_ReturnsTrue_ForValidJson()
     {
+        var original = FileTypeOptions.GetSnapshot();
         using var scope = TestTempPaths.CreateScope("ftd-options-json");
         var path = Path.Combine(scope.RootPath, "config.json");
         File.WriteAllText(path, "{ \"maxBytes\": 12345 }");
 
-        var options = FileTypeDetector.LoadOptions(path);
-
-        Assert.Equal(12345, options.MaxBytes);
+        try
+        {
+            var ok = FileTypeOptions.LoadOptionsFromPath(path);
+            Assert.True(ok);
+            Assert.Equal(12345, FileTypeOptions.GetSnapshot().MaxBytes);
+        }
+        finally
+        {
+            FileTypeOptions.SetSnapshot(original);
+        }
     }
 
     [Fact]

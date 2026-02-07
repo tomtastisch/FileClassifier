@@ -6,28 +6,43 @@ namespace FileTypeDetectionLib.Tests.Unit;
 public sealed class FileTypeDetectorAdditionalUnitTests
 {
     [Fact]
-    public void LoadOptions_ReturnsDefaults_ForMissingOrNonJson()
+    public void LoadOptionsFromPath_ReturnsFalse_ForMissingOrNonJson()
     {
-        var missing = FileTypeDetector.LoadOptions("missing.json");
-        var notJson = FileTypeDetector.LoadOptions("config.txt");
+        var original = FileTypeOptions.GetSnapshot();
+        try
+        {
+            var missing = FileTypeOptions.LoadOptionsFromPath("missing.json");
+            var notJson = FileTypeOptions.LoadOptionsFromPath("config.txt");
 
-        Assert.NotNull(missing);
-        Assert.NotNull(notJson);
-        Assert.Equal(FileTypeProjectOptions.DefaultOptions().MaxBytes, missing.MaxBytes);
-        Assert.Equal(FileTypeProjectOptions.DefaultOptions().MaxBytes, notJson.MaxBytes);
+            Assert.False(missing);
+            Assert.False(notJson);
+            Assert.Equal(original.MaxBytes, FileTypeOptions.GetSnapshot().MaxBytes);
+        }
+        finally
+        {
+            FileTypeOptions.SetSnapshot(original);
+        }
     }
 
     [Fact]
-    public void LoadOptions_ReturnsDefaults_ForInvalidJson()
+    public void LoadOptionsFromPath_ReturnsFalse_ForInvalidJson()
     {
+        var original = FileTypeOptions.GetSnapshot();
         using var scope = TestTempPaths.CreateScope("ftd-options");
         var path = Path.Combine(scope.RootPath, "bad.json");
         File.WriteAllText(path, "{ invalid json");
 
-        var options = FileTypeDetector.LoadOptions(path);
+        try
+        {
+            var ok = FileTypeOptions.LoadOptionsFromPath(path);
 
-        Assert.NotNull(options);
-        Assert.Equal(FileTypeProjectOptions.DefaultOptions().MaxBytes, options.MaxBytes);
+            Assert.False(ok);
+            Assert.Equal(original.MaxBytes, FileTypeOptions.GetSnapshot().MaxBytes);
+        }
+        finally
+        {
+            FileTypeOptions.SetSnapshot(original);
+        }
     }
 
     [Fact]

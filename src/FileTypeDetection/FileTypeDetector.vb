@@ -47,33 +47,6 @@ Namespace FileTypeDetection
         End Function
 
         ''' <summary>
-        '''     Laedt Optionen aus einer JSON-Datei.
-        '''     Unbekannte Schluessel werden ignoriert, Parse-/IO-Fehler fallen auf Defaults zurueck.
-        ''' </summary>
-        ''' <param name="path">Pfad zur JSON-Konfigurationsdatei.</param>
-        ''' <returns>Geparste Optionen oder Defaults.</returns>
-        Friend Shared Function LoadOptions(path As String) As FileTypeProjectOptions
-            Dim defaults = FileTypeProjectOptions.DefaultOptions()
-            If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
-                LogGuard.Warn(defaults.Logger, "[Config] Datei nicht gefunden, Defaults.")
-                Return defaults
-            End If
-
-            If Not path.EndsWith(".json", StringComparison.OrdinalIgnoreCase) Then
-                LogGuard.Warn(defaults.Logger, "[Config] Nur JSON unterstuetzt, Defaults.")
-                Return defaults
-            End If
-
-            Try
-                If Not FileTypeOptions.LoadOptionsFromPath(path) Then Return defaults
-                Return FileTypeOptions.GetSnapshot()
-            Catch ex As Exception
-                LogGuard.Warn(defaults.Logger, $"[Config] Parse/IO-Fehler: {ex.Message}, Defaults.")
-                Return defaults
-            End Try
-        End Function
-
-        ''' <summary>
         '''     Liest eine Datei begrenzt in Memory ein. Wird z. B. fuer Detect(byte())-Workflows verwendet.
         ''' </summary>
         ''' <param name="path">Dateipfad.</param>
