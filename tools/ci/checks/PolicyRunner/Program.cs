@@ -149,6 +149,12 @@ var matchingRules = allRules
 matchedRuleCount = matchingRules.Count;
 logger.Add($"RULES|loaded={allRules.Count}|matching={matchingRules.Count}");
 
+if (matchingRules.Count == 0)
+{
+    AddPolicyFailure($"no policy rule matches check_id '{checkId}'", "tools/ci/policies/rules");
+    return FinalizeAndExit();
+}
+
 foreach (var rule in matchingRules)
 {
     EvaluateRule(rule);
