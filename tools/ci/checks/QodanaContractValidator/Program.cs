@@ -84,6 +84,26 @@ try
         Console.Error.WriteLine($"CI-QODANA-004: blocking findings detected at severity High+ ({blockingFindings.Count})");
         return 1;
     }
+
+    var ideaLogPath = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(sarifPath)) ?? ".", "log", "idea.log");
+    if (File.Exists(ideaLogPath))
+    {
+        var toolsetErrors = File.ReadLines(ideaLogPath)
+            .Where(static line => line.Contains("Rider toolset and environment errors", StringComparison.Ordinal))
+            .OrderBy(static line => line, StringComparer.Ordinal)
+            .ToList();
+
+        foreach (var line in toolsetErrors.Take(20))
+        {
+            Console.Error.WriteLine($"QODANA_TOOL_ERROR|{line}");
+        }
+
+        if (toolsetErrors.Count > 0)
+        {
+            Console.Error.WriteLine($"CI-QODANA-005: qodana toolset/environment errors detected ({toolsetErrors.Count})");
+            return 1;
+        }
+    }
 }
 catch (Exception ex)
 {
