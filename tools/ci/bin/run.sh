@@ -128,6 +128,7 @@ build_validators() {
 run_preflight() {
   build_validators
   run_or_fail "CI-PREFLIGHT-001" "Label engine tests" node "${ROOT_DIR}/tools/versioning/test-compute-pr-labels.js"
+  run_or_fail "CI-PREFLIGHT-001" "Doc consistency drift guard" python3 "${ROOT_DIR}/tools/check-doc-consistency.py"
   run_or_fail "CI-PREFLIGHT-001" "Policy/RoC bijection" python3 "${ROOT_DIR}/tools/check-policy-roc.py" --out "${ROOT_DIR}/artifacts/policy_roc_matrix.tsv"
   run_or_fail "CI-PREFLIGHT-001" "Versioning guard" bash "${ROOT_DIR}/tools/versioning/check-versioning.sh"
   run_or_fail "CI-PREFLIGHT-001" "Format check" dotnet format "${ROOT_DIR}/FileClassifier.sln" --verify-no-changes
@@ -140,6 +141,7 @@ run_preflight() {
 }
 
 run_docs_links_full() {
+  run_or_fail "CI-DOCS-LINKS-001" "Doc consistency drift guard" python3 "${ROOT_DIR}/tools/check-doc-consistency.py"
   run_or_fail "CI-DOCS-LINKS-001" "Full docs/link validation" python3 "${ROOT_DIR}/tools/check-docs.py"
   ci_result_append_summary "Docs links full validation completed."
 }

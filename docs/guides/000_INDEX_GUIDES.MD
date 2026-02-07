@@ -26,9 +26,9 @@ Beide Guides folgen derselben Struktur:
 ## 4. Wann welcher Guide?
 | Frage | Guide |
 |---|---|
-| Neue oder geänderte Konfigurationsoption? | `OPTIONS_CHANGE_GUIDE.md` |
-| Neuer erkennbarer Dateityp (`FileKind`) oder Magic/Alias-Update? | `DATATYPE_EXTENSION_GUIDE.md` |
-| Neues API-Rückgabemodell unter `Abstractions/*`? | `DATATYPE_EXTENSION_GUIDE.md` |
+| Neue oder geänderte Konfigurationsoption? | `docs/guides/001_GUIDE_OPTIONS.MD` |
+| Neuer erkennbarer Dateityp (`FileKind`) oder Magic/Alias-Update? | `docs/guides/002_GUIDE_DATATYPE.MD` |
+| Neues API-Rückgabemodell unter `Abstractions/*`? | `docs/guides/002_GUIDE_DATATYPE.MD` |
 | Kombination aus Option + Datatype? | beide Guides, zuerst Options-Guide, dann Datatype-Guide |
 
 ## 5. Verknüpfungen

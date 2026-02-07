@@ -25,7 +25,7 @@ Der Workflow `CI` hat zwei klar getrennte Verantwortungswege:
 
 ### Job: preflight (fail-fast)
 1. Label-Engine Golden-Tests
-2. Docs-Check
+2. Doc-Consistency-Drift-Guard
 3. Versioning-Guard
 4. Format-Check
 
@@ -95,6 +95,7 @@ Branch-Protection-Hinweis:
 ## 8. Lokale Reproduktion
 ```bash
 node tools/versioning/test-compute-pr-labels.js
+python3 tools/check-doc-consistency.py
 python3 tools/check-docs.py
 bash tools/versioning/check-versioning.sh
 dotnet format FileClassifier.sln --verify-no-changes

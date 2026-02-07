@@ -50,6 +50,7 @@ Bei Änderungen an CI, Labeling, Versioning oder API:
 
 Pflichtcheck:
 ```bash
+python3 tools/check-doc-consistency.py
 python3 tools/check-docs.py
 ```
 
@@ -57,6 +58,14 @@ python3 tools/check-docs.py
 - Keine doppelte Pflege derselben Regel in mehreren SSOT-Dateien.
 - Keine veralteten Backup-/Deprecated-Dokumente im aktiven Pfad.
 - Keine gemischten Benennungsschemata (`kebab-case`/`snake_case`) innerhalb derselben Doku-Ebene.
+
+## 10. CI-Checkliste: Doc-Consistency (verbindlich)
+Die folgende Checkliste ist als CI-Regel verdrahtet und muss bei jedem Lauf bestehen:
+1. Veraltete Kern-Dateinamenmuster sind verboten und müssen auf kanonische Ziele zeigen.
+2. Veraltete Guides-Namen sind verboten und müssen auf kanonische Guide-Dateien zeigen.
+3. Veraltete Guide-Index-Referenzen sind verboten und müssen auf den kanonischen Guides-Index zeigen.
+4. Nicht-kanonische `docs/04_*`-Pfade sind verboten; erlaubt sind nur aktuelle 3-stellige UPPERCASE-Pfade.
+5. Jeder Treffer wird mit `Datei:Zeile`, Regel-ID und konkreter Korrekturhilfe ausgegeben.
 
 ## RoC-Bezug
 - [Artifact-Contract-Regel](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tools/ci/policies/rules/artifact_contract.yaml)

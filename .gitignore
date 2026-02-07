@@ -44,6 +44,7 @@ benchmark_detect_ms.txt
 # local-only tools
 tools/*
 !tools/check-docs.py
+!tools/check-doc-consistency.py
 !tools/check-policy-roc.py
 !tools/check-quality.sh
 !tools/run-coverage.sh
