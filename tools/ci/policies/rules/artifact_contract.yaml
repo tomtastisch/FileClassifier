@@ -7,6 +7,7 @@ rules:
     description: Required artifacts must be present for each configured check_id.
     applies_to:
       - artifact_contract
+      - summary
     params:
       artifact_root: artifacts/ci
       check_ids:

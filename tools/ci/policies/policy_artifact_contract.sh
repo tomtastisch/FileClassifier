@@ -1,34 +1,53 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# shellcheck source=tools/ci/lib/result.sh
-source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)/lib/result.sh"
+CI_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd -- "${CI_DIR}/../.." && pwd)"
 
-if [[ $# -lt 1 ]]; then
-  echo "Usage: policy_artifact_contract.sh <check_id> [<check_id> ...]" >&2
-  exit 2
+# shellcheck source=tools/ci/lib/result.sh
+source "${CI_DIR}/lib/result.sh"
+
+POLICY_OUT_DIR="artifacts/ci/_policy_summary"
+mkdir -p "${POLICY_OUT_DIR}"
+
+policy_exit=0
+if ! dotnet "${CI_DIR}/checks/PolicyRunner/bin/Release/net10.0/PolicyRunner.dll" --check-id summary --repo-root "${REPO_ROOT}" --out-dir "${POLICY_OUT_DIR}" >> "$CI_RAW_LOG" 2>&1; then
+  policy_exit=1
 fi
 
-has_failures=0
+policy_result_json="${POLICY_OUT_DIR}/result.json"
+if [[ ! -f "${policy_result_json}" ]]; then
+  ci_result_add_violation "CI-POLICY-001" "fail" "PolicyRunner did not produce result.json" "${policy_result_json}"
+  ci_result_append_summary "Summary artifact contract policy failed (missing result.json)."
+  exit 1
+fi
 
-for check_id in "$@"; do
-  check_dir="artifacts/ci/${check_id}"
-  for req in raw.log summary.md result.json; do
-    if [[ ! -f "${check_dir}/${req}" ]]; then
-      ci_result_add_violation "CI-ARTIFACT-001" "fail" "missing required artifact ${check_dir}/${req}" "${check_dir}/${req}"
-      has_failures=1
-      continue
-    fi
-  done
+findings=0
+has_fail=0
 
-  if [[ -f "${check_dir}/result.json" ]]; then
-    if ! dotnet tools/ci/checks/ResultSchemaValidator/bin/Release/net10.0/ResultSchemaValidator.dll --schema tools/ci/schema/result.schema.json --result "${check_dir}/result.json" >> "$CI_RAW_LOG" 2>&1; then
-      ci_result_add_violation "CI-SCHEMA-001" "fail" "result.json schema validation failed for ${check_id}" "${check_dir}/result.json"
-      has_failures=1
-    fi
+while IFS= read -r violation; do
+  rule_id="$(jq -r '.rule_id' <<< "$violation")"
+  severity="$(jq -r '.severity' <<< "$violation")"
+  message="$(jq -r '.message' <<< "$violation")"
+
+  mapfile -t evidence_paths < <(jq -r '.evidence_paths[]' <<< "$violation")
+  if [[ "${#evidence_paths[@]}" -eq 0 ]]; then
+    evidence_paths=("tools/ci/policies/policy_artifact_contract.sh")
   fi
-done
 
-if [[ "$has_failures" -eq 1 ]]; then
+  ci_result_add_violation "$rule_id" "$severity" "$message" "${evidence_paths[@]}"
+  findings=$((findings + 1))
+  if [[ "$severity" == "fail" ]]; then
+    has_fail=1
+  fi
+done < <(jq -c '.rule_violations[]' "${policy_result_json}")
+
+if [[ "$findings" -eq 0 ]]; then
+  ci_result_append_summary "Summary artifact contract policy passed."
+else
+  ci_result_append_summary "Summary artifact contract policy violations: $findings"
+fi
+
+if [[ "$policy_exit" -ne 0 || "$has_fail" -eq 1 ]]; then
   exit 1
 fi
