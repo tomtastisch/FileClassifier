@@ -7,6 +7,7 @@ Diese Seite ist der Einstieg fuer die testbezogene SSOT-Dokumentation im Bereich
 - `tests/FileTypeDetectionLib.Tests/Features/*.feature`
 - `tests/FileTypeDetectionLib.Tests/Steps/FileTypeDetectionSteps.cs`
 - Testlauf in CI via `tools/test-bdd-readable.sh`
+- Runner/Adapter: Reqnroll mit `Reqnroll.xunit.v3` (xUnit v3)
 
 ## 3. Dokumente
 1. [BDD_SATZKATALOG.md](./BDD_SATZKATALOG.md)

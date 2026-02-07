@@ -37,6 +37,7 @@ Die CI ist deterministisch und auditierbar aufgebaut. Alle Checks laufen in sepa
 - BDD-Testkatalog und Testablauf: [docs/tests/README.md](docs/tests/README.md)
 - Governance/Ownership: [docs/governance/LABELING_OWNERSHIP.md](docs/governance/LABELING_OWNERSHIP.md)
 - Qodana läuft als separater Workflow, schreibt Ergebnisse nach `artifacts/ci/qodana/` und veröffentlicht diese als Artefakt.
+- Teststack-SSOT (Migrationstand): Reqnroll mit `Reqnroll.xunit.v3` auf xUnit v3.
 
 ## 7. Runbook (reproduzierbar)
 ```bash

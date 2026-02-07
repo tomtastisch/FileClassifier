@@ -39,6 +39,7 @@ Der Workflow `CI` hat zwei klar getrennte Verantwortungswege:
 
 ### Job: tests-bdd-coverage
 1. Single-Run BDD-Tests + Coverage-Gate (`Line >= 85`, `Branch >= 69`)
+2. Runner-Stack: Reqnroll + `Reqnroll.xunit.v3` (xUnit v3)
 
 ### Job: summary
 - Coverage- und Security-Zusammenfassung (nur Reporting)
