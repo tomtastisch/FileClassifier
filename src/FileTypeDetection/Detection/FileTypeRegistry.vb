@@ -138,15 +138,18 @@ Namespace FileTypeDetection
         Friend Shared Function DetectByMagic(header As Byte()) As FileKind
             If header Is Nothing OrElse header.Length = 0 Then Return FileKind.Unknown
 
-            Dim match = MagicRules.
-                SelectMany(Function(rule) rule.Patterns.
-                    Select(Function(pattern) New With {.Rule = rule, .Pattern = pattern})).
-                FirstOrDefault(Function(item)
-                                   Dim segments = item.Pattern.Segments
-                                   Return segments.All(Function(segment) HasSegment(header, segment))
-                               End Function)
+            For i = 0 To MagicRules.Length - 1
+                Dim rule = MagicRules(i)
+                Dim patterns = rule.Patterns
+                For j = 0 To patterns.Length - 1
+                    Dim segments = patterns(j).Segments
+                    If segments.All(Function(segment) HasSegment(header, segment)) Then
+                        Return rule.Kind
+                    End If
+                Next
+            Next
 
-            Return If(match Is Nothing, FileKind.Unknown, match.Rule.Kind)
+            Return FileKind.Unknown
         End Function
 
         Friend Shared Function HasDirectHeaderDetection(kind As FileKind) As Boolean

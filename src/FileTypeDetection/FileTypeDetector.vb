@@ -3,6 +3,7 @@ Option Explicit On
 
 Imports System.IO
 Imports System.Linq
+Imports System.Diagnostics.CodeAnalysis
 
 Namespace FileTypeDetection
     ''' <summary>
@@ -140,6 +141,8 @@ Namespace FileTypeDetection
         ''' <summary>
         '''     Liefert ein detailliertes, auditierbares Detektionsergebnis inkl. Endungs-Policy.
         ''' </summary>
+        ' ReSharper disable once MemberCanBeMadeStatic.Global
+        <SuppressMessage("Performance", "CA1822:Mark members as static", Justification:="Public instance API; changing to Shared would be a breaking API change.")>
         Public Function DetectDetailed(path As String, verifyExtension As Boolean) As DetectionDetail
             Dim opt = GetDefaultOptions()
             Dim trace As DetectionTrace = DetectionTrace.Empty
@@ -194,7 +197,7 @@ Namespace FileTypeDetection
             End Try
         End Function
 
-        Private Function DetectPathCore(path As String) As FileType
+        Private Shared Function DetectPathCore(path As String) As FileType
             Dim opt = GetDefaultOptions()
             Dim trace As DetectionTrace = DetectionTrace.Empty
             Return DetectPathCoreWithTrace(path, opt, trace)
@@ -239,6 +242,8 @@ Namespace FileTypeDetection
         ''' </summary>
         ''' <param name="data">Zu pruefende Nutzdaten.</param>
         ''' <returns>Erkannter Typ oder Unknown.</returns>
+        ' ReSharper disable once MemberCanBeMadeStatic.Global
+        <SuppressMessage("Performance", "CA1822:Mark members as static", Justification:="Public instance API; changing to Shared would be a breaking API change.")>
         Public Function Detect(data As Byte()) As FileType
             Dim opt = GetDefaultOptions()
             Return DetectInternalBytes(data, opt)

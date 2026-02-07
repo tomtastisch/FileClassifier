@@ -30,20 +30,22 @@ public sealed class ArchiveManagedBackendUnitTests
 
         var ok = backend.Process(stream, opt, 0, ArchiveContainerType.Zip, entry =>
         {
-            if (entry.RelativePath == "a.txt")
+            switch (entry.RelativePath)
             {
-                sawFile = true;
-                Assert.False(entry.IsDirectory);
-                Assert.Equal(3, entry.UncompressedSize);
-                Assert.True(entry.CompressedSize.HasValue);
-                using var s = entry.OpenStream();
-                Assert.True(s.CanRead);
-            }
-
-            else if (entry.RelativePath == "dir/")
-            {
-                sawDir = true;
-                Assert.True(entry.IsDirectory);
+                case "a.txt":
+                    sawFile = true;
+                    Assert.False(entry.IsDirectory);
+                    Assert.Equal(3, entry.UncompressedSize);
+                    Assert.True(entry.CompressedSize.HasValue);
+                    using (var s = entry.OpenStream())
+                    {
+                        Assert.True(s.CanRead);
+                    }
+                    break;
+                case "dir/":
+                    sawDir = true;
+                    Assert.True(entry.IsDirectory);
+                    break;
             }
 
             return true;

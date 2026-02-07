@@ -38,11 +38,6 @@ internal static class ArchiveEntryPayloadFactory
         return ms.ToArray();
     }
 
-    internal static byte[] CreateNestedZip(int nestedZipBytes)
-    {
-        return CreateNestedZipWithInnerLength(nestedZipBytes).zipBytes;
-    }
-
     internal static (byte[] zipBytes, long innerUncompressedBytes) CreateNestedZipWithInnerLength(int nestedZipBytes)
     {
         var nestedContent = CreateZipWithEntries(1, Math.Max(1, nestedZipBytes));

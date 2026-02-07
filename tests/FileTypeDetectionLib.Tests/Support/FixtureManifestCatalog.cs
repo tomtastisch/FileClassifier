@@ -23,8 +23,6 @@ internal sealed class FixtureManifestCatalog
         _byFileName = byFileName;
     }
 
-    internal IReadOnlyCollection<FixtureManifestEntry> Entries => _byFixtureId.Values.ToList().AsReadOnly();
-
     internal static FixtureManifestCatalog LoadAndValidate(string resourcesRoot)
     {
         if (string.IsNullOrWhiteSpace(resourcesRoot))
@@ -36,7 +34,7 @@ internal sealed class FixtureManifestCatalog
         var doc = JsonSerializer.Deserialize<FixtureManifestDocument>(
             File.ReadAllText(manifestPath),
             JsonOptions);
-        if (doc is null || doc.Fixtures is null || doc.Fixtures.Count == 0)
+        if (doc?.Fixtures is not { Count: > 0 })
             throw new InvalidOperationException("Fixture manifest is empty.");
 
         var byFixtureId = new Dictionary<string, FixtureManifestEntry>(KeyComparer);
@@ -115,6 +113,18 @@ internal sealed class FixtureManifestCatalog
 
         if (string.IsNullOrWhiteSpace(entry.Sha256) || entry.Sha256.Length != 64)
             throw new InvalidOperationException($"Fixture '{entry.FixtureId}' requires SHA-256 (64 hex chars).");
+
+        if (string.IsNullOrWhiteSpace(entry.SourceUrl))
+            throw new InvalidOperationException($"Fixture '{entry.FixtureId}' requires sourceUrl.");
+
+        if (string.IsNullOrWhiteSpace(entry.SourceRef))
+            throw new InvalidOperationException($"Fixture '{entry.FixtureId}' requires sourceRef.");
+
+        if (string.IsNullOrWhiteSpace(entry.Purpose))
+            throw new InvalidOperationException($"Fixture '{entry.FixtureId}' requires purpose.");
+
+        if (string.IsNullOrWhiteSpace(entry.SecurityNotes))
+            throw new InvalidOperationException($"Fixture '{entry.FixtureId}' requires securityNotes.");
     }
 
     private static string ComputeSha256(string path)
