@@ -118,7 +118,7 @@ Validierung:
 ## 11. Verlinkte SSOT-Quellen
 - `docs/versioning/001_POLICY_VERSIONING.MD`
 - `docs/ci/001_PIPELINE_CI.MD`
-- `docs/governance/LABELING_OWNERSHIP.md`
+- `docs/governance/002_POLICY_LABELING.MD`
 - `docs/governance/004_POLICY_DOCUMENTATION.MD`
 
 ## RoC-Bezug

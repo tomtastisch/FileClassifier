@@ -76,7 +76,7 @@ Primary-Prioritaet ist fix:
 ## 10. Zugehoerige SSOT-Dokumente
 - `docs/versioning/004_POLICY_LABELING.MD`
 - `docs/ci/001_PIPELINE_CI.MD`
-- `docs/governance/LABELING_OWNERSHIP.md`
+- `docs/governance/002_POLICY_LABELING.MD`
 - `docs/governance/004_POLICY_DOCUMENTATION.MD`
 
 ## 11. Qodana
