@@ -1,86 +1,53 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# shellcheck source=tools/ci/lib/result.sh
-source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)/lib/result.sh"
+CI_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd -- "${CI_DIR}/../.." && pwd)"
 
-MAX_INLINE_RUN_LINES="${MAX_INLINE_RUN_LINES:-5}"
+# shellcheck source=tools/ci/lib/result.sh
+source "${CI_DIR}/lib/result.sh"
+
+POLICY_OUT_DIR="artifacts/ci/_policy_preflight"
+mkdir -p "${POLICY_OUT_DIR}"
+
+policy_exit=0
+if ! dotnet "${CI_DIR}/checks/PolicyRunner/bin/Release/net10.0/PolicyRunner.dll" --check-id preflight --repo-root "${REPO_ROOT}" --out-dir "${POLICY_OUT_DIR}" >> "$CI_RAW_LOG" 2>&1; then
+  policy_exit=1
+fi
+
+policy_result_json="${POLICY_OUT_DIR}/result.json"
+if [[ ! -f "${policy_result_json}" ]]; then
+  ci_result_add_violation "CI-POLICY-001" "fail" "PolicyRunner did not produce result.json" "${policy_result_json}"
+  ci_result_append_summary "Policy preflight rules failed (missing result.json)."
+  exit 1
+fi
 
 findings=0
+has_fail=0
 
-while IFS=: read -r file line _; do
-  [[ -z "$file" ]] && continue
-  ci_result_add_violation "CI-SHELL-001" "fail" "continue-on-error true is forbidden" "${file}:${line}"
-  findings=$((findings + 1))
-done < <(rg -n "continue-on-error:\s*true" .github/workflows || true)
+while IFS= read -r violation; do
+  rule_id="$(jq -r '.rule_id' <<< "$violation")"
+  severity="$(jq -r '.severity' <<< "$violation")"
+  message="$(jq -r '.message' <<< "$violation")"
 
-while IFS=: read -r file line _; do
-  [[ -z "$file" ]] && continue
-  ci_result_add_violation "CI-SHELL-002" "fail" "'|| true' is forbidden on critical workflow paths" "${file}:${line}"
-  findings=$((findings + 1))
-done < <(rg -n "\|\|\s*true" .github/workflows || true)
+  mapfile -t evidence_paths < <(jq -r '.evidence_paths[]' <<< "$violation")
+  if [[ "${#evidence_paths[@]}" -eq 0 ]]; then
+    evidence_paths=("tools/ci/policies/policy_shell_safety.sh")
+  fi
 
-while IFS=: read -r file line _; do
-  [[ -z "$file" ]] && continue
-  ci_result_add_violation "CI-SHELL-003" "fail" "'set +e' is forbidden outside documented allow-list" "${file}:${line}"
+  ci_result_add_violation "$rule_id" "$severity" "$message" "${evidence_paths[@]}"
   findings=$((findings + 1))
-done < <(rg -n "^[[:space:]]*set[[:space:]]+\\+e([[:space:]]|$)" .github/workflows tools/ci || true)
-
-while IFS=: read -r file line count; do
-  [[ -z "$file" ]] && continue
-  ci_result_add_violation "CI-SHELL-004" "fail" "workflow run block exceeds max lines (${MAX_INLINE_RUN_LINES})" "${file}:${line}" "${file}:${count}"
-  findings=$((findings + 1))
-done < <(awk -v max="$MAX_INLINE_RUN_LINES" '
-  function lead_spaces(s,   i,c) {
-    c = 0
-    for (i = 1; i <= length(s); i++) {
-      if (substr(s, i, 1) == " ") c++
-      else break
-    }
-    return c
-  }
-  BEGIN {inrun=0;count=0;start=0;run_indent=0;prev_file=""}
-  FNR == 1 {
-    if (NR != 1 && inrun == 1 && count > max) {
-      printf "%s:%d:%d\n", prev_file, start, count
-    }
-    inrun=0
-    count=0
-    start=0
-    run_indent=0
-    prev_file=FILENAME
-  }
-  {
-    prev_file=FILENAME
-    if ($0 ~ /^[[:space:]]*run:[[:space:]]*\|[[:space:]]*$/) {
-      inrun=1
-      count=0
-      start=NR
-      run_indent=lead_spaces($0)
-      next
-    }
-    if (inrun==1) {
-      curr_indent=lead_spaces($0)
-      if ($0 !~ /^[[:space:]]*$/ && curr_indent <= run_indent) {
-        if (count > max) {
-          printf "%s:%d:%d\n", FILENAME, start, count
-        }
-        inrun=0
-      } else {
-        count++
-      }
-    }
-  }
-  END {
-    if (inrun==1 && count > max) {
-      printf "%s:%d:%d\n", prev_file, start, count
-    }
-  }
-' .github/workflows/*.yml)
+  if [[ "$severity" == "fail" ]]; then
+    has_fail=1
+  fi
+done < <(jq -c '.rule_violations[]' "${policy_result_json}")
 
 if [[ "$findings" -eq 0 ]]; then
-  ci_result_append_summary "Shell safety policy passed."
+  ci_result_append_summary "Policy preflight rules passed."
 else
-  ci_result_append_summary "Shell safety policy violations: $findings"
+  ci_result_append_summary "Policy preflight rule violations: $findings"
+fi
+
+if [[ "$policy_exit" -ne 0 || "$has_fail" -eq 1 ]]; then
   exit 1
 fi

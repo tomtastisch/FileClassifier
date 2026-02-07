@@ -63,7 +63,9 @@ run_preflight() {
   run_or_fail "CI-PREFLIGHT-001" "Docs check" python3 "${ROOT_DIR}/tools/check-docs.py"
   run_or_fail "CI-PREFLIGHT-001" "Versioning guard" bash "${ROOT_DIR}/tools/versioning/check-versioning.sh"
   run_or_fail "CI-PREFLIGHT-001" "Format check" dotnet format "${ROOT_DIR}/FileClassifier.sln" --verify-no-changes
-  run_or_fail "CI-PREFLIGHT-001" "Policy shell safety" bash "${ROOT_DIR}/tools/ci/policies/policy_shell_safety.sh"
+  if ! ci_run_capture "Policy shell safety" bash "${ROOT_DIR}/tools/ci/policies/policy_shell_safety.sh"; then
+    return 1
+  fi
   run_or_fail "CI-GRAPH-001" "CI graph assertion" bash "${ROOT_DIR}/tools/ci/bin/assert_ci_graph.sh"
 
   ci_result_append_summary "Preflight checks completed."

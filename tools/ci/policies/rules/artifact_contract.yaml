@@ -1,6 +1,7 @@
 rules_schema_version: 1
 rules:
   - rule_id: CI-ARTIFACT-001
+    policy_type: artifact_contract
     severity: fail
     title: Required CI artifacts must exist
     description: Required artifacts must be present for each configured check_id.

@@ -1,0 +1,50 @@
+rules_schema_version: 1
+rules:
+  - rule_id: CI-SHELL-001
+    policy_type: shell_continue_on_error
+    severity: fail
+    title: continue-on-error is forbidden
+    description: continue-on-error true is forbidden
+    applies_to:
+      - preflight
+    params:
+      scan_paths:
+        - .github/workflows
+      regex_pattern: 'continue-on-error:\s*true'
+
+  - rule_id: CI-SHELL-002
+    policy_type: shell_or_true
+    severity: fail
+    title: "|| true is forbidden"
+    description: "|| true is forbidden on critical workflow paths"
+    applies_to:
+      - preflight
+    params:
+      scan_paths:
+        - .github/workflows
+      regex_pattern: '\|\|\s*true'
+
+  - rule_id: CI-SHELL-003
+    policy_type: shell_set_plus_e
+    severity: fail
+    title: set +e is forbidden
+    description: set +e is forbidden outside documented allow-list
+    applies_to:
+      - preflight
+    params:
+      scan_paths:
+        - .github/workflows
+        - tools/ci
+      regex_pattern: '^\s*set\s+\+e(\s|$)'
+
+  - rule_id: CI-SHELL-004
+    policy_type: shell_run_block_max_lines
+    severity: fail
+    title: Workflow run block line limit
+    description: workflow run block exceeds max lines
+    applies_to:
+      - preflight
+    params:
+      scan_paths:
+        - .github/workflows
+      max_inline_run_lines: 5

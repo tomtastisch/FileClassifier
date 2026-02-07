@@ -1,0 +1,19 @@
+rules_schema_version: 1
+rules:
+  - rule_id: CI-DOCS-001
+    policy_type: docs_drift
+    severity: fail
+    title: Docs must not contain policy parameters
+    description: docs must not duplicate normative policy parameters
+    applies_to:
+      - preflight
+    params:
+      docs_paths:
+        - docs
+        - README.md
+      forbidden_patterns:
+        - '\brequired_artifacts\b'
+        - '\bcheck_ids\b'
+        - '\bartifact_root\b'
+        - '\bregex_pattern\b'
+        - '\bmax_inline_run_lines\b'

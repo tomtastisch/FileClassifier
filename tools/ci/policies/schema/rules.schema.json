@@ -15,11 +15,22 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["rule_id", "severity", "title", "description", "applies_to", "params"],
+        "required": ["rule_id", "policy_type", "severity", "title", "description", "applies_to", "params"],
         "properties": {
           "rule_id": {
             "type": "string",
             "pattern": "^CI-[A-Z0-9_-]+-[0-9]{3}$"
+          },
+          "policy_type": {
+            "type": "string",
+            "enum": [
+              "artifact_contract",
+              "shell_continue_on_error",
+              "shell_or_true",
+              "shell_set_plus_e",
+              "shell_run_block_max_lines",
+              "docs_drift"
+            ]
           },
           "severity": {
             "type": "string",
@@ -44,7 +55,6 @@
           "params": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["required_artifacts", "check_ids"],
             "properties": {
               "required_artifacts": {
                 "type": "array",
@@ -65,6 +75,45 @@
               "artifact_root": {
                 "type": "string",
                 "minLength": 1
+              },
+              "scan_paths": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "regex_pattern": {
+                "type": "string",
+                "minLength": 1
+              },
+              "max_inline_run_lines": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "docs_paths": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "forbidden_patterns": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "allowed_paths": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
               }
             }
           }

@@ -1,5 +1,6 @@
-using System.Text.Json;
 using System.Diagnostics;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using YamlDotNet.RepresentationModel;
 
 var argsList = args.ToList();
@@ -43,7 +44,7 @@ var resultPath = Path.Combine(outDirPath, "result.json");
 
 var startedAt = DateTimeOffset.UtcNow;
 var startedAtText = startedAt.ToString("yyyy-MM-ddTHH:mm:ssZ");
-var startMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+var startMs = startedAt.ToUnixTimeMilliseconds();
 
 var logger = new List<string>();
 var violations = new List<Violation>();
@@ -97,7 +98,7 @@ var allRules = new List<PolicyRule>();
 foreach (var yamlFile in yamlFiles)
 {
     logger.Add($"RULE_FILE|path={Rel(repoRootPath, yamlFile)}");
-    var loaded = LoadRulesFromYaml(repoRootPath, yamlFile, schemaDocument.SchemaVersion);
+    var loaded = LoadRulesFromYaml(yamlFile, schemaDocument.SchemaVersion);
     if (!loaded.Ok)
     {
         AddPolicyFailure(loaded.Error ?? "failed to load policy file", Rel(repoRootPath, yamlFile));
@@ -126,13 +127,49 @@ logger.Add($"RULES|loaded={allRules.Count}|matching={matchingRules.Count}");
 
 foreach (var rule in matchingRules)
 {
-    EvaluateArtifactContractRule(rule);
+    EvaluateRule(rule);
 }
 
 return FinalizeAndExit();
 
+void EvaluateRule(PolicyRule rule)
+{
+    switch (rule.PolicyType)
+    {
+        case "artifact_contract":
+            EvaluateArtifactContractRule(rule);
+            break;
+        case "shell_continue_on_error":
+        case "shell_or_true":
+        case "shell_set_plus_e":
+            EvaluateRegexLineRule(rule);
+            break;
+        case "shell_run_block_max_lines":
+            EvaluateRunBlockMaxLinesRule(rule);
+            break;
+        case "docs_drift":
+            EvaluateDocsDriftRule(rule);
+            break;
+        default:
+            AddPolicyFailure($"unsupported policy_type '{rule.PolicyType}'", "tools/ci/policies/rules");
+            break;
+    }
+}
+
 void EvaluateArtifactContractRule(PolicyRule rule)
 {
+    if (rule.Params.RequiredArtifacts.Count == 0)
+    {
+        AddPolicyFailure($"{rule.RuleId}: params.required_artifacts must be non-empty", "tools/ci/policies/rules");
+        return;
+    }
+
+    if (rule.Params.CheckIds.Count == 0)
+    {
+        AddPolicyFailure($"{rule.RuleId}: params.check_ids must be non-empty", "tools/ci/policies/rules");
+        return;
+    }
+
     var rootDir = string.IsNullOrWhiteSpace(rule.Params.ArtifactRoot)
         ? Path.Combine(repoRootPath, "artifacts", "ci")
         : Path.Combine(repoRootPath, rule.Params.ArtifactRoot);
@@ -140,9 +177,7 @@ void EvaluateArtifactContractRule(PolicyRule rule)
     var checkIds = rule.Params.CheckIds.OrderBy(static x => x, StringComparer.Ordinal).ToList();
     var requiredArtifacts = rule.Params.RequiredArtifacts.OrderBy(static x => x, StringComparer.Ordinal).ToList();
 
-    logger.Add($"EVAL|rule_id={rule.RuleId}|root={Rel(repoRootPath, rootDir)}");
-    logger.Add($"EVAL|rule_id={rule.RuleId}|check_ids={string.Join(",", checkIds)}");
-    logger.Add($"EVAL|rule_id={rule.RuleId}|required_artifacts={string.Join(",", requiredArtifacts)}");
+    logger.Add($"EVAL|rule_id={rule.RuleId}|type={rule.PolicyType}|root={Rel(repoRootPath, rootDir)}");
 
     foreach (var evaluatedCheckId in checkIds)
     {
@@ -152,18 +187,220 @@ void EvaluateArtifactContractRule(PolicyRule rule)
             var relTargetPath = Rel(repoRootPath, targetPath);
             if (!File.Exists(targetPath))
             {
-                violations.Add(new Violation(
-                    rule.RuleId,
-                    rule.Severity,
-                    $"missing required artifact {relTargetPath}",
-                    new[] { relTargetPath }));
-                logger.Add($"VIOLATION|rule_id={rule.RuleId}|path={relTargetPath}");
+                AddRuleViolation(rule.RuleId, rule.Severity, $"missing required artifact {relTargetPath}", new[] { relTargetPath });
                 continue;
             }
 
             if (string.Equals(requiredArtifact, "result.json", StringComparison.Ordinal))
             {
                 ValidateResultSchema(targetPath, relTargetPath);
+            }
+        }
+    }
+}
+
+void EvaluateRegexLineRule(PolicyRule rule)
+{
+    if (string.IsNullOrWhiteSpace(rule.Params.RegexPattern))
+    {
+        AddPolicyFailure($"{rule.RuleId}: params.regex_pattern must be set", "tools/ci/policies/rules");
+        return;
+    }
+
+    if (rule.Params.ScanPaths.Count == 0)
+    {
+        AddPolicyFailure($"{rule.RuleId}: params.scan_paths must be non-empty", "tools/ci/policies/rules");
+        return;
+    }
+
+    Regex regex;
+    try
+    {
+        regex = new Regex(rule.Params.RegexPattern, RegexOptions.CultureInvariant);
+    }
+    catch (Exception ex)
+    {
+        AddPolicyFailure($"{rule.RuleId}: invalid params.regex_pattern ({ex.Message})", "tools/ci/policies/rules");
+        return;
+    }
+
+    var files = CollectFiles(rule.Params.ScanPaths);
+    logger.Add($"EVAL|rule_id={rule.RuleId}|type={rule.PolicyType}|files={files.Count}");
+
+    foreach (var file in files)
+    {
+        var lines = File.ReadAllLines(file);
+        for (var i = 0; i < lines.Length; i++)
+        {
+            if (!regex.IsMatch(lines[i]))
+            {
+                continue;
+            }
+
+            var evidence = $"{Rel(repoRootPath, file)}:{i + 1}";
+            AddRuleViolation(rule.RuleId, rule.Severity, rule.Description, new[] { evidence });
+        }
+    }
+}
+
+void EvaluateRunBlockMaxLinesRule(PolicyRule rule)
+{
+    if (rule.Params.MaxInlineRunLines is null || rule.Params.MaxInlineRunLines < 1)
+    {
+        AddPolicyFailure($"{rule.RuleId}: params.max_inline_run_lines must be >= 1", "tools/ci/policies/rules");
+        return;
+    }
+
+    if (rule.Params.ScanPaths.Count == 0)
+    {
+        AddPolicyFailure($"{rule.RuleId}: params.scan_paths must be non-empty", "tools/ci/policies/rules");
+        return;
+    }
+
+    var max = rule.Params.MaxInlineRunLines.Value;
+    var files = CollectFiles(rule.Params.ScanPaths)
+        .Where(static f => f.EndsWith(".yml", StringComparison.Ordinal) || f.EndsWith(".yaml", StringComparison.Ordinal))
+        .ToList();
+
+    logger.Add($"EVAL|rule_id={rule.RuleId}|type={rule.PolicyType}|files={files.Count}|max={max}");
+
+    foreach (var file in files)
+    {
+        var lines = File.ReadAllLines(file);
+
+        var inRun = false;
+        var count = 0;
+        var startLine = 0;
+        var runIndent = 0;
+
+        for (var index = 0; index < lines.Length; index++)
+        {
+            var line = lines[index];
+            var lineNumber = index + 1;
+
+            if (!inRun)
+            {
+                if (Regex.IsMatch(line, @"^\s*run:\s*\|\s*$", RegexOptions.CultureInvariant))
+                {
+                    inRun = true;
+                    count = 0;
+                    startLine = lineNumber;
+                    runIndent = LeadingSpaces(line);
+                }
+
+                continue;
+            }
+
+            var currIndent = LeadingSpaces(line);
+            var isBlank = string.IsNullOrWhiteSpace(line);
+            if (!isBlank && currIndent <= runIndent)
+            {
+                if (count > max)
+                {
+                    AddRuleViolation(
+                        rule.RuleId,
+                        rule.Severity,
+                        $"{rule.Description} ({max})",
+                        new[]
+                        {
+                            $"{Rel(repoRootPath, file)}:{startLine}",
+                            $"{Rel(repoRootPath, file)}:lines={count}"
+                        });
+                }
+
+                inRun = false;
+                count = 0;
+                startLine = 0;
+                runIndent = 0;
+
+                if (Regex.IsMatch(line, @"^\s*run:\s*\|\s*$", RegexOptions.CultureInvariant))
+                {
+                    inRun = true;
+                    startLine = lineNumber;
+                    runIndent = LeadingSpaces(line);
+                }
+
+                continue;
+            }
+
+            count++;
+        }
+
+        if (inRun && count > max)
+        {
+            AddRuleViolation(
+                rule.RuleId,
+                rule.Severity,
+                $"{rule.Description} ({max})",
+                new[]
+                {
+                    $"{Rel(repoRootPath, file)}:{startLine}",
+                    $"{Rel(repoRootPath, file)}:lines={count}"
+                });
+        }
+    }
+}
+
+void EvaluateDocsDriftRule(PolicyRule rule)
+{
+    if (rule.Params.DocsPaths.Count == 0)
+    {
+        AddPolicyFailure($"{rule.RuleId}: params.docs_paths must be non-empty", "tools/ci/policies/rules");
+        return;
+    }
+
+    if (rule.Params.ForbiddenPatterns.Count == 0)
+    {
+        AddPolicyFailure($"{rule.RuleId}: params.forbidden_patterns must be non-empty", "tools/ci/policies/rules");
+        return;
+    }
+
+    var docsFiles = CollectFiles(rule.Params.DocsPaths)
+        .Where(static f => f.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
+        .OrderBy(static f => f, StringComparer.Ordinal)
+        .ToList();
+
+    var allowedSet = new HashSet<string>(
+        rule.Params.AllowedPaths.Select(path => Rel(repoRootPath, Path.Combine(repoRootPath, path))),
+        StringComparer.Ordinal);
+
+    logger.Add($"EVAL|rule_id={rule.RuleId}|type={rule.PolicyType}|docs_files={docsFiles.Count}");
+
+    var compiledPatterns = new List<Regex>();
+    foreach (var pattern in rule.Params.ForbiddenPatterns.OrderBy(static p => p, StringComparer.Ordinal))
+    {
+        try
+        {
+            compiledPatterns.Add(new Regex(pattern, RegexOptions.CultureInvariant));
+        }
+        catch (Exception ex)
+        {
+            AddPolicyFailure($"{rule.RuleId}: invalid forbidden pattern '{pattern}' ({ex.Message})", "tools/ci/policies/rules");
+            return;
+        }
+    }
+
+    foreach (var file in docsFiles)
+    {
+        var rel = Rel(repoRootPath, file);
+        if (allowedSet.Contains(rel))
+        {
+            continue;
+        }
+
+        var lines = File.ReadAllLines(file);
+        for (var i = 0; i < lines.Length; i++)
+        {
+            var line = lines[i];
+            foreach (var pattern in compiledPatterns)
+            {
+                if (!pattern.IsMatch(line))
+                {
+                    continue;
+                }
+
+                AddRuleViolation(rule.RuleId, rule.Severity, rule.Description, new[] { $"{rel}:{i + 1}" });
+                break;
             }
         }
     }
@@ -228,13 +465,47 @@ void ValidateResultSchema(string resultPathAbsolute, string resultPathRelative)
 
     if (process.ExitCode != 0)
     {
-        violations.Add(new Violation(
-            "CI-SCHEMA-001",
-            "fail",
-            $"result.json schema validation failed for {resultPathRelative}",
-            new[] { resultPathRelative }));
-        logger.Add($"VIOLATION|rule_id=CI-SCHEMA-001|path={resultPathRelative}");
+        AddRuleViolation("CI-SCHEMA-001", "fail", $"result.json schema validation failed for {resultPathRelative}", new[] { resultPathRelative });
     }
+}
+
+List<string> CollectFiles(IReadOnlyList<string> configuredPaths)
+{
+    var files = new SortedSet<string>(StringComparer.Ordinal);
+
+    foreach (var configuredPath in configuredPaths.OrderBy(static p => p, StringComparer.Ordinal))
+    {
+        var fullPath = Path.Combine(repoRootPath, configuredPath);
+        if (File.Exists(fullPath))
+        {
+            files.Add(Path.GetFullPath(fullPath));
+            continue;
+        }
+
+        if (Directory.Exists(fullPath))
+        {
+            foreach (var file in Directory.GetFiles(fullPath, "*", SearchOption.AllDirectories).OrderBy(static f => f, StringComparer.Ordinal))
+            {
+                files.Add(Path.GetFullPath(file));
+            }
+
+            continue;
+        }
+
+        AddPolicyFailure($"configured path missing: {configuredPath}", configuredPath);
+    }
+
+    return files.ToList();
+}
+
+void AddRuleViolation(string ruleId, string severity, string message, IReadOnlyList<string> evidence)
+{
+    violations.Add(new Violation(
+        ruleId,
+        severity,
+        message,
+        evidence.OrderBy(static p => p, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList()));
+    logger.Add($"VIOLATION|rule_id={ruleId}|message={message}");
 }
 
 bool HasPolicyFailure()
@@ -244,12 +515,7 @@ bool HasPolicyFailure()
 
 void AddPolicyFailure(string message, string evidencePath)
 {
-    violations.Add(new Violation(
-        "CI-POLICY-001",
-        "fail",
-        message,
-        new[] { evidencePath }));
-    logger.Add($"VIOLATION|rule_id=CI-POLICY-001|path={evidencePath}|message={message}");
+    AddRuleViolation("CI-POLICY-001", "fail", message, new[] { evidencePath });
 }
 
 int FinalizeAndExit()
@@ -317,7 +583,7 @@ int FinalizeAndExit()
     var summaryLines = new List<string>
     {
         $"PolicyRunner check '{checkId}' completed.",
-        $"Rules evaluated: {normalizedViolations.Select(v => v.RuleId).Distinct(StringComparer.Ordinal).Count()}",
+        $"Rules matched: {normalizedViolations.Select(v => v.RuleId).Distinct(StringComparer.Ordinal).Count()}",
         $"Violations: {normalizedViolations.Count}",
         $"Status: {status}"
     };
@@ -341,6 +607,17 @@ int FinalizeAndExit()
 static string Rel(string repoRootPath, string path)
 {
     return Path.GetRelativePath(repoRootPath, path).Replace('\\', '/');
+}
+
+static int LeadingSpaces(string input)
+{
+    var count = 0;
+    while (count < input.Length && input[count] == ' ')
+    {
+        count++;
+    }
+
+    return count;
 }
 
 static (bool Ok, int SchemaVersion, string? Error) LoadRulesSchema(string schemaPath)
@@ -374,7 +651,7 @@ static (bool Ok, int SchemaVersion, string? Error) LoadRulesSchema(string schema
     }
 }
 
-static (bool Ok, List<PolicyRule> Rules, List<string> ValidationErrors, string? Error) LoadRulesFromYaml(string repoRootPath, string yamlPath, int schemaVersion)
+static (bool Ok, List<PolicyRule> Rules, List<string> ValidationErrors, string? Error) LoadRulesFromYaml(string yamlPath, int schemaVersion)
 {
     try
     {
@@ -416,7 +693,7 @@ static (bool Ok, List<PolicyRule> Rules, List<string> ValidationErrors, string? 
             var unknownKeys = ruleMap.Children.Keys
                 .OfType<YamlScalarNode>()
                 .Select(static x => x.Value ?? string.Empty)
-                .Where(key => key is not ("rule_id" or "severity" or "title" or "description" or "applies_to" or "params"))
+                .Where(key => key is not ("rule_id" or "policy_type" or "severity" or "title" or "description" or "applies_to" or "params"))
                 .OrderBy(static x => x, StringComparer.Ordinal)
                 .ToList();
             if (unknownKeys.Count > 0)
@@ -424,16 +701,28 @@ static (bool Ok, List<PolicyRule> Rules, List<string> ValidationErrors, string? 
                 validationErrors.Add($"rules[{index}] has unknown keys: {string.Join(",", unknownKeys)}");
             }
 
-            var ruleId = GetScalar(ruleMap, "rule_id");
-            var severity = GetScalar(ruleMap, "severity");
-            var title = GetScalar(ruleMap, "title");
-            var description = GetScalar(ruleMap, "description");
+            var ruleId = GetScalar(ruleMap, "rule_id") ?? string.Empty;
+            var policyType = GetScalar(ruleMap, "policy_type") ?? string.Empty;
+            var severity = GetScalar(ruleMap, "severity") ?? string.Empty;
+            var title = GetScalar(ruleMap, "title") ?? string.Empty;
+            var description = GetScalar(ruleMap, "description") ?? string.Empty;
             var appliesTo = GetStringSequence(ruleMap, "applies_to");
             var paramsNode = GetNode(ruleMap, "params") as YamlMappingNode;
 
-            if (string.IsNullOrWhiteSpace(ruleId) || !System.Text.RegularExpressions.Regex.IsMatch(ruleId, "^CI-[A-Z0-9_-]+-[0-9]{3}$"))
+            if (string.IsNullOrWhiteSpace(ruleId) || !Regex.IsMatch(ruleId, "^CI-[A-Z0-9_-]+-[0-9]{3}$", RegexOptions.CultureInvariant))
             {
                 validationErrors.Add($"rules[{index}].rule_id invalid");
+            }
+
+            if (policyType is not (
+                "artifact_contract" or
+                "shell_continue_on_error" or
+                "shell_or_true" or
+                "shell_set_plus_e" or
+                "shell_run_block_max_lines" or
+                "docs_drift"))
+            {
+                validationErrors.Add($"rules[{index}].policy_type invalid");
             }
 
             if (severity is not ("warn" or "fail"))
@@ -465,38 +754,43 @@ static (bool Ok, List<PolicyRule> Rules, List<string> ValidationErrors, string? 
             var unknownParamKeys = paramsNode.Children.Keys
                 .OfType<YamlScalarNode>()
                 .Select(static x => x.Value ?? string.Empty)
-                .Where(key => key is not ("required_artifacts" or "check_ids" or "artifact_root"))
+                .Where(key => key is not (
+                    "required_artifacts" or
+                    "check_ids" or
+                    "artifact_root" or
+                    "scan_paths" or
+                    "regex_pattern" or
+                    "max_inline_run_lines" or
+                    "docs_paths" or
+                    "forbidden_patterns" or
+                    "allowed_paths"))
                 .OrderBy(static x => x, StringComparer.Ordinal)
                 .ToList();
+
             if (unknownParamKeys.Count > 0)
             {
                 validationErrors.Add($"rules[{index}].params has unknown keys: {string.Join(",", unknownParamKeys)}");
             }
 
-            var requiredArtifacts = GetStringSequence(paramsNode, "required_artifacts");
-            var checkIds = GetStringSequence(paramsNode, "check_ids");
-            var artifactRoot = GetScalar(paramsNode, "artifact_root");
-
-            if (requiredArtifacts.Count == 0)
-            {
-                validationErrors.Add($"rules[{index}].params.required_artifacts must be non-empty");
-            }
-
-            if (checkIds.Count == 0)
-            {
-                validationErrors.Add($"rules[{index}].params.check_ids must be non-empty");
-            }
+            var parsedParams = new RuleParams(
+                RequiredArtifacts: GetStringSequence(paramsNode, "required_artifacts").OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList(),
+                CheckIds: GetStringSequence(paramsNode, "check_ids").OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList(),
+                ArtifactRoot: GetScalar(paramsNode, "artifact_root"),
+                ScanPaths: GetStringSequence(paramsNode, "scan_paths").OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList(),
+                RegexPattern: GetScalar(paramsNode, "regex_pattern"),
+                MaxInlineRunLines: GetIntScalar(paramsNode, "max_inline_run_lines"),
+                DocsPaths: GetStringSequence(paramsNode, "docs_paths").OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList(),
+                ForbiddenPatterns: GetStringSequence(paramsNode, "forbidden_patterns").OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList(),
+                AllowedPaths: GetStringSequence(paramsNode, "allowed_paths").OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList());
 
             rules.Add(new PolicyRule(
-                ruleId ?? string.Empty,
-                severity ?? "fail",
-                title ?? string.Empty,
-                description ?? string.Empty,
-                appliesTo.OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList(),
-                new RuleParams(
-                    requiredArtifacts.OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList(),
-                    checkIds.OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList(),
-                    artifactRoot)));
+                RuleId: ruleId,
+                PolicyType: policyType,
+                Severity: severity,
+                Title: title,
+                Description: description,
+                AppliesTo: appliesTo.OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList(),
+                Params: parsedParams));
         }
 
         return (true, rules, validationErrors, null);
@@ -515,6 +809,16 @@ static YamlNode? GetNode(YamlMappingNode mappingNode, string key)
 static string? GetScalar(YamlMappingNode mappingNode, string key)
 {
     return GetNode(mappingNode, key) is YamlScalarNode scalar ? scalar.Value : null;
+}
+
+static int? GetIntScalar(YamlMappingNode mappingNode, string key)
+{
+    if (!int.TryParse(GetScalar(mappingNode, key), out var parsed))
+    {
+        return null;
+    }
+
+    return parsed;
 }
 
 static List<string> GetStringSequence(YamlMappingNode mappingNode, string key)
@@ -539,10 +843,17 @@ static List<string> GetStringSequence(YamlMappingNode mappingNode, string key)
 internal sealed record RuleParams(
     IReadOnlyList<string> RequiredArtifacts,
     IReadOnlyList<string> CheckIds,
-    string? ArtifactRoot);
+    string? ArtifactRoot,
+    IReadOnlyList<string> ScanPaths,
+    string? RegexPattern,
+    int? MaxInlineRunLines,
+    IReadOnlyList<string> DocsPaths,
+    IReadOnlyList<string> ForbiddenPatterns,
+    IReadOnlyList<string> AllowedPaths);
 
 internal sealed record PolicyRule(
     string RuleId,
+    string PolicyType,
     string Severity,
     string Title,
     string Description,
