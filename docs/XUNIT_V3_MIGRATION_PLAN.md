@@ -94,3 +94,38 @@ Use this template for every migration failure event:
 - Decision: Use this document as migration SSOT for baseline, gates, and rollback protocol.
 - Reason: enforce deterministic and auditable rollout for xUnit v3 migration.
 - Evidence: Phase-0 baseline artifacts listed in section 2.2 and CI run status in section 2.3.
+
+## 8. Branch Description and DoD Checklist
+
+### 8.1 Branch Description (Best Practice)
+- Branch: `codex/migrate-xunit-v3`
+- Purpose: deterministic migration from xUnit v2 to xUnit v3 with Reqnroll v3-compatible runner stack.
+- Strategy:
+  1. Baseline lock with measurable gates.
+  2. Isolated package graph migration.
+  3. Discovery/adapter stabilization before any test-code compatibility work.
+  4. CI + SSOT docs alignment.
+  5. Hard verification and final policy-compliant version bump.
+- Rollback: commit-specific `git revert`, never history rewrite.
+
+### 8.2 Phase Checklist (Status)
+- [x] Phase 0: Baseline lock + migration gates (`844ade0`)
+- [x] Phase 1: Package graph migration (`743b3e8`)
+- [x] Phase 2: Adapter/discovery stabilization (`96b7550`)
+- [x] Phase 3: Mechanical compatibility validation (`5ceeac8`)
+- [x] Phase 4: CI/docs SSOT alignment (`1742dae`)
+- [x] Phase 5: Local hard verification (required local quality checks green)
+- [ ] Phase 5: two consecutive GitHub CI runs green (pending remote execution evidence)
+- [ ] Phase 6: policy-compliant version bump (pending)
+
+### 8.3 DoD (Current)
+- [x] Restore/build/test local deterministic and green
+- [x] Scenario-count parity (`385`)
+- [x] Coverage gate parity (`Line 92.2%`, `Branch 89.32%`)
+- [x] Required-job contract unchanged (`preflight`, `build`, `security-nuget`, `tests-bdd-coverage`)
+- [ ] Two consecutive GitHub CI runs green on migration branch
+- [ ] Versioning bump commit completed and validated (`check-versioning.sh`)
+
+### 8.4 Open Actions
+1. Run CI twice consecutively on `codex/migrate-xunit-v3` and archive evidence.
+2. Execute final version bump according to `docs/versioning/POLICY.md`.
