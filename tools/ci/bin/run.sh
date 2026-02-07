@@ -14,6 +14,14 @@ if [[ -z "$CHECK_ID" ]]; then
 fi
 
 OUT_DIR="artifacts/ci/${CHECK_ID}"
+
+if [[ "$CHECK_ID" == "artifact_contract" ]]; then
+  cd "$ROOT_DIR"
+  dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/PolicyRunner/PolicyRunner.csproj"
+  dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/PolicyRunner/PolicyRunner.csproj"
+  exec dotnet "${ROOT_DIR}/tools/ci/checks/PolicyRunner/bin/Release/net10.0/PolicyRunner.dll" --check-id artifact_contract --repo-root "${ROOT_DIR}" --out-dir "${OUT_DIR}"
+fi
+
 ci_result_init "$CHECK_ID" "$OUT_DIR"
 
 finalized=0
@@ -39,6 +47,8 @@ run_or_fail() {
 build_validators() {
   run_or_fail "CI-SETUP-001" "Restore validator projects (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
   run_or_fail "CI-SETUP-001" "Build ResultSchemaValidator" dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
+  run_or_fail "CI-SETUP-001" "Restore PolicyRunner (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/PolicyRunner/PolicyRunner.csproj"
+  run_or_fail "CI-SETUP-001" "Build PolicyRunner" dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/PolicyRunner/PolicyRunner.csproj"
   run_or_fail "CI-SETUP-001" "Restore CiGraphValidator (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/CiGraphValidator/CiGraphValidator.csproj"
   run_or_fail "CI-SETUP-001" "Build CiGraphValidator" dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/CiGraphValidator/CiGraphValidator.csproj"
   run_or_fail "CI-SETUP-001" "Restore QodanaContractValidator (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/QodanaContractValidator/QodanaContractValidator.csproj"

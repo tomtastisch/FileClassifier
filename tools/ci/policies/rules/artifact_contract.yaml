@@ -1,0 +1,19 @@
+rules_schema_version: 1
+rules:
+  - rule_id: CI-ARTIFACT-001
+    severity: fail
+    title: Required CI artifacts must exist
+    description: Required artifacts must be present for each configured check_id.
+    applies_to:
+      - artifact_contract
+    params:
+      artifact_root: artifacts/ci
+      check_ids:
+        - preflight
+        - build
+        - security-nuget
+        - tests-bdd-coverage
+      required_artifacts:
+        - raw.log
+        - summary.md
+        - result.json

@@ -1,7 +1,10 @@
 # CI Policy (SSOT)
 
 ## Scope
-This document is the single source of truth for CI rule IDs, severity handling, and exit code policy.
+This document defines policy principles, severity handling, and exit code policy.
+Normative policy definitions live in:
+- `tools/ci/policies/schema/rules.schema.json`
+- `tools/ci/policies/rules/`
 
 ## Global Rules
 - Fail-closed: no silent bypass paths.
@@ -20,6 +23,7 @@ All required checks MUST write:
 
 ## Rule Catalog
 - `CI-ARTIFACT-001` fail: required artifact missing.
+- `CI-POLICY-001` fail: policy rule loading/schema validation failed.
 - `CI-SCHEMA-001` fail: `result.json` schema validation failed.
 - `CI-SHELL-001` fail: found `continue-on-error: true`.
 - `CI-SHELL-002` fail: found `|| true` in critical workflow path.
