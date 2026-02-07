@@ -4,7 +4,12 @@ Alle Aenderungen werden hier technisch dokumentiert. Die Version selbst ist in
 `Directory.Build.props` die SSOT.
 
 ## [Unreleased]
-- Hinweis: Version-Baseline `4.1.2` ist in diesem Branch gesetzt (xUnit-v3 Migration Release-Bump).
+- Added:
+- Changed:
+- Fixed:
+- Docs/CI/Tooling:
+
+## [4.1.2]
 - Added:
 - Changed:
   - Test-Toolchain auf xUnit v3 + `Reqnroll.xunit.v3` migriert.
