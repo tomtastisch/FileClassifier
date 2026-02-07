@@ -8,7 +8,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 RULES = ROOT / "tools" / "ci" / "policies" / "rules"
-REPO = "https://github.com/tomtastisch/FileClassifier"
 LINK_RE = re.compile(r'(?<!\!)\[(?P<text>[^\]]+)\]\((?P<url>[^)\s]+)(?:\s+"[^"]*")?\)')
 RULE_URL_RE = re.compile(r'^https://github\.com/tomtastisch/FileClassifier/blob/[0-9a-f]{7,40}/tools/ci/policies/rules/.+\.(?:yml|yaml)(?:#[A-Za-z0-9\-_\.]+)?$')
 
