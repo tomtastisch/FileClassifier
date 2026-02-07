@@ -108,8 +108,7 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 
 Hinweis:
 
-- Coverage excludes: `*Internals.vb` (file pattern) plus `DeterministicHashing` and `FileTypeDetector` (
-  ExcludeFromCodeCoverage).
+- Die Coverage-Konfiguration wird über den jeweils verwendeten Testlauf (`dotnet test` bzw. CI-Job) gesteuert; in diesem Repository sind dafür aktuell keine festen `ExcludeByFile`/`ExcludeByAttribute`-Filter in der Testprojektdatei hinterlegt.
 
 ## Dokumentpflege-Checkliste
 

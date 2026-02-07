@@ -67,9 +67,6 @@ Direkter Nachweis von API-Korrektheit, Security-Regeln und Determinismus.
 | `DeterministicHashingNormalizedEntryUnitTests.cs`        | NormalizedEntry-Defaults                                                      |
 | `FileTypeDetectorAdditionalUnitTests.cs`                 | LoadOptions/ReadFileSafe/Detect Branches                                      |
 | `FileTypeDetectorPrivateBranchUnitTests.cs`              | Private Branches via Reflection                                               |
-| `ArchiveExtractorEndToEndUnitTests.cs`                   | End-to-End Extract für ZIP-Streams                                            |
-| `ArchiveEntryCollectorUnitTests.cs`                      | Collector Fail/Success Branches                                               |
-| `SharpCompressArchiveBackendUnitTests.cs`                | Branches für SharpCompress-Backend                                            |
 
 Hinweis: Keine Coverage-Excludes (maximal strikt).
 

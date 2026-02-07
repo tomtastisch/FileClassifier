@@ -22,11 +22,14 @@ Einstiegspunkt für die Source-Variante des Moduls.
 - [Index - Infrastructure](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Infrastructure/README.md)
 
 ## Strukturregel
-Im Root von `FileTypeDetection` liegen nur:
+Im Root von `FileTypeDetection` liegen die öffentlichen API-Dateien:
 - `FileTypeDetector.vb`
 - `ArchiveProcessing.vb`
 - `FileMaterializer.vb`
 - `FileTypeOptions.vb`
+- `DeterministicHashing.vb`
+
+Zusätzlich liegen dort Projekt-/Build-Artefakte wie `FileTypeDetectionLib.vbproj`, `packages.lock.json`, `README.md` sowie die Unterordner `Abstractions/`, `Configuration/`, `Detection/`, `Infrastructure/`.
 
 ## README-Regel
 Jeder versionierte Quellordner unter `src/*` besitzt eine eigene `README.md` mit Verantwortungen und Verweisen.
