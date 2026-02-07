@@ -123,12 +123,11 @@ flowchart LR
 ## 10. Nachweise
 
 - Build: `dotnet build FileClassifier.sln --no-restore -v minimal`
-- Test: `dotnet test FileClassifier.sln --no-build -v minimal`
-- Portable Check: `bash tools/check-portable-filetypedetection.sh --clean`
+- Test: siehe Runbook in `README.md` (BDD + Coverage).
 
 ## Dokumentpflege-Checkliste
 
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-markdown-links.py` geprüft.
+- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
 - [ ] Begriffe mit `docs/01_FUNCTIONS.md` abgeglichen.

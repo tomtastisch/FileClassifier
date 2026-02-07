@@ -16,33 +16,35 @@ jobs:
     runs-on: ubuntu-latest
     env:
       QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.102"
       - name: Run Qodana
         if: env.QODANA_TOKEN != ''
         uses: JetBrains/qodana-action@v2025.3
         with:
           args: --linter,jetbrains/qodana-dotnet:2025.3
-          results-dir: qodana-results
+          results-dir: artifacts/ci/qodana
           upload-result: false
-
+      - name: Skip Qodana (missing token)
+        if: env.QODANA_TOKEN == ''
+        run: echo "QODANA_TOKEN is not set; skipping Qodana scan."
+      - name: Run Entry Check
+        if: env.QODANA_TOKEN != ''
+        run: bash tools/ci/bin/run.sh qodana
       - name: Upload SARIF To Code Scanning
-        if: env.QODANA_TOKEN != '' && github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && env.QODANA_TOKEN != ''
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: qodana-results/qodana.sarif.json
-
-      - name: Upload SARIF Artifact
-        if: env.QODANA_TOKEN != ''
+          sarif_file: artifacts/ci/qodana/qodana.sarif.json
+      - name: Upload Artifact
+        if: always() && env.QODANA_TOKEN != ''
         uses: actions/upload-artifact@v4
         with:
-          name: qodana-sarif
-          path: qodana-results/qodana.sarif.json
+          name: ci-qodana
+          path: artifacts/ci/qodana/
           if-no-files-found: error
-
-      - name: Skip Message (No Token)
-        if: env.QODANA_TOKEN == ''
-        run: echo "QODANA_TOKEN not set; qodana scan skipped."

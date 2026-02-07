@@ -79,6 +79,18 @@ Für `pull_request` wird SARIF als Workflow-Artefakt veröffentlicht.
 Code-Scanning-SARIF-Upload erfolgt nur auf non-PR-Runs, um PR-Noise zu vermeiden.
 Profil-Hinweis: In `.qodana/profiles/fileclassifier.yaml` sind nur testpfad-spezifische Excludes für reine Redundanz-Inspections gesetzt (`tests/**`), Produktionscode bleibt unverändert streng.
 
+### 7.1 Qodana Ergebnisse & Artefakte
+- Wenn `QODANA_TOKEN` fehlt, wird Qodana im Workflow übersprungen.
+- Qodana schreibt Ergebnisse in `artifacts/ci/qodana/` (inkl. `qodana.sarif.json`).
+- Für `pull_request`-Runs wird das Verzeichnis als Artefakt veröffentlicht.
+- Für non-PR-Runs wird `artifacts/ci/qodana/qodana.sarif.json` in GitHub Code Scanning hochgeladen.
+- Artefakte:
+  - `artifacts/ci/qodana/qodana.sarif.json`
+  - Verzeichnis `artifacts/ci/qodana/`
+
+Branch-Protection-Hinweis:
+- Der Workflow-Status `qodana` muss in GitHub als Required Check konfiguriert werden, damit PR-Merges blockiert werden.
+
 ## 8. Lokale Reproduktion
 ```bash
 node tools/versioning/test-compute-pr-labels.js

@@ -176,7 +176,7 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
         public bool IsDirectory { get; }
         public long? UncompressedSize { get; }
         public long? CompressedSize { get; }
-        public string LinkTarget { get; } = string.Empty;
+        public string LinkTarget => string.Empty;
 
         public Stream OpenStream()
         {

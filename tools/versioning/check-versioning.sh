@@ -120,14 +120,16 @@ if [[ "${MODE}" == "required" ]]; then
   exit 0
 fi
 
-# Determine base version from latest tag or base file
+# Determine base version deterministically from base ref file first.
+# Use tags only as a fallback for repositories that don't carry Directory.Build.props in base history.
 base_version=""
-latest_tag=$(git tag -l 'v[0-9]*' --sort=-v:refname | head -n1)
-if [[ -n "${latest_tag}" ]]; then
-  base_version="${latest_tag#v}"
-else
-  if git show "${BASE}:Directory.Build.props" >/dev/null 2>&1; then
-    base_version=$(git show "${BASE}:Directory.Build.props" | sed -n 's/.*<Version>\(.*\)<\/Version>.*/\1/p' | head -n1)
+if git show "${BASE}:Directory.Build.props" >/dev/null 2>&1; then
+  base_version=$(git show "${BASE}:Directory.Build.props" | sed -n 's/.*<Version>\(.*\)<\/Version>.*/\1/p' | head -n1)
+fi
+if [[ -z "${base_version}" ]]; then
+  latest_tag=$(git tag -l 'v[0-9]*' --sort=-v:refname | head -n1)
+  if [[ -n "${latest_tag}" ]]; then
+    base_version="${latest_tag#v}"
   fi
 fi
 

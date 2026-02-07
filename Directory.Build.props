@@ -1,11 +1,12 @@
 <Project>
     <PropertyGroup>
         <!-- Central, deterministic project versioning (SemVer baseline). -->
-        <Version>4.0.0</Version>
-        <AssemblyVersion>4.0.0.0</AssemblyVersion>
-        <FileVersion>4.0.0.0</FileVersion>
-        <InformationalVersion>4.0.0</InformationalVersion>
+        <Version>4.1.0</Version>
+        <AssemblyVersion>4.1.0.0</AssemblyVersion>
+        <FileVersion>4.1.0.0</FileVersion>
+        <InformationalVersion>4.1.0</InformationalVersion>
         <Deterministic>true</Deterministic>
         <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     </PropertyGroup>
 </Project>
