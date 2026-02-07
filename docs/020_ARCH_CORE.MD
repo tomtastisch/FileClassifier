@@ -44,54 +44,69 @@ flowchart LR
 
 ## 3. Architekturübersicht (Systemkontext)
 ### 3.1 E2E-Systemkontext (kompakt)
-Dieses Diagramm zeigt nur Verantwortungsbereiche und den linearen Hauptfluss.
-Detailentscheidungen (Archivfall, Refinement, Persistenzzweig) folgen separat in 3.2 und Abschnitt 4.
+Dieses Diagramm zeigt die Schichten des Laufzeitflusses:
+Inputs -> Public API -> Kernkomponenten -> Outputs.
+Detailentscheidungen (Archivfall, Refinement, Persistenzzweig) folgen in 3.2 und Abschnitt 4.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 80, "rankSpacing": 90}, "themeVariables": {"fontSize": "16px"}}}%%
 flowchart LR
-  subgraph INPUT["Input"]
-    FP["File Path"]
-    BP["Byte Payload"]
-  end
+    subgraph INPUT["Input"]
+        FP["File Path"]
+        BP["Byte Payload"]
+    end
 
-  subgraph API["Public API"]
-    FTD["FileTypeDetector"]
-    AP["ArchiveProcessing"]
-    FM["FileMaterializer"]
-  end
+    subgraph API["Public API"]
+        FTD["FileTypeDetector"]
+        AP["ArchiveProcessing"]
+        FM["FileMaterializer"]
+        DH["DeterministicHashing"]
+    end
 
-  subgraph CORE["Core Pipeline"]
-    RH["ReadHeader"]
-    DM["DetectByMagic"]
-    ASG["ArchiveSafetyGate"]
-    OXR["OpenXmlRefiner"]
-    AX["ArchiveExtractor"]
-  end
+    subgraph CORE["Kernkomponenten"]
+        REG["FileTypeRegistry"]
+        GATE["ArchiveSafetyGate"]
+        EXT["ArchiveExtractor"]
+        COL["ArchiveEntryCollector"]
+        REF["OpenXmlRefiner"]
+    end
 
-  subgraph OUT["Outputs"]
-    T["FileType / DetectionDetail"]
-    V["Bool (Validate/Persist)"]
-    E["Entries (Memory Extract)"]
-    F["File/Directory (Materialized)"]
-  end
+    subgraph OUT["Outputs"]
+        T["FileType / DetectionDetail"]
+        V["Bool"]
+        E["Entries"]
+        F["Files / Directories"]
+        H["HashEvidence / RoundTripReport"]
+    end
 
-	  FP --> FTD
-	  BP --> FTD
-	  FP --> AP
-	  BP --> AP
-	  BP --> FM
+    FP --> FTD
+    BP --> FTD
+    FP --> AP
+    BP --> AP
+    BP --> FM
+    FP --> DH
+    BP --> DH
 
-	  FTD --> RH --> DM --> ASG --> OXR --> T
-	  AP --> ASG --> V
-	  AP --> AX --> E
-	  FM --> AX --> F
-	  FM --> V
+    FTD --> REG
+    FTD --> GATE
+    FTD --> REF
+    AP --> GATE
+    AP --> EXT
+    FM --> EXT
+    DH --> COL
+    DH --> REG
+
+    FTD --> T
+    AP --> V
+    AP --> E
+    FM --> V
+    FM --> F
+    DH --> H
 ```
 
 Kurzlesehilfe:
-- Nur Hauptfluss, keine Detailzweige.
-- `ArchiveSafetyGate` bleibt das zentrale fail-closed-Gate für archivbezogene Pfade.
+- Nur Schichtsicht, keine Branch-Details.
+- Branch- und Sicherheitsentscheidungen stehen in Abschnitt 4.
 
 ### 3.2 Entscheidungsübersicht (kompakt)
 Dieses Diagramm zeigt die zentrale Entscheidungslogik in einer vertikalen Lesespur.

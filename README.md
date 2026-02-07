@@ -24,7 +24,7 @@ FileClassifier liefert deterministische Dateityperkennung, sichere Archivverarbe
 
 Hinweis zur Typdomäne: `DetectedType.Kind` ist nicht nur "Datei roh", sondern kann auch Archiv/Container-Typen tragen (`Zip`, `Docx`, `Xlsx`, `Pptx`).
 
-### 4.2 Diagramm
+### 4.2 Diagramm (kompakt)
 ```mermaid
 flowchart LR
     P["Input: path"] --> DET["FileTypeDetector"]
@@ -34,38 +34,20 @@ flowchart LR
     B --> MAT["FileMaterializer"]
     P --> DH["DeterministicHashing"]
     B --> DH
-    E["Input: IReadOnlyList<ZipExtractedEntry>"] --> DH
+    E["Input: entries"] --> DH
 
-    OPT["FileTypeOptions (global snapshot)"] -. read .-> DET
+    DET --> O1["Output: FileType / DetectionDetail / bool"]
+    AP --> O2["Output: bool / IReadOnlyList<ZipExtractedEntry>"]
+    MAT --> O3["Output: bool"]
+    DH --> O4["Output: HashEvidence / RoundTripReport"]
+
+    OPT["FileTypeOptions snapshot"] -. read .-> DET
     OPT -. read .-> AP
     OPT -. read .-> MAT
     OPT -. read .-> DH
-
-    subgraph DET_PIPE["Detektion (realer Pfad)"]
-        RH["ReadHeader"] --> MAG["FileTypeRegistry.DetectByMagic"]
-        MAG --> GATE["ArchiveTypeResolver + ArchiveSafetyGate"]
-        GATE --> REF["OpenXmlRefiner (nur ZIP/OOXML)"]
-    end
-    DET --> RH
-
-    DET --> DOUT["Output: FileType / DetectionDetail / bool"]
-    DOUT --> DT["DetectedType.Kind: Unknown, Pdf, Png, Jpeg, Gif, Webp, Zip, Docx, Xlsx, Pptx"]
-
-    AP --> AVAL["Validate: FileTypeDetector.TryValidateArchive / ArchivePayloadGuard"]
-    AP --> AEXT["Extract: ArchiveEntryCollector oder FileTypeDetector.ExtractArchiveSafeToMemory"]
-    AEXT --> AOUT["Output: IReadOnlyList<ZipExtractedEntry>"]
-    AVAL --> ABOOL["Output: bool"]
-
-    MAT --> MBR["secureExtract=false: raw byte write"]
-    MAT --> MEX["secureExtract=true + archivfähig: ArchiveTypeResolver -> ArchiveSafetyGate -> ArchiveExtractor"]
-    MBR --> MOUT["Output: bool"]
-    MEX --> MOUT
-
-    DH --> HCOL["ArchiveEntryCollector (falls Archiv) oder Raw-Path"]
-    HCOL --> HEV["Output: DeterministicHashEvidence"]
-    DH --> HRT["VerifyRoundTrip: Hash -> materialize -> re-hash"]
-    HRT --> HREP["Output: DeterministicHashRoundTripReport"]
 ```
+
+Detailierte Ablaufdiagramme liegen in [Architektur und Flows (Detail)](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/020_ARCH_CORE.MD).
 
 
 ## 5. Dokumentationspfad
