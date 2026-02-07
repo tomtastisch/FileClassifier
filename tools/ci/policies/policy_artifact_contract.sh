@@ -7,7 +7,7 @@ REPO_ROOT="$(cd -- "${CI_DIR}/../.." && pwd)"
 # shellcheck source=tools/ci/lib/result.sh
 source "${CI_DIR}/lib/result.sh"
 
-POLICY_OUT_DIR="artifacts/ci/_policy_summary"
+POLICY_OUT_DIR="${REPO_ROOT}/artifacts/ci/_policy_summary"
 mkdir -p "${POLICY_OUT_DIR}"
 
 policy_exit=0
@@ -16,8 +16,9 @@ if ! dotnet "${CI_DIR}/checks/PolicyRunner/bin/Release/net10.0/PolicyRunner.dll"
 fi
 
 policy_result_json="${POLICY_OUT_DIR}/result.json"
+policy_result_evidence="artifacts/ci/_policy_summary/result.json"
 if [[ ! -f "${policy_result_json}" ]]; then
-  ci_result_add_violation "CI-POLICY-001" "fail" "PolicyRunner did not produce result.json" "${policy_result_json}"
+  ci_result_add_violation "CI-POLICY-001" "fail" "PolicyRunner did not produce result.json" "${policy_result_evidence}"
   ci_result_append_summary "Summary artifact contract policy failed (missing result.json)."
   exit 1
 fi

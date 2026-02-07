@@ -48,6 +48,7 @@ var startMs = startedAt.ToUnixTimeMilliseconds();
 
 var logger = new List<string>();
 var violations = new List<Violation>();
+var matchedRuleCount = 0;
 
 var rulesDir = Path.Combine(repoRootPath, "tools", "ci", "policies", "rules");
 var rulesSchemaPath = Path.Combine(repoRootPath, "tools", "ci", "policies", "schema", "rules.schema.json");
@@ -118,11 +119,33 @@ if (HasPolicyFailure())
     return FinalizeAndExit();
 }
 
+var duplicateRuleIds = allRules
+    .GroupBy(rule => rule.RuleId, StringComparer.Ordinal)
+    .Where(group => group.Count() > 1)
+    .OrderBy(group => group.Key, StringComparer.Ordinal)
+    .ToList();
+
+foreach (var duplicate in duplicateRuleIds)
+{
+    var evidence = duplicate
+        .Select(rule => Rel(repoRootPath, rule.SourcePath))
+        .Distinct(StringComparer.Ordinal)
+        .OrderBy(static x => x, StringComparer.Ordinal)
+        .ToList();
+    AddRuleViolation("CI-POLICY-001", "fail", $"duplicate rule_id detected: {duplicate.Key}", evidence);
+}
+
+if (HasPolicyFailure())
+{
+    return FinalizeAndExit();
+}
+
 var matchingRules = allRules
     .Where(rule => rule.AppliesTo.Any(applies => string.Equals(applies, checkId, StringComparison.Ordinal)))
     .OrderBy(rule => rule.RuleId, StringComparer.Ordinal)
     .ToList();
 
+matchedRuleCount = matchingRules.Count;
 logger.Add($"RULES|loaded={allRules.Count}|matching={matchingRules.Count}");
 
 foreach (var rule in matchingRules)
@@ -170,9 +193,14 @@ void EvaluateArtifactContractRule(PolicyRule rule)
         return;
     }
 
-    var rootDir = string.IsNullOrWhiteSpace(rule.Params.ArtifactRoot)
-        ? Path.Combine(repoRootPath, "artifacts", "ci")
-        : Path.Combine(repoRootPath, rule.Params.ArtifactRoot);
+    var configuredArtifactRoot = string.IsNullOrWhiteSpace(rule.Params.ArtifactRoot)
+        ? "artifacts/ci"
+        : rule.Params.ArtifactRoot!;
+    var rootDir = TryResolvePathUnderRepo(configuredArtifactRoot, $"{rule.RuleId}:artifact_root");
+    if (rootDir is null)
+    {
+        return;
+    }
 
     var checkIds = rule.Params.CheckIds.OrderBy(static x => x, StringComparer.Ordinal).ToList();
     var requiredArtifacts = rule.Params.RequiredArtifacts.OrderBy(static x => x, StringComparer.Ordinal).ToList();
@@ -443,9 +471,12 @@ void ValidateResultSchema(string resultPathAbsolute, string resultPathRelative)
     process.StartInfo.ArgumentList.Add(resultPathAbsolute);
 
     process.Start();
-    var stdout = process.StandardOutput.ReadToEnd();
-    var stderr = process.StandardError.ReadToEnd();
+    var stdoutTask = process.StandardOutput.ReadToEndAsync();
+    var stderrTask = process.StandardError.ReadToEndAsync();
     process.WaitForExit();
+    Task.WaitAll(stdoutTask, stderrTask);
+    var stdout = stdoutTask.Result;
+    var stderr = stderrTask.Result;
 
     if (!string.IsNullOrWhiteSpace(stdout))
     {
@@ -475,7 +506,12 @@ List<string> CollectFiles(IReadOnlyList<string> configuredPaths)
 
     foreach (var configuredPath in configuredPaths.OrderBy(static p => p, StringComparer.Ordinal))
     {
-        var fullPath = Path.Combine(repoRootPath, configuredPath);
+        var fullPath = TryResolvePathUnderRepo(configuredPath, "collect_files");
+        if (fullPath is null)
+        {
+            continue;
+        }
+
         if (File.Exists(fullPath))
         {
             files.Add(Path.GetFullPath(fullPath));
@@ -496,6 +532,26 @@ List<string> CollectFiles(IReadOnlyList<string> configuredPaths)
     }
 
     return files.ToList();
+}
+
+string? TryResolvePathUnderRepo(string configuredPath, string context)
+{
+    if (Path.IsPathRooted(configuredPath))
+    {
+        AddPolicyFailure($"{context}: configured path must be relative", configuredPath);
+        return null;
+    }
+
+    var fullPath = Path.GetFullPath(Path.Combine(repoRootPath, configuredPath));
+    var repoRootWithSep = repoRootPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+    var fullPathWithSep = fullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+    if (!fullPathWithSep.StartsWith(repoRootWithSep, StringComparison.Ordinal))
+    {
+        AddPolicyFailure($"{context}: configured path escapes repository root", configuredPath);
+        return null;
+    }
+
+    return fullPath;
 }
 
 void AddRuleViolation(string ruleId, string severity, string message, IReadOnlyList<string> evidence)
@@ -583,7 +639,8 @@ int FinalizeAndExit()
     var summaryLines = new List<string>
     {
         $"PolicyRunner check '{checkId}' completed.",
-        $"Rules matched: {normalizedViolations.Select(v => v.RuleId).Distinct(StringComparer.Ordinal).Count()}",
+        $"Rules matched: {matchedRuleCount}",
+        $"Rules with violations: {normalizedViolations.Select(v => v.RuleId).Distinct(StringComparer.Ordinal).Count()}",
         $"Violations: {normalizedViolations.Count}",
         $"Status: {status}"
     };
@@ -668,6 +725,17 @@ static (bool Ok, List<PolicyRule> Rules, List<string> ValidationErrors, string? 
         }
 
         var validationErrors = new List<string>();
+        var unknownRootKeys = root.Children.Keys
+            .OfType<YamlScalarNode>()
+            .Select(static x => x.Value ?? string.Empty)
+            .Where(key => key is not ("rules_schema_version" or "rules"))
+            .OrderBy(static x => x, StringComparer.Ordinal)
+            .ToList();
+        if (unknownRootKeys.Count > 0)
+        {
+            validationErrors.Add($"root has unknown keys: {string.Join(",", unknownRootKeys)}");
+        }
+
         var versionText = GetScalar(root, "rules_schema_version");
         if (!int.TryParse(versionText, out var parsedVersion) || parsedVersion != schemaVersion)
         {
@@ -790,7 +858,8 @@ static (bool Ok, List<PolicyRule> Rules, List<string> ValidationErrors, string? 
                 Title: title,
                 Description: description,
                 AppliesTo: appliesTo.OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList(),
-                Params: parsedParams));
+                Params: parsedParams,
+                SourcePath: yamlPath));
         }
 
         return (true, rules, validationErrors, null);
@@ -858,7 +927,8 @@ internal sealed record PolicyRule(
     string Title,
     string Description,
     IReadOnlyList<string> AppliesTo,
-    RuleParams Params);
+    RuleParams Params,
+    string SourcePath);
 
 internal sealed record Violation(
     string RuleId,
