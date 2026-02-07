@@ -16,12 +16,23 @@ FileClassifier liefert deterministische Dateityperkennung, sichere Archivverarbe
 ## 4. Architekturüberblick
 ```mermaid
 graph TD
-    A["Abstractions"] --> B["Detection"]
-    A --> C["Archive"]
-    A --> D["Hashing"]
+    API["Public API"] --> DET["FileTypeDetector"]
+    API --> ARC["ArchiveProcessing"]
+    API --> MAT["FileMaterializer"]
+    API --> OPT["FileTypeOptions"]
+    API --> HSH["DeterministicHashing"]
+
+    ABS["Abstractions"] --> B["Detection"]
+    ABS --> C["Archive"]
+    ABS --> D["Hashing"]
     B --> B1["FileKind / FileType / DetectionDetail"]
     C --> C1["ZipExtractedEntry"]
     D --> D1["DeterministicHash* Modelle"]
+
+    DET --> ABS
+    ARC --> C
+    MAT --> C
+    HSH --> D
 ```
 
 ## 5. Dokumentationspfad
