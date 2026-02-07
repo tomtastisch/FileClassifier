@@ -35,6 +35,8 @@ Diese Policy definiert verbindliche SemVer-Regeln (`MAJOR.MINOR.PATCH`) und die 
 ## 6. CI-Guard (Pflicht)
 - `tools/versioning/check-versioning.sh` klassifiziert Aenderungen und prueft den erforderlichen Bump.
 - `versioning-guard` muss vor Build/Test grün sein.
+- Fuer jede aktive Version in `Directory.Build.props` MUSS ein Tabellen-Eintrag in
+  `docs/versioning/002_HISTORY_VERSIONS.MD` vorhanden sein.
 - Nachweis in Logs/Summary:
   - `required=<...>`
   - `actual=<...>`

@@ -12,7 +12,13 @@ Aktueller Entwicklungsstand:
 
 | Version | Kurzbeschreibung | Commit | Keyword |
 |---|---|---|---|
+| `4.2.1` | Bump version to 4.2.1 for quality-gate hardening | [8ab274d](https://github.com/tomtastisch/FileClassifier/commit/8ab274d) | chore |
+| `4.2.0` | docs: fix root readme parity, link sha targets, and preflight version gate | [9691bec](https://github.com/tomtastisch/FileClassifier/commit/9691bec) | docs |
+| `4.1.3` | docs: deterministic restructure with SHA-locked links and policy-roc gate | [90a2825](https://github.com/tomtastisch/FileClassifier/commit/90a2825) | docs |
 | `4.1.2` | chore(version): bump version for xunit v3 migration release | [d1ed2a9](https://github.com/tomtastisch/FileClassifier/commit/d1ed2a9) | chore |
+| `4.1.1` | chore(version): bump patch version to satisfy CI guard | [d67050c](https://github.com/tomtastisch/FileClassifier/commit/d67050c) | chore |
+| `4.1.0` | chore: update version to 4.1.0 and improve versioning logic | [a3dfe23](https://github.com/tomtastisch/FileClassifier/commit/a3dfe23) | chore |
+| `4.0.0` | chore(versioning): bump baseline to 4.0.0 | [2a78f97](https://github.com/tomtastisch/FileClassifier/commit/2a78f97) | chore |
 | `1.0.0` | Add initial implementation of FileTypeDetection library and tests | [d9a6015](https://github.com/tomtastisch/FileClassifier/commit/d9a6015) | initial |
 | `1.1.0` | Add extension verification to FileTypeDetector and corresponding tests | [80e74ce](https://github.com/tomtastisch/FileClassifier/commit/80e74ce) | feature |
 | `1.1.1` | Remove redundant solution file | [9158395](https://github.com/tomtastisch/FileClassifier/commit/9158395) | maintenance |

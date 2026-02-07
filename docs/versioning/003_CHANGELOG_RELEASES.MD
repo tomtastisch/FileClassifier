@@ -9,6 +9,17 @@ Alle Aenderungen werden hier technisch dokumentiert. Die Version selbst ist in
 - Fixed:
 - Docs/CI/Tooling:
 
+## [4.2.1]
+- Added:
+- Changed:
+  - Quality-Gates auf explizites `Release`-Build/Test/Coverage gehaertet.
+  - Versioning-Guard erzwingt nun einen vorhandenen History-Eintrag fuer die aktive Version.
+- Fixed:
+  - Reqnroll/xUnit Release-Regeneration gegen stale `obj/Release` Artefakte stabilisiert.
+- Docs/CI/Tooling:
+  - Versionshistorie `docs/versioning/002_HISTORY_VERSIONS.MD` fuer fehlende `4.x`-Eintraege nachgezogen.
+  - Versionierungs-Policy um den Pflicht-Nachweis im Versionsverlauf erweitert.
+
 ## [4.1.2]
 - Added:
 - Changed:

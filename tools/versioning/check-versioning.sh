@@ -140,6 +140,17 @@ if [[ -z "${base_version}" || -z "${current_version}" ]]; then
   exit 2
 fi
 
+history_file="docs/versioning/002_HISTORY_VERSIONS.MD"
+history_row="| \`${current_version}\` |"
+if [[ ! -f "${history_file}" ]]; then
+  echo "versioning-guard: version history file missing (${history_file})" >&2
+  exit 6
+fi
+if ! grep -Fq "${history_row}" "${history_file}"; then
+  echo "versioning-guard: missing history entry for current version ${current_version} in ${history_file}" >&2
+  exit 6
+fi
+
 parse_version() {
   IFS='.' read -r major minor patch <<< "$1"
   echo "${major:-0} ${minor:-0} ${patch:-0}"
@@ -178,6 +189,7 @@ act_rank=$(rank "${actual}")
 cat <<MSG
 versioning-guard: base=${base_version} current=${current_version}
 versioning-guard: required=${required} actual=${actual}
+versioning-guard: history_entry=present (${current_version})
 MSG
 
 if [[ ${act_rank} -lt ${req_rank} ]]; then
