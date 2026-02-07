@@ -82,6 +82,6 @@ python3 tools/check-docs.py
 5. Regression: nach Aenderungen immer `bash tools/test-bdd-readable.sh` ausfuehren.
 
 ## 7. Verlinkte SSOT-Quellen
-- [Testdokumentation (BDD)](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/tests/001_INDEX_TESTS.MD)
-- [BDD-Ausfuehrung und Gherkin-Flow](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/tests/002_FLOW_BDD.MD)
-- [CI-Pipeline (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/ci/001_PIPELINE_CI.MD)
+- [Testdokumentation (BDD)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/tests/001_INDEX_TESTS.MD)
+- [BDD-Ausfuehrung und Gherkin-Flow](https://github.com/tomtastisch/FileClassifier/blob/main/docs/tests/002_FLOW_BDD.MD)
+- [CI-Pipeline (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/ci/001_PIPELINE_CI.MD)

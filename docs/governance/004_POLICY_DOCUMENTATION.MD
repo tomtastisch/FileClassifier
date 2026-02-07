@@ -68,6 +68,6 @@ Die folgende Checkliste ist als CI-Regel verdrahtet und muss bei jedem Lauf best
 5. Jeder Treffer wird mit `Datei:Zeile`, Regel-ID und konkreter Korrekturhilfe ausgegeben.
 
 ## RoC-Bezug
-- [Artifact-Contract-Regel](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tools/ci/policies/rules/artifact_contract.yaml)
-- [Docs-Drift-Regel](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tools/ci/policies/rules/docs_drift.yaml)
-- [Shell-Safety-Regeln](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tools/ci/policies/rules/shell_safety.yaml)
+- [Artifact-Contract-Regel](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/artifact_contract.yaml)
+- [Docs-Drift-Regel](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/docs_drift.yaml)
+- [Shell-Safety-Regeln](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/shell_safety.yaml)

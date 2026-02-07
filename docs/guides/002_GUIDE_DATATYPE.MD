@@ -21,10 +21,10 @@ Zielgruppe:
 ### 3.1 Pflichtdateien
 | Bereich | Datei | Aufgabe |
 |---|---|---|
-| Öffentliche Typliste | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/Detection/FileKind.vb) | Enum-Wert ergänzen |
-| SSOT Metadaten und Magic | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Detection/FileTypeRegistry.vb) | Extension/Alias/Magic und Resolve-Verhalten |
-| Detection-Details | [Detection Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Detection/README.md) | fachliche Erklärung nachziehen |
-| Registry-Tests | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tests/FileTypeDetectionLib.Tests/Unit/FileTypeRegistryUnitTests.cs) | Resolve/Alias/Magic validieren |
+| Öffentliche Typliste | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Detection/FileKind.vb) | Enum-Wert ergänzen |
+| SSOT Metadaten und Magic | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Detection/FileTypeRegistry.vb) | Extension/Alias/Magic und Resolve-Verhalten |
+| Detection-Details | [Detection Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Detection/README.md) | fachliche Erklärung nachziehen |
+| Registry-Tests | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/tests/FileTypeDetectionLib.Tests/Unit/FileTypeRegistryUnitTests.cs) | Resolve/Alias/Magic validieren |
 
 ### 3.2 Registry-Punkte, die geprüft werden müssen
 - `ExtensionOverrides` (nur falls CanonicalExtension vom Enum-Namen abweicht)
@@ -34,7 +34,7 @@ Zielgruppe:
 - indirekte Auswirkungen auf `KindsWithoutDirectContentDetection()`
 
 ### 3.3 Bei neuen Containerarten zusätzlich
-- [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Infrastructure/README.md) prüfen, ob Gate/Extractor den Container bereits trägt.
+- [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md) prüfen, ob Gate/Extractor den Container bereits trägt.
 - Falls nein: Infrastrukturpfad erweitern und Security-Gates (Depth, Size, Traversal, Links) mitziehen.
 
 ## 4. Schritt-für-Schritt-Checkliste für neue `FileKind`
@@ -49,11 +49,11 @@ Zielgruppe:
 ### 5.1 Pflichtdateien
 | Bereich | Datei | Aufgabe |
 |---|---|---|
-| Modell-Übersicht | [Abstractions Modul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/README.md) | passenden Modellbereich bestimmen (`Detection`, `Archive`, `Hashing`) |
+| Modell-Übersicht | [Abstractions Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md) | passenden Modellbereich bestimmen (`Detection`, `Archive`, `Hashing`) |
 | Modellklasse/enum | `src/FileTypeDetection/Abstractions/<Bereich>/<Typ>.vb` | neuen Typ definieren |
 | Teilbereich README | `src/FileTypeDetection/Abstractions/<Bereich>/README.md` | Typ in Index aufnehmen |
-| API-Katalog | [01 - Funktionen](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/010_API_CORE.MD) | neue/veränderte Rückgabemodelle eintragen |
-| Referenzen | [03 - Referenzen](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/references/001_REFERENCES_CORE.MD) | Modell- und Pfadreferenzen aktualisieren |
+| API-Katalog | [01 - Funktionen](https://github.com/tomtastisch/FileClassifier/blob/main/docs/010_API_CORE.MD) | neue/veränderte Rückgabemodelle eintragen |
+| Referenzen | [03 - Referenzen](https://github.com/tomtastisch/FileClassifier/blob/main/docs/references/001_REFERENCES_CORE.MD) | Modell- und Pfadreferenzen aktualisieren |
 | Contract-Doku (falls relevant) | `docs/contracts/*.MD` | nur bei Contract-relevanten Signatur-/Vertragsänderungen |
 
 ### 5.2 Modellregeln

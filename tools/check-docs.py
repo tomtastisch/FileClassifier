@@ -23,7 +23,11 @@ RELATIVE_RE = re.compile(
 PATH_TEXT_RE = re.compile(r'(?i)^\s*(?:\.{1,2}/|/)?(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+\s*$')
 FILE_TEXT_RE = re.compile(r'(?i)^\s*[A-Za-z0-9_.-]+\.(md|mdx|vb|cs|fs|java|kt|ts|js|json|yml|yaml|toml|xml|sh|ps1|sql)\s*$')
 INTERNAL_REPO_URL_RE = re.compile(
-    r"^https://github\.com/tomtastisch/FileClassifier/(?P<kind>blob|tree)/(?P<sha>[0-9a-f]{7,40})/(?P<path>[^\s)#]+)(?:#[A-Za-z0-9\-_\.]+)?$"
+    r"^https://github\.com/tomtastisch/FileClassifier/"
+    r"(?P<kind>blob|tree)/"
+    r"(?P<ref>[A-Za-z0-9._-]+)/"
+    r"(?P<path>[^\s)#]+)"
+    r"(?:#[A-Za-z0-9\-_\.]+)?$"
 )
 ANCHOR_RE = re.compile(r'^#[A-Za-z0-9\-_\.]+$')
 DOC_NAME_RE = re.compile(r'^[0-9]{3}_[A-Z0-9]+_[A-Z0-9]+\.MD$')
@@ -133,10 +137,21 @@ def check_internal_repo_url(url: str, cache: dict[str, str | None]) -> str | Non
         return cache[url]
 
     kind = match.group("kind")
-    sha = match.group("sha")
+    ref = match.group("ref")
     rel_path = match.group("path")
 
-    spec = f"{sha}:{rel_path}"
+    ref_exists = subprocess.run(
+        ["git", "rev-parse", "--verify", "--quiet", ref],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if ref_exists.returncode != 0:
+        cache[url] = f"ref not found ({ref})"
+        return cache[url]
+
+    spec = f"{ref}:{rel_path}"
     exists = subprocess.run(
         ["git", "cat-file", "-e", spec],
         cwd=ROOT,

@@ -18,12 +18,12 @@ Verwende dieses Dokument, wenn mindestens einer der folgenden Punkte zutrifft:
 ## 3. Zentral betroffene Stellen (Datei-Map)
 | Bereich | Datei | Muss angepasst werden bei |
 |---|---|---|
-| Option-Definition und Normalize | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Configuration/FileTypeProjectOptions.vb) | neue Property, Default, Normalisierungsregel |
-| JSON Load/Parse und Snapshot-Set | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/FileTypeOptions.vb) | JSON key mapping, parse guard, `SetSnapshot` |
-| JSON Export | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/FileTypeOptions.vb) | `GetOptions()` für Snapshot-Sicht |
-| Baseline-Werte | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Configuration/FileTypeProjectBaseline.vb) | produktive Defaults (`ApplyDeterministicDefaults`) |
-| Unit Tests (Options) | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tests/FileTypeDetectionLib.Tests/Unit/FileTypeOptionsFacadeUnitTests.cs) | parse/export/normalize behavior |
-| Unit Tests (Baseline) | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tests/FileTypeDetectionLib.Tests/Unit/FileTypeProjectBaselineUnitTests.cs) | Baseline-Defaultwerte |
+| Option-Definition und Normalize | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/FileTypeProjectOptions.vb) | neue Property, Default, Normalisierungsregel |
+| JSON Load/Parse und Snapshot-Set | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/FileTypeOptions.vb) | JSON key mapping, parse guard, `SetSnapshot` |
+| JSON Export | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/FileTypeOptions.vb) | `GetOptions()` für Snapshot-Sicht |
+| Baseline-Werte | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/FileTypeProjectBaseline.vb) | produktive Defaults (`ApplyDeterministicDefaults`) |
+| Unit Tests (Options) | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/tests/FileTypeDetectionLib.Tests/Unit/FileTypeOptionsFacadeUnitTests.cs) | parse/export/normalize behavior |
+| Unit Tests (Baseline) | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/tests/FileTypeDetectionLib.Tests/Unit/FileTypeProjectBaselineUnitTests.cs) | Baseline-Defaultwerte |
 
 ## 4. Schritt-für-Schritt-Checkliste (Vorgehen)
 Arbeite die Schritte in dieser Reihenfolge ab:
