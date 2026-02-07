@@ -302,9 +302,10 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         Assert.NotNull(state.ExtensionMatchResult);
+        Assert.True(state.ExtensionMatchResult.HasValue);
         Assert.True(bool.TryParse(expectedBoolean, out var expected),
             $"Expected boolean literal but got: {expectedBoolean}");
-        Assert.Equal(expected, state.ExtensionMatchResult.Value);
+        Assert.Equal(expected, state.ExtensionMatchResult.GetValueOrDefault());
     }
 
     [Then("ist der MIME-Provider build-konform aktiv")]
@@ -333,9 +334,10 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         Assert.NotNull(state.LastIsOfTypeResult);
+        Assert.True(state.LastIsOfTypeResult.HasValue);
         Assert.True(bool.TryParse(expectedBoolean, out var expected),
             $"Expected boolean literal but got: {expectedBoolean}");
-        Assert.Equal(expected, state.LastIsOfTypeResult.Value);
+        Assert.Equal(expected, state.LastIsOfTypeResult.GetValueOrDefault());
     }
 
     [Then("ist das Archiv-Validierungsergebnis {string}")]
@@ -343,9 +345,10 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         Assert.NotNull(state.LastArchiveValidateResult);
+        Assert.True(state.LastArchiveValidateResult.HasValue);
         Assert.True(bool.TryParse(expectedBoolean, out var expected),
             $"Expected boolean literal but got: {expectedBoolean}");
-        Assert.Equal(expected, state.LastArchiveValidateResult.Value);
+        Assert.Equal(expected, state.LastArchiveValidateResult.GetValueOrDefault());
     }
 
     [Then("ist der extrahierte Eintragssatz nicht leer")]

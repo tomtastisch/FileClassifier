@@ -14,7 +14,17 @@ public sealed class CoreAndArchiveInternalsFailClosedUnitTests
         using var input = new MemoryStream(new byte[] { 1, 2, 3, 4, 5 });
         using var output = new MemoryStream();
 
-        Assert.Throws<InvalidOperationException>(() => StreamBounds.CopyBounded(input, output, maxBytes: 4));
+        var threw = false;
+        try
+        {
+            StreamBounds.CopyBounded(input, output, maxBytes: 4);
+        }
+        catch (InvalidOperationException)
+        {
+            threw = true;
+        }
+
+        Assert.True(threw);
     }
 
     [Fact]
@@ -157,8 +167,9 @@ public sealed class CoreAndArchiveInternalsFailClosedUnitTests
 
         Assert.Equal("inner/note.txt", model.RelativePath);
         Assert.False(model.IsDirectory);
-        Assert.True(model.UncompressedSize.HasValue);
-        Assert.True(model.UncompressedSize.Value >= 5);
+        var uncompressedSize = model.UncompressedSize;
+        Assert.True(uncompressedSize.HasValue);
+        Assert.True(uncompressedSize.GetValueOrDefault() >= 5);
 
         using var source = model.OpenStream();
         using var reader = new StreamReader(source);
@@ -170,8 +181,14 @@ public sealed class CoreAndArchiveInternalsFailClosedUnitTests
     public void LogGuard_SwallowsLoggerExceptions_AndNeverThrows()
     {
         var logger = new ThrowingLogger();
+        var rawLogger = (ILogger)logger;
         var ex = Record.Exception(() =>
         {
+            using var scope = rawLogger.BeginScope("scope");
+            Assert.True(rawLogger.IsEnabled(LogLevel.Debug));
+            Assert.Throws<InvalidOperationException>(() =>
+                rawLogger.Log(LogLevel.Error, new EventId(42, "test"), "state", null, (state, _) => state));
+
             LogGuard.Debug(logger, "debug");
             LogGuard.Warn(logger, "warn");
             LogGuard.Error(logger, "error", new InvalidOperationException("boom"));
@@ -190,19 +207,26 @@ public sealed class CoreAndArchiveInternalsFailClosedUnitTests
 
     private sealed class ThrowingLogger : ILogger
     {
-        public IDisposable BeginScope<TState>(TState state) where TState : notnull
+        IDisposable ILogger.BeginScope<TState>(TState state)
         {
+            _ = state;
             return NoopScope.Instance;
         }
 
-        public bool IsEnabled(LogLevel logLevel)
+        bool ILogger.IsEnabled(LogLevel logLevel)
         {
+            _ = logLevel;
             return true;
         }
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
+        void ILogger.Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
             Func<TState, Exception?, string> formatter)
         {
+            _ = logLevel;
+            _ = eventId;
+            _ = state;
+            _ = exception;
+            _ = formatter;
             throw new InvalidOperationException("logger failure");
         }
 

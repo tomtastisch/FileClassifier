@@ -10,7 +10,7 @@ public sealed class DeterministicHashingPrivateBranchUnitTests
     public void NormalizeLabel_FallsBack_ForNullOrWhitespace()
     {
         var method =
-            typeof(DeterministicHashing).GetMethod("NormalizeLabel", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(DeterministicHashing).GetMethod("NormalizeLabel", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var label1 = TestGuard.NotNull(method.Invoke(null, new object?[] { null }) as string);
@@ -23,7 +23,7 @@ public sealed class DeterministicHashingPrivateBranchUnitTests
     [Fact]
     public void CopyBytes_ReturnsEmpty_ForNullOrEmpty()
     {
-        var method = typeof(DeterministicHashing).GetMethod("CopyBytes", BindingFlags.NonPublic | BindingFlags.Static);
+        var method = typeof(DeterministicHashing).GetMethod("CopyBytes", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var empty1 = TestGuard.NotNull(method.Invoke(null, new object?[] { null }) as byte[]);
@@ -37,7 +37,7 @@ public sealed class DeterministicHashingPrivateBranchUnitTests
     public void ComputeFastHash_ReturnsEmpty_WhenOptionDisabled()
     {
         var method =
-            typeof(DeterministicHashing).GetMethod("ComputeFastHash", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(DeterministicHashing).GetMethod("ComputeFastHash", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var options = new DeterministicHashOptions { IncludeFastHash = false };

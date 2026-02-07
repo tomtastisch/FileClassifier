@@ -19,10 +19,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.102"
+      - name: Temporarily disable .editorconfig for Qodana
+        if: env.QODANA_TOKEN != ''
+        run: |
+          if [ -f .editorconfig ]; then
+            mv .editorconfig .editorconfig.qodana.bak
+          fi
       - name: Run Qodana
         if: env.QODANA_TOKEN != ''
         uses: JetBrains/qodana-action@v2025.3
@@ -30,6 +38,12 @@ jobs:
           args: --linter,jetbrains/qodana-dotnet:2025.3
           results-dir: artifacts/ci/qodana
           upload-result: false
+      - name: Restore .editorconfig
+        if: always() && env.QODANA_TOKEN != ''
+        run: |
+          if [ -f .editorconfig.qodana.bak ]; then
+            mv .editorconfig.qodana.bak .editorconfig
+          fi
       - name: Skip Qodana (missing token)
         if: env.QODANA_TOKEN == ''
         run: echo "QODANA_TOKEN is not set; skipping Qodana scan."

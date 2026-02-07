@@ -11,7 +11,7 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
     {
         var method =
             typeof(SharpCompressArchiveBackend).GetMethod("TryGetValidatedSize",
-                BindingFlags.NonPublic | BindingFlags.Static);
+                BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -30,7 +30,7 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
     {
         var method =
             typeof(SharpCompressArchiveBackend).GetMethod("TryGetValidatedSize",
-                BindingFlags.NonPublic | BindingFlags.Static);
+                BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -48,7 +48,7 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
     {
         var method =
             typeof(SharpCompressArchiveBackend).GetMethod("TryGetValidatedSize",
-                BindingFlags.NonPublic | BindingFlags.Static);
+                BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -65,7 +65,7 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
     {
         var method =
             typeof(SharpCompressArchiveBackend).GetMethod("TryGetValidatedSize",
-                BindingFlags.NonPublic | BindingFlags.Static);
+                BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -82,7 +82,7 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
     {
         var method =
             typeof(SharpCompressArchiveBackend).GetMethod("TryMeasureEntrySize",
-                BindingFlags.NonPublic | BindingFlags.Static);
+                BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -99,7 +99,7 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
     {
         var method =
             typeof(SharpCompressArchiveBackend).GetMethod("TryGetValidatedSize",
-                BindingFlags.NonPublic | BindingFlags.Static);
+                BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -115,7 +115,7 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
     {
         var method =
             typeof(SharpCompressArchiveBackend).GetMethod("TryMeasureEntrySize",
-                BindingFlags.NonPublic | BindingFlags.Static);
+                BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -132,7 +132,7 @@ public sealed class ArchiveInternalsPrivateBranchUnitTests
     {
         var method =
             typeof(SharpCompressArchiveBackend).GetMethod("TryMeasureEntrySize",
-                BindingFlags.NonPublic | BindingFlags.Static);
+                BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();

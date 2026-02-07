@@ -128,7 +128,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     public void ExtractEntryToMemory_ReturnsTrue_ForDirectoryEntry()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -145,7 +145,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     public void ExtractEntryToMemory_ReturnsFalse_ForNullEntriesOrOptions()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -161,7 +161,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     public void ExtractEntryToMemory_ReturnsFalse_ForNullEntry()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -176,7 +176,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     public void ExtractEntryToMemory_ReturnsFalse_WhenEntryStreamNullOrUnreadable()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -192,7 +192,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     public void ExtractEntryToMemory_ReturnsFalse_ForInvalidPath()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToMemory", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -208,7 +208,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     public void ExtractEntryToDirectory_ReturnsFalse_ForNullInputs()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("ExtractEntryToDirectory", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToDirectory", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var opt = FileTypeProjectOptions.DefaultOptions();
@@ -223,7 +223,7 @@ public sealed class ArchiveExtractorAdditionalUnitTests
     public void ExtractEntryToDirectory_ReturnsFalse_WhenEntryTooLarge()
     {
         var method =
-            typeof(ArchiveExtractor).GetMethod("ExtractEntryToDirectory", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ArchiveExtractor).GetMethod("ExtractEntryToDirectory", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         using var scope = TestTempPaths.CreateScope("ftd-extract-large");

@@ -11,7 +11,17 @@ public sealed class CoreInternalsAdditionalUnitTests
         using var input = new MemoryStream(new byte[10]);
         using var output = new MemoryStream();
 
-        Assert.Throws<InvalidOperationException>(() => StreamBounds.CopyBounded(input, output, maxBytes: 5));
+        var threw = false;
+        try
+        {
+            StreamBounds.CopyBounded(input, output, maxBytes: 5);
+        }
+        catch (InvalidOperationException)
+        {
+            threw = true;
+        }
+
+        Assert.True(threw);
     }
 
     [Fact]

@@ -14,6 +14,16 @@ if [[ -z "$CHECK_ID" ]]; then
 fi
 
 OUT_DIR="artifacts/ci/${CHECK_ID}"
+
+if [[ "$CHECK_ID" == "artifact_contract" || "$CHECK_ID" == "summary" ]]; then
+  cd "$ROOT_DIR"
+  dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
+  dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
+  dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/PolicyRunner/PolicyRunner.csproj"
+  dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/PolicyRunner/PolicyRunner.csproj"
+  exec dotnet "${ROOT_DIR}/tools/ci/checks/PolicyRunner/bin/Release/net10.0/PolicyRunner.dll" --check-id "${CHECK_ID}" --repo-root "${ROOT_DIR}" --out-dir "${OUT_DIR}"
+fi
+
 ci_result_init "$CHECK_ID" "$OUT_DIR"
 
 finalized=0
@@ -36,9 +46,79 @@ run_or_fail() {
   fi
 }
 
+log_contains_code() {
+  local code="$1"
+  if command -v rg >/dev/null 2>&1; then
+    rg -q --fixed-strings "$code" "$CI_RAW_LOG"
+  else
+    grep -Fq -- "$code" "$CI_RAW_LOG"
+  fi
+}
+
+log_contains_high_or_critical() {
+  if command -v rg >/dev/null 2>&1; then
+    rg -n "\\b(High|Critical)\\b" "$CI_RAW_LOG" >/dev/null
+  else
+    grep -En "(^|[^[:alnum:]_])(High|Critical)([^[:alnum:]_]|$)" "$CI_RAW_LOG" >/dev/null
+  fi
+}
+
+run_policy_runner_bridge() {
+  local policy_check_id="$1"
+  local policy_out_dir="$2"
+  local summary_message="$3"
+  local fallback_evidence="$4"
+
+  mkdir -p "${ROOT_DIR}/${policy_out_dir}"
+
+  local policy_exit=0
+  if ! ci_run_capture "${summary_message}" dotnet "${ROOT_DIR}/tools/ci/checks/PolicyRunner/bin/Release/net10.0/PolicyRunner.dll" --check-id "${policy_check_id}" --repo-root "${ROOT_DIR}" --out-dir "${policy_out_dir}"; then
+    policy_exit=1
+  fi
+
+  local policy_result_json="${ROOT_DIR}/${policy_out_dir}/result.json"
+  if [[ ! -f "${policy_result_json}" ]]; then
+    ci_result_add_violation "CI-POLICY-001" "fail" "PolicyRunner did not produce result.json" "${policy_out_dir}/result.json"
+    ci_result_append_summary "${summary_message} failed (missing result.json)."
+    return 1
+  fi
+
+  local findings=0
+  local has_fail=0
+  while IFS= read -r violation; do
+    local rule_id severity message
+    rule_id="$(jq -r '.rule_id' <<< "$violation")"
+    severity="$(jq -r '.severity' <<< "$violation")"
+    message="$(jq -r '.message' <<< "$violation")"
+
+    mapfile -t evidence_paths < <(jq -r '.evidence_paths[]' <<< "$violation")
+    if [[ "${#evidence_paths[@]}" -eq 0 ]]; then
+      evidence_paths=("${fallback_evidence}")
+    fi
+
+    ci_result_add_violation "$rule_id" "$severity" "$message" "${evidence_paths[@]}"
+    findings=$((findings + 1))
+    if [[ "$severity" == "fail" ]]; then
+      has_fail=1
+    fi
+  done < <(jq -c '.rule_violations[]' "${policy_result_json}")
+
+  if [[ "$findings" -eq 0 ]]; then
+    ci_result_append_summary "${summary_message} passed."
+  else
+    ci_result_append_summary "${summary_message} violations: ${findings}"
+  fi
+
+  if [[ "$policy_exit" -ne 0 || "$has_fail" -eq 1 ]]; then
+    return 1
+  fi
+}
+
 build_validators() {
   run_or_fail "CI-SETUP-001" "Restore validator projects (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
   run_or_fail "CI-SETUP-001" "Build ResultSchemaValidator" dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
+  run_or_fail "CI-SETUP-001" "Restore PolicyRunner (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/PolicyRunner/PolicyRunner.csproj"
+  run_or_fail "CI-SETUP-001" "Build PolicyRunner" dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/PolicyRunner/PolicyRunner.csproj"
   run_or_fail "CI-SETUP-001" "Restore CiGraphValidator (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/CiGraphValidator/CiGraphValidator.csproj"
   run_or_fail "CI-SETUP-001" "Build CiGraphValidator" dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/CiGraphValidator/CiGraphValidator.csproj"
   run_or_fail "CI-SETUP-001" "Restore QodanaContractValidator (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/QodanaContractValidator/QodanaContractValidator.csproj"
@@ -51,7 +131,9 @@ run_preflight() {
   run_or_fail "CI-PREFLIGHT-001" "Docs check" python3 "${ROOT_DIR}/tools/check-docs.py"
   run_or_fail "CI-PREFLIGHT-001" "Versioning guard" bash "${ROOT_DIR}/tools/versioning/check-versioning.sh"
   run_or_fail "CI-PREFLIGHT-001" "Format check" dotnet format "${ROOT_DIR}/FileClassifier.sln" --verify-no-changes
-  run_or_fail "CI-PREFLIGHT-001" "Policy shell safety" bash "${ROOT_DIR}/tools/ci/policies/policy_shell_safety.sh"
+  if ! run_policy_runner_bridge "preflight" "artifacts/ci/_policy_preflight" "Policy shell safety" "tools/ci/bin/run.sh"; then
+    return 1
+  fi
   run_or_fail "CI-GRAPH-001" "CI graph assertion" bash "${ROOT_DIR}/tools/ci/bin/assert_ci_graph.sh"
 
   ci_result_append_summary "Preflight checks completed."
@@ -67,7 +149,7 @@ run_security_nuget() {
   run_or_fail "CI-SECURITY-002" "Restore solution (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/FileClassifier.sln" -v minimal
   run_or_fail "CI-SECURITY-002" "NuGet vulnerability scan" dotnet list "${ROOT_DIR}/FileClassifier.sln" package --vulnerable --include-transitive
 
-  if rg -n "\\b(High|Critical)\\b" "$CI_RAW_LOG" >/dev/null; then
+  if log_contains_high_or_critical; then
     ci_result_add_violation "CI-SECURITY-001" "fail" "High/Critical NuGet vulnerabilities detected" "$CI_RAW_LOG"
     ci_result_append_summary "High/Critical NuGet vulnerabilities detected."
     return 1
@@ -85,12 +167,6 @@ run_tests_bdd_coverage() {
   run_or_fail "CI-TEST-001" "Restore solution (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/FileClassifier.sln" -v minimal
   run_or_fail "CI-TEST-001" "BDD tests + coverage" env TEST_BDD_OUTPUT_DIR="$tests_dir" bash "${ROOT_DIR}/tools/test-bdd-readable.sh" -- /p:CollectCoverage=true /p:Include="[FileTypeDetectionLib]*" /p:CoverletOutputFormat=cobertura /p:CoverletOutput="${coverage_dir}/coverage" /p:Threshold=85%2c69 /p:ThresholdType=line%2cbranch /p:ThresholdStat=total
   ci_result_append_summary "BDD coverage checks completed."
-}
-
-run_summary() {
-  build_validators
-  run_or_fail "CI-ARTIFACT-001" "Artifact contract policy" bash "${ROOT_DIR}/tools/ci/policies/policy_artifact_contract.sh" preflight build security-nuget tests-bdd-coverage
-  ci_result_append_summary "Summary contract checks completed."
 }
 
 run_pr_labeling() {
@@ -125,12 +201,16 @@ run_qodana_contract() {
   build_validators
   local sarif_path="${OUT_DIR}/qodana.sarif.json"
   if ! ci_run_capture "Qodana contract validator" dotnet "${ROOT_DIR}/tools/ci/checks/QodanaContractValidator/bin/Release/net10.0/QodanaContractValidator.dll" --sarif "$sarif_path"; then
-    if rg -q "CI-QODANA-001" "$CI_RAW_LOG"; then
+    if log_contains_code "CI-QODANA-001"; then
       ci_result_add_violation "CI-QODANA-001" "fail" "QODANA_TOKEN missing" "$CI_RAW_LOG"
-    elif rg -q "CI-QODANA-002" "$CI_RAW_LOG"; then
+    elif log_contains_code "CI-QODANA-002"; then
       ci_result_add_violation "CI-QODANA-002" "fail" "Qodana SARIF missing" "$CI_RAW_LOG"
-    elif rg -q "CI-QODANA-003" "$CI_RAW_LOG"; then
+    elif log_contains_code "CI-QODANA-003"; then
       ci_result_add_violation "CI-QODANA-003" "fail" "Qodana SARIF invalid" "$CI_RAW_LOG"
+    elif log_contains_code "CI-QODANA-004"; then
+      ci_result_add_violation "CI-QODANA-004" "fail" "Qodana blocking findings detected (High+)" "$CI_RAW_LOG"
+    elif log_contains_code "CI-QODANA-005"; then
+      ci_result_add_violation "CI-QODANA-005" "fail" "Qodana toolset/environment errors detected" "$CI_RAW_LOG"
     else
       ci_result_add_violation "CI-QODANA-001" "fail" "Qodana contract validation failed" "$CI_RAW_LOG"
     fi
@@ -146,7 +226,10 @@ main() {
     build) run_build ;;
     security-nuget) run_security_nuget ;;
     tests-bdd-coverage) run_tests_bdd_coverage ;;
-    summary) run_summary ;;
+    summary)
+      ci_result_add_violation "CI-RUNNER-001" "fail" "summary must be executed via PolicyRunner bridge" "tools/ci/bin/run.sh"
+      return 2
+      ;;
     pr-labeling) run_pr_labeling ;;
     qodana) run_qodana_contract ;;
     *)

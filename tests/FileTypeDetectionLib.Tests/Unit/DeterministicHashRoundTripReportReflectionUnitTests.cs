@@ -10,7 +10,7 @@ public sealed class DeterministicHashRoundTripReportReflectionUnitTests
     public void EqualLogical_ReturnsFalse_WhenEvidenceNull()
     {
         var method = typeof(DeterministicHashRoundTripReport)
-            .GetMethod("EqualLogical", BindingFlags.NonPublic | BindingFlags.Static);
+            .GetMethod("EqualLogical", BindingFlags.NonPublic | BindingFlags.Static)!;
 
         Assert.NotNull(method);
         var result = TestGuard.Unbox<bool>(method.Invoke(null, new object?[] { null, null }));
@@ -22,7 +22,7 @@ public sealed class DeterministicHashRoundTripReportReflectionUnitTests
     public void EqualPhysical_ReturnsFalse_WhenEvidenceNull()
     {
         var method = typeof(DeterministicHashRoundTripReport)
-            .GetMethod("EqualPhysical", BindingFlags.NonPublic | BindingFlags.Static);
+            .GetMethod("EqualPhysical", BindingFlags.NonPublic | BindingFlags.Static)!;
 
         Assert.NotNull(method);
         var result = TestGuard.Unbox<bool>(method.Invoke(null, new object?[] { null, null }));
