@@ -79,20 +79,14 @@ Für `pull_request` wird SARIF als Workflow-Artefakt veröffentlicht.
 Code-Scanning-SARIF-Upload erfolgt nur auf non-PR-Runs, um PR-Noise zu vermeiden.
 Profil-Hinweis: In `.qodana/profiles/fileclassifier.yaml` sind nur testpfad-spezifische Excludes für reine Redundanz-Inspections gesetzt (`tests/**`), Produktionscode bleibt unverändert streng.
 
-### 7.1 Qodana Dead-Code Gate (verpflichtend)
-- Der Workflow `.github/workflows/qodana.yml` failt früh, wenn `QODANA_TOKEN` nicht gesetzt ist.
-- Nach dem Scan wird `qodana-results/qodana.sarif.json` gegen das Dead-Code-Regelset geprüft.
-- Gate-Regeln:
-  - `UnusedMember.Global`
-  - `UnusedMember.Local`
-  - `UnusedType.Global`
-  - `UnusedType.Local`
-  - `UnusedParameter.Global`
-  - `UnusedParameter.Local`
-- Wenn Treffer vorhanden sind, schlägt der Step `Dead Code Gate` fehl (`exit 1`).
+### 7.1 Qodana Ergebnisse & Artefakte
+- Wenn `QODANA_TOKEN` fehlt, wird Qodana im Workflow übersprungen.
+- Qodana schreibt Ergebnisse in `artifacts/ci/qodana/` (inkl. `qodana.sarif.json`).
+- Für `pull_request`-Runs wird das Verzeichnis als Artefakt veröffentlicht.
+- Für non-PR-Runs wird `artifacts/ci/qodana/qodana.sarif.json` in GitHub Code Scanning hochgeladen.
 - Artefakte:
-  - `qodana-results/qodana.sarif.json`
-  - `artifacts/qodana/dead-code-summary.txt`
+  - `artifacts/ci/qodana/qodana.sarif.json`
+  - Verzeichnis `artifacts/ci/qodana/`
 
 Branch-Protection-Hinweis:
 - Der Workflow-Status `qodana` muss in GitHub als Required Check konfiguriert werden, damit PR-Merges blockiert werden.

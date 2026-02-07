@@ -39,8 +39,19 @@ done < <(awk -v max="$MAX_INLINE_RUN_LINES" '
     }
     return c
   }
-  BEGIN {inrun=0;count=0;start=0;run_indent=0}
+  BEGIN {inrun=0;count=0;start=0;run_indent=0;prev_file=""}
+  FNR == 1 {
+    if (NR != 1 && inrun == 1 && count > max) {
+      printf "%s:%d:%d\n", prev_file, start, count
+    }
+    inrun=0
+    count=0
+    start=0
+    run_indent=0
+    prev_file=FILENAME
+  }
   {
+    prev_file=FILENAME
     if ($0 ~ /^[[:space:]]*run:[[:space:]]*\|[[:space:]]*$/) {
       inrun=1
       count=0
@@ -62,7 +73,7 @@ done < <(awk -v max="$MAX_INLINE_RUN_LINES" '
   }
   END {
     if (inrun==1 && count > max) {
-      printf "%s:%d:%d\n", FILENAME, start, count
+      printf "%s:%d:%d\n", prev_file, start, count
     }
   }
 ' .github/workflows/*.yml)

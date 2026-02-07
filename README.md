@@ -36,7 +36,7 @@ Die CI ist deterministisch und auditierbar aufgebaut. Alle Checks laufen in sepa
 - Auto-Labeling & Auto-Versionierung: [docs/AUTO_LABELING_AND_VERSIONING.md](docs/AUTO_LABELING_AND_VERSIONING.md)
 - BDD-Testkatalog und Testablauf: [docs/tests/README.md](docs/tests/README.md)
 - Governance/Ownership: [docs/governance/LABELING_OWNERSHIP.md](docs/governance/LABELING_OWNERSHIP.md)
-- Qodana (separater Workflow) enthält ein verpflichtendes Dead-Code-Gate mit SARIF-Auswertung und Artefakt `artifacts/qodana/dead-code-summary.txt`.
+- Qodana läuft als separater Workflow, schreibt Ergebnisse nach `artifacts/ci/qodana/` und veröffentlicht diese als Artefakt.
 
 ## 7. Runbook (reproduzierbar)
 ```bash
