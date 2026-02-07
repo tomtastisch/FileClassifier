@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 import time
 import urllib.error
 import urllib.request
@@ -13,6 +14,7 @@ SRC_FTD_DIR = ROOT / "src" / "FileTypeDetection"
 TESTS_DIR = ROOT / "tests"
 ROOT_README = ROOT / "README.md"
 REPO = "https://github.com/tomtastisch/FileClassifier"
+SCAN_EXCLUDED_DIRS = {".git", "bin", "obj", "artifacts", ".qodana", ".idea", ".vscode", "node_modules", ".tmp"}
 
 LINK_RE = re.compile(r'(?<!\!)\[(?P<text>[^\]]+)\]\((?P<url>[^)\s]+)(?:\s+"[^"]*")?\)')
 RELATIVE_RE = re.compile(
@@ -20,7 +22,9 @@ RELATIVE_RE = re.compile(
 )
 PATH_TEXT_RE = re.compile(r'(?i)^\s*(?:\.{1,2}/|/)?(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+\s*$')
 FILE_TEXT_RE = re.compile(r'(?i)^\s*[A-Za-z0-9_.-]+\.(md|mdx|vb|cs|fs|java|kt|ts|js|json|yml|yaml|toml|xml|sh|ps1|sql)\s*$')
-ALLOWED_REPO_URL_RE = re.compile(r'^https://github\.com/tomtastisch/FileClassifier/(blob|tree)/[0-9a-f]{7,40}/[^\s)#]+(?:#[A-Za-z0-9\-_\.]+)?$')
+INTERNAL_REPO_URL_RE = re.compile(
+    r"^https://github\.com/tomtastisch/FileClassifier/(?P<kind>blob|tree)/(?P<sha>[0-9a-f]{7,40})/(?P<path>[^\s)#]+)(?:#[A-Za-z0-9\-_\.]+)?$"
+)
 ANCHOR_RE = re.compile(r'^#[A-Za-z0-9\-_\.]+$')
 DOC_NAME_RE = re.compile(r'^[0-9]{3}_[A-Z0-9]+_[A-Z0-9]+\.MD$')
 PLAIN_URL_RE = re.compile(r'(?P<url>https?://[^\s<>"\)\]]+)')
@@ -44,11 +48,15 @@ EXCLUDED_DIRS = {"bin", "obj"}
 
 def collect_targets() -> list[Path]:
     files: list[Path] = []
-    if ROOT_README.exists():
-        files.append(ROOT_README)
-    files.extend(sorted(DOCS_DIR.rglob("*.MD")))
-    files.extend(sorted(SRC_FTD_DIR.rglob("README.md")))
-    files.extend(sorted(TESTS_DIR.rglob("README.md")))
+    for path in sorted(ROOT.rglob("*")):
+        if not path.is_file():
+            continue
+        if path.suffix not in {".md", ".MD"}:
+            continue
+        rel = path.relative_to(ROOT)
+        if any(part in SCAN_EXCLUDED_DIRS for part in rel.parts):
+            continue
+        files.append(path)
     return files
 
 
@@ -115,9 +123,56 @@ def check_http_url(url: str, cache: dict[str, str | None]) -> str | None:
     return last_error
 
 
+def check_internal_repo_url(url: str, cache: dict[str, str | None]) -> str | None:
+    if url in cache:
+        return cache[url]
+
+    match = INTERNAL_REPO_URL_RE.match(url)
+    if not match:
+        cache[url] = "invalid internal repo URL format"
+        return cache[url]
+
+    kind = match.group("kind")
+    sha = match.group("sha")
+    rel_path = match.group("path")
+
+    spec = f"{sha}:{rel_path}"
+    exists = subprocess.run(
+        ["git", "cat-file", "-e", spec],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if exists.returncode != 0:
+        cache[url] = f"target not found at commit ({spec})"
+        return cache[url]
+
+    type_result = subprocess.run(
+        ["git", "cat-file", "-t", spec],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if type_result.returncode != 0:
+        cache[url] = f"unable to resolve object type ({spec})"
+        return cache[url]
+
+    git_type = type_result.stdout.strip()
+    expected = "blob" if kind == "blob" else "tree"
+    if git_type != expected:
+        cache[url] = f"expected {expected}, got {git_type} ({spec})"
+        return cache[url]
+
+    cache[url] = None
+    return None
+
+
 def check_links_and_text(files: list[Path]) -> list[str]:
     errors: list[str] = []
     http_cache: dict[str, str | None] = {}
+    internal_repo_cache: dict[str, str | None] = {}
 
     for f in files:
         text = f.read_text(encoding="utf-8")
@@ -142,16 +197,17 @@ def check_links_and_text(files: list[Path]) -> list[str]:
                 if url.startswith(REPO):
                     if url.startswith(f"{REPO}/commit/"):
                         continue
-                    if not ALLOWED_REPO_URL_RE.match(url):
-                        errors.append(f"invalid internal repo URL in {f.relative_to(ROOT)}: {url}")
+                    if INTERNAL_REPO_URL_RE.match(url):
+                        internal_error = check_internal_repo_url(url, internal_repo_cache)
+                        if internal_error:
+                            errors.append(
+                                f"broken internal repo URL in {f.relative_to(ROOT)}: {url} ({internal_error})"
+                            )
+                            continue
                         continue
-                    path_part = url.split("/", 7)[7]
-                    rel_path = path_part.split("#", 1)[0]
-                    if rel_path.startswith("README.md"):
-                        rel_path = "README.md"
-                    target = ROOT / rel_path
-                    if not target.exists():
-                        errors.append(f"repo URL points to missing path in {f.relative_to(ROOT)}: {rel_path}")
+                    http_error = check_http_url(url, http_cache)
+                    if http_error:
+                        errors.append(f"broken URL in {f.relative_to(ROOT)}: {url} ({http_error})")
                         continue
 
                 http_error = check_http_url(url, http_cache)
@@ -168,6 +224,18 @@ def check_links_and_text(files: list[Path]) -> list[str]:
             if cleaned.startswith("mailto:"):
                 continue
             if cleaned.startswith(REPO) and cleaned.startswith(f"{REPO}/commit/"):
+                continue
+            if cleaned.startswith(REPO):
+                if INTERNAL_REPO_URL_RE.match(cleaned):
+                    internal_error = check_internal_repo_url(cleaned, internal_repo_cache)
+                    if internal_error:
+                        errors.append(
+                            f"broken internal plain-url in {f.relative_to(ROOT)}: {cleaned} ({internal_error})"
+                        )
+                    continue
+                http_error = check_http_url(cleaned, http_cache)
+                if http_error:
+                    errors.append(f"broken plain-url in {f.relative_to(ROOT)}: {cleaned} ({http_error})")
                 continue
             http_error = check_http_url(cleaned, http_cache)
             if http_error:
