@@ -4,7 +4,7 @@ Alle Aenderungen werden hier technisch dokumentiert. Die Version selbst ist in
 `Directory.Build.props` die SSOT.
 
 ## [Unreleased]
-- BREAKING: Version-Baseline auf `4.0.0` angehoben (Major-Bump durch oeffentliche API-/Struktur-Aenderungen im Branch).
+- Hinweis: Version-Baseline `4.0.0` ist bereits in `main` enthalten.
 - Added:
 - Changed:
 - Fixed:
