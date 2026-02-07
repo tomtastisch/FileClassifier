@@ -47,6 +47,10 @@ tools/*
 !tools/check-quality.sh
 !tools/run-coverage.sh
 !tools/test-bdd-readable.sh
+!tools/ci/
+!tools/ci/**
+tools/ci/checks/**/bin/
+tools/ci/checks/**/obj/
 !tools/versioning/
 !tools/versioning/check-versioning.sh
 !tools/versioning/labels.json
