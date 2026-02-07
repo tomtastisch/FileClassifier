@@ -60,6 +60,26 @@ RULES: tuple[DriftRule, ...] = (
         pattern=re.compile(r"(?i)\bdocs/04_[A-Z0-9_]+\.md\b"),
         guidance="Use canonical 3-digit uppercase path under docs/ (for example docs/contracts/001_CONTRACT_HASHING.MD)",
     ),
+    DriftRule(
+        rule_id="DOC-CONSISTENCY-009",
+        pattern=re.compile(r"(?i)\b(?:docs/)?04_DETERMINISTIC_HASHING_API_CONTRACT\.md\b"),
+        guidance="Use docs/contracts/001_CONTRACT_HASHING.MD",
+    ),
+    DriftRule(
+        rule_id="DOC-CONSISTENCY-010",
+        pattern=re.compile(r"(?i)\b(?:docs/)?04_DIN_SPECIFICATION_DE\.md\b"),
+        guidance="Use docs/specs/001_SPEC_DIN.MD",
+    ),
+    DriftRule(
+        rule_id="DOC-CONSISTENCY-011",
+        pattern=re.compile(r"(?i)\b(?:docs/)?04_REFERENCES\.md\b"),
+        guidance="Use docs/references/001_REFERENCES_CORE.MD",
+    ),
+    DriftRule(
+        rule_id="DOC-CONSISTENCY-012",
+        pattern=re.compile(r"(?i)\b(?:docs/)?04_API_FUNCTIONS\.md\b"),
+        guidance="Use docs/010_API_CORE.MD",
+    ),
 )
 
 

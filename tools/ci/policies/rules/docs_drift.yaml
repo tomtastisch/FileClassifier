@@ -17,3 +17,29 @@ rules:
         - '\bartifact_root\b'
         - '\bregex_pattern\b'
         - '\bmax_inline_run_lines\b'
+  - rule_id: CI-DOCS-002
+    policy_type: docs_drift
+    severity: fail
+    title: Docs must not reference legacy document paths
+    description: docs must only reference canonical SSOT document paths
+    applies_to:
+      - preflight
+    params:
+      docs_paths:
+        - docs
+        - README.md
+        - src
+        - tests
+      forbidden_patterns:
+        - '(?i)\b(?:docs/)?01_FUNCTIONS\.md\b'
+        - '(?i)\b(?:docs/)?02_ARCHITECTURE_AND_FLOWS\.md\b'
+        - '(?i)\b(?:docs/)?03_REFERENCES\.md\b'
+        - '(?i)\b(?:docs/)?DIN_SPECIFICATION_DE\.md\b'
+        - '(?i)\b(?:docs/)?guides/OPTIONS_CHANGE_GUIDE\.md\b'
+        - '(?i)\b(?:docs/)?guides/DATATYPE_EXTENSION_GUIDE\.md\b'
+        - '(?i)\b(?:docs/)?guides/README\.md\b'
+        - '(?i)\b(?:docs/)?04_DETERMINISTIC_HASHING_API_CONTRACT\.md\b'
+        - '(?i)\b(?:docs/)?04_DIN_SPECIFICATION_DE\.md\b'
+        - '(?i)\b(?:docs/)?04_REFERENCES\.md\b'
+        - '(?i)\b(?:docs/)?04_API_FUNCTIONS\.md\b'
+        - '(?i)\bdocs/04_[A-Z0-9_]+\.md\b'
