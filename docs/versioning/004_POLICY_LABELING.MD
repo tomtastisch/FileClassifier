@@ -122,6 +122,6 @@ Validierung:
 - `docs/governance/004_POLICY_DOCUMENTATION.MD`
 
 ## RoC-Bezug
-- [Artifact-Contract-Regel](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/tools/ci/policies/rules/artifact_contract.yaml)
-- [Docs-Drift-Regel](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/tools/ci/policies/rules/docs_drift.yaml)
-- [Shell-Safety-Regeln](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/tools/ci/policies/rules/shell_safety.yaml)
+- [Artifact-Contract-Regel](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tools/ci/policies/rules/artifact_contract.yaml)
+- [Docs-Drift-Regel](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tools/ci/policies/rules/docs_drift.yaml)
+- [Shell-Safety-Regeln](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tools/ci/policies/rules/shell_safety.yaml)

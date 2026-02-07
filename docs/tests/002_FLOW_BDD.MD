@@ -75,6 +75,6 @@ TEST_BDD_OUTPUT_DIR=artifacts/tests bash tools/test-bdd-readable.sh -- \
 ```
 
 ## 9. Verlinkte SSOT-Quellen
-- [BDD-Satzkatalog (Deutsch, kanonisch)](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/tests/003_CATALOG_BDD.MD)
-- [CI-Pipeline (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/ci/001_PIPELINE_CI.MD)
-- [Filetypedetectionsteps](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/tests/FileTypeDetectionLib.Tests/Steps/FileTypeDetectionSteps.cs)
+- [BDD-Satzkatalog (Deutsch, kanonisch)](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/tests/003_CATALOG_BDD.MD)
+- [CI-Pipeline (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/ci/001_PIPELINE_CI.MD)
+- [Filetypedetectionsteps](https://github.com/tomtastisch/FileClassifier/blob/90a2825/tests/FileTypeDetectionLib.Tests/Steps/FileTypeDetectionSteps.cs)

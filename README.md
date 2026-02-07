@@ -4,35 +4,41 @@
 Dieses Dokument ist der zentrale Einstiegspunkt für Nutzer und Entwickler.
 
 ## 2. Zielbild
-FileClassifier bietet deterministische Dateityperkennung, sichere Archivverarbeitung und reproduzierbare Hash-Nachweise mit fail-closed Semantik.
+FileClassifier liefert deterministische Dateityperkennung, sichere Archivverarbeitung und reproduzierbare Nachweise mit fail-closed Semantik.
 
 ## 3. Public API Surface
-- `FileTypeDetector`: erkennt Dateitypen aus Pfad oder Bytes.
-- `ArchiveProcessing`: validiert/extrahiert Archive über eine statische Fassade.
-- `FileMaterializer`: persistiert Byte-Payloads und materialisiert Archive sicher auf Disk.
-- `FileTypeOptions`: lädt/liest globale Laufzeitoptionen.
-- `DeterministicHashing`: erzeugt Physical/Logical Evidence und RoundTrip-Berichte.
+- `FileTypeDetector`: Erkennung aus Pfad/Bytes inklusive Detailbewertung.
+- `ArchiveProcessing`: statische Fassade für Archiv-Validierung und sichere Extraktion.
+- `FileMaterializer`: sichere Persistenz und optionale Archiv-Materialisierung.
+- `FileTypeOptions`: Laden und Auslesen globaler Laufzeitoptionen.
+- `DeterministicHashing`: Physical/Logical Hash-Evidence und RoundTrip-Report.
 
-### FileMaterializer (prominent)
-`FileMaterializer` ist die zentrale Persistenz-API für Payloads und sichere Archiv-Materialisierung.
-- Raw-Persistenz: schreibt Byte-Daten fail-closed.
-- Secure-Extract: validiert Archivpayloads und extrahiert nur sichere Inhalte.
+## 4. Architekturüberblick
+```mermaid
+graph TD
+    A["Abstractions"] --> B["Detection"]
+    A --> C["Archive"]
+    A --> D["Hashing"]
+    B --> B1["FileKind / FileType / DetectionDetail"]
+    C --> C1["ZipExtractedEntry"]
+    D --> D1["DeterministicHash* Modelle"]
+```
 
-## 4. Dokumentationspfad
-- [Dokumentationsindex](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/001_INDEX_CORE.MD)
-- [API-Kernübersicht](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/010_API_CORE.MD)
-- [Architektur und Flows](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/020_ARCH_CORE.MD)
-- [Policy und Governance](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/governance/001_POLICY_CI.MD)
-- [Versioning-Policy](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/versioning/001_POLICY_VERSIONING.MD)
+## 5. Dokumentationspfad
+- [Dokumentationsindex](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/001_INDEX_CORE.MD)
+- [API-Kernübersicht](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/010_API_CORE.MD)
+- [Architektur und Flows](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/020_ARCH_CORE.MD)
+- [Governance und Policies](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/governance/001_POLICY_CI.MD)
+- [Versioning-Policy](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/versioning/001_POLICY_VERSIONING.MD)
 
-## 5. Modul-READMEs
-- [FileTypeDetection Modul](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/src/FileTypeDetection/README.md)
-- [Detektion](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/src/FileTypeDetection/Detection/README.md)
-- [Infrastruktur](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/src/FileTypeDetection/Infrastructure/README.md)
-- [Konfiguration](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/src/FileTypeDetection/Configuration/README.md)
-- [Abstractions](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/src/FileTypeDetection/Abstractions/README.md)
+## 6. Modul-READMEs
+- [Bibliotheksmodul Index](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/README.md)
+- [Detektion](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Detection/README.md)
+- [Infrastruktur](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Infrastructure/README.md)
+- [Konfiguration](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Configuration/README.md)
+- [Abstractions](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/README.md)
 
-## 6. Verifikation
+## 7. Verifikation
 ```bash
 python3 tools/check-docs.py
 python3 tools/check-policy-roc.py --out artifacts/policy_roc_matrix.tsv

@@ -26,10 +26,10 @@ flowchart LR
 ```
 
 ## 6. Verweise
-- [Dokumentationsindex](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/001_INDEX_CORE.MD)
-- [API-Kernübersicht](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/010_API_CORE.MD)
-- [Architektur und Flows](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/020_ARCH_CORE.MD)
-- [Detektion-Submodul](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/src/FileTypeDetection/Detection/README.md)
-- [Infrastruktur-Submodul](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/src/FileTypeDetection/Infrastructure/README.md)
-- [Konfiguration-Submodul](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/src/FileTypeDetection/Configuration/README.md)
-- [Abstractions-Submodul](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/src/FileTypeDetection/Abstractions/README.md)
+- [Dokumentationsindex](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/001_INDEX_CORE.MD)
+- [API-Kernübersicht](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/010_API_CORE.MD)
+- [Architektur und Flows](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/020_ARCH_CORE.MD)
+- [Detektion-Submodul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Detection/README.md)
+- [Infrastruktur-Submodul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Infrastructure/README.md)
+- [Konfiguration-Submodul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Configuration/README.md)
+- [Abstractions-Submodul](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/README.md)

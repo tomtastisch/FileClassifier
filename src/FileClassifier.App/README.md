@@ -6,8 +6,8 @@ Kompakter CLI-Einstiegspunkt für die Bibliothek `FileTypeDetectionLib`.
 
 ## 2. Dateien
 
-- [Program](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/src/FileClassifier.App/Program.cs)
-- [FileClassifier.App.csproj](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/src/FileClassifier.App/FileClassifier.App.csproj)
+- [Program](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileClassifier.App/Program.cs)
+- [FileClassifier.App.csproj](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileClassifier.App/FileClassifier.App.csproj)
 
 ## 3. Verhalten
 
@@ -24,8 +24,8 @@ dotnet run --project src/FileClassifier.App -- ./tests/FileTypeDetectionLib.Test
 
 ## 5. Siehe auch
 
-- [Modulindex FileTypeDetection](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/src/FileTypeDetection/README.md)
-- [Funktionsreferenz](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/010_API_CORE.MD)
+- [Modulindex FileTypeDetection](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/README.md)
+- [Funktionsreferenz](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/010_API_CORE.MD)
 
 ## Dokumentpflege-Checkliste
 

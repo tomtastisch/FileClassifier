@@ -22,6 +22,6 @@ flowchart LR
 ```
 
 ## 6. Verweise
-- [Modulübersicht](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/src/FileTypeDetection/README.md)
-- [API-Kernübersicht](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/010_API_CORE.MD)
-- [Architektur und Flows](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/020_ARCH_CORE.MD)
+- [Modulübersicht](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/README.md)
+- [API-Kernübersicht](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/010_API_CORE.MD)
+- [Architektur und Flows](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/020_ARCH_CORE.MD)

@@ -26,6 +26,6 @@ flowchart LR
 ```
 
 ## 6. Verweise
-- [Abstractions-Übersicht](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/src/FileTypeDetection/Abstractions/README.md)
-- [Hashing-Contract](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/contracts/001_CONTRACT_HASHING.MD)
-- [Hashing-Testmatrix](https://github.com/tomtastisch/FileClassifier/blob/241c6d4/docs/tests/004_MATRIX_HASHING.MD)
+- [Abstractions-Übersicht](https://github.com/tomtastisch/FileClassifier/blob/90a2825/src/FileTypeDetection/Abstractions/README.md)
+- [Hashing-Contract](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/contracts/001_CONTRACT_HASHING.MD)
+- [Hashing-Testmatrix](https://github.com/tomtastisch/FileClassifier/blob/90a2825/docs/tests/004_MATRIX_HASHING.MD)
