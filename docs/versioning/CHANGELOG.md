@@ -4,14 +4,22 @@ Alle Aenderungen werden hier technisch dokumentiert. Die Version selbst ist in
 `Directory.Build.props` die SSOT.
 
 ## [Unreleased]
-- Hinweis: Version-Baseline `4.0.0` ist bereits in `main` enthalten.
 - Added:
 - Changed:
+- Fixed:
+- Docs/CI/Tooling:
+
+## [4.1.2]
+- Added:
+- Changed:
+  - Test-Toolchain auf xUnit v3 + `Reqnroll.xunit.v3` migriert.
+  - BDD-Discovery/Runner-Ausführung für xUnit v3 stabilisiert (Scenario-Parity erhalten).
 - Fixed:
 - Docs/CI/Tooling:
   - CI in getrennte, auditierbare Jobs refaktoriert (Preflight, Build, Security, Tests+Coverage, Summary).
   - BDD-Readable Testlauf liefert TRX + lesbare Ausgabe + Coverage + Gate im Single-Run.
   - Dokumentation fuer CI-Nachweise unter `docs/CI_PIPELINE.md` ergaenzt.
+  - Migrations-DoD und Fortschrittstracking in der PR-Beschreibung gepflegt.
 
 ## [3.0.0]
 - Breaking: Rename `FileTypeDetectorOptions` -> `FileTypeProjectOptions`

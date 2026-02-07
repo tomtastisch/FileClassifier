@@ -8,10 +8,11 @@ Heuristik fuer die Rueckwirkungs-Zuordnung:
 - `docs|test|ci|chore|tooling|refactor|fix` => Patch
 
 Aktueller Entwicklungsstand:
-- `Unreleased` fuehrt auf Version `4.0.0` (siehe `Directory.Build.props` und `docs/versioning/CHANGELOG.md`).
+- Aktuelle Release-Linie enthält `4.x` (siehe `Directory.Build.props` und `docs/versioning/CHANGELOG.md`).
 
 | Version | Kurzbeschreibung | Commit | Keyword |
 |---|---|---|---|
+| `4.1.2` | chore(version): bump version for xunit v3 migration release | [d1ed2a9](https://github.com/tomtastisch/FileClassifier/commit/d1ed2a9) | chore |
 | `1.0.0` | Add initial implementation of FileTypeDetection library and tests | [d9a6015](https://github.com/tomtastisch/FileClassifier/commit/d9a6015) | initial |
 | `1.1.0` | Add extension verification to FileTypeDetector and corresponding tests | [80e74ce](https://github.com/tomtastisch/FileClassifier/commit/80e74ce) | feature |
 | `1.1.1` | Remove redundant solution file | [9158395](https://github.com/tomtastisch/FileClassifier/commit/9158395) | maintenance |
