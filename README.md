@@ -14,8 +14,8 @@ FileClassifier liefert deterministische Dateityperkennung, sichere Archivverarbe
 - `FileTypeOptions`: globaler Konfigurations-Snapshot für alle Pfade (wird von den Kernklassen gelesen).
 
 ## 4. Architekturüberblick
-### 4.1 Kernklassen (build-realer Datenfluss)
-| Kernklasse | Primäre Inputs | Primäre Outputs | Build-reale Kernlogik |
+### 4.1 Kernklassen (Datenfluss)
+| Kernklasse | Primäre Inputs | Primäre Outputs | Kernlogik |
 |---|---|---|---|
 | `FileTypeDetector` | `path`, `byte[]`, `verifyExtension` | `FileType`, `DetectionDetail`, `bool`, `IReadOnlyList<ZipExtractedEntry>` | Header/Magic (`FileTypeRegistry`) plus Archiv-Gate (`ArchiveTypeResolver` + `ArchiveSafetyGate`) und optionales OOXML-Refinement (`OpenXmlRefiner`). |
 | `ArchiveProcessing` | `path`, `byte[]` | `bool`, `IReadOnlyList<ZipExtractedEntry>` | Fassade auf `FileTypeDetector.TryValidateArchive`, `ArchivePayloadGuard`, `ArchiveEntryCollector` und sichere In-Memory-Extraktion. |
@@ -24,9 +24,8 @@ FileClassifier liefert deterministische Dateityperkennung, sichere Archivverarbe
 
 Hinweis zur Typdomäne: `DetectedType.Kind` ist nicht nur "Datei roh", sondern kann auch Archiv/Container-Typen tragen (`Zip`, `Docx`, `Xlsx`, `Pptx`).
 
-### 4.2 Diagramm (1:1 zu den Kernpfaden)
+### 4.2 Diagramm
 ```mermaid
-flowchart LR
 flowchart LR
     P["Input: path"] --> DET["FileTypeDetector"]
     B["Input: byte[]"] --> DET
