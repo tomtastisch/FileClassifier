@@ -1,6 +1,8 @@
 name: version-policy
 
 on:
+    permissions:
+        contents: read
     pull_request:
     workflow_dispatch:
 
