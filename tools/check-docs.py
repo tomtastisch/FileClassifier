@@ -30,7 +30,7 @@ INTERNAL_REPO_URL_RE = re.compile(
     r"(?:#[A-Za-z0-9\-_\.]+)?$"
 )
 ANCHOR_RE = re.compile(r'^#[A-Za-z0-9\-_\.]+$')
-DOC_NAME_RE = re.compile(r'^[0-9]{3}_[A-Z0-9]+_[A-Z0-9]+\.MD$')
+DOC_NAME_RE = re.compile(r'^[0-9]{3}_(?:[A-Z0-9]+_)*[A-Z0-9]+\.MD$')
 PLAIN_URL_RE = re.compile(r'(?P<url>https?://[^\s<>"\)\]]+)')
 
 DOC_TYPES_REQUIRE_DIAGRAM = (
