@@ -4,7 +4,7 @@ rules:
     policy_type: naming_snt
     severity: fail
     title: Naming SNT must be consistent with SSOT
-    description: Canonical naming identity and repo linkage must match SSOT across vbproj, namespace declarations, docs, CI and package consumers.
+    description: Canonical package/assembly/root namespace plus docs and consumer references must resolve to Tomtastisch.FileClassifier; deprecated ids are migration-only.
     applies_to:
       - naming-snt
     params:

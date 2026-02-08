@@ -1,0 +1,12 @@
+rules_schema_version: 1
+rules:
+  - rule_id: CI-VERSION-001
+    policy_type: versioning_svt
+    severity: fail
+    title: Versioning SVT must be consistent with tag SSOT
+    description: Canonical release version must be equal across git tag, vbproj Version/PackageVersion, and produced nupkg metadata.
+    applies_to:
+      - versioning-svt
+    params:
+      ssot_file: tools/ci/policies/data/versioning.json
+      summary_json: artifacts/ci/versioning-svt/versioning-svt-summary.json

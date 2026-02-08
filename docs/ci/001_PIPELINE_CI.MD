@@ -12,7 +12,7 @@ Diese Pipeline liefert auditierbare Nachweise für Produktionsreife:
 ## 2. Workflow-Struktur
 Der Workflow `CI` hat zwei klar getrennte Verantwortungswege:
 - `pull_request`: `pr-labeling` (Governance, nicht-gating)
-- `pull_request`/`push`: technische Qualitätsjobs (`preflight`, `version-policy`, `build`, `api-contract`, `pack`, `consumer-smoke`, `package-backed-tests`, `security-nuget`, `tests-bdd-coverage`, `summary`)
+- `pull_request`/`push`: technische Qualitätsjobs (`preflight`, `versioning-svt`, `build`, `api-contract`, `pack`, `consumer-smoke`, `package-backed-tests`, `security-nuget`, `tests-bdd-coverage`, `summary`)
 
 ## 3. Jobs (1 Job = 1 Verantwortung)
 ### Job: pr-labeling (Governance)
@@ -28,7 +28,7 @@ Der Workflow `CI` hat zwei klar getrennte Verantwortungswege:
 2. Doc-Consistency-Drift-Guard
 3. Format-Check
 
-### Job: version-policy (fail-closed)
+### Job: versioning-svt (fail-closed)
 1. Erzwingt Tag-SSOT (keine statischen Versionfelder im Repository)
 2. Blockiert Build/Test bei Policy-Verletzung
 
@@ -66,7 +66,7 @@ Der Workflow `CI` hat zwei klar getrennte Verantwortungswege:
 ## 4. Required vs. Non-Required Checks
 Required in Branch-Protection:
 - `preflight`
-- `version-policy`
+- `versioning-svt`
 - `build`
 - `api-contract`
 - `pack`
@@ -121,7 +121,7 @@ Branch-Protection-Hinweis:
 node tools/versioning/test-compute-pr-labels.js
 python3 tools/check-doc-consistency.py
 python3 tools/check-docs.py
-bash tools/versioning/check-version-policy.sh
+bash tools/versioning/check-versioning-svt.sh
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --filter "Category=ApiContract" -v minimal
 dotnet pack src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -o artifacts/nuget -v minimal
 dotnet restore samples/PortableConsumer/PortableConsumer.csproj --configfile samples/PortableConsumer/NuGet.config -p:PortableConsumerPackageVersion=1.0.0 -v minimal

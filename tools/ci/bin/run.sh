@@ -248,9 +248,14 @@ run_naming_snt() {
   ci_result_append_summary "Naming SNT checks completed."
 }
 
-run_version_policy() {
-  run_or_fail "CI-VERSION-001" "Version policy (tag SSOT, no static versions)" bash "${ROOT_DIR}/tools/versioning/check-version-policy.sh"
-  ci_result_append_summary "Version policy checks completed."
+run_versioning_svt() {
+  local versioning_summary="${ROOT_DIR}/${OUT_DIR}/versioning-svt-summary.json"
+  build_validators
+  run_or_fail "CI-VERSION-001" "Versioning SVT checker" bash "${ROOT_DIR}/tools/ci/check-versioning-svt.sh" --repo-root "${ROOT_DIR}" --naming-ssot "${ROOT_DIR}/tools/ci/policies/data/naming.json" --versioning-ssot "${ROOT_DIR}/tools/ci/policies/data/versioning.json" --out "${versioning_summary}"
+  if ! run_policy_runner_bridge "versioning-svt" "artifacts/ci/_policy_versioning_svt" "Policy versioning SVT" "${OUT_DIR}/versioning-svt-summary.json"; then
+    return 1
+  fi
+  ci_result_append_summary "Versioning SVT checks completed."
 }
 
 run_consumer_smoke() {
@@ -280,7 +285,7 @@ run_consumer_smoke() {
     return 1
   fi
 
-  run_or_fail "CI-SMOKE-001" "Restore consumer sample from package" dotnet restore "${consumer_project}" --configfile "${consumer_nuget_config}" -p:PortableConsumerPackageVersion="${package_version}" -v minimal
+  run_or_fail "CI-SMOKE-001" "Restore consumer sample from package" dotnet restore "${consumer_project}" --configfile "${consumer_nuget_config}" -p:PortableConsumerPackageVersion="${package_version}" -p:RestoreLockedMode=false --force-evaluate -v minimal
   run_or_fail "CI-SMOKE-001" "Build consumer sample from package" dotnet build "${consumer_project}" -c Release --no-restore -p:PortableConsumerPackageVersion="${package_version}" -v minimal
   run_or_fail "CI-SMOKE-001" "Run consumer sample from package" dotnet run --project "${consumer_project}" -c Release -f net10.0 --no-build -p:PortableConsumerPackageVersion="${package_version}"
   ci_result_append_summary "Consumer smoke completed against package ${package_version}."
@@ -303,7 +308,7 @@ run_package_backed_tests() {
     return 1
   fi
 
-  run_or_fail "CI-PKGTEST-001" "Restore package-backed tests from package" dotnet restore "${package_tests_project}" --configfile "${package_tests_nuget_config}" -p:PackageBackedVersion="${package_version}" -v minimal
+  run_or_fail "CI-PKGTEST-001" "Restore package-backed tests from package" dotnet restore "${package_tests_project}" --configfile "${package_tests_nuget_config}" -p:PackageBackedVersion="${package_version}" -p:RestoreLockedMode=false --force-evaluate -v minimal
 
   if dotnet --list-runtimes | grep -q "Microsoft.NETCore.App 8\\."; then
     run_or_fail "CI-PKGTEST-001" "Run package-backed tests" dotnet test "${package_tests_project}" -c Release --no-restore -p:PackageBackedVersion="${package_version}" -v minimal
@@ -335,10 +340,19 @@ run_security_nuget() {
 run_tests_bdd_coverage() {
   local tests_dir="${OUT_DIR}/tests"
   local coverage_dir="${OUT_DIR}/coverage"
+  local coverage_assembly
+  local coverage_include
   mkdir -p "$tests_dir" "$coverage_dir"
 
+  coverage_assembly="$(read_naming_ssot_field assembly_name)"
+  if [[ -z "${coverage_assembly}" ]]; then
+    ci_result_add_violation "CI-TEST-001" "fail" "Naming SSOT assembly_name is missing." "tools/ci/policies/data/naming.json"
+    return 1
+  fi
+  coverage_include="[${coverage_assembly}]*"
+
   run_or_fail "CI-TEST-001" "Restore solution (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/FileClassifier.sln" -v minimal
-  run_or_fail "CI-TEST-001" "BDD tests + coverage" env TEST_BDD_OUTPUT_DIR="$tests_dir" bash "${ROOT_DIR}/tools/test-bdd-readable.sh" -- /p:CollectCoverage=true /p:Include="[FileTypeDetectionLib]*" /p:CoverletOutputFormat=cobertura /p:CoverletOutput="${coverage_dir}/coverage" /p:Threshold=85%2c69 /p:ThresholdType=line%2cbranch /p:ThresholdStat=total
+  run_or_fail "CI-TEST-001" "BDD tests + coverage" env TEST_BDD_OUTPUT_DIR="$tests_dir" bash "${ROOT_DIR}/tools/test-bdd-readable.sh" -- /p:CollectCoverage=true /p:Include="${coverage_include}" /p:CoverletOutputFormat=cobertura /p:CoverletOutput="${coverage_dir}/coverage" /p:Threshold=85%2c69 /p:ThresholdType=line%2cbranch /p:ThresholdStat=total
   ci_result_append_summary "BDD coverage checks completed."
 }
 
@@ -400,7 +414,7 @@ main() {
     api-contract) run_api_contract ;;
     pack) run_pack ;;
     naming-snt) run_naming_snt ;;
-    version-policy) run_version_policy ;;
+    versioning-svt) run_versioning_svt ;;
     consumer-smoke) run_consumer_smoke ;;
     package-backed-tests) run_package_backed_tests ;;
     build) run_build ;;
