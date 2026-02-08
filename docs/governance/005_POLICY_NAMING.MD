@@ -13,32 +13,39 @@ Sie gilt fuer:
 Die einzige normative Quelle ist:
 - `tools/ci/policies/data/naming.json`
 
-Kanonische Felder:
-- `repo_name`
+Kanonische Felder (Schema `tools/ci/policies/data/naming.json`):
+- `canonical_name`
 - `product_name`
 - `package_id`
-- `legacy_package_id`
-- `legacy_unlist_package_id`
-- `namespace_name`
+- `assembly_name`
+- `root_namespace`
+- `repo_identity`
+- `repo_slug`
+- `repo_display_name`
 - `repository_url`
+- `deprecated_package_ids`
 - `namespace_decision`
 - `docs_expected_links`
 
 Aenderungen am Namen erfolgen ausschliesslich durch Update dieser SSOT-Datei plus begleitende Migration.
 
 ## 3. Was konsistent sein MUSS
-Harte Gleichheitsregel (SNT strict identity):
-- `repo_name == package_id == legacy_package_id == namespace_name`
+Harte Gleichheits-/Konsistenzregel (SNT strict identity):
+- `canonical_name == package_id == assembly_name == root_namespace`
+- `repo_slug` muss zum `origin`-Remote-Slug passen
+- Eintraege in `deprecated_package_ids` duerfen nicht als kanonische Paketreferenz verwendet werden
 
 Folgende Stellen MUESSEN dem SSOT entsprechen:
 1. `src/FileTypeDetection/FileTypeDetectionLib.vbproj`
    - `PackageId == package_id`
    - `RepositoryUrl == repository_url`
    - `PackageProjectUrl == repository_url`
-   - Quell-Namespace in `src/FileTypeDetection/**/*.vb` ist einheitlich `namespace_name`
+   - `AssemblyName == assembly_name`
+   - `RootNamespace == root_namespace`
+   - Quell-Namespace in `src/FileTypeDetection/**/*.vb` ist einheitlich unter `root_namespace`
 2. `README.md` und definierte Nutzungsdokumente
    - Installationsbeispiele verwenden nur `package_id`
-   - `legacy_unlist_package_id` darf dort nicht mehr auftauchen
+   - IDs aus `deprecated_package_ids` duerfen dort nicht als Install-Snippet auftauchen
 3. CI/Release
    - `tools/ci/bin/run.sh` erzwingt in `run_pack` exakt `package_id`
    - `.github/workflows/release.yml` laeuft einen Naming-Gate vor Pack/Publish
@@ -63,7 +70,7 @@ RaC-Regel (PolicyRunner):
 ## 5. NuGet-Migration (Level 3 Betrieb)
 Zielbild auf nuget.org:
 - Genau EIN Paket ist discoverable/recommended: `package_id`
-- Altes Paket (`legacy_unlist_package_id`) bleibt technisch existent, aber:
+- Legacy-Pakete aus `deprecated_package_ids` bleiben technisch existent, aber:
   - fuer alle Versionen unlisted
   - deprecated mit Verweis auf `package_id`
   - in Dokumentation nicht mehr empfohlen
@@ -84,11 +91,12 @@ Hinweis:
 
 ## 6. Namespace-Entscheidung
 Die Namespace-Strategie ist explizit im SSOT hinterlegt (`namespace_decision`).
-Aktueller Beschluss:
-- `mode: keep`
-- Root-Namespace bleibt stabil, um API-Breaks zu vermeiden.
+Aktueller Beschluss laut SSOT:
+- `mode: rename`
+- `current_root_namespace: FileTypeDetection`
+- `target_root_namespace: Tomtastisch.FileClassifier`
 
-Wenn spaeter `rename` gewaehlt wird, ist dies als Breaking Change (major) zu behandeln inkl. Migrationsanleitung.
+Diese Umstellung ist als Breaking Change (major) zu behandeln und wird durch Migrationsdokumentation begleitet.
 
 ## 7. Nicht-Ziele
 - Keine Hard-Delete-Annahme fuer nuget.org.

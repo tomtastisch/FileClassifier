@@ -125,6 +125,7 @@ repository_url = str(ssot.get("repository_url", ""))
 deprecated_package_ids = ssot.get("deprecated_package_ids", [])
 namespace_decision = ssot.get("namespace_decision", {})
 target_root_namespace = str(namespace_decision.get("target_root_namespace", ""))
+docs_expected_links = ssot.get("docs_expected_links", [])
 
 # Canonical equality constraints
 for scope, expected, actual in [
@@ -196,6 +197,20 @@ scan_paths = [
     repo_root / "samples",
     repo_root / "tests",
 ]
+
+docs_required = {"README.md"}
+if isinstance(docs_expected_links, list):
+    for link in docs_expected_links:
+        if not isinstance(link, str):
+            continue
+        marker = "/blob/main/"
+        if marker in link:
+            docs_required.add(link.split(marker, 1)[1])
+
+canonical_required_paths = set(docs_required) | {
+    "samples/PortableConsumer/PortableConsumer.csproj",
+    "tests/PackageBacked.Tests/PackageBacked.Tests.csproj",
+}
 for base in scan_paths:
     if not base.exists():
         continue
@@ -206,21 +221,11 @@ for base in scan_paths:
         rpath = rel(path)
         checked_paths.append(rpath)
         text = path.read_text(encoding="utf-8", errors="ignore")
-        if package_id not in text and rpath in {
-            "README.md",
-            "docs/021_USAGE_NUGET.MD",
-            "docs/guides/003_GUIDE_PORTABLE.MD",
-            "samples/PortableConsumer/PortableConsumer.csproj",
-            "tests/PackageBacked.Tests/PackageBacked.Tests.csproj",
-        }:
+        if package_id not in text and rpath in canonical_required_paths:
             add_violation("canonical_reference", package_id, "missing", rpath, "Canonical package reference missing in required install/consumer file")
 
 # Deprecated IDs must not appear in install snippets except migration guide.
-install_targets = {
-    "README.md",
-    "docs/021_USAGE_NUGET.MD",
-    "docs/guides/003_GUIDE_PORTABLE.MD",
-}
+install_targets = set(docs_required)
 migration_doc_rel = "docs/guides/004_GUIDE_MIGRATE_LEGACY_NUGET.MD"
 for rpath in sorted(install_targets):
     path = repo_root / rpath

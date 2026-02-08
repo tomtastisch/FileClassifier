@@ -83,8 +83,10 @@ if [[ "${APPLY}" != "1" ]]; then
 fi
 
 supports_deprecate=0
-if nuget help deprecate 2>/dev/null | rg -q "^NuGet"; then
-  supports_deprecate=1
+if command -v nuget >/dev/null 2>&1; then
+  if nuget help deprecate 2>/dev/null | rg -q "^NuGet"; then
+    supports_deprecate=1
+  fi
 fi
 
 for LEGACY_PACKAGE_ID in "${DEPRECATED_IDS[@]}"; do
