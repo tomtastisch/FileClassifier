@@ -250,6 +250,7 @@ run_naming_snt() {
 
 run_versioning_svt() {
   local versioning_summary="${ROOT_DIR}/${OUT_DIR}/versioning-svt-summary.json"
+  build_validators
   run_or_fail "CI-VERSION-001" "Versioning SVT checker" bash "${ROOT_DIR}/tools/ci/check-versioning-svt.sh" --repo-root "${ROOT_DIR}" --naming-ssot "${ROOT_DIR}/tools/ci/policies/data/naming.json" --versioning-ssot "${ROOT_DIR}/tools/ci/policies/data/versioning.json" --out "${versioning_summary}"
   if ! run_policy_runner_bridge "versioning-svt" "artifacts/ci/_policy_versioning_svt" "Policy versioning SVT" "${OUT_DIR}/versioning-svt-summary.json"; then
     return 1
