@@ -151,5 +151,7 @@ python3 tools/check-policy-roc.py --out artifacts/policy_roc_matrix.tsv
 bash tools/versioning/check-version-policy.sh
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --filter "Category=ApiContract" -v minimal
 dotnet pack src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -o artifacts/nuget -v minimal
+EXPECTED_VERSION=4.3.2 bash tools/ci/verify_nuget_release.sh
+EXPECTED_VERSION=4.3.2 bash tools/ci/publish_nuget_local.sh
 node tools/versioning/test-compute-pr-labels.js
 ```
