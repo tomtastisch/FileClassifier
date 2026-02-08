@@ -1,4 +1,4 @@
-using FileTypeDetection;
+using Tomtastisch.FileClassifier;
 
 var payload = "%PDF-1.7\nportable-consumer\n"u8.ToArray();
 var detector = new FileTypeDetector();

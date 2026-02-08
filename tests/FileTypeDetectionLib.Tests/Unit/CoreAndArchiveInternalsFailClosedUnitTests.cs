@@ -1,8 +1,8 @@
-using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
 using Microsoft.Extensions.Logging;
 using SharpCompress.Archives;
 using SharpCompress.Common;
+using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 

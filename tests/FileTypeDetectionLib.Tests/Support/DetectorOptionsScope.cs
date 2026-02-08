@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using FileTypeDetection;
+using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Support;
 

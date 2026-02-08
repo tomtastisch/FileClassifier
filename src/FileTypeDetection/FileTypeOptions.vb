@@ -5,7 +5,7 @@ Imports System.IO
 Imports System.Text.Json
 Imports Microsoft.Extensions.Logging
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Zentrale, globale Optionsverwaltung als JSON-Schnittstelle.
     ''' </summary>

@@ -3,7 +3,7 @@ Option Explicit On
 
 Imports System.IO
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Einheitliche Byte-basierte Materialisierung mit optionaler sicherer ZIP-Extraktion.
     ''' </summary>

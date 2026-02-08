@@ -1,4 +1,4 @@
-using FileTypeDetection;
+using Tomtastisch.FileClassifier;
 
 if (args.Length != 1)
 {

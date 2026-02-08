@@ -2,11 +2,11 @@
   "version": 1,
   "dependencies": {
     "net10.0": {
-      "Tomtastisch.FileTypeDetection": {
+      "Tomtastisch.FileClassifier": {
         "type": "Direct",
-        "requested": "[9.9.9-rc.1, )",
-        "resolved": "9.9.9-rc.1",
-        "contentHash": "38dVm1g5h8u89cD19iNgI37Q5IRRscJlemkeFPXB5ubly7oTwXo9hjvATa3JmCrUYzuObdyhXaRoGCJ+v7ytbA==",
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "M/tkMhIE3gihW9wTcZdkXU+986EuvIZNUeROpr6sNHywQStWXfgIVx3BN95xyPBjgWBnjhhCgRxCER50F300Lw==",
         "dependencies": {
           "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
           "Mime": "3.8.0",
@@ -52,11 +52,11 @@
       }
     },
     "net8.0": {
-      "Tomtastisch.FileTypeDetection": {
+      "Tomtastisch.FileClassifier": {
         "type": "Direct",
-        "requested": "[9.9.9-rc.1, )",
-        "resolved": "9.9.9-rc.1",
-        "contentHash": "38dVm1g5h8u89cD19iNgI37Q5IRRscJlemkeFPXB5ubly7oTwXo9hjvATa3JmCrUYzuObdyhXaRoGCJ+v7ytbA==",
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "M/tkMhIE3gihW9wTcZdkXU+986EuvIZNUeROpr6sNHywQStWXfgIVx3BN95xyPBjgWBnjhhCgRxCER50F300Lw==",
         "dependencies": {
           "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
           "Mime": "3.8.0",

@@ -7,7 +7,7 @@ Imports System.Linq
 Imports System.Security.Cryptography
 Imports System.Text
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Öffentliche Fassade für deterministische Hash- und RoundTrip-Nachweise.
     ''' </summary>

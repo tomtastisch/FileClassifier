@@ -1,14 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <RootNamespace/>
+        <RootNamespace>Tomtastisch.FileClassifier</RootNamespace>
+        <AssemblyName>Tomtastisch.FileClassifier</AssemblyName>
         <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
         <IsPackable>true</IsPackable>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-        <PackageId>Tomtastisch.FileTypeDetection</PackageId>
+        <PackageId>Tomtastisch.FileClassifier</PackageId>
         <Authors>tomtastisch</Authors>
-        <Description>Deterministic file type detection, safe archive validation/extraction, and hashing evidence for .NET consumers.</Description>
-        <PackageTags>filetype;detection;archive;hashing;deterministic</PackageTags>
+        <Description>Deterministic file type detection, safe archive validation/extraction, and hashing evidence for .NET. Repo: https://github.com/tomtastisch/FileClassifier</Description>
+        <PackageTags>filetype;file-type;mime;magic;sniffing;archive;zip;tar;7z;rar;security;zipslip;hashing;sha256;deterministic;dotnet;net8;net10</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/tomtastisch/FileClassifier</RepositoryUrl>
         <RepositoryType>git</RepositoryType>

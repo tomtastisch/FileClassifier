@@ -9,6 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Tomtastisch.FileTypeDetection" Version="$(PortableConsumerPackageVersion)" />
+    <PackageReference Include="Tomtastisch.FileClassifier" Version="$(PortableConsumerPackageVersion)" />
   </ItemGroup>
 </Project>

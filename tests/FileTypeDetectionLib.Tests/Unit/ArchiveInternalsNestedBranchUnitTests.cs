@@ -1,10 +1,10 @@
 using System.Reflection;
-using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using SharpCompress.Writers;
+using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 

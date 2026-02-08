@@ -1,7 +1,7 @@
 Option Strict On
 Option Explicit On
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Ergebnisbericht fuer deterministische h1-h4 RoundTrip-Pruefungen.
     ''' </summary>
