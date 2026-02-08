@@ -16,12 +16,26 @@ FileClassifier liefert deterministische Dateityperkennung, sichere Archivverarbe
 ## 4. Installation (NuGet)
 - PackageId: `Tomtastisch.FileTypeDetection`
 - Feed: NuGet.org (online such- und installierbar)
-- Beispiel:
+- Installation:
+```bash
+dotnet add package Tomtastisch.FileTypeDetection --version X.Y.Z
+```
+- `PackageReference`:
 ```xml
 <ItemGroup>
-  <PackageReference Include="Tomtastisch.FileTypeDetection" Version="x.y.z" />
+  <PackageReference Include="Tomtastisch.FileTypeDetection" Version="X.Y.Z" />
 </ItemGroup>
 ```
+- SVT (Single Version Truth):
+  - Release-Tag `vX.Y.Z` erzeugt NuGet-Version `X.Y.Z`.
+  - CI erzwingt `git version == nupkg version == nuget version` über SVT-Gates.
+- Verfügbarkeit/Konsistenz lokal prüfen:
+```bash
+EXPECTED_VERSION=X.Y.Z bash tools/ci/verify_nuget_release.sh
+```
+- Details: [NuGet Usage Guide](https://github.com/tomtastisch/FileClassifier/blob/main/docs/021_USAGE_NUGET.MD)
+- Maintainer-Hinweis: Das Publish-Helper-Skript nutzt `NUGET_API_KEY` aus dem Keychain und gibt den Token nicht aus.
+  - Siehe: [NuGet Usage Guide](https://github.com/tomtastisch/FileClassifier/blob/main/docs/021_USAGE_NUGET.MD)
 
 ## 5. Compatibility / TFMs
 - Library-Zielplattformen: `net8.0` und `net10.0`
