@@ -141,10 +141,7 @@ def check_internal_repo_url(url: str, cache: dict[str, str | None]) -> str | Non
     ref = match.group("ref")
     rel_path = match.group("path")
 
-    def ref_exists_locally_or_remote(git_ref: str) -> bool:
-        if git_ref in REF_EXISTS_CACHE:
-            return REF_EXISTS_CACHE[git_ref]
-
+    def local_ref_exists(git_ref: str) -> bool:
         local = subprocess.run(
             ["git", "rev-parse", "--verify", "--quiet", git_ref],
             cwd=ROOT,
@@ -152,7 +149,13 @@ def check_internal_repo_url(url: str, cache: dict[str, str | None]) -> str | Non
             text=True,
             check=False,
         )
-        if local.returncode == 0:
+        return local.returncode == 0
+
+    def ref_exists_locally_or_remote(git_ref: str) -> bool:
+        if git_ref in REF_EXISTS_CACHE:
+            return REF_EXISTS_CACHE[git_ref]
+
+        if local_ref_exists(git_ref):
             REF_EXISTS_CACHE[git_ref] = True
             return True
 
@@ -176,6 +179,21 @@ def check_internal_repo_url(url: str, cache: dict[str, str | None]) -> str | Non
     if not ref_exists_locally_or_remote(ref):
         cache[url] = f"ref not found ({ref})"
         return cache[url]
+
+    # In shallow CI clones, refs like "main" may exist only remotely.
+    # In that case, validate path/type against current workspace content.
+    if not local_ref_exists(ref):
+        path = ROOT / rel_path
+        if kind == "blob":
+            if not path.is_file():
+                cache[url] = f"target not found in workspace ({rel_path})"
+                return cache[url]
+        else:
+            if not path.is_dir():
+                cache[url] = f"target tree not found in workspace ({rel_path})"
+                return cache[url]
+        cache[url] = None
+        return None
 
     spec = f"{ref}:{rel_path}"
     exists = subprocess.run(
