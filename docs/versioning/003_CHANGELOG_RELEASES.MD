@@ -9,6 +9,19 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 - Fixed:
 - Docs/CI/Tooling:
 
+## [4.4.0]
+- Added:
+  - Neue Governance-Policies fuer einheitliches Naming und SVT-Versioning (`CI-NAMING-001`, `CI-VERSION-001`).
+- Changed:
+  - Kanonischer Paket-/Assembly-/Namespace-Name auf `Tomtastisch.FileClassifier` vereinheitlicht.
+  - Release-Publish auf NuGet Trusted Publishing (OIDC via `NuGet/login@v1`) umgestellt, fail-closed abgesichert.
+- Fixed:
+  - PR-Labeling robust gegen paginierte GitHub-File-Listen gemacht (deterministische JSON-Bildung).
+  - Release-Workflow YAML-Syntax fuer Fail-Closed-Assert korrigiert.
+- Docs/CI/Tooling:
+  - CI um dedizierte Checks `naming-snt` und `versioning-svt` inkl. Artefakt-Nachweisen erweitert.
+  - Migrationsdoku fuer Legacy-NuGet-ID (`Tomtastisch.FileTypeDetection`) ergänzt.
+
 ## [4.2.1]
 - Added:
 - Changed:

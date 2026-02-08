@@ -3,7 +3,7 @@ Option Explicit On
 
 Imports System.Collections.Immutable
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Unveränderliches Wertobjekt für einen Dateityp.
     '''     SSOT-Regel:

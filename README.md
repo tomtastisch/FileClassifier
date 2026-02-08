@@ -1,10 +1,10 @@
-# FileClassifier
+# Tomtastisch.FileClassifier
 
 ## 1. Einstieg
 Dieses Dokument ist der zentrale Einstiegspunkt für Nutzer und Entwickler.
 
 ## 2. Zielbild
-FileClassifier liefert deterministische Dateityperkennung, sichere Archivverarbeitung und reproduzierbare Nachweise mit fail-closed Semantik.
+Tomtastisch.FileClassifier liefert deterministische Dateityperkennung, sichere Archivverarbeitung und reproduzierbare Nachweise mit fail-closed Semantik.
 
 ## 3. Public API Surface
 - `FileTypeDetector`: inhaltsbasierte Erkennung aus Pfad/Bytes, optional mit Endungsprüfung und Detailtrace.
@@ -14,16 +14,16 @@ FileClassifier liefert deterministische Dateityperkennung, sichere Archivverarbe
 - `FileTypeOptions`: globaler Konfigurations-Snapshot für alle Pfade (wird von den Kernklassen gelesen).
 
 ## 4. Installation (NuGet)
-- PackageId: `Tomtastisch.FileTypeDetection`
+- PackageId: `Tomtastisch.FileClassifier`
 - Feed: NuGet.org (online such- und installierbar)
 - Installation:
 ```bash
-dotnet add package Tomtastisch.FileTypeDetection --version X.Y.Z
+dotnet add package Tomtastisch.FileClassifier --version X.Y.Z
 ```
 - `PackageReference`:
 ```xml
 <ItemGroup>
-  <PackageReference Include="Tomtastisch.FileTypeDetection" Version="X.Y.Z" />
+  <PackageReference Include="Tomtastisch.FileClassifier" Version="X.Y.Z" />
 </ItemGroup>
 ```
 - SVT (Single Version Truth):
@@ -34,7 +34,9 @@ dotnet add package Tomtastisch.FileTypeDetection --version X.Y.Z
 EXPECTED_VERSION=X.Y.Z bash tools/ci/verify_nuget_release.sh
 ```
 - Details: [NuGet Usage Guide](https://github.com/tomtastisch/FileClassifier/blob/main/docs/021_USAGE_NUGET.MD)
+- Portable-Integration: [Portable Adoption Guide](https://github.com/tomtastisch/FileClassifier/blob/main/docs/guides/003_GUIDE_PORTABLE.MD)
 - Maintainer-Hinweis: Das Publish-Helper-Skript nutzt `NUGET_API_KEY` aus dem Keychain und gibt den Token nicht aus.
+- Migration: Verwende ausschließlich `Tomtastisch.FileClassifier` (Details in `docs/guides/004_GUIDE_MIGRATE_LEGACY_NUGET.MD`).
   - Siehe: [NuGet Usage Guide](https://github.com/tomtastisch/FileClassifier/blob/main/docs/021_USAGE_NUGET.MD)
 
 ## 5. Compatibility / TFMs
@@ -165,7 +167,7 @@ python3 tools/check-policy-roc.py --out artifacts/policy_roc_matrix.tsv
 bash tools/versioning/check-version-policy.sh
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --filter "Category=ApiContract" -v minimal
 dotnet pack src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -o artifacts/nuget -v minimal
-EXPECTED_VERSION=4.3.2 bash tools/ci/verify_nuget_release.sh
-EXPECTED_VERSION=4.3.2 bash tools/ci/publish_nuget_local.sh
+EXPECTED_VERSION=4.4.0 bash tools/ci/verify_nuget_release.sh
+EXPECTED_VERSION=4.4.0 bash tools/ci/publish_nuget_local.sh
 node tools/versioning/test-compute-pr-labels.js
 ```

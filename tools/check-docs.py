@@ -30,8 +30,9 @@ INTERNAL_REPO_URL_RE = re.compile(
     r"(?:#[A-Za-z0-9\-_\.]+)?$"
 )
 ANCHOR_RE = re.compile(r'^#[A-Za-z0-9\-_\.]+$')
-DOC_NAME_RE = re.compile(r'^[0-9]{3}_[A-Z0-9]+_[A-Z0-9]+\.MD$')
+DOC_NAME_RE = re.compile(r'^[0-9]{3}_(?:[A-Z0-9]+_)*[A-Z0-9]+\.MD$')
 PLAIN_URL_RE = re.compile(r'(?P<url>https?://[^\s<>"\)\]]+)')
+REF_EXISTS_CACHE: dict[str, bool] = {}
 
 DOC_TYPES_REQUIRE_DIAGRAM = (
     "_API_",
@@ -140,16 +141,59 @@ def check_internal_repo_url(url: str, cache: dict[str, str | None]) -> str | Non
     ref = match.group("ref")
     rel_path = match.group("path")
 
-    ref_exists = subprocess.run(
-        ["git", "rev-parse", "--verify", "--quiet", ref],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if ref_exists.returncode != 0:
+    def local_ref_exists(git_ref: str) -> bool:
+        local = subprocess.run(
+            ["git", "rev-parse", "--verify", "--quiet", git_ref],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        return local.returncode == 0
+
+    def ref_exists_locally_or_remote(git_ref: str) -> bool:
+        if git_ref in REF_EXISTS_CACHE:
+            return REF_EXISTS_CACHE[git_ref]
+
+        if local_ref_exists(git_ref):
+            REF_EXISTS_CACHE[git_ref] = True
+            return True
+
+        # CI often uses shallow checkouts without local refs like "main".
+        # Fallback to remote ref existence to keep checks deterministic.
+        for remote_ref in (f"refs/heads/{git_ref}", f"refs/tags/{git_ref}", f"refs/tags/{git_ref}^{{}}"):
+            remote = subprocess.run(
+                ["git", "ls-remote", "--exit-code", "origin", remote_ref],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if remote.returncode == 0:
+                REF_EXISTS_CACHE[git_ref] = True
+                return True
+
+        REF_EXISTS_CACHE[git_ref] = False
+        return False
+
+    if not ref_exists_locally_or_remote(ref):
         cache[url] = f"ref not found ({ref})"
         return cache[url]
+
+    # In shallow CI clones, refs like "main" may exist only remotely.
+    # In that case, validate path/type against current workspace content.
+    if not local_ref_exists(ref):
+        path = ROOT / rel_path
+        if kind == "blob":
+            if not path.is_file():
+                cache[url] = f"target not found in workspace ({rel_path})"
+                return cache[url]
+        else:
+            if not path.is_dir():
+                cache[url] = f"target tree not found in workspace ({rel_path})"
+                return cache[url]
+        cache[url] = None
+        return None
 
     spec = f"{ref}:{rel_path}"
     exists = subprocess.run(

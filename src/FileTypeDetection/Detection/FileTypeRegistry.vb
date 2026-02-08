@@ -4,7 +4,7 @@ Option Explicit On
 Imports System.Collections.Immutable
 Imports System.Linq
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Zentrale Registry als SSOT fuer Typmetadaten, Alias-Aufloesung und Magic-Patterns.
     '''     Regeln:

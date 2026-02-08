@@ -5,7 +5,7 @@ Imports System.IO
 Imports System.IO.Compression
 Imports Microsoft.Extensions.Logging
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     Friend NotInheritable Class InternalIoDefaults
         Friend Const CopyBufferSize As Integer = 8192
         Friend Const FileStreamBufferSize As Integer = 81920

@@ -22,6 +22,7 @@ Beide Guides folgen derselben Struktur:
 ## 3. Playbooks
 1. [Playbook: Options anlegen und anpassen](https://github.com/tomtastisch/FileClassifier/blob/main/docs/guides/001_GUIDE_OPTIONS.MD)
 2. [Playbook: Neue Datatypes und API-Modelle erweitern](https://github.com/tomtastisch/FileClassifier/blob/main/docs/guides/002_GUIDE_DATATYPE.MD)
+3. Playbook: Legacy NuGet auf kanonisches Paket migrieren (`docs/guides/004_GUIDE_MIGRATE_LEGACY_NUGET.MD`)
 
 ## 4. Wann welcher Guide?
 | Frage | Guide |

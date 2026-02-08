@@ -3,7 +3,7 @@ Option Explicit On
 
 Imports Microsoft.Extensions.Logging
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Konfiguration fuer Dateityp-Erkennung und ZIP-Sicherheitsgrenzen.
     '''     Sicherheitsannahmen:

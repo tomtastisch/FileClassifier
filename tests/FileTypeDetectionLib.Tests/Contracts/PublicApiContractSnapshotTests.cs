@@ -1,6 +1,6 @@
 using System.Reflection;
 using System.Text;
-using FileTypeDetection;
+using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Contracts;
 
@@ -32,7 +32,7 @@ public sealed class PublicApiContractSnapshotTests
         var lines = new List<string>();
 
         var publicTypes = assembly.GetTypes()
-            .Where(type => type.IsPublic && type.Namespace == "FileTypeDetection")
+            .Where(type => type.IsPublic && type.Namespace == "Tomtastisch.FileClassifier")
             .OrderBy(type => type.FullName, StringComparer.Ordinal)
             .ToArray();
 

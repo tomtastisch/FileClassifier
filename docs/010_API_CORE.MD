@@ -21,7 +21,7 @@ Dieses Dokument beschreibt alle öffentlichen Einstiegspunkte der API mit Signat
 | `FileTypeDetector` / `ArchiveProcessing` / `FileMaterializer` | [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md) | Archive-Gate, Guards, Extraktions-Engine |
 | `FileTypeOptions` / `FileTypeProjectBaseline` | [Configuration Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/README.md) | globale Optionen und Baseline |
 | Rückgabemodelle (`FileType`, `DetectionDetail`, `ZipExtractedEntry`, `DeterministicHash*`) | [Abstractions Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md) | Modellverträge der Public API |
-| Modulnavigation | [FileTypeDetection Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md) | Übersicht und Einstieg je Leserrolle |
+| Modulnavigation | [FileClassifier Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md) | Übersicht und Einstieg je Leserrolle |
 
 ## 2.2.1 Physische Modellablage (ohne Funktionsänderung)
 Die Rückgabemodelle sind rein organisatorisch in Unterordner aufgeteilt; die API-Semantik bleibt unverändert:
@@ -77,7 +77,7 @@ Die Rückgabemodelle sind rein organisatorisch in Unterordner aufgeteilt; die AP
 
 ## 4. Methodenfamilien
 ### 4.1 FileTypeDetector
-Details: [FileTypeDetection Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md), [Detection Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Detection/README.md), [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md).
+Details: [FileClassifier Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md), [Detection Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Detection/README.md), [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md).
 
 **Wichtiger Semantikhinweis:** `TryValidateArchive(path)` validiert generische Archivcontainer über dieselbe fail-closed Pipeline wie Extraktion und Materialisierung.
 
@@ -97,7 +97,7 @@ flowchart TD
 ```
 
 ```csharp
-using FileTypeDetection;
+using Tomtastisch.FileClassifier;
 
 var detector = new FileTypeDetector();
 var t = detector.Detect("/data/invoice.pdf", verifyExtension: true);
@@ -110,7 +110,7 @@ Console.WriteLine($"{t.Kind} / {d.ReasonCode} / {archiveOk} / {entries.Count}");
 
 ### 4.2 ArchiveProcessing
 API-Name bleibt aus Kompatibilitätsgründen erhalten; intern werden Archivcontainer einheitlich behandelt.
-Details: [FileTypeDetection Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md), [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md).
+Details: [FileClassifier Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md), [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md).
 
 ```mermaid
 flowchart LR
@@ -124,7 +124,7 @@ flowchart LR
 ```
 
 ```csharp
-using FileTypeDetection;
+using Tomtastisch.FileClassifier;
 
 bool okPath = ArchiveProcessing.TryValidate("/data/archive.zip");
 bool okBytes = ArchiveProcessing.TryValidate(File.ReadAllBytes("/data/archive.zip"));
@@ -133,7 +133,7 @@ var entriesBytes = ArchiveProcessing.TryExtractToMemory(File.ReadAllBytes("/data
 ```
 
 ### 4.3 FileMaterializer
-Details: [FileTypeDetection Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md), [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md).
+Details: [FileClassifier Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md), [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md).
 
 ```mermaid
 flowchart TD
@@ -150,7 +150,7 @@ flowchart TD
 ```
 
 ```csharp
-using FileTypeDetection;
+using Tomtastisch.FileClassifier;
 
 byte[] payload = File.ReadAllBytes("/data/input.bin");
 byte[] archivePayload = File.ReadAllBytes("/data/archive.zip");
@@ -160,7 +160,7 @@ bool archiveExtractOk = FileMaterializer.Persist(archivePayload, "/data/out/unpa
 ```
 
 ### 4.4 FileTypeOptions + FileTypeProjectBaseline
-Details: [FileTypeDetection Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md), [Configuration Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/README.md).
+Details: [FileClassifier Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md), [Configuration Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/README.md).
 
 ```mermaid
 flowchart LR
@@ -176,7 +176,7 @@ flowchart LR
 ```
 
 ```csharp
-using FileTypeDetection;
+using Tomtastisch.FileClassifier;
 
 FileTypeProjectBaseline.ApplyDeterministicDefaults();
 bool loaded = FileTypeOptions.LoadOptions("{\"maxBytes\":134217728}");
@@ -185,7 +185,7 @@ Console.WriteLine($"Loaded={loaded}; Snapshot={snapshot}");
 ```
 
 ### 4.5 DeterministicHashing
-Details: [FileTypeDetection Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md), [Abstractions Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md).
+Details: [FileClassifier Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md), [Abstractions Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md).
 Formaler API-Contract: [04 - DeterministicHashing API Contract](https://github.com/tomtastisch/FileClassifier/blob/main/docs/contracts/001_CONTRACT_HASHING.MD).
 
 ```mermaid
@@ -203,7 +203,7 @@ flowchart LR
 ```
 
 ```csharp
-using FileTypeDetection;
+using Tomtastisch.FileClassifier;
 
 var evidence = DeterministicHashing.HashFile("/data/archive.zip");
 var report = DeterministicHashing.VerifyRoundTrip("/data/archive.zip");

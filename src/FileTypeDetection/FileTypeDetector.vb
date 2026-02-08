@@ -5,7 +5,7 @@ Imports System.IO
 Imports System.Linq
 Imports System.Diagnostics.CodeAnalysis
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Oeffentliche API zur inhaltsbasierten Dateityp-Erkennung.
     '''     <remarks>

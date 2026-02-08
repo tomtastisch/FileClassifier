@@ -1,0 +1,12 @@
+rules_schema_version: 1
+rules:
+  - rule_id: CI-NAMING-001
+    policy_type: naming_snt
+    severity: fail
+    title: Naming SNT must be consistent with SSOT
+    description: Canonical package/assembly/root namespace plus docs and consumer references must resolve to Tomtastisch.FileClassifier; deprecated ids are migration-only.
+    applies_to:
+      - naming-snt
+    params:
+      ssot_file: tools/ci/policies/data/naming.json
+      summary_json: artifacts/ci/naming-snt/naming-snt-summary.json

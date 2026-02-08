@@ -15,6 +15,7 @@ RULE_URL_RE = re.compile(
     r"(?P<path>tools/ci/policies/rules/.+\.(?:yml|yaml))"
     r"(?:#[A-Za-z0-9\-_\.]+)?$"
 )
+RULE_PATH_RE = re.compile(r"`(?P<path>tools/ci/policies/rules/.+\.(?:yml|yaml))`")
 
 
 def main() -> int:
@@ -36,6 +37,12 @@ def main() -> int:
             if not rule_match:
                 continue
             path_part = rule_match.group("path")
+            rule_path = (ROOT / path_part).resolve()
+            policy_to_rules[policy.resolve()].add(rule_path)
+            mappings.append((str(policy.relative_to(ROOT)), str(rule_path.relative_to(ROOT))))
+
+        for m in RULE_PATH_RE.finditer(text):
+            path_part = m.group("path")
             rule_path = (ROOT / path_part).resolve()
             policy_to_rules[policy.resolve()].add(rule_path)
             mappings.append((str(policy.relative_to(ROOT)), str(rule_path.relative_to(ROOT))))

@@ -2,7 +2,7 @@ Option Strict On
 Option Explicit On
 Option Infer On
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Kanonische, in der Bibliothek unterstuetzte Dateitypen.
     '''     Fachlicher Kontext:

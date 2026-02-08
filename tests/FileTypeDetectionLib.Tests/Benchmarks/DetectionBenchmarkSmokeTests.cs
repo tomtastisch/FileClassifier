@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
+using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Benchmarks;
 

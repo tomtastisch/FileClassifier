@@ -1,16 +1,16 @@
 # NuGet Usage
 
 ## A) Purpose
-`Tomtastisch.FileTypeDetection` stellt die öffentliche Bibliotheksoberfläche für Dateityperkennung, sichere Archivverarbeitung, Byte-Materialisierung und deterministische Hashing-Nachweise bereit.
+`Tomtastisch.FileClassifier` stellt die öffentliche Bibliotheksoberfläche für Dateityperkennung, sichere Archivverarbeitung, Byte-Materialisierung und deterministische Hashing-Nachweise bereit.
 
 ## B) Install (Consumer)
 ```bash
-dotnet add package Tomtastisch.FileTypeDetection --version X.Y.Z
+dotnet add package Tomtastisch.FileClassifier --version X.Y.Z
 ```
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Tomtastisch.FileTypeDetection" Version="X.Y.Z" />
+  <PackageReference Include="Tomtastisch.FileClassifier" Version="X.Y.Z" />
 </ItemGroup>
 ```
 
@@ -20,7 +20,7 @@ Version-Pinning:
 
 ## C) Minimal Usage (Consumer)
 ```csharp
-using FileTypeDetection;
+using Tomtastisch.FileClassifier;
 
 var payload = "%PDF-1.7\nsample\n"u8.ToArray();
 var detector = new FileTypeDetector();

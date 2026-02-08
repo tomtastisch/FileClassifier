@@ -4,7 +4,7 @@ Option Explicit On
 Imports System.IO
 Imports System.Linq
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Steuerung fuer deterministic hashing APIs.
     ''' </summary>

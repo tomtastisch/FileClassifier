@@ -3,7 +3,7 @@ Option Explicit On
 
 Imports System.IO
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     Friend Enum ArchiveContainerType
         Unknown = 0
         Zip

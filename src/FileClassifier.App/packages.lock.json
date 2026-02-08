@@ -12,7 +12,7 @@
         "resolved": "0.8.4",
         "contentHash": "eieSXq3kakCUXbgdxkKaRqWS6hF0KBJcqok9LlDCs60GOyrynLvPOcQ0pRw7shdPF7lh/VepJ9cP9n9HHc759g=="
       },
-      "Tomtastisch.FileTypeDetection": {
+      "Tomtastisch.FileClassifier": {
         "type": "Project",
         "dependencies": {
           "Microsoft.IO.RecyclableMemoryStream": "[3.0.1, )",

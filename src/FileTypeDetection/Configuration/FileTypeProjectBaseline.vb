@@ -1,7 +1,7 @@
 Option Strict On
 Option Explicit On
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Liefert ein konservatives, deterministisches Sicherheitsprofil für die Dateityp-Erkennung.
     ''' </summary>

@@ -1,5 +1,5 @@
 using System.Text.Json;
-using FileTypeDetection;
+using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 

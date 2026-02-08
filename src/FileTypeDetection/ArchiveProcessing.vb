@@ -2,7 +2,7 @@ Option Strict On
 Option Explicit On
 
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Oeffentliche Archiv-Fassade fuer Validierung und sichere Extraktion.
     ''' </summary>
