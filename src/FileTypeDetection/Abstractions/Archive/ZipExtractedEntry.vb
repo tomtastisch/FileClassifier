@@ -4,7 +4,7 @@ Option Explicit On
 Imports System.Collections.Immutable
 Imports System.IO
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Unveraenderliches In-Memory-Ergebnis einer sicheren ZIP-Extraktion.
     ''' </summary>

@@ -29,7 +29,9 @@
               "shell_or_true",
               "shell_set_plus_e",
               "shell_run_block_max_lines",
-              "docs_drift"
+              "docs_drift",
+              "naming_snt",
+              "versioning_svt"
             ]
           },
           "severity": {
@@ -121,6 +123,14 @@
                   "type": "string",
                   "minLength": 1
                 }
+              },
+              "ssot_file": {
+                "type": "string",
+                "minLength": 1
+              },
+              "summary_json": {
+                "type": "string",
+                "minLength": 1
               }
             }
           }

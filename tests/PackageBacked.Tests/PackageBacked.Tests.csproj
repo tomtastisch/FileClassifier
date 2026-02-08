@@ -12,6 +12,6 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="xunit.v3" Version="2.0.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
-    <PackageReference Include="Tomtastisch.FileTypeDetection" Version="$(PackageBackedVersion)" />
+    <PackageReference Include="Tomtastisch.FileClassifier" Version="$(PackageBackedVersion)" />
   </ItemGroup>
 </Project>

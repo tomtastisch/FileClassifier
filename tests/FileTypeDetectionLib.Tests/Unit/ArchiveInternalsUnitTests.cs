@@ -1,6 +1,6 @@
-using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
 using SharpCompress.Common;
+using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 

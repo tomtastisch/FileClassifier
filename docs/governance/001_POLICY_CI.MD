@@ -40,3 +40,4 @@ Allow-list definitions are managed in rule parameters under `tools/ci/policies/r
 - [Artifact-Contract-Regel](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/artifact_contract.yaml)
 - [Docs-Drift-Regel](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/docs_drift.yaml)
 - [Shell-Safety-Regeln](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/shell_safety.yaml)
+- Naming-SNT-Regel: `tools/ci/policies/rules/naming_snt.yaml`

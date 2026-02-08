@@ -1,5 +1,5 @@
 using System.Reflection;
-using FileTypeDetection;
+using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 

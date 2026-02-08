@@ -4,14 +4,14 @@
 Diese Anleitung beschreibt die portable Uebernahme als NuGet-Paket ohne `ProjectReference`.
 
 ## 2. Package-Daten
-- PackageId: `Tomtastisch.FileTypeDetection`
+- PackageId: `Tomtastisch.FileClassifier`
 - Feed: NuGet.org
 - Versioning-Quelle: Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT
 
 ## 3. Consumer-Setup
 ```xml
 <ItemGroup>
-  <PackageReference Include="Tomtastisch.FileTypeDetection" Version="x.y.z" />
+  <PackageReference Include="Tomtastisch.FileClassifier" Version="x.y.z" />
 </ItemGroup>
 ```
 

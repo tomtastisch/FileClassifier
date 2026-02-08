@@ -25,29 +25,16 @@ jobs:
             8.0.x
             10.0.102
 
+      - name: Gate 0 - Naming SNT
+        run: bash tools/ci/release/gate0_naming_snt.sh "${GITHUB_WORKSPACE}"
+
+      - name: Gate 0b - Assert naming summary pass
+        run: bash tools/ci/release/assert_naming_summary_pass.sh "${GITHUB_WORKSPACE}/artifacts/nuget/naming-snt-summary.json"
+
       - name: Gate 1 - Validate release tag and derive version
         id: tag
         shell: bash
-        run: |
-          set -euo pipefail
-          TAG="${GITHUB_REF_NAME}"
-          REGEX='^v([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?$'
-
-          if [[ ! "${TAG}" =~ ${REGEX} ]]; then
-            echo "Invalid tag format '${TAG}'. Expected vMAJOR.MINOR.PATCH[-prerelease]." >&2
-            exit 1
-          fi
-
-          MAJOR="${BASH_REMATCH[1]}"
-          MINOR="${BASH_REMATCH[2]}"
-          PATCH="${BASH_REMATCH[3]}"
-          VERSION="${TAG#v}"
-          ASSEMBLY_VERSION="${MAJOR}.${MINOR}.0.0"
-          FILE_VERSION="${MAJOR}.${MINOR}.${PATCH}.0"
-          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
-          echo "tag=${TAG}" >> "${GITHUB_OUTPUT}"
-          echo "assembly_version=${ASSEMBLY_VERSION}" >> "${GITHUB_OUTPUT}"
-          echo "file_version=${FILE_VERSION}" >> "${GITHUB_OUTPUT}"
+        run: bash tools/ci/release/derive_tag_outputs.sh
 
       - name: Restore (locked mode)
         run: dotnet restore --locked-mode FileClassifier.sln -v minimal
@@ -62,82 +49,26 @@ jobs:
         run: dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --no-build --filter "Category=ApiContract" -v minimal
 
       - name: Pack with tag version (SSOT)
-        run: |
-          set -euo pipefail
-          mkdir -p artifacts/nuget
-          dotnet pack src/FileTypeDetection/FileTypeDetectionLib.vbproj \
-            -c Release \
-            --no-build \
-            -o artifacts/nuget \
-            -p:PackageVersion="${{ steps.tag.outputs.version }}" \
-            -p:Version="${{ steps.tag.outputs.version }}" \
-            -p:ContinuousIntegrationBuild=true \
-            -p:RepositoryTag="${{ steps.tag.outputs.tag }}" \
-            -p:AssemblyVersion="${{ steps.tag.outputs.assembly_version }}" \
-            -p:FileVersion="${{ steps.tag.outputs.file_version }}"
+        run: bash tools/ci/release/pack_with_tag.sh "${{ steps.tag.outputs.version }}" "${{ steps.tag.outputs.tag }}" "${{ steps.tag.outputs.assembly_version }}" "${{ steps.tag.outputs.file_version }}"
 
       - name: Resolve nupkg path
         id: nupkg
         shell: bash
-        run: |
-          set -euo pipefail
-          NUPKG_PATH="$(find artifacts/nuget -maxdepth 1 -type f -name '*.nupkg' ! -name '*.snupkg' | head -n1)"
-          if [[ -z "${NUPKG_PATH}" ]]; then
-            echo "No .nupkg generated in artifacts/nuget" >&2
-            exit 1
-          fi
-          echo "path=${NUPKG_PATH}" >> "${GITHUB_OUTPUT}"
+        run: bash tools/ci/release/resolve_nupkg_path.sh artifacts/nuget
 
       - name: Gate 2 - Verify TagVersion == PackageVersion
         shell: bash
-        run: |
-          set -euo pipefail
-          MODE=release \
-          TAG="${{ steps.tag.outputs.tag }}" \
-          NUPKG_PATH="${{ steps.nupkg.outputs.path }}" \
-          bash tools/versioning/check-version-policy.sh
+        run: bash tools/ci/release/gate2_version_policy.sh release "${{ steps.tag.outputs.tag }}" "${{ steps.nupkg.outputs.path }}"
 
       - name: Gate 3 - SVT pre-publish (tag version == nupkg version)
         shell: bash
-        run: |
-          set -euo pipefail
-          EXPECTED_VERSION="${{ steps.tag.outputs.version }}" \
-          NUPKG_PATH="${{ steps.nupkg.outputs.path }}" \
-          VERIFY_ONLINE=0 \
-          bash tools/ci/verify_nuget_release.sh
+        run: bash tools/ci/release/gate3_verify_prepublish.sh "${{ steps.tag.outputs.version }}" "${{ steps.nupkg.outputs.path }}"
 
       - name: Consumer smoke against packed package
-        run: |
-          set -euo pipefail
-          dotnet restore samples/PortableConsumer/PortableConsumer.csproj \
-            --source artifacts/nuget \
-            --source https://api.nuget.org/v3/index.json \
-            -p:PortableConsumerPackageVersion="${{ steps.tag.outputs.version }}" \
-            -v minimal
-          dotnet build samples/PortableConsumer/PortableConsumer.csproj \
-            -c Release \
-            --no-restore \
-            -p:PortableConsumerPackageVersion="${{ steps.tag.outputs.version }}" \
-            -v minimal
-          dotnet run --project samples/PortableConsumer/PortableConsumer.csproj \
-            -c Release \
-            -f net10.0 \
-            --no-build \
-            -p:PortableConsumerPackageVersion="${{ steps.tag.outputs.version }}"
+        run: bash tools/ci/release/consumer_smoke_from_pack.sh "${{ steps.tag.outputs.version }}"
 
       - name: Package-backed tests against packed package
-        run: |
-          set -euo pipefail
-          dotnet restore tests/PackageBacked.Tests/PackageBacked.Tests.csproj \
-            --source artifacts/nuget \
-            --source https://api.nuget.org/v3/index.json \
-            -p:PackageBackedVersion="${{ steps.tag.outputs.version }}" \
-            -v minimal
-          dotnet test tests/PackageBacked.Tests/PackageBacked.Tests.csproj \
-            -c Release \
-            --no-restore \
-            -p:PackageBackedVersion="${{ steps.tag.outputs.version }}" \
-            -v minimal
+        run: bash tools/ci/release/package_backed_from_pack.sh "${{ steps.tag.outputs.version }}"
 
       - name: Upload package artifact
         uses: actions/upload-artifact@v4
@@ -146,13 +77,30 @@ jobs:
           path: artifacts/nuget/
           if-no-files-found: error
 
+      - name: Upload naming SNT summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-naming-snt-summary
+          path: artifacts/nuget/naming-snt-summary.json
+          if-no-files-found: error
+
   publish-nuget:
     runs-on: ubuntu-latest
     needs: version-policy
     if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.102
 
       - name: Download package artifact
         uses: actions/download-artifact@v4
@@ -160,38 +108,37 @@ jobs:
           name: nuget-package
           path: artifacts/nuget/
 
+      - name: Download naming SNT summary
+        uses: actions/download-artifact@v4
+        with:
+          name: release-naming-snt-summary
+          path: artifacts/nuget/
+
+      - name: Gate 0c - Re-assert naming summary pass
+        run: bash tools/ci/release/assert_naming_summary_pass.sh artifacts/nuget/naming-snt-summary.json
+
       - name: Resolve nupkg path
         id: nupkg
         shell: bash
-        run: |
-          set -euo pipefail
-          NUPKG_PATH="$(find artifacts/nuget -maxdepth 1 -type f -name '*.nupkg' ! -name '*.snupkg' | head -n1)"
-          if [[ -z "${NUPKG_PATH}" ]]; then
-            echo "No .nupkg available after artifact download." >&2
-            exit 1
-          fi
-          echo "path=${NUPKG_PATH}" >> "${GITHUB_OUTPUT}"
+        run: bash tools/ci/release/resolve_nupkg_path.sh artifacts/nuget
 
-      - name: Publish to NuGet
-        env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: |
-          set -euo pipefail
-          if [[ -z "${NUGET_API_KEY}" || "${NUGET_API_KEY}" == "__REPLACE_WITH_NUGET_API_KEY__" ]]; then
-            echo "NUGET_API_KEY is missing or still placeholder value." >&2
-            exit 1
-          fi
-          dotnet nuget push "${{ steps.nupkg.outputs.path }}" \
-            --api-key "${NUGET_API_KEY}" \
-            --source "https://api.nuget.org/v3/index.json" \
-            --skip-duplicate
+      - name: NuGet login (OIDC / Trusted Publishing)
+        uses: NuGet/login@v1
+        id: nuget_login
+        with:
+          user: Tomtastisch
 
-      - name: Gate 4 - SVT post-publish (git version == package version == nuget version)
+      - name: "Fail-closed: assert OIDC temp key present"
         shell: bash
         run: |
           set -euo pipefail
-          EXPECTED_VERSION="${GITHUB_REF_NAME#v}" \
-          NUPKG_PATH="${{ steps.nupkg.outputs.path }}" \
-          RETRY_COUNT=12 \
-          RETRY_SLEEP_SECONDS=10 \
-          bash tools/ci/verify_nuget_release.sh
+          test -n "${{ steps.nuget_login.outputs.NUGET_API_KEY }}"
+
+      - name: Publish to NuGet
+        env:
+          NUGET_API_KEY: ${{ steps.nuget_login.outputs.NUGET_API_KEY }}
+        run: bash tools/ci/release/publish_nuget.sh "${{ steps.nupkg.outputs.path }}"
+
+      - name: Gate 4 - SVT post-publish (git version == package version == nuget version)
+        shell: bash
+        run: bash tools/ci/release/gate4_verify_postpublish.sh "${GITHUB_REF_NAME#v}" "${{ steps.nupkg.outputs.path }}"

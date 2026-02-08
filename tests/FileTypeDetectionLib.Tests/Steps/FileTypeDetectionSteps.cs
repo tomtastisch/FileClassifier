@@ -1,6 +1,6 @@
-using FileTypeDetection;
 using FileTypeDetectionLib.Tests.Support;
 using Reqnroll;
+using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Steps;
 
