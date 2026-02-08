@@ -285,7 +285,7 @@ run_consumer_smoke() {
     return 1
   fi
 
-  run_or_fail "CI-SMOKE-001" "Restore consumer sample from package" dotnet restore "${consumer_project}" --configfile "${consumer_nuget_config}" -p:PortableConsumerPackageVersion="${package_version}" -p:RestoreLockedMode=false --force-evaluate -v minimal
+  run_or_fail "CI-SMOKE-001" "Restore consumer sample from package" dotnet restore "${consumer_project}" --source "${pack_out_dir}" --source "https://api.nuget.org/v3/index.json" -p:PortableConsumerPackageVersion="${package_version}" -p:RestoreLockedMode=false --force-evaluate -v minimal
   run_or_fail "CI-SMOKE-001" "Build consumer sample from package" dotnet build "${consumer_project}" -c Release --no-restore -p:PortableConsumerPackageVersion="${package_version}" -v minimal
   run_or_fail "CI-SMOKE-001" "Run consumer sample from package" dotnet run --project "${consumer_project}" -c Release -f net10.0 --no-build -p:PortableConsumerPackageVersion="${package_version}"
   ci_result_append_summary "Consumer smoke completed against package ${package_version}."
@@ -308,7 +308,7 @@ run_package_backed_tests() {
     return 1
   fi
 
-  run_or_fail "CI-PKGTEST-001" "Restore package-backed tests from package" dotnet restore "${package_tests_project}" --configfile "${package_tests_nuget_config}" -p:PackageBackedVersion="${package_version}" -p:RestoreLockedMode=false --force-evaluate -v minimal
+  run_or_fail "CI-PKGTEST-001" "Restore package-backed tests from package" dotnet restore "${package_tests_project}" --source "${pack_out_dir}" --source "https://api.nuget.org/v3/index.json" -p:PackageBackedVersion="${package_version}" -p:RestoreLockedMode=false --force-evaluate -v minimal
 
   if dotnet --list-runtimes | grep -q "Microsoft.NETCore.App 8\\."; then
     run_or_fail "CI-PKGTEST-001" "Run package-backed tests" dotnet test "${package_tests_project}" -c Release --no-restore -p:PackageBackedVersion="${package_version}" -v minimal

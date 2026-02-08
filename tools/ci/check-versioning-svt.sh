@@ -130,6 +130,44 @@ elif len(head_tags) > 1:
     fail("svt.head_tag", "exactly one tag vX.Y.Z on HEAD", ",".join(head_tags), ".git", "Multiple release tags on HEAD")
 
 expected_version = head_tags[0][1:] if len(head_tags) == 1 else ""
+# --- repo SSOT version consistency (no mixed versions) ---
+def read_repo_version(props_path: Path) -> str:
+    if not props_path.exists():
+        fail("repo.props.exists", "Directory.Build.props present", "missing", str(props_path), "Directory.Build.props missing")
+        return ""
+    txt = props_path.read_text(encoding="utf-8", errors="ignore")
+    m = re.search(r"<RepoVersion>\s*([^<\s]+)\s*</RepoVersion>", txt)
+    return m.group(1).strip() if m else ""
+
+def check_csproj_uses_repo_version(csproj: Path, prop_name: str) -> None:
+    if not csproj.exists():
+        fail(f"repo.csproj.exists.{csproj.name}", "present", "missing", rel(csproj), f"{csproj.name} missing")
+        return
+    txt = csproj.read_text(encoding="utf-8", errors="ignore")
+    # enforce: default property value must be $(RepoVersion), not a literal
+    pat = rf"<{re.escape(prop_name)}\s+Condition=\"'\\$\\({re.escape(prop_name)}\\)' == ''\">([^<]+)</{re.escape(prop_name)}>"
+    m = re.search(pat, txt)
+    if not m:
+        fail(f"repo.csproj.{csproj.name}.{prop_name}", "default property present", "missing", rel(csproj), f"Default {prop_name} missing")
+        return
+    actual = m.group(1).strip()
+    check(f"repo.csproj.{csproj.name}.{prop_name}", "$(RepoVersion)", actual, rel(csproj))
+
+repo_props = repo_root / "Directory.Build.props"
+repo_version = read_repo_version(repo_props)
+if repo_version == "":
+    fail("repo.ssot.RepoVersion", "non-empty", "empty", rel(repo_props), "RepoVersion missing in Directory.Build.props")
+else:
+    # basic semver guard to avoid garbage
+    if not re.match(r"^[0-9]+\.[0-9]+\.[0-9]+$", repo_version):
+        fail("repo.ssot.RepoVersion.semver", "X.Y.Z", repo_version, rel(repo_props), "RepoVersion is not semver X.Y.Z")
+    # if tag defines the release version, RepoVersion must match exactly
+    if expected_version:
+        check("repo.ssot.RepoVersion", expected_version, repo_version, rel(repo_props))
+
+check_csproj_uses_repo_version(repo_root / "samples" / "PortableConsumer" / "PortableConsumer.csproj", "PortableConsumerPackageVersion")
+check_csproj_uses_repo_version(repo_root / "tests" / "PackageBacked.Tests" / "PackageBacked.Tests.csproj", "PackageBackedVersion")
+# --- end repo SSOT version consistency ---
 
 vbproj_version = ""
 vbproj_package_version = ""

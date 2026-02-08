@@ -4,4 +4,7 @@
         <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     </PropertyGroup>
+  <PropertyGroup>
+    <RepoVersion>4.4.0</RepoVersion>
+  </PropertyGroup>
 </Project>
