@@ -358,6 +358,11 @@ jobs:
         with:
           name: ci-naming-snt
           path: artifacts/ci/naming-snt
+      - name: Download Versioning Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ci-versioning-svt
+          path: artifacts/ci/versioning-svt
       - name: Download Test Artifact
         uses: actions/download-artifact@v4
         with:
