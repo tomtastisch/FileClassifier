@@ -1,3 +1,4 @@
+rule_id: CI-ARTIFACT-000
 rules_schema_version: 1
 rules:
   - rule_id: CI-ARTIFACT-001
