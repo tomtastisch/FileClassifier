@@ -11,9 +11,11 @@ jobs:
   version-policy:
     name: version-policy
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v4
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
       - name: Run versioning SVT (PR-safe)
         run: bash tools/ci/bin/run.sh versioning-svt
