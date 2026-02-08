@@ -3,8 +3,16 @@
   "$id": "tools/ci/policies/schema/rules.schema.json",
   "type": "object",
   "additionalProperties": false,
-  "required": ["rules_schema_version", "rules"],
+  "required": [
+    "rules_schema_version",
+    "rules"
+  ],
   "properties": {
+    "rule_id": {
+      "type": "string",
+      "description": "Rule collection identifier (file-level). Optional.",
+      "pattern": "^CI-[A-Z0-9_-]+-[0-9]{3}$"
+    },
     "rules_schema_version": {
       "type": "integer",
       "const": 1
@@ -15,7 +23,15 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["rule_id", "policy_type", "severity", "title", "description", "applies_to", "params"],
+        "required": [
+          "rule_id",
+          "policy_type",
+          "severity",
+          "title",
+          "description",
+          "applies_to",
+          "params"
+        ],
         "properties": {
           "rule_id": {
             "type": "string",
@@ -36,7 +52,10 @@
           },
           "severity": {
             "type": "string",
-            "enum": ["warn", "fail"]
+            "enum": [
+              "warn",
+              "fail"
+            ]
           },
           "title": {
             "type": "string",

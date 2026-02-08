@@ -939,7 +939,7 @@ static (bool Ok, List<PolicyRule> Rules, List<string> ValidationErrors, string? 
         var unknownRootKeys = root.Children.Keys
             .OfType<YamlScalarNode>()
             .Select(static x => x.Value ?? string.Empty)
-            .Where(key => key is not ("rules_schema_version" or "rules"))
+            .Where(key => key is not ("rule_id" or "rules_schema_version" or "rules"))
             .OrderBy(static x => x, StringComparer.Ordinal)
             .ToList();
         if (unknownRootKeys.Count > 0)
