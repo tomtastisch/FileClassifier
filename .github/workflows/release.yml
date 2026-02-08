@@ -53,7 +53,7 @@ jobs:
         run: dotnet restore --locked-mode FileClassifier.sln -v minimal
 
       - name: Build
-        run: dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal
+        run: dotnet build FileClassifier.sln -c Release --no-restore -warnaserror -v minimal
 
       - name: Source-based tests
         run: dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --no-build -v minimal
