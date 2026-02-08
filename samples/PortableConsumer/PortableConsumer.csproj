@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
-    <PortableConsumerPackageVersion Condition="'$(PortableConsumerPackageVersion)'==''">$(RepoVersion)</PortableConsumerPackageVersion>
+    <PortableConsumerPackageVersion Condition="'$(PortableConsumerPackageVersion)' == ''">$(RepoVersion)</PortableConsumerPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
