@@ -3,7 +3,7 @@ name: version-policy
 permissions:
   contents: read
 
-on:
+'on':
   pull_request:
   workflow_dispatch:
 
