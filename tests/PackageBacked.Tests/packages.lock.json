@@ -14,9 +14,9 @@
       },
       "Tomtastisch.FileClassifier": {
         "type": "Direct",
-        "requested": "[4.4.0, )",
-        "resolved": "4.4.0",
-        "contentHash": "USMirK3EvVGy71q2lCxBkkKNB4R/Eu8oUrj5SIM39sZne9IMb1/YsernZDVQ3Uk/bcBRt9nF0+kBY4cV91GzCA==",
+        "requested": "[4.4.1, )",
+        "resolved": "4.4.1",
+        "contentHash": "RHDPhh0z9IrE6O1ia6rgHyeCIhzlbo9OkpqtciwMjWhzVknBhQLn33p7Fe8LtXPhUvwAO8NJYC6o2RQYRIy3qg==",
         "dependencies": {
           "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
           "Mime": "3.8.0",
@@ -196,9 +196,9 @@
       },
       "Tomtastisch.FileClassifier": {
         "type": "Direct",
-        "requested": "[4.4.0, )",
-        "resolved": "4.4.0",
-        "contentHash": "USMirK3EvVGy71q2lCxBkkKNB4R/Eu8oUrj5SIM39sZne9IMb1/YsernZDVQ3Uk/bcBRt9nF0+kBY4cV91GzCA==",
+        "requested": "[4.4.1, )",
+        "resolved": "4.4.1",
+        "contentHash": "RHDPhh0z9IrE6O1ia6rgHyeCIhzlbo9OkpqtciwMjWhzVknBhQLn33p7Fe8LtXPhUvwAO8NJYC6o2RQYRIy3qg==",
         "dependencies": {
           "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
           "Mime": "3.8.0",
