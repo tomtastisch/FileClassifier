@@ -30,7 +30,8 @@
               "shell_set_plus_e",
               "shell_run_block_max_lines",
               "docs_drift",
-              "naming_snt"
+              "naming_snt",
+              "versioning_svt"
             ]
           },
           "severity": {

@@ -183,6 +183,9 @@ void EvaluateRule(PolicyRule rule)
         case "naming_snt":
             EvaluateNamingSntRule(rule);
             break;
+        case "versioning_svt":
+            EvaluateVersioningSvtRule(rule);
+            break;
         default:
             AddPolicyFailure($"unsupported policy_type '{rule.PolicyType}'", "tools/ci/policies/rules");
             break;
@@ -523,6 +526,81 @@ void EvaluateNamingSntRule(PolicyRule rule)
     catch (Exception ex)
     {
         AddRuleViolation(rule.RuleId, rule.Severity, $"unable to parse naming summary JSON ({ex.Message})", new[] { Rel(repoRootPath, summaryPath) });
+    }
+}
+
+void EvaluateVersioningSvtRule(PolicyRule rule)
+{
+    if (string.IsNullOrWhiteSpace(rule.Params.SsotFile))
+    {
+        AddPolicyFailure($"{rule.RuleId}: params.ssot_file must be non-empty", "tools/ci/policies/rules");
+        return;
+    }
+
+    if (string.IsNullOrWhiteSpace(rule.Params.SummaryJson))
+    {
+        AddPolicyFailure($"{rule.RuleId}: params.summary_json must be non-empty", "tools/ci/policies/rules");
+        return;
+    }
+
+    var ssotPath = TryResolvePathUnderRepo(rule.Params.SsotFile, $"{rule.RuleId}:ssot_file");
+    var summaryPath = TryResolvePathUnderRepo(rule.Params.SummaryJson, $"{rule.RuleId}:summary_json");
+    if (ssotPath is null || summaryPath is null)
+    {
+        return;
+    }
+
+    logger.Add($"EVAL|rule_id={rule.RuleId}|type={rule.PolicyType}|ssot={Rel(repoRootPath, ssotPath)}|summary={Rel(repoRootPath, summaryPath)}");
+
+    if (!File.Exists(ssotPath))
+    {
+        AddRuleViolation(rule.RuleId, rule.Severity, "versioning SSOT file missing", new[] { Rel(repoRootPath, ssotPath) });
+        return;
+    }
+
+    if (!File.Exists(summaryPath))
+    {
+        AddRuleViolation(rule.RuleId, rule.Severity, "versioning summary JSON missing", new[] { Rel(repoRootPath, summaryPath) });
+        return;
+    }
+
+    try
+    {
+        using var summaryDoc = JsonDocument.Parse(File.ReadAllText(summaryPath));
+        var root = summaryDoc.RootElement;
+        if (root.ValueKind != JsonValueKind.Object)
+        {
+            AddRuleViolation(rule.RuleId, rule.Severity, "versioning summary root must be object", new[] { Rel(repoRootPath, summaryPath) });
+            return;
+        }
+
+        var summaryStatus = root.TryGetProperty("status", out var statusElem) ? statusElem.GetString() : null;
+        if (!string.Equals(summaryStatus, "pass", StringComparison.Ordinal))
+        {
+            AddRuleViolation(rule.RuleId, rule.Severity, "versioning summary status is not pass", new[] { Rel(repoRootPath, summaryPath) });
+        }
+
+        if (root.TryGetProperty("rule_violations", out var violationsElem) && violationsElem.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var violation in violationsElem.EnumerateArray())
+            {
+                var message = violation.TryGetProperty("message", out var msgElem) ? msgElem.GetString() : null;
+                var evidence = Rel(repoRootPath, summaryPath);
+                if (violation.TryGetProperty("evidence_paths", out var evidenceElem) && evidenceElem.ValueKind == JsonValueKind.Array)
+                {
+                    var first = evidenceElem.EnumerateArray().FirstOrDefault();
+                    if (first.ValueKind == JsonValueKind.String && !string.IsNullOrWhiteSpace(first.GetString()))
+                    {
+                        evidence = first.GetString()!;
+                    }
+                }
+                AddRuleViolation(rule.RuleId, rule.Severity, message ?? "versioning mismatch detected", new[] { evidence });
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        AddRuleViolation(rule.RuleId, rule.Severity, $"unable to parse versioning summary JSON ({ex.Message})", new[] { Rel(repoRootPath, summaryPath) });
     }
 }
 
@@ -922,7 +1000,8 @@ static (bool Ok, List<PolicyRule> Rules, List<string> ValidationErrors, string? 
                 "shell_set_plus_e" or
                 "shell_run_block_max_lines" or
                 "docs_drift" or
-                "naming_snt"))
+                "naming_snt" or
+                "versioning_svt"))
             {
                 validationErrors.Add($"rules[{index}].policy_type invalid");
             }

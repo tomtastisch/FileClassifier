@@ -1,49 +1,36 @@
 # Unified Naming Policy (SSOT)
 
-## 1. Zweck
-Diese Policy definiert die verbindliche Namensidentitaet fuer Paket, Namespace, Assembly und Dokumentation.
+## 1. Purpose
+This policy defines one canonical public identity for package naming, assembly naming, namespace root, docs install snippets, and CI checks.
 
 ## 2. SSOT
-Die einzige normative Quelle ist `tools/ci/policies/data/naming.json`.
+Normative source: `tools/ci/policies/data/naming.json`.
 
-## 3. Verbindliche Gleichheit
-Die folgende Gleichheit MUSS gelten:
-- `canonical_name == package_id == root_namespace == assembly_name`
+## 3. SHALL Statements (Canonical Equality)
+- `canonical_name` SHALL equal `package_id`.
+- `canonical_name` SHALL equal `assembly_name`.
+- `canonical_name` SHALL equal `root_namespace`.
+- `canonical_name` SHALL be the public root namespace in source declarations.
+- Canonical value is `Tomtastisch.FileClassifier`.
 
-Aktuell ist der kanonische Name:
-- `Tomtastisch.FileClassifier`
+## 4. Deprecated Package Rule
+- `deprecated_package_ids` SHALL list legacy package IDs.
+- Deprecated package IDs (from SSOT `deprecated_package_ids`) SHALL NOT appear in install snippets or PackageReference examples.
+- Deprecated IDs MAY appear only in migration documentation.
 
-## 4. Repo-Slug Relaxation
-- Der GitHub-Repo-Slug DARF von `canonical_name` abweichen.
-- Wenn `repo_slug != canonical_name`, dann MUESSEN in `src/FileTypeDetection/FileTypeDetectionLib.vbproj` gelten:
-  - `RepositoryUrl == repository_url`
-  - `PackageProjectUrl == repository_url`
-- CI MUSS erzwingen, dass `repository_url` dem `git remote origin` entspricht (normalisiert).
+## 5. GitHub Slug Limitation
+- GitHub repository slug is operational identity (`repo_identity`) and MAY differ from package ID.
+- Current slug is `FileClassifier`; canonical package remains `Tomtastisch.FileClassifier`.
+- If literal slug equality is required, manual rename steps are required:
+  1. GitHub repository Settings -> Rename repository.
+  2. Update `repository_url` in `tools/ci/policies/data/naming.json`.
+  3. Update `RepositoryUrl`/`PackageProjectUrl` in `src/FileTypeDetection/FileTypeDetectionLib.vbproj`.
+  4. Update local remotes (`git remote set-url origin ...`) and CI references.
 
-## 5. Doku-Anforderung
-- `repo_display_name` MUSS in README/docs als Produktname verwendet werden.
-- Installationsbeispiele MUESSEN `package_id` verwenden.
-
-## 6. Legacy-Pakete
-- `deprecated_package_ids` MUESSEN vorhanden sein.
-- Werte in `deprecated_package_ids` sind strikt legacy-only und duerfen nicht als kanonischer Installname verwendet werden.
-- Legacy-Pakete sind unlist/deprecate zu migrieren.
-
-## 7. Enforcement
-- CI-Regel-ID bleibt: `CI-NAMING-001`.
-- Regel ist fail-closed.
-- Der Checker `tools/ci/check-naming-snt.sh` erzeugt:
+## 6. CI Enforcement Mapping
+- Rule ID is fixed: `CI-NAMING-001`.
+- Rule file: `tools/ci/policies/rules/naming_snt.yaml`.
+- Checker: `tools/ci/check-naming-snt.sh`.
+- Reports:
   - `artifacts/naming_snt_report.json`
-  - `artifacts/naming_snt_report.txt`
-  - plus CI-summary JSON unter `artifacts/ci/naming-snt/`.
-
-## 8. Migration
-- Namespace-Rename auf `Tomtastisch.FileClassifier` ist eine Level-3 Public-Surface-Aenderung.
-- Alte NuGet-ID (`Tomtastisch.FileTypeDetection`) bleibt nur als deprecated/unlisted Legacy-Artefakt.
-- Migration-Hinweis fuer Consumers:
-  - Bisher: `Tomtastisch.FileTypeDetection` (deprecated/unlisted)
-  - Neu: `Tomtastisch.FileClassifier`
-
-## RoC-Bezug
-- Naming-SNT-Regel: `tools/ci/policies/rules/naming_snt.yaml`
-- [Artifact-Contract-Regel](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/artifact_contract.yaml)
+  - `artifacts/naming_snt_report.tsv`

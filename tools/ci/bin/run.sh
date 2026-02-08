@@ -248,9 +248,13 @@ run_naming_snt() {
   ci_result_append_summary "Naming SNT checks completed."
 }
 
-run_version_policy() {
-  run_or_fail "CI-VERSION-001" "Version policy (tag SSOT, no static versions)" bash "${ROOT_DIR}/tools/versioning/check-version-policy.sh"
-  ci_result_append_summary "Version policy checks completed."
+run_versioning_svt() {
+  local versioning_summary="${ROOT_DIR}/${OUT_DIR}/versioning-svt-summary.json"
+  run_or_fail "CI-VERSION-001" "Versioning SVT checker" bash "${ROOT_DIR}/tools/ci/check-versioning-svt.sh" --repo-root "${ROOT_DIR}" --naming-ssot "${ROOT_DIR}/tools/ci/policies/data/naming.json" --versioning-ssot "${ROOT_DIR}/tools/ci/policies/data/versioning.json" --out "${versioning_summary}"
+  if ! run_policy_runner_bridge "versioning-svt" "artifacts/ci/_policy_versioning_svt" "Policy versioning SVT" "${OUT_DIR}/versioning-svt-summary.json"; then
+    return 1
+  fi
+  ci_result_append_summary "Versioning SVT checks completed."
 }
 
 run_consumer_smoke() {
@@ -409,7 +413,7 @@ main() {
     api-contract) run_api_contract ;;
     pack) run_pack ;;
     naming-snt) run_naming_snt ;;
-    version-policy) run_version_policy ;;
+    versioning-svt) run_versioning_svt ;;
     consumer-smoke) run_consumer_smoke ;;
     package-backed-tests) run_package_backed_tests ;;
     build) run_build ;;

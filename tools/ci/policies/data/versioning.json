@@ -1,0 +1,17 @@
+{
+  "svt_mode": "tag",
+  "tag_prefix": "v",
+  "version_source": "git_tag",
+  "project_files": [
+    "src/FileTypeDetection/FileTypeDetectionLib.vbproj"
+  ],
+  "require_vbproj_version_fields": [
+    "Version",
+    "PackageVersion"
+  ],
+  "allow_legacy_versions": true,
+  "canonical_package_id": "Tomtastisch.FileClassifier",
+  "deprecated_package_ids": [
+    "Tomtastisch.FileTypeDetection"
+  ]
+}

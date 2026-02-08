@@ -7,9 +7,11 @@
         <IsPackable>true</IsPackable>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>Tomtastisch.FileClassifier</PackageId>
+        <Version>4.3.2</Version>
+        <PackageVersion>4.3.2</PackageVersion>
         <Authors>tomtastisch</Authors>
-        <Description>Deterministic file type detection, safe archive validation/extraction, and hashing evidence for .NET. Repo: https://github.com/tomtastisch/FileClassifier</Description>
-        <PackageTags>filetype;file-type;mime;magic;sniffing;archive;zip;tar;7z;rar;security;zipslip;hashing;sha256;deterministic;dotnet;net8;net10</PackageTags>
+        <Description>Deterministic file type and MIME detection with fail-closed archive safety checks, secure extraction primitives, and reproducible hashing evidence for .NET.</Description>
+        <PackageTags>filetype;mime;detection;magic-bytes;sniffing;archive;zip;tar;7z;rar;zipslip;security;hashing;sha256;deterministic;dotnet;net8;net10</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/tomtastisch/FileClassifier</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
