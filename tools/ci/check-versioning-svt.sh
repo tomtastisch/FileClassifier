@@ -145,7 +145,7 @@ def check_csproj_uses_repo_version(csproj: Path, prop_name: str) -> None:
         return
     txt = csproj.read_text(encoding="utf-8", errors="ignore")
     # enforce: default property value must be $(RepoVersion), not a literal
-    pat = rf"<{re.escape(prop_name)}\s+Condition=\"'\\$\\({re.escape(prop_name)}\\)'\s*==\s*''\">([^<]+)</{re.escape(prop_name)}>"
+    pat = rf"<{re.escape(prop_name)}\s+Condition=\"'\$\({re.escape(prop_name)}\)'\s*==\s*''\">([^<]+)</{re.escape(prop_name)}>"
     m = re.search(pat, txt)
     if not m:
         fail(f"repo.csproj.{csproj.name}.{prop_name}", "default property present", "missing", rel(csproj), f"Default {prop_name} missing")
