@@ -1,0 +1,14 @@
+name: version-policy
+
+on:
+    pull_request:
+    workflow_dispatch:
+
+jobs:
+    version-policy:
+        name: version-policy
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Run versioning SVT (PR-safe)
+              run: bash tools/ci/bin/run.sh versioning-svt
