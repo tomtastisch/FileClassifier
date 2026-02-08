@@ -8,12 +8,12 @@ permissions:
   workflow_dispatch:
 
 jobs:
-    version-policy:
-        name: version-policy
-        runs-on: ubuntu-latest
-        permissions:
-            contents: read
-        steps:
-            - uses: actions/checkout@v4
-            - name: Run versioning SVT (PR-safe)
-              run: bash tools/ci/bin/run.sh versioning-svt
+  version-policy:
+    name: version-policy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run versioning SVT (PR-safe)
+        run: bash tools/ci/bin/run.sh versioning-svt
