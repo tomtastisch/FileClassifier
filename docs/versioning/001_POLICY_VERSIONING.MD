@@ -4,7 +4,7 @@
 Diese Policy definiert verbindliche SemVer-Regeln (`MAJOR.MINOR.PATCH`) und die deterministische CI-Erzwingung.
 
 ## 2. Geltungsbereich
-- Produkt- und Bibliotheksversionen aus `Directory.Build.props` (einzige SSOT-Quelle).
+- Release-Tags `vX.Y.Z` (optional `-prerelease`) als einzige SSOT-Quelle fuer Paketversionen.
 - PR-Versioning-Guard und Auto-Labeling in CI.
 
 ## 3. Begriffe
@@ -21,6 +21,8 @@ Diese Policy definiert verbindliche SemVer-Regeln (`MAJOR.MINOR.PATCH`) und die 
   - Fixes, Refactorings ohne Verhaltensbruch, Tests, Doku, CI, Tooling
 - `NONE`
   - reine Metadatenaenderungen ohne Versionsauswirkung
+- Pre-Release-Tags sind erlaubt:
+  - `vX.Y.Z-<label>` wird exakt als NuGet-Version `X.Y.Z-<label>` uebernommen.
 
 ## 5. Entscheidungs-Matrix
 | Aenderungstyp | Beispiel | Bump |
@@ -33,14 +35,17 @@ Diese Policy definiert verbindliche SemVer-Regeln (`MAJOR.MINOR.PATCH`) und die 
 | Metadaten-only | mechanische Aenderung ohne Laufzeitwirkung | NONE |
 
 ## 6. CI-Guard (Pflicht)
-- `tools/versioning/check-versioning.sh` klassifiziert Aenderungen und prueft den erforderlichen Bump.
-- `versioning-guard` muss vor Build/Test grün sein.
-- Fuer jede aktive Version in `Directory.Build.props` MUSS ein Tabellen-Eintrag in
-  `docs/versioning/002_HISTORY_VERSIONS.MD` vorhanden sein.
-- Nachweis in Logs/Summary:
-  - `required=<...>`
-  - `actual=<...>`
-  - `reason=<...>`
+- `tools/versioning/check-version-policy.sh` erzwingt fail-closed:
+  - In PR/CI: keine statischen Versionfelder in `Directory.Build.props`/`Directory.Build.targets`/`*.csproj`/`*.vbproj`.
+  - In Release (Tag): Tag-Format-Validierung und `TagVersion == nupkg-PackageVersion`.
+- Publish ist nur bei `refs/tags/v*` erlaubt.
+- Target-Feed fuer Online-Installierbarkeit: NuGet.org.
+- Release-Packaging setzt die Version ausschliesslich via:
+  - `dotnet pack ... -p:PackageVersion=$VERSION -p:Version=$VERSION`
+- Assembly-/File-Version werden deterministisch aus dem Tag-Kern abgeleitet:
+  - `AssemblyVersion = MAJOR.MINOR.0.0`
+  - `FileVersion = MAJOR.MINOR.PATCH.0`
+- `tools/versioning/check-versioning.sh` bleibt fuer Deterministik der `required`-Klassifikation im PR-Labeling.
 
 ## 7. Deterministisches Auto-Labeling (Pflicht)
 Caps pro PR-Lauf:

@@ -3,6 +3,7 @@ using FileTypeDetection;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
+[Trait("Category", "ApiContract")]
 public sealed class DeterministicHashingApiContractUnitTests
 {
     private static readonly string[] sourceArray = new[]
@@ -37,7 +38,8 @@ public sealed class DeterministicHashingApiContractUnitTests
     [Fact]
     public void HashFile_MissingPath_FailsClosedWithoutThrowing()
     {
-        var evidence = DeterministicHashing.HashFile("/tmp/does-not-exist-__ftd__.bin");
+        var missingPath = Path.Combine(Path.GetTempPath(), $"does-not-exist-{Guid.NewGuid():N}.bin");
+        var evidence = DeterministicHashing.HashFile(missingPath);
 
         Assert.Equal(FileKind.Unknown, evidence.DetectedType.Kind);
         Assert.False(evidence.Digests.HasLogicalHash);

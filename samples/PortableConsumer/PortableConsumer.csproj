@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <PortableConsumerPackageVersion Condition="'$(PortableConsumerPackageVersion)' == ''">0.0.0-local</PortableConsumerPackageVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Tomtastisch.FileTypeDetection" Version="$(PortableConsumerPackageVersion)" />
+  </ItemGroup>
+</Project>

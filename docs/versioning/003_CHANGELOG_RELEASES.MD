@@ -1,7 +1,7 @@
 # Changelog
 
-Alle Aenderungen werden hier technisch dokumentiert. Die Version selbst ist in
-`Directory.Build.props` die SSOT.
+Alle Aenderungen werden hier technisch dokumentiert. Die Release-Version selbst ist
+der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 
 ## [Unreleased]
 - Added:

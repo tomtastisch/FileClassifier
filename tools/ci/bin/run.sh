@@ -63,6 +63,27 @@ log_contains_high_or_critical() {
   fi
 }
 
+find_pack_nupkg() {
+  local pack_dir="$1"
+  find "${pack_dir}" -maxdepth 1 -type f -name '*.nupkg' ! -name '*.snupkg' | head -n1
+}
+
+read_nupkg_metadata() {
+  local nupkg_path="$1"
+  local field="$2"
+  local nuspec_xml
+
+  if [[ ! -f "${nupkg_path}" ]]; then
+    return 1
+  fi
+
+  if ! nuspec_xml="$(unzip -p "${nupkg_path}" '*.nuspec' 2>/dev/null)"; then
+    return 1
+  fi
+
+  printf '%s\n' "${nuspec_xml}" | tr -d '\r' | sed -n "s/.*<${field}>\\([^<]*\\)<\\/${field}>.*/\\1/p" | head -n1
+}
+
 run_policy_runner_bridge() {
   local policy_check_id="$1"
   local policy_out_dir="$2"
@@ -130,7 +151,6 @@ run_preflight() {
   run_or_fail "CI-PREFLIGHT-001" "Label engine tests" node "${ROOT_DIR}/tools/versioning/test-compute-pr-labels.js"
   run_or_fail "CI-PREFLIGHT-001" "Doc consistency drift guard" python3 "${ROOT_DIR}/tools/check-doc-consistency.py"
   run_or_fail "CI-PREFLIGHT-001" "Policy/RoC bijection" python3 "${ROOT_DIR}/tools/check-policy-roc.py" --out "${ROOT_DIR}/artifacts/policy_roc_matrix.tsv"
-  run_or_fail "CI-PREFLIGHT-001" "Versioning guard" bash "${ROOT_DIR}/tools/versioning/check-versioning.sh"
   run_or_fail "CI-PREFLIGHT-001" "Format check" dotnet format "${ROOT_DIR}/FileClassifier.sln" --verify-no-changes
   if ! run_policy_runner_bridge "preflight" "artifacts/ci/_policy_preflight" "Policy shell safety" "tools/ci/bin/run.sh"; then
     return 1
@@ -150,6 +170,118 @@ run_build() {
   run_or_fail "CI-BUILD-001" "Restore solution (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/FileClassifier.sln" -v minimal
   run_or_fail "CI-BUILD-001" "Build solution" dotnet build "${ROOT_DIR}/FileClassifier.sln" --no-restore -warnaserror -v minimal
   ci_result_append_summary "Build completed."
+}
+
+run_api_contract() {
+  run_or_fail "CI-CONTRACT-001" "Restore test project (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj" -v minimal
+  run_or_fail "CI-CONTRACT-001" "Run API contract tests" dotnet test "${ROOT_DIR}/tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj" -c Release --no-restore --filter "Category=ApiContract" -v minimal
+  ci_result_append_summary "API contract checks completed."
+}
+
+run_pack() {
+  local package_project="${ROOT_DIR}/src/FileTypeDetection/FileTypeDetectionLib.vbproj"
+  local pack_output_dir="${ROOT_DIR}/${OUT_DIR}/nuget"
+  local expected_package_id="Tomtastisch.FileTypeDetection"
+
+  mkdir -p "${pack_output_dir}"
+  run_or_fail "CI-PACK-001" "Restore package project (locked mode)" dotnet restore --locked-mode "${package_project}" -v minimal
+  run_or_fail "CI-PACK-001" "Build package project" dotnet build "${package_project}" -c Release --no-restore -warnaserror -v minimal
+  run_or_fail "CI-PACK-001" "Pack package project" dotnet pack "${package_project}" -c Release --no-build -o "${pack_output_dir}" -v minimal
+
+  local nupkg_path
+  nupkg_path="$(find_pack_nupkg "${pack_output_dir}")"
+  if [[ -z "${nupkg_path}" ]]; then
+    ci_result_add_violation "CI-PACK-001" "fail" "No nupkg produced by pack job." "${pack_output_dir}"
+    return 1
+  fi
+
+  local package_id package_version
+  package_id="$(read_nupkg_metadata "${nupkg_path}" "id")"
+  package_version="$(read_nupkg_metadata "${nupkg_path}" "version")"
+  if [[ -z "${package_id}" || -z "${package_version}" ]]; then
+    ci_result_add_violation "CI-PACK-001" "fail" "Unable to read nupkg metadata (id/version)." "${nupkg_path}"
+    return 1
+  fi
+
+  if [[ "${package_id}" != "${expected_package_id}" ]]; then
+    ci_result_add_violation "CI-PACK-001" "fail" "Unexpected package id '${package_id}' (expected '${expected_package_id}')." "${nupkg_path}"
+    return 1
+  fi
+
+  printf '%s\n' "${nupkg_path}" > "${ROOT_DIR}/${OUT_DIR}/nupkg-path.txt"
+  printf '%s\n' "${package_id}" > "${ROOT_DIR}/${OUT_DIR}/package-id.txt"
+  printf '%s\n' "${package_version}" > "${ROOT_DIR}/${OUT_DIR}/package-version.txt"
+  ci_result_append_summary "Pack completed (${package_id} ${package_version})."
+}
+
+run_version_policy() {
+  run_or_fail "CI-VERSION-001" "Version policy (tag SSOT, no static versions)" bash "${ROOT_DIR}/tools/versioning/check-version-policy.sh"
+  ci_result_append_summary "Version policy checks completed."
+}
+
+run_consumer_smoke() {
+  local pack_out_dir="${ROOT_DIR}/artifacts/ci/pack/nuget"
+  local consumer_project="${ROOT_DIR}/samples/PortableConsumer/PortableConsumer.csproj"
+  local consumer_nuget_config="${ROOT_DIR}/samples/PortableConsumer/NuGet.config"
+
+  if [[ ! -f "${consumer_project}" ]]; then
+    ci_result_add_violation "CI-SMOKE-001" "fail" "Consumer project is missing." "${consumer_project}"
+    return 1
+  fi
+
+  if rg -n "<ProjectReference" "${consumer_project}" >/dev/null 2>&1; then
+    ci_result_add_violation "CI-SMOKE-001" "fail" "Consumer project must not reference source projects." "${consumer_project}"
+    return 1
+  fi
+
+  local nupkg_path package_version
+  nupkg_path="$(find_pack_nupkg "${pack_out_dir}")"
+  if [[ -z "${nupkg_path}" ]]; then
+    ci_result_add_violation "CI-SMOKE-001" "fail" "No nupkg available for consumer smoke." "${pack_out_dir}"
+    return 1
+  fi
+  package_version="$(read_nupkg_metadata "${nupkg_path}" "version")"
+  if [[ -z "${package_version}" ]]; then
+    ci_result_add_violation "CI-SMOKE-001" "fail" "Unable to read package version from nupkg." "${nupkg_path}"
+    return 1
+  fi
+
+  run_or_fail "CI-SMOKE-001" "Restore consumer sample from package" dotnet restore "${consumer_project}" --configfile "${consumer_nuget_config}" -p:PortableConsumerPackageVersion="${package_version}" -v minimal
+  run_or_fail "CI-SMOKE-001" "Build consumer sample from package" dotnet build "${consumer_project}" -c Release --no-restore -p:PortableConsumerPackageVersion="${package_version}" -v minimal
+  run_or_fail "CI-SMOKE-001" "Run consumer sample from package" dotnet run --project "${consumer_project}" -c Release -f net10.0 --no-build -p:PortableConsumerPackageVersion="${package_version}"
+  ci_result_append_summary "Consumer smoke completed against package ${package_version}."
+}
+
+run_package_backed_tests() {
+  local pack_out_dir="${ROOT_DIR}/artifacts/ci/pack/nuget"
+  local package_tests_project="${ROOT_DIR}/tests/PackageBacked.Tests/PackageBacked.Tests.csproj"
+  local package_tests_nuget_config="${ROOT_DIR}/tests/PackageBacked.Tests/NuGet.config"
+
+  local nupkg_path package_version
+  nupkg_path="$(find_pack_nupkg "${pack_out_dir}")"
+  if [[ -z "${nupkg_path}" ]]; then
+    ci_result_add_violation "CI-PKGTEST-001" "fail" "No nupkg available for package-backed tests." "${pack_out_dir}"
+    return 1
+  fi
+  package_version="$(read_nupkg_metadata "${nupkg_path}" "version")"
+  if [[ -z "${package_version}" ]]; then
+    ci_result_add_violation "CI-PKGTEST-001" "fail" "Unable to read package version from nupkg." "${nupkg_path}"
+    return 1
+  fi
+
+  run_or_fail "CI-PKGTEST-001" "Restore package-backed tests from package" dotnet restore "${package_tests_project}" --configfile "${package_tests_nuget_config}" -p:PackageBackedVersion="${package_version}" -v minimal
+
+  if dotnet --list-runtimes | grep -q "Microsoft.NETCore.App 8\\."; then
+    run_or_fail "CI-PKGTEST-001" "Run package-backed tests" dotnet test "${package_tests_project}" -c Release --no-restore -p:PackageBackedVersion="${package_version}" -v minimal
+  else
+    if [[ "${CI:-}" == "true" ]]; then
+      ci_result_add_violation "CI-PKGTEST-001" "fail" "Missing .NET 8 runtime for package-backed tests in CI." "${CI_RAW_LOG}"
+      return 1
+    fi
+    run_or_fail "CI-PKGTEST-001" "Run package-backed tests (net10 fallback outside CI)" dotnet test "${package_tests_project}" -c Release -f net10.0 --no-restore -p:PackageBackedVersion="${package_version}" -v minimal
+  fi
+
+  ci_result_append_summary "Package-backed tests completed against package ${package_version}."
 }
 
 run_security_nuget() {
@@ -189,7 +321,7 @@ run_pr_labeling() {
   local head_sha
   head_sha="$(jq -r '.pull_request.head.sha // empty' "${GITHUB_EVENT_PATH}")"
 
-  run_or_fail "CI-LABEL-001" "Derive versioning decision" env BASE_REF=origin/main HEAD_REF="$head_sha" "${ROOT_DIR}/tools/versioning/check-versioning.sh"
+  run_or_fail "CI-LABEL-001" "Derive required versioning decision" env MODE=required BASE_REF=origin/main HEAD_REF="$head_sha" "${ROOT_DIR}/tools/versioning/check-versioning.sh"
 
   local files_json labels_json pr_title
   files_json="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_number}/files" --paginate --jq '[.[].filename]')"
@@ -231,6 +363,11 @@ main() {
   case "$CHECK_ID" in
     preflight) run_preflight ;;
     docs-links-full) run_docs_links_full ;;
+    api-contract) run_api_contract ;;
+    pack) run_pack ;;
+    version-policy) run_version_policy ;;
+    consumer-smoke) run_consumer_smoke ;;
+    package-backed-tests) run_package_backed_tests ;;
     build) run_build ;;
     security-nuget) run_security_nuget ;;
     tests-bdd-coverage) run_tests_bdd_coverage ;;

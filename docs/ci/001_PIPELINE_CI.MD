@@ -12,7 +12,7 @@ Diese Pipeline liefert auditierbare Nachweise für Produktionsreife:
 ## 2. Workflow-Struktur
 Der Workflow `CI` hat zwei klar getrennte Verantwortungswege:
 - `pull_request`: `pr-labeling` (Governance, nicht-gating)
-- `pull_request`/`push`: technische Qualitätsjobs (`preflight`, `build`, `security-nuget`, `tests-bdd-coverage`, `summary`)
+- `pull_request`/`push`: technische Qualitätsjobs (`preflight`, `version-policy`, `build`, `api-contract`, `pack`, `consumer-smoke`, `package-backed-tests`, `security-nuget`, `tests-bdd-coverage`, `summary`)
 
 ## 3. Jobs (1 Job = 1 Verantwortung)
 ### Job: pr-labeling (Governance)
@@ -26,12 +26,31 @@ Der Workflow `CI` hat zwei klar getrennte Verantwortungswege:
 ### Job: preflight (fail-fast)
 1. Label-Engine Golden-Tests
 2. Doc-Consistency-Drift-Guard
-3. Versioning-Guard
-4. Format-Check
+3. Format-Check
+
+### Job: version-policy (fail-closed)
+1. Erzwingt Tag-SSOT (keine statischen Versionfelder im Repository)
+2. Blockiert Build/Test bei Policy-Verletzung
 
 ### Job: build
 1. Restore
 2. Build (`--warnaserror`)
+
+### Job: api-contract
+1. Public-API-Snapshot-Gate (`Category=ApiContract`)
+2. Fail-closed bei unbeabsichtigter API-Drift
+
+### Job: pack
+1. `dotnet pack` erzeugt `.nupkg` (Artefakt)
+2. Paket-Metadaten (`id`, `version`) werden verifiziert
+
+### Job: consumer-smoke
+1. Restore/Build/Run eines externen Consumers gegen das gepackte Paket
+2. Harte Regel: kein `ProjectReference` zur Source-Library
+
+### Job: package-backed-tests
+1. Definierter Kern-Test-Satz laeuft gegen das gepackte Paket
+2. Beweist Verhaltensidentitaet package-basiert (nicht Source-basiert)
 
 ### Job: security-nuget
 1. Vulnerability-Scan (`--include-transitive`)
@@ -47,7 +66,12 @@ Der Workflow `CI` hat zwei klar getrennte Verantwortungswege:
 ## 4. Required vs. Non-Required Checks
 Required in Branch-Protection:
 - `preflight`
+- `version-policy`
 - `build`
+- `api-contract`
+- `pack`
+- `consumer-smoke`
+- `package-backed-tests`
 - `security-nuget`
 - `tests-bdd-coverage`
 - optional: `qodana` (policy-abhängig)
@@ -97,7 +121,13 @@ Branch-Protection-Hinweis:
 node tools/versioning/test-compute-pr-labels.js
 python3 tools/check-doc-consistency.py
 python3 tools/check-docs.py
-bash tools/versioning/check-versioning.sh
+bash tools/versioning/check-version-policy.sh
+dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --filter "Category=ApiContract" -v minimal
+dotnet pack src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -o artifacts/nuget -v minimal
+dotnet restore samples/PortableConsumer/PortableConsumer.csproj --configfile samples/PortableConsumer/NuGet.config -p:PortableConsumerPackageVersion=1.0.0 -v minimal
+dotnet build samples/PortableConsumer/PortableConsumer.csproj -c Release --no-restore -p:PortableConsumerPackageVersion=1.0.0 -v minimal
+dotnet restore tests/PackageBacked.Tests/PackageBacked.Tests.csproj --configfile tests/PackageBacked.Tests/NuGet.config -p:PackageBackedVersion=1.0.0 -v minimal
+dotnet test tests/PackageBacked.Tests/PackageBacked.Tests.csproj -c Release --no-restore -p:PackageBackedVersion=1.0.0 -v minimal
 dotnet format FileClassifier.sln --verify-no-changes
 dotnet restore FileClassifier.sln -v minimal
 dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal

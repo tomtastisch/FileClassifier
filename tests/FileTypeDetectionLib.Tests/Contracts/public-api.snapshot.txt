@@ -1,0 +1,141 @@
+F:FileTypeDetection.DeterministicHashSourceType.ArchiveEntries:FileTypeDetection.DeterministicHashSourceType
+F:FileTypeDetection.DeterministicHashSourceType.FilePath:FileTypeDetection.DeterministicHashSourceType
+F:FileTypeDetection.DeterministicHashSourceType.MaterializedFile:FileTypeDetection.DeterministicHashSourceType
+F:FileTypeDetection.DeterministicHashSourceType.RawBytes:FileTypeDetection.DeterministicHashSourceType
+F:FileTypeDetection.DeterministicHashSourceType.Unknown:FileTypeDetection.DeterministicHashSourceType
+F:FileTypeDetection.FileKind.Docx:FileTypeDetection.FileKind
+F:FileTypeDetection.FileKind.Gif:FileTypeDetection.FileKind
+F:FileTypeDetection.FileKind.Jpeg:FileTypeDetection.FileKind
+F:FileTypeDetection.FileKind.Pdf:FileTypeDetection.FileKind
+F:FileTypeDetection.FileKind.Png:FileTypeDetection.FileKind
+F:FileTypeDetection.FileKind.Pptx:FileTypeDetection.FileKind
+F:FileTypeDetection.FileKind.Unknown:FileTypeDetection.FileKind
+F:FileTypeDetection.FileKind.Webp:FileTypeDetection.FileKind
+F:FileTypeDetection.FileKind.Xlsx:FileTypeDetection.FileKind
+F:FileTypeDetection.FileKind.Zip:FileTypeDetection.FileKind
+M:FileTypeDetection.ArchiveProcessing.ExtractToMemory(System.String,System.Boolean):System.Collections.Generic.IReadOnlyList<FileTypeDetection.ZipExtractedEntry>
+M:FileTypeDetection.ArchiveProcessing.TryExtractToMemory(System.Byte[]):System.Collections.Generic.IReadOnlyList<FileTypeDetection.ZipExtractedEntry>
+M:FileTypeDetection.ArchiveProcessing.TryValidate(System.Byte[]):System.Boolean
+M:FileTypeDetection.ArchiveProcessing.TryValidate(System.String):System.Boolean
+M:FileTypeDetection.DeterministicHashOptions..ctor()
+M:FileTypeDetection.DeterministicHashing.HashBytes(System.Byte[]):FileTypeDetection.DeterministicHashEvidence
+M:FileTypeDetection.DeterministicHashing.HashBytes(System.Byte[],System.String):FileTypeDetection.DeterministicHashEvidence
+M:FileTypeDetection.DeterministicHashing.HashBytes(System.Byte[],System.String,FileTypeDetection.DeterministicHashOptions):FileTypeDetection.DeterministicHashEvidence
+M:FileTypeDetection.DeterministicHashing.HashEntries(System.Collections.Generic.IReadOnlyList<FileTypeDetection.ZipExtractedEntry>):FileTypeDetection.DeterministicHashEvidence
+M:FileTypeDetection.DeterministicHashing.HashEntries(System.Collections.Generic.IReadOnlyList<FileTypeDetection.ZipExtractedEntry>,System.String):FileTypeDetection.DeterministicHashEvidence
+M:FileTypeDetection.DeterministicHashing.HashEntries(System.Collections.Generic.IReadOnlyList<FileTypeDetection.ZipExtractedEntry>,System.String,FileTypeDetection.DeterministicHashOptions):FileTypeDetection.DeterministicHashEvidence
+M:FileTypeDetection.DeterministicHashing.HashFile(System.String):FileTypeDetection.DeterministicHashEvidence
+M:FileTypeDetection.DeterministicHashing.HashFile(System.String,FileTypeDetection.DeterministicHashOptions):FileTypeDetection.DeterministicHashEvidence
+M:FileTypeDetection.DeterministicHashing.VerifyRoundTrip(System.String):FileTypeDetection.DeterministicHashRoundTripReport
+M:FileTypeDetection.DeterministicHashing.VerifyRoundTrip(System.String,FileTypeDetection.DeterministicHashOptions):FileTypeDetection.DeterministicHashRoundTripReport
+M:FileTypeDetection.FileMaterializer.Persist(System.Byte[],System.String):System.Boolean
+M:FileTypeDetection.FileMaterializer.Persist(System.Byte[],System.String,System.Boolean):System.Boolean
+M:FileTypeDetection.FileMaterializer.Persist(System.Byte[],System.String,System.Boolean,System.Boolean):System.Boolean
+M:FileTypeDetection.FileType.ToString():System.String
+M:FileTypeDetection.FileTypeDetector..ctor()
+M:FileTypeDetection.FileTypeDetector.Detect(System.Byte[]):FileTypeDetection.FileType
+M:FileTypeDetection.FileTypeDetector.Detect(System.String):FileTypeDetection.FileType
+M:FileTypeDetection.FileTypeDetector.Detect(System.String,System.Boolean):FileTypeDetection.FileType
+M:FileTypeDetection.FileTypeDetector.DetectAndVerifyExtension(System.String):System.Boolean
+M:FileTypeDetection.FileTypeDetector.DetectDetailed(System.String):FileTypeDetection.DetectionDetail
+M:FileTypeDetection.FileTypeDetector.DetectDetailed(System.String,System.Boolean):FileTypeDetection.DetectionDetail
+M:FileTypeDetection.FileTypeDetector.ExtractArchiveSafe(System.String,System.String,System.Boolean):System.Boolean
+M:FileTypeDetection.FileTypeDetector.ExtractArchiveSafeToMemory(System.String,System.Boolean):System.Collections.Generic.IReadOnlyList<FileTypeDetection.ZipExtractedEntry>
+M:FileTypeDetection.FileTypeDetector.IsOfType(System.Byte[],FileTypeDetection.FileKind):System.Boolean
+M:FileTypeDetection.FileTypeDetector.ReadFileSafe(System.String):System.Byte[]
+M:FileTypeDetection.FileTypeDetector.TryValidateArchive(System.String):System.Boolean
+M:FileTypeDetection.FileTypeOptions.GetOptions():System.String
+M:FileTypeDetection.FileTypeOptions.LoadOptions(System.String):System.Boolean
+M:FileTypeDetection.FileTypeProjectBaseline.ApplyDeterministicDefaults():System.Void
+M:FileTypeDetection.FileTypeProjectOptions..ctor()
+M:FileTypeDetection.ZipExtractedEntry.OpenReadOnlyStream():System.IO.MemoryStream
+P:FileTypeDetection.DetectionDetail.DetectedType:FileTypeDetection.FileType
+P:FileTypeDetection.DetectionDetail.ExtensionVerified:System.Boolean
+P:FileTypeDetection.DetectionDetail.ReasonCode:System.String
+P:FileTypeDetection.DetectionDetail.UsedStructuredRefinement:System.Boolean
+P:FileTypeDetection.DetectionDetail.UsedZipContentCheck:System.Boolean
+P:FileTypeDetection.DeterministicHashDigestSet.FastLogicalXxHash3:System.String
+P:FileTypeDetection.DeterministicHashDigestSet.FastPhysicalXxHash3:System.String
+P:FileTypeDetection.DeterministicHashDigestSet.HasLogicalHash:System.Boolean
+P:FileTypeDetection.DeterministicHashDigestSet.HasPhysicalHash:System.Boolean
+P:FileTypeDetection.DeterministicHashDigestSet.LogicalSha256:System.String
+P:FileTypeDetection.DeterministicHashDigestSet.PhysicalSha256:System.String
+P:FileTypeDetection.DeterministicHashEvidence.CompressedBytes:System.Collections.Immutable.ImmutableArray<System.Byte>
+P:FileTypeDetection.DeterministicHashEvidence.DetectedType:FileTypeDetection.FileType
+P:FileTypeDetection.DeterministicHashEvidence.Digests:FileTypeDetection.DeterministicHashDigestSet
+P:FileTypeDetection.DeterministicHashEvidence.Entry:FileTypeDetection.ZipExtractedEntry
+P:FileTypeDetection.DeterministicHashEvidence.EntryCount:System.Int32
+P:FileTypeDetection.DeterministicHashEvidence.Label:System.String
+P:FileTypeDetection.DeterministicHashEvidence.Notes:System.String
+P:FileTypeDetection.DeterministicHashEvidence.SourceType:FileTypeDetection.DeterministicHashSourceType
+P:FileTypeDetection.DeterministicHashEvidence.TotalUncompressedBytes:System.Int64
+P:FileTypeDetection.DeterministicHashEvidence.UncompressedBytes:System.Collections.Immutable.ImmutableArray<System.Byte>
+P:FileTypeDetection.DeterministicHashOptions.IncludeFastHash:System.Boolean
+P:FileTypeDetection.DeterministicHashOptions.IncludePayloadCopies:System.Boolean
+P:FileTypeDetection.DeterministicHashOptions.MaterializedFileName:System.String
+P:FileTypeDetection.DeterministicHashRoundTripReport.H1:FileTypeDetection.DeterministicHashEvidence
+P:FileTypeDetection.DeterministicHashRoundTripReport.H2:FileTypeDetection.DeterministicHashEvidence
+P:FileTypeDetection.DeterministicHashRoundTripReport.H3:FileTypeDetection.DeterministicHashEvidence
+P:FileTypeDetection.DeterministicHashRoundTripReport.H4:FileTypeDetection.DeterministicHashEvidence
+P:FileTypeDetection.DeterministicHashRoundTripReport.InputPath:System.String
+P:FileTypeDetection.DeterministicHashRoundTripReport.IsArchiveInput:System.Boolean
+P:FileTypeDetection.DeterministicHashRoundTripReport.LogicalConsistent:System.Boolean
+P:FileTypeDetection.DeterministicHashRoundTripReport.LogicalH1EqualsH2:System.Boolean
+P:FileTypeDetection.DeterministicHashRoundTripReport.LogicalH1EqualsH3:System.Boolean
+P:FileTypeDetection.DeterministicHashRoundTripReport.LogicalH1EqualsH4:System.Boolean
+P:FileTypeDetection.DeterministicHashRoundTripReport.Notes:System.String
+P:FileTypeDetection.DeterministicHashRoundTripReport.PhysicalH1EqualsH2:System.Boolean
+P:FileTypeDetection.DeterministicHashRoundTripReport.PhysicalH1EqualsH3:System.Boolean
+P:FileTypeDetection.DeterministicHashRoundTripReport.PhysicalH1EqualsH4:System.Boolean
+P:FileTypeDetection.FileType.Aliases:System.Collections.Immutable.ImmutableArray<System.String>
+P:FileTypeDetection.FileType.Allowed:System.Boolean
+P:FileTypeDetection.FileType.CanonicalExtension:System.String
+P:FileTypeDetection.FileType.Kind:FileTypeDetection.FileKind
+P:FileTypeDetection.FileType.Mime:System.String
+P:FileTypeDetection.FileTypeProjectOptions.AllowUnknownArchiveEntrySize:System.Boolean
+P:FileTypeDetection.FileTypeProjectOptions.DeterministicHash:FileTypeDetection.DeterministicHashOptions
+P:FileTypeDetection.FileTypeProjectOptions.HeaderOnlyNonZip:System.Boolean
+P:FileTypeDetection.FileTypeProjectOptions.Logger:Microsoft.Extensions.Logging.ILogger
+P:FileTypeDetection.FileTypeProjectOptions.MaxBytes:System.Int64
+P:FileTypeDetection.FileTypeProjectOptions.MaxZipCompressionRatio:System.Int32
+P:FileTypeDetection.FileTypeProjectOptions.MaxZipEntries:System.Int32
+P:FileTypeDetection.FileTypeProjectOptions.MaxZipEntryUncompressedBytes:System.Int64
+P:FileTypeDetection.FileTypeProjectOptions.MaxZipNestedBytes:System.Int64
+P:FileTypeDetection.FileTypeProjectOptions.MaxZipNestingDepth:System.Int32
+P:FileTypeDetection.FileTypeProjectOptions.MaxZipTotalUncompressedBytes:System.Int64
+P:FileTypeDetection.FileTypeProjectOptions.RejectArchiveLinks:System.Boolean
+P:FileTypeDetection.FileTypeProjectOptions.SniffBytes:System.Int32
+P:FileTypeDetection.ZipExtractedEntry.Content:System.Collections.Immutable.ImmutableArray<System.Byte>
+P:FileTypeDetection.ZipExtractedEntry.RelativePath:System.String
+P:FileTypeDetection.ZipExtractedEntry.Size:System.Int32
+T:class FileTypeDetection.ArchiveProcessing
+T:class FileTypeDetection.DetectionDetail
+T:class FileTypeDetection.DeterministicHashDigestSet
+T:class FileTypeDetection.DeterministicHashEvidence
+T:class FileTypeDetection.DeterministicHashOptions
+T:class FileTypeDetection.DeterministicHashRoundTripReport
+T:class FileTypeDetection.DeterministicHashing
+T:class FileTypeDetection.FileMaterializer
+T:class FileTypeDetection.FileType
+T:class FileTypeDetection.FileTypeDetector
+T:class FileTypeDetection.FileTypeOptions
+T:class FileTypeDetection.FileTypeProjectBaseline
+T:class FileTypeDetection.FileTypeProjectOptions
+T:class FileTypeDetection.ZipExtractedEntry
+T:enum FileTypeDetection.DeterministicHashSourceType
+T:enum FileTypeDetection.FileKind
+V:FileTypeDetection.DeterministicHashSourceType.ArchiveEntries
+V:FileTypeDetection.DeterministicHashSourceType.FilePath
+V:FileTypeDetection.DeterministicHashSourceType.MaterializedFile
+V:FileTypeDetection.DeterministicHashSourceType.RawBytes
+V:FileTypeDetection.DeterministicHashSourceType.Unknown
+V:FileTypeDetection.FileKind.Docx
+V:FileTypeDetection.FileKind.Gif
+V:FileTypeDetection.FileKind.Jpeg
+V:FileTypeDetection.FileKind.Pdf
+V:FileTypeDetection.FileKind.Png
+V:FileTypeDetection.FileKind.Pptx
+V:FileTypeDetection.FileKind.Unknown
+V:FileTypeDetection.FileKind.Webp
+V:FileTypeDetection.FileKind.Xlsx
+V:FileTypeDetection.FileKind.Zip

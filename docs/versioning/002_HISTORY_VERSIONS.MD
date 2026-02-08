@@ -8,7 +8,7 @@ Heuristik fuer die Rueckwirkungs-Zuordnung:
 - `docs|test|ci|chore|tooling|refactor|fix` => Patch
 
 Aktueller Entwicklungsstand:
-- Aktuelle Release-Linie enthält `4.x` (siehe `Directory.Build.props` und `docs/versioning/003_CHANGELOG_RELEASES.MD`).
+- Aktuelle Release-Linie enthält `4.x` (siehe Release-Tags `v4.*` und `docs/versioning/003_CHANGELOG_RELEASES.MD`).
 
 | Version | Kurzbeschreibung | Commit | Keyword |
 |---|---|---|---|

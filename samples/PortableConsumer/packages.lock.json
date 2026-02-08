@@ -1,25 +1,39 @@
 {
-  "version": 2,
+  "version": 1,
   "dependencies": {
     "net10.0": {
-      "Microsoft.IO.RecyclableMemoryStream": {
+      "Tomtastisch.FileTypeDetection": {
         "type": "Direct",
-        "requested": "[3.0.1, )",
+        "requested": "[9.9.9-rc.1, )",
+        "resolved": "9.9.9-rc.1",
+        "contentHash": "38dVm1g5h8u89cD19iNgI37Q5IRRscJlemkeFPXB5ubly7oTwXo9hjvATa3JmCrUYzuObdyhXaRoGCJ+v7ytbA==",
+        "dependencies": {
+          "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
+          "Mime": "3.8.0",
+          "SharpCompress": "0.39.0",
+          "System.IO.Hashing": "10.0.2"
+        }
+      },
+      "Microsoft.IO.RecyclableMemoryStream": {
+        "type": "Transitive",
         "resolved": "3.0.1",
         "contentHash": "s/s20YTVY9r9TPfTrN5g8zPF1YhwxyqO6PxUkrYTGI2B+OGPe9AdajWZrLhFqXIvqIW23fnUE4+ztrUWNU1+9g=="
       },
       "Mime": {
-        "type": "Direct",
-        "requested": "[3.8.0, )",
+        "type": "Transitive",
         "resolved": "3.8.0",
         "contentHash": "SG8QHXjnyLoVeIOSw4ym7orS5LIRPBpzFQYfkgSqyAkeog+eZNMj32UOEO1SxLNBASxNPgVBIacxOOZsenBImg==",
         "dependencies": {
           "MimeTypesMap": "1.0.9"
         }
       },
+      "MimeTypesMap": {
+        "type": "Transitive",
+        "resolved": "1.0.9",
+        "contentHash": "M0TuSCwL1a8QV0VKw8ysY4AIs6v/Aor3N7GXQeqgNlAvqjx9Kj9KxNd09Pg5RzpY1tCOU8mkrfYBi1Lxwj8quQ=="
+      },
       "SharpCompress": {
-        "type": "Direct",
-        "requested": "[0.39.0, )",
+        "type": "Transitive",
         "resolved": "0.39.0",
         "contentHash": "0esqIUDlg68Z7+Weuge4QzEvNtawUO4obTJFL7xuf4DBHMxVRr+wbNgiX9arMrj3kGXQSvLe0zbZG3oxpkwJOA==",
         "dependencies": {
@@ -27,15 +41,9 @@
         }
       },
       "System.IO.Hashing": {
-        "type": "Direct",
-        "requested": "[10.0.2, )",
+        "type": "Transitive",
         "resolved": "10.0.2",
         "contentHash": "AKJknIFi9O3+rGExxTry188JPvUoZAPcCtS2qdqyFhIzsxQ1Ap94BeGDG0VzVEHakhmRxmJtVih6TsHoghIt/g=="
-      },
-      "MimeTypesMap": {
-        "type": "Transitive",
-        "resolved": "1.0.9",
-        "contentHash": "M0TuSCwL1a8QV0VKw8ysY4AIs6v/Aor3N7GXQeqgNlAvqjx9Kj9KxNd09Pg5RzpY1tCOU8mkrfYBi1Lxwj8quQ=="
       },
       "ZstdSharp.Port": {
         "type": "Transitive",
@@ -44,24 +52,38 @@
       }
     },
     "net8.0": {
-      "Microsoft.IO.RecyclableMemoryStream": {
+      "Tomtastisch.FileTypeDetection": {
         "type": "Direct",
-        "requested": "[3.0.1, )",
+        "requested": "[9.9.9-rc.1, )",
+        "resolved": "9.9.9-rc.1",
+        "contentHash": "38dVm1g5h8u89cD19iNgI37Q5IRRscJlemkeFPXB5ubly7oTwXo9hjvATa3JmCrUYzuObdyhXaRoGCJ+v7ytbA==",
+        "dependencies": {
+          "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
+          "Mime": "3.8.0",
+          "SharpCompress": "0.39.0",
+          "System.IO.Hashing": "10.0.2"
+        }
+      },
+      "Microsoft.IO.RecyclableMemoryStream": {
+        "type": "Transitive",
         "resolved": "3.0.1",
         "contentHash": "s/s20YTVY9r9TPfTrN5g8zPF1YhwxyqO6PxUkrYTGI2B+OGPe9AdajWZrLhFqXIvqIW23fnUE4+ztrUWNU1+9g=="
       },
       "Mime": {
-        "type": "Direct",
-        "requested": "[3.8.0, )",
+        "type": "Transitive",
         "resolved": "3.8.0",
         "contentHash": "SG8QHXjnyLoVeIOSw4ym7orS5LIRPBpzFQYfkgSqyAkeog+eZNMj32UOEO1SxLNBASxNPgVBIacxOOZsenBImg==",
         "dependencies": {
           "MimeTypesMap": "1.0.9"
         }
       },
+      "MimeTypesMap": {
+        "type": "Transitive",
+        "resolved": "1.0.9",
+        "contentHash": "M0TuSCwL1a8QV0VKw8ysY4AIs6v/Aor3N7GXQeqgNlAvqjx9Kj9KxNd09Pg5RzpY1tCOU8mkrfYBi1Lxwj8quQ=="
+      },
       "SharpCompress": {
-        "type": "Direct",
-        "requested": "[0.39.0, )",
+        "type": "Transitive",
         "resolved": "0.39.0",
         "contentHash": "0esqIUDlg68Z7+Weuge4QzEvNtawUO4obTJFL7xuf4DBHMxVRr+wbNgiX9arMrj3kGXQSvLe0zbZG3oxpkwJOA==",
         "dependencies": {
@@ -69,15 +91,9 @@
         }
       },
       "System.IO.Hashing": {
-        "type": "Direct",
-        "requested": "[10.0.2, )",
+        "type": "Transitive",
         "resolved": "10.0.2",
         "contentHash": "AKJknIFi9O3+rGExxTry188JPvUoZAPcCtS2qdqyFhIzsxQ1Ap94BeGDG0VzVEHakhmRxmJtVih6TsHoghIt/g=="
-      },
-      "MimeTypesMap": {
-        "type": "Transitive",
-        "resolved": "1.0.9",
-        "contentHash": "M0TuSCwL1a8QV0VKw8ysY4AIs6v/Aor3N7GXQeqgNlAvqjx9Kj9KxNd09Pg5RzpY1tCOU8mkrfYBi1Lxwj8quQ=="
       },
       "ZstdSharp.Port": {
         "type": "Transitive",

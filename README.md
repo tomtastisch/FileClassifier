@@ -13,8 +13,22 @@ FileClassifier liefert deterministische Dateityperkennung, sichere Archivverarbe
 - `DeterministicHashing`: `HashFile`/`HashBytes`/`HashEntries` sowie `VerifyRoundTrip` mit deterministischer Evidence.
 - `FileTypeOptions`: globaler Konfigurations-Snapshot für alle Pfade (wird von den Kernklassen gelesen).
 
-## 4. Architekturüberblick
-### 4.1 Kernklassen (Datenfluss)
+## 4. Installation (NuGet)
+- PackageId: `Tomtastisch.FileTypeDetection`
+- Feed: NuGet.org (online such- und installierbar)
+- Beispiel:
+```xml
+<ItemGroup>
+  <PackageReference Include="Tomtastisch.FileTypeDetection" Version="x.y.z" />
+</ItemGroup>
+```
+
+## 5. Compatibility / TFMs
+- Library-Zielplattformen: `net8.0` und `net10.0`
+- Release-Versioning: Git-Tag `vX.Y.Z` (optional `-prerelease`) ist SSOT
+
+## 6. Architekturüberblick
+### 6.1 Kernklassen (Datenfluss)
 | Kernklasse | Primäre Inputs | Primäre Outputs | Kernlogik |
 |---|---|---|---|
 | `FileTypeDetector` | `path`, `byte[]`, `verifyExtension` | `FileType`, `DetectionDetail`, `bool`, `IReadOnlyList<ZipExtractedEntry>` | Header/Magic (`FileTypeRegistry`) plus Archiv-Gate (`ArchiveTypeResolver` + `ArchiveSafetyGate`) und optionales OOXML-Refinement (`OpenXmlRefiner`). |
@@ -24,7 +38,7 @@ FileClassifier liefert deterministische Dateityperkennung, sichere Archivverarbe
 
 Hinweis zur Typdomäne: `DetectedType.Kind` ist nicht nur "Datei roh", sondern kann auch Archiv/Container-Typen tragen (`Zip`, `Docx`, `Xlsx`, `Pptx`).
 
-### 4.2 Diagramm (kompakt)
+### 6.2 Diagramm (kompakt)
 ```mermaid
 flowchart LR
 
@@ -116,24 +130,26 @@ Detailierte Ablaufdiagramme liegen in [Architektur und Flows (Detail)](https://g
 Delegationshinweis: `ArchiveProcessing` ist bei path-basierten Archivpfaden eine Fassade auf `FileTypeDetector`; nur die byte-basierten Archivpfade laufen direkt über `ArchivePayloadGuard`/`ArchiveEntryCollector`.
 
 
-## 5. Dokumentationspfad
+## 7. Dokumentationspfad
 - [Dokumentationsindex](https://github.com/tomtastisch/FileClassifier/blob/main/docs/001_INDEX_CORE.MD)
 - [API-Kernübersicht](https://github.com/tomtastisch/FileClassifier/blob/main/docs/010_API_CORE.MD)
 - [Architektur und Flows](https://github.com/tomtastisch/FileClassifier/blob/main/docs/020_ARCH_CORE.MD)
 - [Governance und Policies](https://github.com/tomtastisch/FileClassifier/blob/main/docs/governance/001_POLICY_CI.MD)
 - [Versioning-Policy](https://github.com/tomtastisch/FileClassifier/blob/main/docs/versioning/001_POLICY_VERSIONING.MD)
 
-## 6. Modul-READMEs
+## 8. Modul-READMEs
 - [Bibliotheksmodul Index](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md)
 - [Detektion](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Detection/README.md)
 - [Infrastruktur](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md)
 - [Konfiguration](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/README.md)
 - [Abstractions](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md)
 
-## 7. Verifikation
+## 9. Verifikation
 ```bash
 python3 tools/check-docs.py
 python3 tools/check-policy-roc.py --out artifacts/policy_roc_matrix.tsv
-bash tools/versioning/check-versioning.sh
+bash tools/versioning/check-version-policy.sh
+dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --filter "Category=ApiContract" -v minimal
+dotnet pack src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -o artifacts/nuget -v minimal
 node tools/versioning/test-compute-pr-labels.js
 ```
