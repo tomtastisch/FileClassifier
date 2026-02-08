@@ -128,7 +128,7 @@ jobs:
         with:
           user: Tomtastisch
 
-      - name: Fail-closed: assert OIDC temp key present
+      - name: "Fail-closed: assert OIDC temp key present"
         shell: bash
         run: |
           set -euo pipefail

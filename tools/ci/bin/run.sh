@@ -372,7 +372,7 @@ run_pr_labeling() {
   run_or_fail "CI-LABEL-001" "Derive required versioning decision" env MODE=required BASE_REF=origin/main HEAD_REF="$head_sha" "${ROOT_DIR}/tools/versioning/check-versioning.sh"
 
   local files_json labels_json pr_title
-  files_json="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_number}/files" --paginate --jq '[.[].filename]')"
+  files_json="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_number}/files" --paginate --jq '.[].filename' | jq -Rsc 'split("\n")[:-1]')"
   labels_json="$(gh api "repos/${GITHUB_REPOSITORY}/issues/${pr_number}" --jq '[.labels[].name]')"
   pr_title="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_number}" --jq '.title')"
 
