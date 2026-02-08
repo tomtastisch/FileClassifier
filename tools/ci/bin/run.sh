@@ -335,10 +335,19 @@ run_security_nuget() {
 run_tests_bdd_coverage() {
   local tests_dir="${OUT_DIR}/tests"
   local coverage_dir="${OUT_DIR}/coverage"
+  local coverage_assembly
+  local coverage_include
   mkdir -p "$tests_dir" "$coverage_dir"
 
+  coverage_assembly="$(read_naming_ssot_field assembly_name)"
+  if [[ -z "${coverage_assembly}" ]]; then
+    ci_result_add_violation "CI-TEST-001" "fail" "Naming SSOT assembly_name is missing." "tools/ci/policies/data/naming.json"
+    return 1
+  fi
+  coverage_include="[${coverage_assembly}]*"
+
   run_or_fail "CI-TEST-001" "Restore solution (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/FileClassifier.sln" -v minimal
-  run_or_fail "CI-TEST-001" "BDD tests + coverage" env TEST_BDD_OUTPUT_DIR="$tests_dir" bash "${ROOT_DIR}/tools/test-bdd-readable.sh" -- /p:CollectCoverage=true /p:Include="[FileTypeDetectionLib]*" /p:CoverletOutputFormat=cobertura /p:CoverletOutput="${coverage_dir}/coverage" /p:Threshold=85%2c69 /p:ThresholdType=line%2cbranch /p:ThresholdStat=total
+  run_or_fail "CI-TEST-001" "BDD tests + coverage" env TEST_BDD_OUTPUT_DIR="$tests_dir" bash "${ROOT_DIR}/tools/test-bdd-readable.sh" -- /p:CollectCoverage=true /p:Include="${coverage_include}" /p:CoverletOutputFormat=cobertura /p:CoverletOutput="${coverage_dir}/coverage" /p:Threshold=85%2c69 /p:ThresholdType=line%2cbranch /p:ThresholdStat=total
   ci_result_append_summary "BDD coverage checks completed."
 }
 
