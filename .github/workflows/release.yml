@@ -56,7 +56,7 @@ jobs:
         run: dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal
 
       - name: Source-based tests
-        run: dotnet test FileClassifier.sln -c Release --no-build -v minimal
+        run: dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --no-build -v minimal
 
       - name: API contract tests
         run: dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --no-build --filter "Category=ApiContract" -v minimal
