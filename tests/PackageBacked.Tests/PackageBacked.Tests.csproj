@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
-    <PackageBackedVersion Condition="'$(PackageBackedVersion)' == ''">$(RepoVersion)</PackageBackedVersion>
+    <PackageBackedVersion Condition="'$(PackageBackedVersion)'==''">$(RepoVersion)</PackageBackedVersion>
   </PropertyGroup>
 
   <ItemGroup>
