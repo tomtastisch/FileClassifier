@@ -162,7 +162,16 @@ if expected_version and project_path is not None and project_path.exists():
 nupkg_dir = repo_root / "artifacts" / "nuget"
 nupkg_files = sorted([p for p in nupkg_dir.glob("*.nupkg") if not p.name.endswith(".snupkg")])
 if len(nupkg_files) == 0:
-    fail("nupkg.exists", "at least one nupkg in artifacts/nuget", "none", rel(nupkg_dir), "No nupkg found for SVT verification")
+    if require_release_tag:
+        fail("nupkg.exists", "at least one nupkg in artifacts/nuget", "none", rel(nupkg_dir), "No nupkg found for SVT verification")
+    else:
+        checks.append({
+            "scope": "nupkg.exists",
+            "status": "pass",
+            "expected": "pre-pack check allows missing nupkg",
+            "actual": "none",
+            "evidence": rel(nupkg_dir),
+        })
 else:
     records = []
     for nupkg in nupkg_files:
