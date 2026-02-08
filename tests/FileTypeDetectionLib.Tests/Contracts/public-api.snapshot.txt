@@ -1,141 +1,141 @@
-F:FileTypeDetection.DeterministicHashSourceType.ArchiveEntries:FileTypeDetection.DeterministicHashSourceType
-F:FileTypeDetection.DeterministicHashSourceType.FilePath:FileTypeDetection.DeterministicHashSourceType
-F:FileTypeDetection.DeterministicHashSourceType.MaterializedFile:FileTypeDetection.DeterministicHashSourceType
-F:FileTypeDetection.DeterministicHashSourceType.RawBytes:FileTypeDetection.DeterministicHashSourceType
-F:FileTypeDetection.DeterministicHashSourceType.Unknown:FileTypeDetection.DeterministicHashSourceType
-F:FileTypeDetection.FileKind.Docx:FileTypeDetection.FileKind
-F:FileTypeDetection.FileKind.Gif:FileTypeDetection.FileKind
-F:FileTypeDetection.FileKind.Jpeg:FileTypeDetection.FileKind
-F:FileTypeDetection.FileKind.Pdf:FileTypeDetection.FileKind
-F:FileTypeDetection.FileKind.Png:FileTypeDetection.FileKind
-F:FileTypeDetection.FileKind.Pptx:FileTypeDetection.FileKind
-F:FileTypeDetection.FileKind.Unknown:FileTypeDetection.FileKind
-F:FileTypeDetection.FileKind.Webp:FileTypeDetection.FileKind
-F:FileTypeDetection.FileKind.Xlsx:FileTypeDetection.FileKind
-F:FileTypeDetection.FileKind.Zip:FileTypeDetection.FileKind
-M:FileTypeDetection.ArchiveProcessing.ExtractToMemory(System.String,System.Boolean):System.Collections.Generic.IReadOnlyList<FileTypeDetection.ZipExtractedEntry>
-M:FileTypeDetection.ArchiveProcessing.TryExtractToMemory(System.Byte[]):System.Collections.Generic.IReadOnlyList<FileTypeDetection.ZipExtractedEntry>
-M:FileTypeDetection.ArchiveProcessing.TryValidate(System.Byte[]):System.Boolean
-M:FileTypeDetection.ArchiveProcessing.TryValidate(System.String):System.Boolean
-M:FileTypeDetection.DeterministicHashOptions..ctor()
-M:FileTypeDetection.DeterministicHashing.HashBytes(System.Byte[]):FileTypeDetection.DeterministicHashEvidence
-M:FileTypeDetection.DeterministicHashing.HashBytes(System.Byte[],System.String):FileTypeDetection.DeterministicHashEvidence
-M:FileTypeDetection.DeterministicHashing.HashBytes(System.Byte[],System.String,FileTypeDetection.DeterministicHashOptions):FileTypeDetection.DeterministicHashEvidence
-M:FileTypeDetection.DeterministicHashing.HashEntries(System.Collections.Generic.IReadOnlyList<FileTypeDetection.ZipExtractedEntry>):FileTypeDetection.DeterministicHashEvidence
-M:FileTypeDetection.DeterministicHashing.HashEntries(System.Collections.Generic.IReadOnlyList<FileTypeDetection.ZipExtractedEntry>,System.String):FileTypeDetection.DeterministicHashEvidence
-M:FileTypeDetection.DeterministicHashing.HashEntries(System.Collections.Generic.IReadOnlyList<FileTypeDetection.ZipExtractedEntry>,System.String,FileTypeDetection.DeterministicHashOptions):FileTypeDetection.DeterministicHashEvidence
-M:FileTypeDetection.DeterministicHashing.HashFile(System.String):FileTypeDetection.DeterministicHashEvidence
-M:FileTypeDetection.DeterministicHashing.HashFile(System.String,FileTypeDetection.DeterministicHashOptions):FileTypeDetection.DeterministicHashEvidence
-M:FileTypeDetection.DeterministicHashing.VerifyRoundTrip(System.String):FileTypeDetection.DeterministicHashRoundTripReport
-M:FileTypeDetection.DeterministicHashing.VerifyRoundTrip(System.String,FileTypeDetection.DeterministicHashOptions):FileTypeDetection.DeterministicHashRoundTripReport
-M:FileTypeDetection.FileMaterializer.Persist(System.Byte[],System.String):System.Boolean
-M:FileTypeDetection.FileMaterializer.Persist(System.Byte[],System.String,System.Boolean):System.Boolean
-M:FileTypeDetection.FileMaterializer.Persist(System.Byte[],System.String,System.Boolean,System.Boolean):System.Boolean
-M:FileTypeDetection.FileType.ToString():System.String
-M:FileTypeDetection.FileTypeDetector..ctor()
-M:FileTypeDetection.FileTypeDetector.Detect(System.Byte[]):FileTypeDetection.FileType
-M:FileTypeDetection.FileTypeDetector.Detect(System.String):FileTypeDetection.FileType
-M:FileTypeDetection.FileTypeDetector.Detect(System.String,System.Boolean):FileTypeDetection.FileType
-M:FileTypeDetection.FileTypeDetector.DetectAndVerifyExtension(System.String):System.Boolean
-M:FileTypeDetection.FileTypeDetector.DetectDetailed(System.String):FileTypeDetection.DetectionDetail
-M:FileTypeDetection.FileTypeDetector.DetectDetailed(System.String,System.Boolean):FileTypeDetection.DetectionDetail
-M:FileTypeDetection.FileTypeDetector.ExtractArchiveSafe(System.String,System.String,System.Boolean):System.Boolean
-M:FileTypeDetection.FileTypeDetector.ExtractArchiveSafeToMemory(System.String,System.Boolean):System.Collections.Generic.IReadOnlyList<FileTypeDetection.ZipExtractedEntry>
-M:FileTypeDetection.FileTypeDetector.IsOfType(System.Byte[],FileTypeDetection.FileKind):System.Boolean
-M:FileTypeDetection.FileTypeDetector.ReadFileSafe(System.String):System.Byte[]
-M:FileTypeDetection.FileTypeDetector.TryValidateArchive(System.String):System.Boolean
-M:FileTypeDetection.FileTypeOptions.GetOptions():System.String
-M:FileTypeDetection.FileTypeOptions.LoadOptions(System.String):System.Boolean
-M:FileTypeDetection.FileTypeProjectBaseline.ApplyDeterministicDefaults():System.Void
-M:FileTypeDetection.FileTypeProjectOptions..ctor()
-M:FileTypeDetection.ZipExtractedEntry.OpenReadOnlyStream():System.IO.MemoryStream
-P:FileTypeDetection.DetectionDetail.DetectedType:FileTypeDetection.FileType
-P:FileTypeDetection.DetectionDetail.ExtensionVerified:System.Boolean
-P:FileTypeDetection.DetectionDetail.ReasonCode:System.String
-P:FileTypeDetection.DetectionDetail.UsedStructuredRefinement:System.Boolean
-P:FileTypeDetection.DetectionDetail.UsedZipContentCheck:System.Boolean
-P:FileTypeDetection.DeterministicHashDigestSet.FastLogicalXxHash3:System.String
-P:FileTypeDetection.DeterministicHashDigestSet.FastPhysicalXxHash3:System.String
-P:FileTypeDetection.DeterministicHashDigestSet.HasLogicalHash:System.Boolean
-P:FileTypeDetection.DeterministicHashDigestSet.HasPhysicalHash:System.Boolean
-P:FileTypeDetection.DeterministicHashDigestSet.LogicalSha256:System.String
-P:FileTypeDetection.DeterministicHashDigestSet.PhysicalSha256:System.String
-P:FileTypeDetection.DeterministicHashEvidence.CompressedBytes:System.Collections.Immutable.ImmutableArray<System.Byte>
-P:FileTypeDetection.DeterministicHashEvidence.DetectedType:FileTypeDetection.FileType
-P:FileTypeDetection.DeterministicHashEvidence.Digests:FileTypeDetection.DeterministicHashDigestSet
-P:FileTypeDetection.DeterministicHashEvidence.Entry:FileTypeDetection.ZipExtractedEntry
-P:FileTypeDetection.DeterministicHashEvidence.EntryCount:System.Int32
-P:FileTypeDetection.DeterministicHashEvidence.Label:System.String
-P:FileTypeDetection.DeterministicHashEvidence.Notes:System.String
-P:FileTypeDetection.DeterministicHashEvidence.SourceType:FileTypeDetection.DeterministicHashSourceType
-P:FileTypeDetection.DeterministicHashEvidence.TotalUncompressedBytes:System.Int64
-P:FileTypeDetection.DeterministicHashEvidence.UncompressedBytes:System.Collections.Immutable.ImmutableArray<System.Byte>
-P:FileTypeDetection.DeterministicHashOptions.IncludeFastHash:System.Boolean
-P:FileTypeDetection.DeterministicHashOptions.IncludePayloadCopies:System.Boolean
-P:FileTypeDetection.DeterministicHashOptions.MaterializedFileName:System.String
-P:FileTypeDetection.DeterministicHashRoundTripReport.H1:FileTypeDetection.DeterministicHashEvidence
-P:FileTypeDetection.DeterministicHashRoundTripReport.H2:FileTypeDetection.DeterministicHashEvidence
-P:FileTypeDetection.DeterministicHashRoundTripReport.H3:FileTypeDetection.DeterministicHashEvidence
-P:FileTypeDetection.DeterministicHashRoundTripReport.H4:FileTypeDetection.DeterministicHashEvidence
-P:FileTypeDetection.DeterministicHashRoundTripReport.InputPath:System.String
-P:FileTypeDetection.DeterministicHashRoundTripReport.IsArchiveInput:System.Boolean
-P:FileTypeDetection.DeterministicHashRoundTripReport.LogicalConsistent:System.Boolean
-P:FileTypeDetection.DeterministicHashRoundTripReport.LogicalH1EqualsH2:System.Boolean
-P:FileTypeDetection.DeterministicHashRoundTripReport.LogicalH1EqualsH3:System.Boolean
-P:FileTypeDetection.DeterministicHashRoundTripReport.LogicalH1EqualsH4:System.Boolean
-P:FileTypeDetection.DeterministicHashRoundTripReport.Notes:System.String
-P:FileTypeDetection.DeterministicHashRoundTripReport.PhysicalH1EqualsH2:System.Boolean
-P:FileTypeDetection.DeterministicHashRoundTripReport.PhysicalH1EqualsH3:System.Boolean
-P:FileTypeDetection.DeterministicHashRoundTripReport.PhysicalH1EqualsH4:System.Boolean
-P:FileTypeDetection.FileType.Aliases:System.Collections.Immutable.ImmutableArray<System.String>
-P:FileTypeDetection.FileType.Allowed:System.Boolean
-P:FileTypeDetection.FileType.CanonicalExtension:System.String
-P:FileTypeDetection.FileType.Kind:FileTypeDetection.FileKind
-P:FileTypeDetection.FileType.Mime:System.String
-P:FileTypeDetection.FileTypeProjectOptions.AllowUnknownArchiveEntrySize:System.Boolean
-P:FileTypeDetection.FileTypeProjectOptions.DeterministicHash:FileTypeDetection.DeterministicHashOptions
-P:FileTypeDetection.FileTypeProjectOptions.HeaderOnlyNonZip:System.Boolean
-P:FileTypeDetection.FileTypeProjectOptions.Logger:Microsoft.Extensions.Logging.ILogger
-P:FileTypeDetection.FileTypeProjectOptions.MaxBytes:System.Int64
-P:FileTypeDetection.FileTypeProjectOptions.MaxZipCompressionRatio:System.Int32
-P:FileTypeDetection.FileTypeProjectOptions.MaxZipEntries:System.Int32
-P:FileTypeDetection.FileTypeProjectOptions.MaxZipEntryUncompressedBytes:System.Int64
-P:FileTypeDetection.FileTypeProjectOptions.MaxZipNestedBytes:System.Int64
-P:FileTypeDetection.FileTypeProjectOptions.MaxZipNestingDepth:System.Int32
-P:FileTypeDetection.FileTypeProjectOptions.MaxZipTotalUncompressedBytes:System.Int64
-P:FileTypeDetection.FileTypeProjectOptions.RejectArchiveLinks:System.Boolean
-P:FileTypeDetection.FileTypeProjectOptions.SniffBytes:System.Int32
-P:FileTypeDetection.ZipExtractedEntry.Content:System.Collections.Immutable.ImmutableArray<System.Byte>
-P:FileTypeDetection.ZipExtractedEntry.RelativePath:System.String
-P:FileTypeDetection.ZipExtractedEntry.Size:System.Int32
-T:class FileTypeDetection.ArchiveProcessing
-T:class FileTypeDetection.DetectionDetail
-T:class FileTypeDetection.DeterministicHashDigestSet
-T:class FileTypeDetection.DeterministicHashEvidence
-T:class FileTypeDetection.DeterministicHashOptions
-T:class FileTypeDetection.DeterministicHashRoundTripReport
-T:class FileTypeDetection.DeterministicHashing
-T:class FileTypeDetection.FileMaterializer
-T:class FileTypeDetection.FileType
-T:class FileTypeDetection.FileTypeDetector
-T:class FileTypeDetection.FileTypeOptions
-T:class FileTypeDetection.FileTypeProjectBaseline
-T:class FileTypeDetection.FileTypeProjectOptions
-T:class FileTypeDetection.ZipExtractedEntry
-T:enum FileTypeDetection.DeterministicHashSourceType
-T:enum FileTypeDetection.FileKind
-V:FileTypeDetection.DeterministicHashSourceType.ArchiveEntries
-V:FileTypeDetection.DeterministicHashSourceType.FilePath
-V:FileTypeDetection.DeterministicHashSourceType.MaterializedFile
-V:FileTypeDetection.DeterministicHashSourceType.RawBytes
-V:FileTypeDetection.DeterministicHashSourceType.Unknown
-V:FileTypeDetection.FileKind.Docx
-V:FileTypeDetection.FileKind.Gif
-V:FileTypeDetection.FileKind.Jpeg
-V:FileTypeDetection.FileKind.Pdf
-V:FileTypeDetection.FileKind.Png
-V:FileTypeDetection.FileKind.Pptx
-V:FileTypeDetection.FileKind.Unknown
-V:FileTypeDetection.FileKind.Webp
-V:FileTypeDetection.FileKind.Xlsx
-V:FileTypeDetection.FileKind.Zip
+F:Tomtastisch.FileClassifier.DeterministicHashSourceType.ArchiveEntries:Tomtastisch.FileClassifier.DeterministicHashSourceType
+F:Tomtastisch.FileClassifier.DeterministicHashSourceType.FilePath:Tomtastisch.FileClassifier.DeterministicHashSourceType
+F:Tomtastisch.FileClassifier.DeterministicHashSourceType.MaterializedFile:Tomtastisch.FileClassifier.DeterministicHashSourceType
+F:Tomtastisch.FileClassifier.DeterministicHashSourceType.RawBytes:Tomtastisch.FileClassifier.DeterministicHashSourceType
+F:Tomtastisch.FileClassifier.DeterministicHashSourceType.Unknown:Tomtastisch.FileClassifier.DeterministicHashSourceType
+F:Tomtastisch.FileClassifier.FileKind.Docx:Tomtastisch.FileClassifier.FileKind
+F:Tomtastisch.FileClassifier.FileKind.Gif:Tomtastisch.FileClassifier.FileKind
+F:Tomtastisch.FileClassifier.FileKind.Jpeg:Tomtastisch.FileClassifier.FileKind
+F:Tomtastisch.FileClassifier.FileKind.Pdf:Tomtastisch.FileClassifier.FileKind
+F:Tomtastisch.FileClassifier.FileKind.Png:Tomtastisch.FileClassifier.FileKind
+F:Tomtastisch.FileClassifier.FileKind.Pptx:Tomtastisch.FileClassifier.FileKind
+F:Tomtastisch.FileClassifier.FileKind.Unknown:Tomtastisch.FileClassifier.FileKind
+F:Tomtastisch.FileClassifier.FileKind.Webp:Tomtastisch.FileClassifier.FileKind
+F:Tomtastisch.FileClassifier.FileKind.Xlsx:Tomtastisch.FileClassifier.FileKind
+F:Tomtastisch.FileClassifier.FileKind.Zip:Tomtastisch.FileClassifier.FileKind
+M:Tomtastisch.FileClassifier.ArchiveProcessing.ExtractToMemory(System.String,System.Boolean):System.Collections.Generic.IReadOnlyList<Tomtastisch.FileClassifier.ZipExtractedEntry>
+M:Tomtastisch.FileClassifier.ArchiveProcessing.TryExtractToMemory(System.Byte[]):System.Collections.Generic.IReadOnlyList<Tomtastisch.FileClassifier.ZipExtractedEntry>
+M:Tomtastisch.FileClassifier.ArchiveProcessing.TryValidate(System.Byte[]):System.Boolean
+M:Tomtastisch.FileClassifier.ArchiveProcessing.TryValidate(System.String):System.Boolean
+M:Tomtastisch.FileClassifier.DeterministicHashOptions..ctor()
+M:Tomtastisch.FileClassifier.DeterministicHashing.HashBytes(System.Byte[]):Tomtastisch.FileClassifier.DeterministicHashEvidence
+M:Tomtastisch.FileClassifier.DeterministicHashing.HashBytes(System.Byte[],System.String):Tomtastisch.FileClassifier.DeterministicHashEvidence
+M:Tomtastisch.FileClassifier.DeterministicHashing.HashBytes(System.Byte[],System.String,Tomtastisch.FileClassifier.DeterministicHashOptions):Tomtastisch.FileClassifier.DeterministicHashEvidence
+M:Tomtastisch.FileClassifier.DeterministicHashing.HashEntries(System.Collections.Generic.IReadOnlyList<Tomtastisch.FileClassifier.ZipExtractedEntry>):Tomtastisch.FileClassifier.DeterministicHashEvidence
+M:Tomtastisch.FileClassifier.DeterministicHashing.HashEntries(System.Collections.Generic.IReadOnlyList<Tomtastisch.FileClassifier.ZipExtractedEntry>,System.String):Tomtastisch.FileClassifier.DeterministicHashEvidence
+M:Tomtastisch.FileClassifier.DeterministicHashing.HashEntries(System.Collections.Generic.IReadOnlyList<Tomtastisch.FileClassifier.ZipExtractedEntry>,System.String,Tomtastisch.FileClassifier.DeterministicHashOptions):Tomtastisch.FileClassifier.DeterministicHashEvidence
+M:Tomtastisch.FileClassifier.DeterministicHashing.HashFile(System.String):Tomtastisch.FileClassifier.DeterministicHashEvidence
+M:Tomtastisch.FileClassifier.DeterministicHashing.HashFile(System.String,Tomtastisch.FileClassifier.DeterministicHashOptions):Tomtastisch.FileClassifier.DeterministicHashEvidence
+M:Tomtastisch.FileClassifier.DeterministicHashing.VerifyRoundTrip(System.String):Tomtastisch.FileClassifier.DeterministicHashRoundTripReport
+M:Tomtastisch.FileClassifier.DeterministicHashing.VerifyRoundTrip(System.String,Tomtastisch.FileClassifier.DeterministicHashOptions):Tomtastisch.FileClassifier.DeterministicHashRoundTripReport
+M:Tomtastisch.FileClassifier.FileMaterializer.Persist(System.Byte[],System.String):System.Boolean
+M:Tomtastisch.FileClassifier.FileMaterializer.Persist(System.Byte[],System.String,System.Boolean):System.Boolean
+M:Tomtastisch.FileClassifier.FileMaterializer.Persist(System.Byte[],System.String,System.Boolean,System.Boolean):System.Boolean
+M:Tomtastisch.FileClassifier.FileType.ToString():System.String
+M:Tomtastisch.FileClassifier.FileTypeDetector..ctor()
+M:Tomtastisch.FileClassifier.FileTypeDetector.Detect(System.Byte[]):Tomtastisch.FileClassifier.FileType
+M:Tomtastisch.FileClassifier.FileTypeDetector.Detect(System.String):Tomtastisch.FileClassifier.FileType
+M:Tomtastisch.FileClassifier.FileTypeDetector.Detect(System.String,System.Boolean):Tomtastisch.FileClassifier.FileType
+M:Tomtastisch.FileClassifier.FileTypeDetector.DetectAndVerifyExtension(System.String):System.Boolean
+M:Tomtastisch.FileClassifier.FileTypeDetector.DetectDetailed(System.String):Tomtastisch.FileClassifier.DetectionDetail
+M:Tomtastisch.FileClassifier.FileTypeDetector.DetectDetailed(System.String,System.Boolean):Tomtastisch.FileClassifier.DetectionDetail
+M:Tomtastisch.FileClassifier.FileTypeDetector.ExtractArchiveSafe(System.String,System.String,System.Boolean):System.Boolean
+M:Tomtastisch.FileClassifier.FileTypeDetector.ExtractArchiveSafeToMemory(System.String,System.Boolean):System.Collections.Generic.IReadOnlyList<Tomtastisch.FileClassifier.ZipExtractedEntry>
+M:Tomtastisch.FileClassifier.FileTypeDetector.IsOfType(System.Byte[],Tomtastisch.FileClassifier.FileKind):System.Boolean
+M:Tomtastisch.FileClassifier.FileTypeDetector.ReadFileSafe(System.String):System.Byte[]
+M:Tomtastisch.FileClassifier.FileTypeDetector.TryValidateArchive(System.String):System.Boolean
+M:Tomtastisch.FileClassifier.FileTypeOptions.GetOptions():System.String
+M:Tomtastisch.FileClassifier.FileTypeOptions.LoadOptions(System.String):System.Boolean
+M:Tomtastisch.FileClassifier.FileTypeProjectBaseline.ApplyDeterministicDefaults():System.Void
+M:Tomtastisch.FileClassifier.FileTypeProjectOptions..ctor()
+M:Tomtastisch.FileClassifier.ZipExtractedEntry.OpenReadOnlyStream():System.IO.MemoryStream
+P:Tomtastisch.FileClassifier.DetectionDetail.DetectedType:Tomtastisch.FileClassifier.FileType
+P:Tomtastisch.FileClassifier.DetectionDetail.ExtensionVerified:System.Boolean
+P:Tomtastisch.FileClassifier.DetectionDetail.ReasonCode:System.String
+P:Tomtastisch.FileClassifier.DetectionDetail.UsedStructuredRefinement:System.Boolean
+P:Tomtastisch.FileClassifier.DetectionDetail.UsedZipContentCheck:System.Boolean
+P:Tomtastisch.FileClassifier.DeterministicHashDigestSet.FastLogicalXxHash3:System.String
+P:Tomtastisch.FileClassifier.DeterministicHashDigestSet.FastPhysicalXxHash3:System.String
+P:Tomtastisch.FileClassifier.DeterministicHashDigestSet.HasLogicalHash:System.Boolean
+P:Tomtastisch.FileClassifier.DeterministicHashDigestSet.HasPhysicalHash:System.Boolean
+P:Tomtastisch.FileClassifier.DeterministicHashDigestSet.LogicalSha256:System.String
+P:Tomtastisch.FileClassifier.DeterministicHashDigestSet.PhysicalSha256:System.String
+P:Tomtastisch.FileClassifier.DeterministicHashEvidence.CompressedBytes:System.Collections.Immutable.ImmutableArray<System.Byte>
+P:Tomtastisch.FileClassifier.DeterministicHashEvidence.DetectedType:Tomtastisch.FileClassifier.FileType
+P:Tomtastisch.FileClassifier.DeterministicHashEvidence.Digests:Tomtastisch.FileClassifier.DeterministicHashDigestSet
+P:Tomtastisch.FileClassifier.DeterministicHashEvidence.Entry:Tomtastisch.FileClassifier.ZipExtractedEntry
+P:Tomtastisch.FileClassifier.DeterministicHashEvidence.EntryCount:System.Int32
+P:Tomtastisch.FileClassifier.DeterministicHashEvidence.Label:System.String
+P:Tomtastisch.FileClassifier.DeterministicHashEvidence.Notes:System.String
+P:Tomtastisch.FileClassifier.DeterministicHashEvidence.SourceType:Tomtastisch.FileClassifier.DeterministicHashSourceType
+P:Tomtastisch.FileClassifier.DeterministicHashEvidence.TotalUncompressedBytes:System.Int64
+P:Tomtastisch.FileClassifier.DeterministicHashEvidence.UncompressedBytes:System.Collections.Immutable.ImmutableArray<System.Byte>
+P:Tomtastisch.FileClassifier.DeterministicHashOptions.IncludeFastHash:System.Boolean
+P:Tomtastisch.FileClassifier.DeterministicHashOptions.IncludePayloadCopies:System.Boolean
+P:Tomtastisch.FileClassifier.DeterministicHashOptions.MaterializedFileName:System.String
+P:Tomtastisch.FileClassifier.DeterministicHashRoundTripReport.H1:Tomtastisch.FileClassifier.DeterministicHashEvidence
+P:Tomtastisch.FileClassifier.DeterministicHashRoundTripReport.H2:Tomtastisch.FileClassifier.DeterministicHashEvidence
+P:Tomtastisch.FileClassifier.DeterministicHashRoundTripReport.H3:Tomtastisch.FileClassifier.DeterministicHashEvidence
+P:Tomtastisch.FileClassifier.DeterministicHashRoundTripReport.H4:Tomtastisch.FileClassifier.DeterministicHashEvidence
+P:Tomtastisch.FileClassifier.DeterministicHashRoundTripReport.InputPath:System.String
+P:Tomtastisch.FileClassifier.DeterministicHashRoundTripReport.IsArchiveInput:System.Boolean
+P:Tomtastisch.FileClassifier.DeterministicHashRoundTripReport.LogicalConsistent:System.Boolean
+P:Tomtastisch.FileClassifier.DeterministicHashRoundTripReport.LogicalH1EqualsH2:System.Boolean
+P:Tomtastisch.FileClassifier.DeterministicHashRoundTripReport.LogicalH1EqualsH3:System.Boolean
+P:Tomtastisch.FileClassifier.DeterministicHashRoundTripReport.LogicalH1EqualsH4:System.Boolean
+P:Tomtastisch.FileClassifier.DeterministicHashRoundTripReport.Notes:System.String
+P:Tomtastisch.FileClassifier.DeterministicHashRoundTripReport.PhysicalH1EqualsH2:System.Boolean
+P:Tomtastisch.FileClassifier.DeterministicHashRoundTripReport.PhysicalH1EqualsH3:System.Boolean
+P:Tomtastisch.FileClassifier.DeterministicHashRoundTripReport.PhysicalH1EqualsH4:System.Boolean
+P:Tomtastisch.FileClassifier.FileType.Aliases:System.Collections.Immutable.ImmutableArray<System.String>
+P:Tomtastisch.FileClassifier.FileType.Allowed:System.Boolean
+P:Tomtastisch.FileClassifier.FileType.CanonicalExtension:System.String
+P:Tomtastisch.FileClassifier.FileType.Kind:Tomtastisch.FileClassifier.FileKind
+P:Tomtastisch.FileClassifier.FileType.Mime:System.String
+P:Tomtastisch.FileClassifier.FileTypeProjectOptions.AllowUnknownArchiveEntrySize:System.Boolean
+P:Tomtastisch.FileClassifier.FileTypeProjectOptions.DeterministicHash:Tomtastisch.FileClassifier.DeterministicHashOptions
+P:Tomtastisch.FileClassifier.FileTypeProjectOptions.HeaderOnlyNonZip:System.Boolean
+P:Tomtastisch.FileClassifier.FileTypeProjectOptions.Logger:Microsoft.Extensions.Logging.ILogger
+P:Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxBytes:System.Int64
+P:Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipCompressionRatio:System.Int32
+P:Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipEntries:System.Int32
+P:Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipEntryUncompressedBytes:System.Int64
+P:Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipNestedBytes:System.Int64
+P:Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipNestingDepth:System.Int32
+P:Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipTotalUncompressedBytes:System.Int64
+P:Tomtastisch.FileClassifier.FileTypeProjectOptions.RejectArchiveLinks:System.Boolean
+P:Tomtastisch.FileClassifier.FileTypeProjectOptions.SniffBytes:System.Int32
+P:Tomtastisch.FileClassifier.ZipExtractedEntry.Content:System.Collections.Immutable.ImmutableArray<System.Byte>
+P:Tomtastisch.FileClassifier.ZipExtractedEntry.RelativePath:System.String
+P:Tomtastisch.FileClassifier.ZipExtractedEntry.Size:System.Int32
+T:class Tomtastisch.FileClassifier.ArchiveProcessing
+T:class Tomtastisch.FileClassifier.DetectionDetail
+T:class Tomtastisch.FileClassifier.DeterministicHashDigestSet
+T:class Tomtastisch.FileClassifier.DeterministicHashEvidence
+T:class Tomtastisch.FileClassifier.DeterministicHashOptions
+T:class Tomtastisch.FileClassifier.DeterministicHashRoundTripReport
+T:class Tomtastisch.FileClassifier.DeterministicHashing
+T:class Tomtastisch.FileClassifier.FileMaterializer
+T:class Tomtastisch.FileClassifier.FileType
+T:class Tomtastisch.FileClassifier.FileTypeDetector
+T:class Tomtastisch.FileClassifier.FileTypeOptions
+T:class Tomtastisch.FileClassifier.FileTypeProjectBaseline
+T:class Tomtastisch.FileClassifier.FileTypeProjectOptions
+T:class Tomtastisch.FileClassifier.ZipExtractedEntry
+T:enum Tomtastisch.FileClassifier.DeterministicHashSourceType
+T:enum Tomtastisch.FileClassifier.FileKind
+V:Tomtastisch.FileClassifier.DeterministicHashSourceType.ArchiveEntries
+V:Tomtastisch.FileClassifier.DeterministicHashSourceType.FilePath
+V:Tomtastisch.FileClassifier.DeterministicHashSourceType.MaterializedFile
+V:Tomtastisch.FileClassifier.DeterministicHashSourceType.RawBytes
+V:Tomtastisch.FileClassifier.DeterministicHashSourceType.Unknown
+V:Tomtastisch.FileClassifier.FileKind.Docx
+V:Tomtastisch.FileClassifier.FileKind.Gif
+V:Tomtastisch.FileClassifier.FileKind.Jpeg
+V:Tomtastisch.FileClassifier.FileKind.Pdf
+V:Tomtastisch.FileClassifier.FileKind.Png
+V:Tomtastisch.FileClassifier.FileKind.Pptx
+V:Tomtastisch.FileClassifier.FileKind.Unknown
+V:Tomtastisch.FileClassifier.FileKind.Webp
+V:Tomtastisch.FileClassifier.FileKind.Xlsx
+V:Tomtastisch.FileClassifier.FileKind.Zip

@@ -1,7 +1,7 @@
 Option Strict On
 Option Explicit On
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Deterministische Hash-Sammlung fuer einen Verarbeitungsschritt.
     ''' </summary>

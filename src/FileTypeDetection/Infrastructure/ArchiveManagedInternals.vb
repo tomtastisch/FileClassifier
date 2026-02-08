@@ -4,7 +4,7 @@ Option Explicit On
 Imports System.IO
 Imports System.IO.Compression
 
-Namespace FileTypeDetection
+Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Zentrale SSOT-Engine fuer archivbasierte Verarbeitung.
     '''     Eine Iterationslogik fuer Validierung und sichere Extraktion.

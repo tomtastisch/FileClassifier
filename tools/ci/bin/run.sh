@@ -84,6 +84,25 @@ read_nupkg_metadata() {
   printf '%s\n' "${nuspec_xml}" | tr -d '\r' | sed -n "s/.*<${field}>\\([^<]*\\)<\\/${field}>.*/\\1/p" | head -n1
 }
 
+read_naming_ssot_field() {
+  local field="$1"
+  local ssot_file="${ROOT_DIR}/tools/ci/policies/data/naming.json"
+  python3 - "$ssot_file" "$field" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+ssot_file = Path(sys.argv[1])
+field = sys.argv[2]
+obj = json.loads(ssot_file.read_text(encoding="utf-8"))
+value = obj.get(field, "")
+if isinstance(value, (dict, list)):
+    print("")
+else:
+    print(str(value))
+PY
+}
+
 run_policy_runner_bridge() {
   local policy_check_id="$1"
   local policy_out_dir="$2"
@@ -181,7 +200,12 @@ run_api_contract() {
 run_pack() {
   local package_project="${ROOT_DIR}/src/FileTypeDetection/FileTypeDetectionLib.vbproj"
   local pack_output_dir="${ROOT_DIR}/${OUT_DIR}/nuget"
-  local expected_package_id="Tomtastisch.FileTypeDetection"
+  local expected_package_id
+  expected_package_id="$(read_naming_ssot_field package_id)"
+  if [[ -z "${expected_package_id}" ]]; then
+    ci_result_add_violation "CI-PACK-001" "fail" "Naming SSOT package_id is missing." "tools/ci/policies/data/naming.json"
+    return 1
+  fi
 
   mkdir -p "${pack_output_dir}"
   run_or_fail "CI-PACK-001" "Restore package project (locked mode)" dotnet restore --locked-mode "${package_project}" -v minimal
@@ -212,6 +236,16 @@ run_pack() {
   printf '%s\n' "${package_id}" > "${ROOT_DIR}/${OUT_DIR}/package-id.txt"
   printf '%s\n' "${package_version}" > "${ROOT_DIR}/${OUT_DIR}/package-version.txt"
   ci_result_append_summary "Pack completed (${package_id} ${package_version})."
+}
+
+run_naming_snt() {
+  local naming_summary="${ROOT_DIR}/${OUT_DIR}/naming-snt-summary.json"
+  build_validators
+  run_or_fail "CI-NAMING-001" "Naming SNT checker" bash "${ROOT_DIR}/tools/ci/check-naming-snt.sh" --repo-root "${ROOT_DIR}" --ssot "${ROOT_DIR}/tools/ci/policies/data/naming.json" --out "${naming_summary}"
+  if ! run_policy_runner_bridge "naming-snt" "artifacts/ci/_policy_naming_snt" "Policy naming SNT" "${OUT_DIR}/naming-snt-summary.json"; then
+    return 1
+  fi
+  ci_result_append_summary "Naming SNT checks completed."
 }
 
 run_version_policy() {
@@ -365,6 +399,7 @@ main() {
     docs-links-full) run_docs_links_full ;;
     api-contract) run_api_contract ;;
     pack) run_pack ;;
+    naming-snt) run_naming_snt ;;
     version-policy) run_version_policy ;;
     consumer-smoke) run_consumer_smoke ;;
     package-backed-tests) run_package_backed_tests ;;

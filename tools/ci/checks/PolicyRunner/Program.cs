@@ -180,6 +180,9 @@ void EvaluateRule(PolicyRule rule)
         case "docs_drift":
             EvaluateDocsDriftRule(rule);
             break;
+        case "naming_snt":
+            EvaluateNamingSntRule(rule);
+            break;
         default:
             AddPolicyFailure($"unsupported policy_type '{rule.PolicyType}'", "tools/ci/policies/rules");
             break;
@@ -452,6 +455,74 @@ void EvaluateDocsDriftRule(PolicyRule rule)
                 break;
             }
         }
+    }
+}
+
+void EvaluateNamingSntRule(PolicyRule rule)
+{
+    if (string.IsNullOrWhiteSpace(rule.Params.SsotFile))
+    {
+        AddPolicyFailure($"{rule.RuleId}: params.ssot_file must be non-empty", "tools/ci/policies/rules");
+        return;
+    }
+
+    if (string.IsNullOrWhiteSpace(rule.Params.SummaryJson))
+    {
+        AddPolicyFailure($"{rule.RuleId}: params.summary_json must be non-empty", "tools/ci/policies/rules");
+        return;
+    }
+
+    var ssotPath = TryResolvePathUnderRepo(rule.Params.SsotFile, $"{rule.RuleId}:ssot_file");
+    var summaryPath = TryResolvePathUnderRepo(rule.Params.SummaryJson, $"{rule.RuleId}:summary_json");
+    if (ssotPath is null || summaryPath is null)
+    {
+        return;
+    }
+
+    logger.Add($"EVAL|rule_id={rule.RuleId}|type={rule.PolicyType}|ssot={Rel(repoRootPath, ssotPath)}|summary={Rel(repoRootPath, summaryPath)}");
+
+    if (!File.Exists(ssotPath))
+    {
+        AddRuleViolation(rule.RuleId, rule.Severity, "naming SSOT file missing", new[] { Rel(repoRootPath, ssotPath) });
+        return;
+    }
+
+    if (!File.Exists(summaryPath))
+    {
+        AddRuleViolation(rule.RuleId, rule.Severity, "naming summary JSON missing", new[] { Rel(repoRootPath, summaryPath) });
+        return;
+    }
+
+    try
+    {
+        using var summaryDoc = JsonDocument.Parse(File.ReadAllText(summaryPath));
+        var root = summaryDoc.RootElement;
+        if (root.ValueKind != JsonValueKind.Object)
+        {
+            AddRuleViolation(rule.RuleId, rule.Severity, "naming summary root must be object", new[] { Rel(repoRootPath, summaryPath) });
+            return;
+        }
+
+        var summaryStatus = root.TryGetProperty("status", out var statusElem) ? statusElem.GetString() : null;
+        if (!string.Equals(summaryStatus, "pass", StringComparison.Ordinal))
+        {
+            AddRuleViolation(rule.RuleId, rule.Severity, "naming summary status is not pass", new[] { Rel(repoRootPath, summaryPath) });
+        }
+
+        if (root.TryGetProperty("mismatches", out var mismatchesElem) && mismatchesElem.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var mismatch in mismatchesElem.EnumerateArray())
+            {
+                var message = mismatch.TryGetProperty("message", out var msgElem) ? msgElem.GetString() : null;
+                var evidence = mismatch.TryGetProperty("evidence", out var evidenceElem) ? evidenceElem.GetString() : null;
+                var evidencePath = string.IsNullOrWhiteSpace(evidence) ? Rel(repoRootPath, summaryPath) : evidence!;
+                AddRuleViolation(rule.RuleId, rule.Severity, message ?? "naming mismatch detected", new[] { evidencePath });
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        AddRuleViolation(rule.RuleId, rule.Severity, $"unable to parse naming summary JSON ({ex.Message})", new[] { Rel(repoRootPath, summaryPath) });
     }
 }
 
@@ -850,7 +921,8 @@ static (bool Ok, List<PolicyRule> Rules, List<string> ValidationErrors, string? 
                 "shell_or_true" or
                 "shell_set_plus_e" or
                 "shell_run_block_max_lines" or
-                "docs_drift"))
+                "docs_drift" or
+                "naming_snt"))
             {
                 validationErrors.Add($"rules[{index}].policy_type invalid");
             }
@@ -894,9 +966,11 @@ static (bool Ok, List<PolicyRule> Rules, List<string> ValidationErrors, string? 
                     "max_inline_run_lines" or
                     "docs_paths" or
                     "forbidden_patterns" or
-                    "allowed_paths"))
-                .OrderBy(static x => x, StringComparer.Ordinal)
-                .ToList();
+                    "allowed_paths" or
+                    "ssot_file" or
+                    "summary_json"))
+            .OrderBy(static x => x, StringComparer.Ordinal)
+            .ToList();
 
             if (unknownParamKeys.Count > 0)
             {
@@ -917,7 +991,9 @@ static (bool Ok, List<PolicyRule> Rules, List<string> ValidationErrors, string? 
                 MaxInlineRunLines: GetIntScalar(paramsNode, "max_inline_run_lines"),
                 DocsPaths: GetStringSequence(paramsNode, "docs_paths").OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList(),
                 ForbiddenPatterns: GetStringSequence(paramsNode, "forbidden_patterns").OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList(),
-                AllowedPaths: GetStringSequence(paramsNode, "allowed_paths").OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList());
+                AllowedPaths: GetStringSequence(paramsNode, "allowed_paths").OrderBy(static x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToList(),
+                SsotFile: GetScalar(paramsNode, "ssot_file"),
+                SummaryJson: GetScalar(paramsNode, "summary_json"));
 
             rules.Add(new PolicyRule(
                 RuleId: ruleId,
@@ -987,7 +1063,9 @@ internal sealed record RuleParams(
     int? MaxInlineRunLines,
     IReadOnlyList<string> DocsPaths,
     IReadOnlyList<string> ForbiddenPatterns,
-    IReadOnlyList<string> AllowedPaths);
+    IReadOnlyList<string> AllowedPaths,
+    string? SsotFile,
+    string? SummaryJson);
 
 internal sealed record PolicyRule(
     string RuleId,

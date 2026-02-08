@@ -1,4 +1,4 @@
-using FileTypeDetection;
+using Tomtastisch.FileClassifier;
 using Xunit;
 
 namespace PackageBacked.Tests;

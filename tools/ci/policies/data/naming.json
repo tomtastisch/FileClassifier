@@ -1,0 +1,22 @@
+{
+  "canonical_name": "Tomtastisch.FileClassifier",
+  "package_id": "Tomtastisch.FileClassifier",
+  "root_namespace": "Tomtastisch.FileClassifier",
+  "assembly_name": "Tomtastisch.FileClassifier",
+  "repo_slug": "FileClassifier",
+  "repo_display_name": "Tomtastisch.FileClassifier",
+  "repository_url": "https://github.com/tomtastisch/FileClassifier",
+  "deprecated_package_ids": [
+    "Tomtastisch.FileTypeDetection"
+  ],
+  "namespace_decision": {
+    "mode": "rename",
+    "current_root_namespace": "FileTypeDetection",
+    "target_root_namespace": "Tomtastisch.FileClassifier",
+    "rationale": "Level 3: public namespace rename for unified package identity; repo slug remains allowed to differ."
+  },
+  "docs_expected_links": [
+    "https://github.com/tomtastisch/FileClassifier/blob/main/docs/021_USAGE_NUGET.MD",
+    "https://github.com/tomtastisch/FileClassifier/blob/main/docs/guides/003_GUIDE_PORTABLE.MD"
+  ]
+}

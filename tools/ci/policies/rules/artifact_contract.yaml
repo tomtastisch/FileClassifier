@@ -13,6 +13,7 @@ rules:
       check_ids:
         - preflight
         - docs-links-full
+        - naming-snt
         - build
         - security-nuget
         - tests-bdd-coverage
