@@ -13,12 +13,16 @@ rules:
       artifact_root: artifacts/ci
       check_ids:
         - preflight
+        - build
+        - api-contract
+        - pack
+        - consumer-smoke
+        - package-backed-tests
+        - security-nuget
+        - tests-bdd-coverage
         - docs-links-full
         - versioning-svt
         - naming-snt
-        - build
-        - security-nuget
-        - tests-bdd-coverage
       required_artifacts:
         - raw.log
         - summary.md
