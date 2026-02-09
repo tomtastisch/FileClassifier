@@ -79,36 +79,85 @@ ci_result_finalize() {
   local finished_ms finished_at duration_ms status
   finished_ms="$(ci_now_ms)"
   finished_at="$(ci_now_utc)"
-  status="$(cat "$CI_STATUS_FILE")"
   duration_ms=$((finished_ms - CI_START_MS))
 
-  local violations_json evidence_json artifacts_json
-  violations_json=$(jq -s . "$CI_VIOLATIONS_NDJSON")
-  evidence_json=$(jq -s 'unique' "$CI_EVIDENCE_NDJSON")
-  artifacts_json=$(jq -cn --arg raw "$CI_RAW_LOG" --arg summary "$CI_SUMMARY_MD" --arg result "$CI_RESULT_JSON" --arg diag "$CI_DIAG_JSON" '[ $raw, $summary, $result, $diag ]')
+  ci_result_write_json() {
+    local write_status="$1"
+    local write_finished_at="$2"
+    local write_duration_ms="$3"
+    local violations_json evidence_json artifacts_json
+    violations_json=$(jq -s . "$CI_VIOLATIONS_NDJSON")
+    evidence_json=$(jq -s 'unique' "$CI_EVIDENCE_NDJSON")
+    artifacts_json=$(jq -cn --arg raw "$CI_RAW_LOG" --arg summary "$CI_SUMMARY_MD" --arg result "$CI_RESULT_JSON" --arg diag "$CI_DIAG_JSON" '[ $raw, $summary, $result, $diag ]')
 
-  jq -cn \
-    --arg check_id "$CI_CHECK_ID" \
-    --arg status "$status" \
-    --arg started_at "$CI_START_AT" \
-    --arg finished_at "$finished_at" \
-    --argjson duration_ms "$duration_ms" \
-    --argjson rule_violations "$violations_json" \
-    --argjson evidence_paths "$evidence_json" \
-    --argjson artifacts "$artifacts_json" \
-    '{
-      schema_version: 1,
-      check_id: $check_id,
-      status: $status,
-      rule_violations: $rule_violations,
-      evidence_paths: $evidence_paths,
-      artifacts: $artifacts,
-      timing: {
-        started_at: $started_at,
-        finished_at: $finished_at,
-        duration_ms: $duration_ms
+    jq -cn \
+      --arg check_id "$CI_CHECK_ID" \
+      --arg status "$write_status" \
+      --arg started_at "$CI_START_AT" \
+      --arg finished_at "$write_finished_at" \
+      --argjson duration_ms "$write_duration_ms" \
+      --argjson rule_violations "$violations_json" \
+      --argjson evidence_paths "$evidence_json" \
+      --argjson artifacts "$artifacts_json" \
+      '{
+        schema_version: 1,
+        check_id: $check_id,
+        status: $status,
+        rule_violations: $rule_violations,
+        evidence_paths: $evidence_paths,
+        artifacts: $artifacts,
+        timing: {
+          started_at: $started_at,
+          finished_at: $finished_at,
+          duration_ms: $duration_ms
+        }
+      }' > "$CI_RESULT_JSON"
+  }
+
+  ci_result_validate_schema() {
+    local lib_dir root_dir schema_path validator_project validator_dll
+    lib_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+    root_dir="$(cd -- "${lib_dir}/../.." && pwd)"
+    schema_path="${root_dir}/tools/ci/schema/result.schema.json"
+    validator_project="${root_dir}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
+    validator_dll="${root_dir}/tools/ci/checks/ResultSchemaValidator/bin/Release/net10.0/ResultSchemaValidator.dll"
+
+    if [[ ! -f "$schema_path" ]]; then
+      ci_result_add_violation "CI-SCHEMA-001" "fail" "result schema missing" "$schema_path"
+      return 1
+    fi
+
+    if [[ ! -f "$validator_project" ]]; then
+      ci_result_add_violation "CI-SCHEMA-001" "fail" "ResultSchemaValidator project missing" "$validator_project"
+      return 1
+    fi
+
+    if [[ ! -f "$validator_dll" ]]; then
+      {
+        printf '$ dotnet restore --locked-mode %s\n' "$validator_project"
+        dotnet restore --locked-mode "$validator_project"
+        printf '$ dotnet build -c Release %s\n' "$validator_project"
+        dotnet build -c Release "$validator_project"
+      } >> "$CI_RAW_LOG" 2>&1 || {
+        ci_result_add_violation "CI-SCHEMA-001" "fail" "ResultSchemaValidator build failed" "$CI_RAW_LOG"
+        return 1
       }
-    }' > "$CI_RESULT_JSON"
+    fi
+
+    {
+      printf '$ dotnet %s --schema %s --result %s\n' "$validator_dll" "$schema_path" "$CI_RESULT_JSON"
+      dotnet "$validator_dll" --schema "$schema_path" --result "$CI_RESULT_JSON"
+    } >> "$CI_RAW_LOG" 2>&1 || {
+      ci_result_add_violation "CI-SCHEMA-001" "fail" "result.json schema validation failed" "$CI_RESULT_JSON" "$CI_RAW_LOG"
+      return 1
+    }
+  }
+
+  status="$(cat "$CI_STATUS_FILE")"
+  ci_result_write_json "$status" "$finished_at" "$duration_ms"
+  ci_result_validate_schema || true
+  status="$(cat "$CI_STATUS_FILE")"
+  ci_result_write_json "$status" "$finished_at" "$duration_ms"
 
   if [[ "$status" == "fail" ]]; then
     ci_emit_error_ux
