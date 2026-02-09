@@ -374,6 +374,11 @@ jobs:
         with:
           name: ci-api-contract
           path: artifacts/ci/api-contract
+      - name: Download Pack Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ci-pack
+          path: artifacts/ci/pack
       - name: Download Consumer Smoke Artifact
         uses: actions/download-artifact@v4
         with:
