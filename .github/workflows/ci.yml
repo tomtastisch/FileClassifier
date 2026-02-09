@@ -14,6 +14,10 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  LC_ALL: C.UTF-8
+  LANG: C.UTF-8
+
 defaults:
   run:
     shell: bash
@@ -45,9 +49,7 @@ jobs:
       - name: Run Entry Check
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          bash tools/ci/bin/run.sh pr-labeling
+        run: bash -euo pipefail tools/ci/bin/run.sh pr-labeling
       - name: Upload Artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -59,6 +61,8 @@ jobs:
   preflight:
     name: preflight
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -75,9 +79,7 @@ jobs:
         with:
           node-version: "20"
       - name: Run Entry Check
-        run: |
-          set -euo pipefail
-          bash tools/ci/bin/run.sh preflight
+        run: bash -euo pipefail tools/ci/bin/run.sh preflight
       - name: Upload Artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -90,6 +92,8 @@ jobs:
     name: docs-links-full
     runs-on: ubuntu-latest
     needs: preflight
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -100,9 +104,7 @@ jobs:
             8.0.x
             10.0.102
       - name: Run Entry Check
-        run: |
-          set -euo pipefail
-          bash tools/ci/bin/run.sh docs-links-full
+        run: bash -euo pipefail tools/ci/bin/run.sh docs-links-full
       - name: Upload Artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -115,6 +117,8 @@ jobs:
     name: versioning-svt
     runs-on: ubuntu-latest
     needs: preflight
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -125,9 +129,7 @@ jobs:
             8.0.x
             10.0.102
       - name: Run Entry Check
-        run: |
-          set -euo pipefail
-          bash tools/ci/bin/run.sh versioning-svt
+        run: bash -euo pipefail tools/ci/bin/run.sh versioning-svt
       - name: Upload Artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -140,6 +142,8 @@ jobs:
     name: naming-snt
     runs-on: ubuntu-latest
     needs: preflight
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -150,9 +154,7 @@ jobs:
             8.0.x
             10.0.102
       - name: Run Entry Check
-        run: |
-          set -euo pipefail
-          bash tools/ci/bin/run.sh naming-snt
+        run: bash -euo pipefail tools/ci/bin/run.sh naming-snt
       - name: Upload Artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -165,6 +167,8 @@ jobs:
     name: build
     runs-on: ubuntu-latest
     needs: [preflight, versioning-svt, naming-snt]
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -175,9 +179,7 @@ jobs:
             8.0.x
             10.0.102
       - name: Run Entry Check
-        run: |
-          set -euo pipefail
-          bash tools/ci/bin/run.sh build
+        run: bash -euo pipefail tools/ci/bin/run.sh build
       - name: Upload Artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -190,6 +192,8 @@ jobs:
     name: api-contract
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -200,9 +204,7 @@ jobs:
             8.0.x
             10.0.102
       - name: Run Entry Check
-        run: |
-          set -euo pipefail
-          bash tools/ci/bin/run.sh api-contract
+        run: bash -euo pipefail tools/ci/bin/run.sh api-contract
       - name: Upload Artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -215,6 +217,8 @@ jobs:
     name: pack
     runs-on: ubuntu-latest
     needs: [build, versioning-svt]
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -225,9 +229,7 @@ jobs:
             8.0.x
             10.0.102
       - name: Run Entry Check
-        run: |
-          set -euo pipefail
-          bash tools/ci/bin/run.sh pack
+        run: bash -euo pipefail tools/ci/bin/run.sh pack
       - name: Upload Artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -240,6 +242,8 @@ jobs:
     name: consumer-smoke
     runs-on: ubuntu-latest
     needs: pack
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -255,9 +259,7 @@ jobs:
           name: ci-pack
           path: artifacts/ci/pack
       - name: Run Entry Check
-        run: |
-          set -euo pipefail
-          bash tools/ci/bin/run.sh consumer-smoke
+        run: bash -euo pipefail tools/ci/bin/run.sh consumer-smoke
       - name: Upload Artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -270,6 +272,8 @@ jobs:
     name: package-backed-tests
     runs-on: ubuntu-latest
     needs: pack
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -285,9 +289,7 @@ jobs:
           name: ci-pack
           path: artifacts/ci/pack
       - name: Run Entry Check
-        run: |
-          set -euo pipefail
-          bash tools/ci/bin/run.sh package-backed-tests
+        run: bash -euo pipefail tools/ci/bin/run.sh package-backed-tests
       - name: Upload Artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -300,6 +302,8 @@ jobs:
     name: security-nuget
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -310,9 +314,7 @@ jobs:
             8.0.x
             10.0.102
       - name: Run Entry Check
-        run: |
-          set -euo pipefail
-          bash tools/ci/bin/run.sh security-nuget
+        run: bash -euo pipefail tools/ci/bin/run.sh security-nuget
       - name: Upload Artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -325,6 +327,8 @@ jobs:
     name: tests-bdd-coverage
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -335,9 +339,7 @@ jobs:
             8.0.x
             10.0.102
       - name: Run Entry Check
-        run: |
-          set -euo pipefail
-          bash tools/ci/bin/run.sh tests-bdd-coverage
+        run: bash -euo pipefail tools/ci/bin/run.sh tests-bdd-coverage
       - name: Upload Artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -350,6 +352,8 @@ jobs:
     name: summary
     runs-on: ubuntu-latest
     needs: [docs-links-full, naming-snt, versioning-svt, api-contract, consumer-smoke, package-backed-tests, security-nuget, tests-bdd-coverage]
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -415,9 +419,7 @@ jobs:
           name: ci-tests-bdd-coverage
           path: artifacts/ci/tests-bdd-coverage
       - name: Run Entry Check
-        run: |
-          set -euo pipefail
-          bash tools/ci/bin/run.sh summary
+        run: bash -euo pipefail tools/ci/bin/run.sh summary
       - name: Upload Artifact
         if: always()
         uses: actions/upload-artifact@v4
