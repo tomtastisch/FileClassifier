@@ -28,7 +28,7 @@ ci_result_init() {
   mkdir -p "$out_dir"
   : > "$CI_RAW_LOG"
   : > "$CI_SUMMARY_MD"
-  : > "$CI_DIAG_JSON"
+  printf '{}\n' > "$CI_DIAG_JSON"
   : > "$CI_VIOLATIONS_NDJSON"
   : > "$CI_EVIDENCE_NDJSON"
   printf 'pass' > "$CI_STATUS_FILE"

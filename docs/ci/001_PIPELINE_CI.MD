@@ -14,6 +14,55 @@ Der Workflow `CI` hat zwei klar getrennte Verantwortungswege:
 - `pull_request`: `pr-labeling` (Governance, nicht-gating)
 - `pull_request`/`push`: technische Qualitätsjobs (`preflight`, `versioning-svt`, `build`, `api-contract`, `pack`, `consumer-smoke`, `package-backed-tests`, `security-nuget`, `tests-bdd-coverage`, `summary`)
 
+## 2.1 Required Status Checks (exakte Context-Namen)
+- `preflight`
+- `version-policy`
+- `build`
+- `api-contract`
+- `pack`
+- `consumer-smoke`
+- `package-backed-tests`
+- `security-nuget`
+- `tests-bdd-coverage`
+
+Hinweis:
+- `version-policy` ist ein separater Workflow-Job (`.github/workflows/version-policy.yml`), ruft intern aber `bash tools/ci/bin/run.sh versioning-svt` auf.
+
+## 2.2 Job-DAG (CI + externer Gate)
+```mermaid
+flowchart TD
+  preflight["preflight"] --> docs["docs-links-full"]
+  preflight --> svt["versioning-svt"]
+  preflight --> naming["naming-snt"]
+  preflight --> build["build"]
+  svt --> build
+  naming --> build
+  build --> api["api-contract"]
+  build --> pack["pack"]
+  svt --> pack
+  pack --> smoke["consumer-smoke"]
+  pack --> pkgtests["package-backed-tests"]
+  build --> sec["security-nuget"]
+  build --> bdd["tests-bdd-coverage"]
+  docs --> summary["summary"]
+  naming --> summary
+  svt --> summary
+  api --> summary
+  smoke --> summary
+  pkgtests --> summary
+  sec --> summary
+  bdd --> summary
+  vp["version-policy (separater Workflow)"] -. required context .-> mainGate["Branch Protection"]
+  preflight -. required context .-> mainGate
+  build -. required context .-> mainGate
+  api -. required context .-> mainGate
+  pack -. required context .-> mainGate
+  smoke -. required context .-> mainGate
+  pkgtests -. required context .-> mainGate
+  sec -. required context .-> mainGate
+  bdd -. required context .-> mainGate
+```
+
 ## 3. Jobs (1 Job = 1 Verantwortung)
 ### Job: pr-labeling (Governance)
 - geänderte Dateien und aktuelle PR-Labels erfassen
@@ -66,7 +115,7 @@ Der Workflow `CI` hat zwei klar getrennte Verantwortungswege:
 ## 4. Required vs. Non-Required Checks
 Required in Branch-Protection:
 - `preflight`
-- `versioning-svt`
+- `version-policy`
 - `build`
 - `api-contract`
 - `pack`
@@ -80,17 +129,18 @@ Nicht required:
 - `pr-labeling` (Governance-Automation, fail-open)
 Wenn Label-API-Aufrufe fehlschlagen, wird dies als Artefakt protokolliert, ohne technische Quality-Gates zu brechen.
 
-## 5. Stabile Artefaktpfade
-- `artifacts/labels/decision.json`
-- `artifacts/docs/doc-check.txt`
-- `artifacts/versioning/versioning-check.txt`
-- `artifacts/format/format-check.txt`
-- `artifacts/build/build-log.txt`
-- `artifacts/security/nuget-vuln.txt`
-- `artifacts/security/nuget-deprecated.txt`
-- `artifacts/tests/**` (TRX, readable output, raw test log)
-- `artifacts/coverage/coverage.cobertura.xml`
-- `artifacts/coverage/coverage-summary.txt`
+## 5. CI-Job-Vertragsmatrix
+| Job (Context) | Zweck | Script-Entrypoint | Artefaktpfad | `result.json` | Schema-Validierung |
+|---|---|---|---|---|---|
+| `preflight` | fail-fast Setup/Policy/Graph | `bash tools/ci/bin/run.sh preflight` | `artifacts/ci/preflight/` | ja | ja (`summary`/`artifact_contract` via PolicyRunner) |
+| `version-policy` | externer Required Gate fuer SVT | `bash tools/ci/bin/run.sh versioning-svt` | `artifacts/ci/versioning-svt/` | ja | ja (`summary`/`artifact_contract` via PolicyRunner) |
+| `build` | Restore + Build | `bash tools/ci/bin/run.sh build` | `artifacts/ci/build/` | ja | ja (`summary`/`artifact_contract` via PolicyRunner) |
+| `api-contract` | API-Contract Tests | `bash tools/ci/bin/run.sh api-contract` | `artifacts/ci/api-contract/` | ja | ja (`summary`/`artifact_contract` via PolicyRunner) |
+| `pack` | NuGet pack + Metadata Checks | `bash tools/ci/bin/run.sh pack` | `artifacts/ci/pack/` | ja | ja (`summary`/`artifact_contract` via PolicyRunner) |
+| `consumer-smoke` | Consumer gegen Paket | `bash tools/ci/bin/run.sh consumer-smoke` | `artifacts/ci/consumer-smoke/` | ja | ja (`summary`/`artifact_contract` via PolicyRunner) |
+| `package-backed-tests` | Tests gegen Paket | `bash tools/ci/bin/run.sh package-backed-tests` | `artifacts/ci/package-backed-tests/` | ja | ja (`summary`/`artifact_contract` via PolicyRunner) |
+| `security-nuget` | Vulnerability/Deprecated Check | `bash tools/ci/bin/run.sh security-nuget` | `artifacts/ci/security-nuget/` | ja | ja (`summary`/`artifact_contract` via PolicyRunner) |
+| `tests-bdd-coverage` | BDD + Coverage Gate | `bash tools/ci/bin/run.sh tests-bdd-coverage` | `artifacts/ci/tests-bdd-coverage/` | ja | ja (`summary`/`artifact_contract` via PolicyRunner) |
 
 ## 6. Labeling- und Versioning-SSOT
 - Policy: `docs/versioning/001_POLICY_VERSIONING.MD`
