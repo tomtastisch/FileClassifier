@@ -9,6 +9,9 @@ import platform
 import re
 import subprocess
 import sys
+import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
 
 try:
@@ -52,11 +55,50 @@ def _render(template: str, values: dict[str, str]) -> str:
     return template.format(**values)
 
 
+def _resolve_artifact_url(run_url: str, artifact_name: str) -> str:
+    match = re.match(r"^https://github\.com/([^/]+)/([^/]+)/actions/runs/(\d+)$", run_url)
+    if not match:
+        raise ValueError("run_url_not_parseable")
+
+    owner, repo, run_id = match.group(1), match.group(2), match.group(3)
+    endpoint = (
+        f"https://api.github.com/repos/{owner}/{repo}/actions/runs/{run_id}/artifacts"
+        f"?name={urllib.parse.quote(artifact_name, safe='')}"
+    )
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "fileclassifier-ci-error-ux",
+    }
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    req = urllib.request.Request(endpoint, headers=headers)
+    with urllib.request.urlopen(req, timeout=10) as resp:
+        payload = json.loads(resp.read().decode("utf-8"))
+
+    artifacts = payload.get("artifacts")
+    if not isinstance(artifacts, list):
+        raise ValueError("artifacts_payload_invalid")
+
+    exact = [a for a in artifacts if isinstance(a, dict) and a.get("name") == artifact_name]
+    if not exact:
+        raise ValueError("artifact_not_found")
+
+    picked = sorted(exact, key=lambda a: int(a.get("id", 0)), reverse=True)[0]
+    artifact_id = picked.get("id")
+    if not artifact_id:
+        raise ValueError("artifact_id_missing")
+
+    return f"https://github.com/{owner}/{repo}/actions/runs/{run_id}/artifacts/{artifact_id}"
+
+
 def _fallback(
     errors: dict[str, str],
     check_id: str,
     artifact_name: str,
-    run_url: str,
+    artifact_url: str,
     diag_path: Path,
     reason: str,
     evidence_paths: list[str],
@@ -69,7 +111,7 @@ def _fallback(
             "reason": reason,
             "rule_id": "",
             "artifact_name": artifact_name,
-            "run_url": run_url,
+            "run_url": artifact_url,
         },
     )
     diag = {
@@ -79,7 +121,7 @@ def _fallback(
         "check_id": check_id,
         "rule_id": "",
         "artifact_name": artifact_name,
-        "artifact_url": run_url,
+        "artifact_url": artifact_url,
         "message": message,
         "reason": reason,
         "timestamp_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -94,7 +136,7 @@ def _fallback(
     diag_path.write_text(json.dumps(diag, indent=2) + "\n", encoding="utf-8")
 
     print(f"\033[31mERROR 9901: {message}\033[0m")
-    print(f"\033[34mARTIFACT {run_url} (artifact: {artifact_name})\033[0m")
+    print(f"\033[34mARTIFACT {artifact_url} (artifact: {artifact_name})\033[0m")
     return 0
 
 
@@ -144,6 +186,18 @@ def main() -> int:
             "missing_run_url",
             evidence_paths,
         )
+    try:
+        artifact_url = _resolve_artifact_url(run_url, args.artifact_name)
+    except (ValueError, KeyError, urllib.error.URLError, TimeoutError) as exc:
+        return _fallback(
+            errors,
+            args.check_id,
+            args.artifact_name,
+            run_url,
+            diag_path,
+            f"artifact_url_resolution_failed:{exc}",
+            evidence_paths,
+        )
 
     step_id = steps.get(args.step_key, "")
     class_id = classes.get(args.class_key, "")
@@ -152,7 +206,7 @@ def main() -> int:
             errors,
             args.check_id,
             args.artifact_name,
-            run_url,
+            artifact_url,
             diag_path,
             f"invalid_mapping:{args.step_key}/{args.class_key}",
             evidence_paths,
@@ -166,7 +220,7 @@ def main() -> int:
             errors,
             args.check_id,
             args.artifact_name,
-            run_url,
+            artifact_url,
             diag_path,
             f"missing_template:{error_key}",
             evidence_paths,
@@ -176,7 +230,7 @@ def main() -> int:
         "check_id": args.check_id,
         "rule_id": args.rule_id,
         "artifact_name": args.artifact_name,
-        "run_url": run_url,
+        "run_url": artifact_url,
         "reason": "",
     }
     try:
@@ -186,7 +240,7 @@ def main() -> int:
             errors,
             args.check_id,
             args.artifact_name,
-            run_url,
+            artifact_url,
             diag_path,
             f"template_render_failed:{exc}",
             evidence_paths,
@@ -199,7 +253,7 @@ def main() -> int:
         "check_id": args.check_id,
         "rule_id": args.rule_id,
         "artifact_name": args.artifact_name,
-        "artifact_url": run_url,
+        "artifact_url": artifact_url,
         "message": message,
         "timestamp_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "tool_versions": {
@@ -213,7 +267,7 @@ def main() -> int:
     diag_path.write_text(json.dumps(diag, indent=2) + "\n", encoding="utf-8")
 
     print(f"\033[31mERROR {error_code}: {message}\033[0m")
-    print(f"\033[34mARTIFACT {run_url} (artifact: {args.artifact_name})\033[0m")
+    print(f"\033[34mARTIFACT {artifact_url} (artifact: {args.artifact_name})\033[0m")
     return 0
 
 
