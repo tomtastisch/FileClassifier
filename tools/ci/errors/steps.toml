@@ -1,0 +1,12 @@
+[steps]
+setup = "01"
+policy = "10"
+build = "20"
+test = "30"
+pack = "40"
+security = "50"
+qodana = "60"
+runner = "70"
+schema = "80"
+generic = "90"
+error_ux = "99"

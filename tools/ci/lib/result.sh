@@ -7,21 +7,28 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/log.sh"
 ci_result_init() {
   local check_id="$1"
   local out_dir="$2"
+  local lib_dir
 
   export CI_CHECK_ID="$check_id"
   export CI_OUT_DIR="$out_dir"
   export CI_RAW_LOG="$out_dir/raw.log"
   export CI_SUMMARY_MD="$out_dir/summary.md"
   export CI_RESULT_JSON="$out_dir/result.json"
+  export CI_DIAG_JSON="$out_dir/diag.json"
   export CI_VIOLATIONS_NDJSON="$out_dir/.violations.ndjson"
   export CI_EVIDENCE_NDJSON="$out_dir/.evidence.ndjson"
   export CI_STATUS_FILE="$out_dir/.status"
+  export CI_ARTIFACT_NAME="${CI_ARTIFACT_NAME:-ci-${check_id}}"
+  export CI_RUN_URL="${GITHUB_SERVER_URL:-https://github.com}/${GITHUB_REPOSITORY:-}/${GITHUB_RUN_ID:+actions/runs/${GITHUB_RUN_ID}}"
+  lib_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+  export CI_ERROR_RENDERER="${lib_dir}/error_ux.py"
   export CI_START_MS
   export CI_START_AT
 
   mkdir -p "$out_dir"
   : > "$CI_RAW_LOG"
   : > "$CI_SUMMARY_MD"
+  : > "$CI_DIAG_JSON"
   : > "$CI_VIOLATIONS_NDJSON"
   : > "$CI_EVIDENCE_NDJSON"
   printf 'pass' > "$CI_STATUS_FILE"
@@ -78,7 +85,7 @@ ci_result_finalize() {
   local violations_json evidence_json artifacts_json
   violations_json=$(jq -s . "$CI_VIOLATIONS_NDJSON")
   evidence_json=$(jq -s 'unique' "$CI_EVIDENCE_NDJSON")
-  artifacts_json=$(jq -cn --arg raw "$CI_RAW_LOG" --arg summary "$CI_SUMMARY_MD" --arg result "$CI_RESULT_JSON" '[ $raw, $summary, $result ]')
+  artifacts_json=$(jq -cn --arg raw "$CI_RAW_LOG" --arg summary "$CI_SUMMARY_MD" --arg result "$CI_RESULT_JSON" --arg diag "$CI_DIAG_JSON" '[ $raw, $summary, $result, $diag ]')
 
   jq -cn \
     --arg check_id "$CI_CHECK_ID" \
@@ -102,15 +109,83 @@ ci_result_finalize() {
         duration_ms: $duration_ms
       }
     }' > "$CI_RESULT_JSON"
+
+  if [[ "$status" == "fail" ]]; then
+    ci_emit_error_ux
+  fi
 }
 
 ci_run_capture() {
   local description="$1"
   shift
 
-  ci_info "$description"
   {
     printf '$ %s\n' "$*"
     "$@"
   } >> "$CI_RAW_LOG" 2>&1
+}
+
+ci_map_error_keys() {
+  local rule_id="$1"
+  case "$rule_id" in
+    CI-SETUP-*) echo "setup command_failed" ;;
+    CI-SHELL-*|CI-DOCS-*|CI-NAMING-*|CI-VERSION-*|CI-ARTIFACT-*|CI-POLICY-*) echo "policy policy_violation" ;;
+    CI-GRAPH-*) echo "policy command_failed" ;;
+    CI-BUILD-*) echo "build command_failed" ;;
+    CI-CONTRACT-*|CI-TEST-*|CI-PKGTEST-*|CI-SMOKE-*) echo "test command_failed" ;;
+    CI-PACK-*) echo "pack command_failed" ;;
+    CI-SECURITY-001) echo "security blocking_findings" ;;
+    CI-SECURITY-*) echo "security command_failed" ;;
+    CI-QODANA-001|CI-QODANA-002) echo "qodana missing_input" ;;
+    CI-QODANA-003|CI-QODANA-005) echo "qodana command_failed" ;;
+    CI-QODANA-004) echo "qodana blocking_findings" ;;
+    CI-SCHEMA-*) echo "schema schema_failure" ;;
+    CI-RUNNER-*) echo "runner missing_input" ;;
+    *) echo "generic command_failed" ;;
+  esac
+}
+
+ci_emit_error_ux() {
+  local first_fail_json rule_id evidence_join map_out step_key class_key run_url
+  first_fail_json="$(jq -c 'map(select(.severity=="fail"))[0] // {}' "$CI_VIOLATIONS_NDJSON")"
+  rule_id="$(jq -r '.rule_id // "CI-RUNNER-001"' <<<"$first_fail_json")"
+  evidence_join="$(jq -r '(.evidence_paths // []) | join("|")' <<<"$first_fail_json")"
+  map_out="$(ci_map_error_keys "$rule_id")"
+  step_key="${map_out%% *}"
+  class_key="${map_out##* }"
+  run_url="$CI_RUN_URL"
+  if [[ "$run_url" == *"//actions/runs/" || "$run_url" == "https://github.com/" ]]; then
+    run_url="https://github.com/${GITHUB_REPOSITORY:-}"
+  fi
+
+  if ! python3 "$CI_ERROR_RENDERER" \
+      --step-key "$step_key" \
+      --class-key "$class_key" \
+      --check-id "$CI_CHECK_ID" \
+      --rule-id "$rule_id" \
+      --artifact-name "$CI_ARTIFACT_NAME" \
+      --run-url "$run_url" \
+      --diag-path "$CI_DIAG_JSON" \
+      --evidence-paths "$evidence_join"; then
+    jq -cn \
+      --arg check_id "$CI_CHECK_ID" \
+      --arg artifact_name "$CI_ARTIFACT_NAME" \
+      --arg run_url "$run_url" \
+      --arg rule_id "$rule_id" \
+      --arg ts "$(ci_now_utc)" \
+      --arg msg "Error mapping/artifact-link failure for check '${CI_CHECK_ID}' (renderer_failed)." \
+      '{
+        error_code:"9901",
+        step_id:"99",
+        class_id:"01",
+        check_id:$check_id,
+        rule_id:$rule_id,
+        artifact_name:$artifact_name,
+        artifact_url:$run_url,
+        message:$msg,
+        timestamp_utc:$ts
+      }' > "$CI_DIAG_JSON"
+    printf '\033[31mERROR 9901: Error mapping/artifact-link failure for check %s (renderer_failed).\033[0m\n' "$CI_CHECK_ID"
+    printf '\033[34mARTIFACT %s (artifact: %s)\033[0m\n' "$run_url" "$CI_ARTIFACT_NAME"
+  fi
 }

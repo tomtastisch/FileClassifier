@@ -1,0 +1,6 @@
+[classes]
+missing_input = "01"
+command_failed = "02"
+policy_violation = "03"
+schema_failure = "04"
+blocking_findings = "05"

@@ -15,15 +15,6 @@ fi
 
 OUT_DIR="artifacts/ci/${CHECK_ID}"
 
-if [[ "$CHECK_ID" == "artifact_contract" || "$CHECK_ID" == "summary" ]]; then
-  cd "$ROOT_DIR"
-  dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
-  dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
-  dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/PolicyRunner/PolicyRunner.csproj"
-  dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/PolicyRunner/PolicyRunner.csproj"
-  exec dotnet "${ROOT_DIR}/tools/ci/checks/PolicyRunner/bin/Release/net10.0/PolicyRunner.dll" --check-id "${CHECK_ID}" --repo-root "${ROOT_DIR}" --out-dir "${OUT_DIR}"
-fi
-
 ci_result_init "$CHECK_ID" "$OUT_DIR"
 
 finalized=0
@@ -406,6 +397,14 @@ run_qodana_contract() {
   ci_result_append_summary "Qodana contract validation completed."
 }
 
+run_policy_contract() {
+  build_validators
+  if ! run_policy_runner_bridge "$CHECK_ID" "$OUT_DIR" "Policy contract check (${CHECK_ID})" "tools/ci/policies/rules"; then
+    return 1
+  fi
+  ci_result_append_summary "Policy contract check '${CHECK_ID}' completed."
+}
+
 main() {
   cd "$ROOT_DIR"
   case "$CHECK_ID" in
@@ -420,10 +419,7 @@ main() {
     build) run_build ;;
     security-nuget) run_security_nuget ;;
     tests-bdd-coverage) run_tests_bdd_coverage ;;
-    summary)
-      ci_result_add_violation "CI-RUNNER-001" "fail" "summary must be executed via PolicyRunner bridge" "tools/ci/bin/run.sh"
-      return 2
-      ;;
+    summary|artifact_contract) run_policy_contract ;;
     pr-labeling) run_pr_labeling ;;
     qodana) run_qodana_contract ;;
     *)
