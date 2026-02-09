@@ -399,22 +399,21 @@ run_pr_labeling() {
     ci_run_capture "Compute deterministic labels" node "${ROOT_DIR}/tools/versioning/compute-pr-labels.js"
 
   run_or_fail "CI-LABEL-001" "Validate label decision" node "${ROOT_DIR}/tools/versioning/validate-label-decision.js" "${ROOT_DIR}/tools/versioning/label-schema.json" "${OUT_DIR}/decision.json"
-  local labels_to_add labels_to_remove
-  labels_to_add="$(jq -r '.labels_to_add[]?' "${OUT_DIR}/decision.json")"
-  labels_to_remove="$(jq -r '.labels_to_remove[]?' "${OUT_DIR}/decision.json")"
+  local expected_json actual_json put_payload_path
+  expected_json="$(jq -cn \
+    --argjson existing "${labels_json}" \
+    --argjson add "$(jq -c '.labels_to_add // []' "${OUT_DIR}/decision.json")" \
+    --argjson remove "$(jq -c '.labels_to_remove // []' "${OUT_DIR}/decision.json")" \
+    '$existing
+      | map(select(. as $label | ($remove | index($label) | not)))
+      | . + $add
+      | unique
+      | sort')"
+  put_payload_path="${OUT_DIR}/labels-put.json"
+  jq -cn --argjson labels "${expected_json}" '{labels:$labels}' > "${put_payload_path}"
 
-  while IFS= read -r label; do
-    [[ -z "${label}" ]] && continue
-    run_or_fail "CI-LABEL-001" "Apply label removal (${label})" gh_retry gh pr edit "${pr_number}" --repo "${GITHUB_REPOSITORY}" --remove-label "${label}"
-  done <<< "${labels_to_remove}"
+  run_or_fail "CI-LABEL-001" "Apply labels (single deterministic PUT)" gh_retry gh api --method PUT "repos/${GITHUB_REPOSITORY}/issues/${pr_number}/labels" --input "${put_payload_path}"
 
-  while IFS= read -r label; do
-    [[ -z "${label}" ]] && continue
-    run_or_fail "CI-LABEL-001" "Apply label add (${label})" gh_retry gh pr edit "${pr_number}" --repo "${GITHUB_REPOSITORY}" --add-label "${label}"
-  done <<< "${labels_to_add}"
-
-  local expected_json actual_json
-  expected_json="$(jq -c '[.labels_to_add[]] | sort' "${OUT_DIR}/decision.json")"
   if ! actual_json="$(gh_retry gh api "repos/${GITHUB_REPOSITORY}/issues/${pr_number}" --jq '[.labels[].name] | sort')"; then
     ci_result_add_violation "CI-LABEL-001" "fail" "Failed to re-read PR labels after apply." "$CI_RAW_LOG"
     return 1
