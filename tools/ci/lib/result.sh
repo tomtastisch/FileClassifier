@@ -147,7 +147,7 @@ ci_map_error_keys() {
 
 ci_emit_error_ux() {
   local first_fail_json rule_id evidence_join map_out step_key class_key run_url
-  first_fail_json="$(jq -c 'map(select(.severity=="fail"))[0] // {}' "$CI_VIOLATIONS_NDJSON")"
+  first_fail_json="$(jq -sc 'map(select(.severity=="fail"))[0] // {}' "$CI_VIOLATIONS_NDJSON")"
   rule_id="$(jq -r '.rule_id // "CI-RUNNER-001"' <<<"$first_fail_json")"
   evidence_join="$(jq -r '(.evidence_paths // []) | join("|")' <<<"$first_fail_json")"
   map_out="$(ci_map_error_keys "$rule_id")"
