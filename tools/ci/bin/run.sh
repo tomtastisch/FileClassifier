@@ -37,6 +37,24 @@ run_or_fail() {
   fi
 }
 
+gh_retry() {
+  local max_attempts="${GH_RETRY_MAX_ATTEMPTS:-4}"
+  local delay_secs="${GH_RETRY_INITIAL_DELAY_SECS:-2}"
+  local attempt=1
+
+  while true; do
+    if "$@"; then
+      return 0
+    fi
+    if (( attempt >= max_attempts )); then
+      return 1
+    fi
+    sleep "$delay_secs"
+    attempt=$((attempt + 1))
+    delay_secs=$((delay_secs * 2))
+  done
+}
+
 log_contains_code() {
   local code="$1"
   if command -v rg >/dev/null 2>&1; then
@@ -363,9 +381,18 @@ run_pr_labeling() {
   run_or_fail "CI-LABEL-001" "Derive required versioning decision" env MODE=required BASE_REF=origin/main HEAD_REF="$head_sha" "${ROOT_DIR}/tools/versioning/check-versioning.sh"
 
   local files_json labels_json pr_title
-  files_json="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_number}/files" --paginate --jq '.[].filename' | jq -Rsc 'split("\n")[:-1]')"
-  labels_json="$(gh api "repos/${GITHUB_REPOSITORY}/issues/${pr_number}" --jq '[.labels[].name]')"
-  pr_title="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_number}" --jq '.title')"
+  if ! files_json="$(gh_retry gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_number}/files" --paginate --jq '.[].filename' | jq -Rsc 'split("\n")[:-1]')"; then
+    ci_result_add_violation "CI-LABEL-001" "fail" "Failed to read PR files from GitHub API." "$CI_RAW_LOG"
+    return 1
+  fi
+  if ! labels_json="$(gh_retry gh api "repos/${GITHUB_REPOSITORY}/issues/${pr_number}" --jq '[.labels[].name]')"; then
+    ci_result_add_violation "CI-LABEL-001" "fail" "Failed to read PR labels from GitHub API." "$CI_RAW_LOG"
+    return 1
+  fi
+  if ! pr_title="$(gh_retry gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_number}" --jq '.title')"; then
+    ci_result_add_violation "CI-LABEL-001" "fail" "Failed to read PR title from GitHub API." "$CI_RAW_LOG"
+    return 1
+  fi
 
   mkdir -p "${OUT_DIR}"
   FILES_JSON="$files_json" EXISTING_LABELS_JSON="$labels_json" PR_TITLE="$pr_title" VERSION_REQUIRED="none" VERSION_ACTUAL="none" VERSION_REASON="contract-run" VERSION_GUARD_EXIT="0" OUTPUT_PATH="${OUT_DIR}/decision.json" \
@@ -378,24 +405,27 @@ run_pr_labeling() {
 
   while IFS= read -r label; do
     [[ -z "${label}" ]] && continue
-    run_or_fail "CI-LABEL-001" "Apply label removal (${label})" gh pr edit "${pr_number}" --repo "${GITHUB_REPOSITORY}" --remove-label "${label}"
+    run_or_fail "CI-LABEL-001" "Apply label removal (${label})" gh_retry gh pr edit "${pr_number}" --repo "${GITHUB_REPOSITORY}" --remove-label "${label}"
   done <<< "${labels_to_remove}"
 
   while IFS= read -r label; do
     [[ -z "${label}" ]] && continue
-    run_or_fail "CI-LABEL-001" "Apply label add (${label})" gh pr edit "${pr_number}" --repo "${GITHUB_REPOSITORY}" --add-label "${label}"
+    run_or_fail "CI-LABEL-001" "Apply label add (${label})" gh_retry gh pr edit "${pr_number}" --repo "${GITHUB_REPOSITORY}" --add-label "${label}"
   done <<< "${labels_to_add}"
 
   local expected_json actual_json
   expected_json="$(jq -c '[.labels_to_add[]] | sort' "${OUT_DIR}/decision.json")"
-  actual_json="$(gh api "repos/${GITHUB_REPOSITORY}/issues/${pr_number}" --jq '[.labels[].name] | sort')"
+  if ! actual_json="$(gh_retry gh api "repos/${GITHUB_REPOSITORY}/issues/${pr_number}" --jq '[.labels[].name] | sort')"; then
+    ci_result_add_violation "CI-LABEL-001" "fail" "Failed to re-read PR labels after apply." "$CI_RAW_LOG"
+    return 1
+  fi
   if [[ "${actual_json}" != "${expected_json}" ]]; then
     ci_result_add_violation "CI-LABEL-001" "fail" "Applied labels do not match decision.json." "${OUT_DIR}/decision.json" "${CI_RAW_LOG}"
     ci_result_append_summary "PR labeling apply failed verification."
     return 1
   fi
 
-  ci_run_capture "Post-apply labels confirmation" gh api "repos/${GITHUB_REPOSITORY}/issues/${pr_number}" --jq '[.labels[].name] | sort'
+  ci_run_capture "Post-apply labels confirmation" gh_retry gh api "repos/${GITHUB_REPOSITORY}/issues/${pr_number}" --jq '[.labels[].name] | sort'
   ci_result_append_summary "PR labeling checks completed."
 }
 
