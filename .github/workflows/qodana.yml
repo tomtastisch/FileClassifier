@@ -44,11 +44,7 @@ jobs:
           if [ -f .editorconfig.qodana.bak ]; then
             mv .editorconfig.qodana.bak .editorconfig
           fi
-      - name: Skip Qodana (missing token)
-        if: env.QODANA_TOKEN == ''
-        run: echo "QODANA_TOKEN is not set; skipping Qodana scan."
       - name: Run Entry Check
-        if: env.QODANA_TOKEN != ''
         run: bash tools/ci/bin/run.sh qodana
       - name: Upload SARIF To Code Scanning
         if: github.event_name != 'pull_request' && env.QODANA_TOKEN != ''
@@ -56,7 +52,7 @@ jobs:
         with:
           sarif_file: artifacts/ci/qodana/qodana.sarif.json
       - name: Upload Artifact
-        if: always() && env.QODANA_TOKEN != ''
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ci-qodana
