@@ -372,6 +372,30 @@ run_pr_labeling() {
     ci_run_capture "Compute deterministic labels" node "${ROOT_DIR}/tools/versioning/compute-pr-labels.js"
 
   run_or_fail "CI-LABEL-001" "Validate label decision" node "${ROOT_DIR}/tools/versioning/validate-label-decision.js" "${ROOT_DIR}/tools/versioning/label-schema.json" "${OUT_DIR}/decision.json"
+  local labels_to_add labels_to_remove
+  labels_to_add="$(jq -r '.labels_to_add[]?' "${OUT_DIR}/decision.json")"
+  labels_to_remove="$(jq -r '.labels_to_remove[]?' "${OUT_DIR}/decision.json")"
+
+  while IFS= read -r label; do
+    [[ -z "${label}" ]] && continue
+    run_or_fail "CI-LABEL-001" "Apply label removal (${label})" gh pr edit "${pr_number}" --repo "${GITHUB_REPOSITORY}" --remove-label "${label}"
+  done <<< "${labels_to_remove}"
+
+  while IFS= read -r label; do
+    [[ -z "${label}" ]] && continue
+    run_or_fail "CI-LABEL-001" "Apply label add (${label})" gh pr edit "${pr_number}" --repo "${GITHUB_REPOSITORY}" --add-label "${label}"
+  done <<< "${labels_to_add}"
+
+  local expected_json actual_json
+  expected_json="$(jq -c '[.labels_to_add[]] | sort' "${OUT_DIR}/decision.json")"
+  actual_json="$(gh api "repos/${GITHUB_REPOSITORY}/issues/${pr_number}" --jq '[.labels[].name] | sort')"
+  if [[ "${actual_json}" != "${expected_json}" ]]; then
+    ci_result_add_violation "CI-LABEL-001" "fail" "Applied labels do not match decision.json." "${OUT_DIR}/decision.json" "${CI_RAW_LOG}"
+    ci_result_append_summary "PR labeling apply failed verification."
+    return 1
+  fi
+
+  ci_run_capture "Post-apply labels confirmation" gh api "repos/${GITHUB_REPOSITORY}/issues/${pr_number}" --jq '[.labels[].name] | sort'
   ci_result_append_summary "PR labeling checks completed."
 }
 
