@@ -169,6 +169,7 @@ ci_run_capture() {
   shift
 
   {
+    printf '# %s\n' "$description"
     printf '$ %s\n' "$*"
     "$@"
   } >> "$CI_RAW_LOG" 2>&1

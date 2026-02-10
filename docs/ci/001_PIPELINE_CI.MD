@@ -84,7 +84,7 @@ Evidence:
 ## Labeling and Versioning Decision Path
 - Decision generation: `compute-pr-labels.js` writes `decision.json` (`tools/ci/bin/run.sh:371-372`).
 - Schema validation: `validate-label-decision.js` (`tools/ci/bin/run.sh:374`).
-- Label application and post-apply verification: `gh pr edit` add/remove and API post-check (`tools/ci/bin/run.sh:375-399`).
+- Label application and post-apply verification: deterministic GitHub API PUT (curl-backed) and post-apply re-read (`tools/ci/bin/run.sh:375-399`, `tools/ci/bin/github_api.py`).
 - Workflow token source: `GH_TOKEN: ${{ github.token }}` (`.github/workflows/ci.yml:46-50`).
 
 ## Qodana Contract Position

@@ -56,15 +56,17 @@ def _render(template: str, values: dict[str, str]) -> str:
 
 
 def _resolve_artifact_url(run_url: str, artifact_name: str) -> str:
-    match = re.match(r"^https://github\.com/([^/]+)/([^/]+)/actions/runs/(\d+)$", run_url)
-    if not match:
+    # Support GitHub.com and GHES: CI_RUN_URL is derived from GITHUB_SERVER_URL.
+    parsed = urllib.parse.urlparse(run_url)
+    if parsed.scheme not in ("http", "https") or not parsed.netloc:
         raise ValueError("run_url_not_parseable")
+    parts = [p for p in (parsed.path or "").split("/") if p]
+    if len(parts) < 5 or parts[2:4] != ["actions", "runs"] or not parts[4].isdigit():
+        raise ValueError("run_url_not_parseable")
+    owner, repo, run_id = parts[0], parts[1], parts[4]
 
-    owner, repo, run_id = match.group(1), match.group(2), match.group(3)
-    endpoint = (
-        f"https://api.github.com/repos/{owner}/{repo}/actions/runs/{run_id}/artifacts"
-        f"?name={urllib.parse.quote(artifact_name, safe='')}"
-    )
+    api_base = (os.environ.get("GITHUB_API_URL") or "https://api.github.com").rstrip("/")
+    endpoint = f"{api_base}/repos/{owner}/{repo}/actions/runs/{run_id}/artifacts?name={urllib.parse.quote(artifact_name, safe='')}"
     token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     headers = {
         "Accept": "application/vnd.github+json",
@@ -91,14 +93,15 @@ def _resolve_artifact_url(run_url: str, artifact_name: str) -> str:
     if not artifact_id:
         raise ValueError("artifact_id_missing")
 
-    return f"https://github.com/{owner}/{repo}/actions/runs/{run_id}/artifacts/{artifact_id}"
+    server_url = (os.environ.get("GITHUB_SERVER_URL") or f"{parsed.scheme}://{parsed.netloc}").rstrip("/")
+    return f"{server_url}/{owner}/{repo}/actions/runs/{run_id}/artifacts/{artifact_id}"
 
 
 def _fallback(
     errors: dict[str, str],
     check_id: str,
     artifact_name: str,
-    artifact_url: str,
+    run_url: str,
     diag_path: Path,
     reason: str,
     evidence_paths: list[str],
@@ -111,7 +114,7 @@ def _fallback(
             "reason": reason,
             "rule_id": "",
             "artifact_name": artifact_name,
-            "run_url": artifact_url,
+            "run_url": run_url,
         },
     )
     diag = {
@@ -121,7 +124,7 @@ def _fallback(
         "check_id": check_id,
         "rule_id": "",
         "artifact_name": artifact_name,
-        "artifact_url": artifact_url,
+        "artifact_url": run_url,
         "message": message,
         "reason": reason,
         "timestamp_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -136,7 +139,7 @@ def _fallback(
     diag_path.write_text(json.dumps(diag, indent=2) + "\n", encoding="utf-8")
 
     print(f"\033[31mERROR 9901: {message}\033[0m")
-    print(f"\033[34mARTIFACT {artifact_url} (artifact: {artifact_name})\033[0m")
+    print(f"\033[34mARTIFACT {run_url} (artifact: {artifact_name})\033[0m")
     return 0
 
 
