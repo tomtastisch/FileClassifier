@@ -16,8 +16,6 @@ permissions:
 jobs:
   qodana:
     runs-on: ubuntu-latest
-    env:
-      QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,6 +27,8 @@ jobs:
         # Do not fail fork PRs (secrets not provided there).
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
         shell: bash
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
         run: |
           test -n "${QODANA_TOKEN:-}" || (echo "FAIL: QODANA_TOKEN missing" >&2; exit 1)
           echo "OK: QODANA_TOKEN present"
@@ -48,8 +48,7 @@ jobs:
       - name: Run Qodana
         uses: JetBrains/qodana-action@v2025.3
         with:
-          # gh-actions input is a single string; use --flag=value form to avoid passing a single argv containing a space.
-          args: --linter=jetbrains/qodana-dotnet:2025.3
+          args: --linter jetbrains/qodana-dotnet:2025.3
           results-dir: artifacts/ci/qodana
           upload-result: false
 
@@ -71,7 +70,7 @@ jobs:
         run: bash tools/ci/bin/run.sh qodana
 
       - name: Upload SARIF To Code Scanning
-        if: github.event_name != 'pull_request'
+        if: always() && github.event_name != 'pull_request'
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: artifacts/ci/qodana/qodana.sarif.json
