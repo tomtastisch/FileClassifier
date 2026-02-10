@@ -4,14 +4,55 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 import sys
-import urllib.error
-import urllib.request
 
 
 def _fail(msg: str) -> None:
     print(f"ERROR: {msg}", file=sys.stderr)
     raise SystemExit(1)
+
+
+def _get_token() -> str:
+    # Fail-closed: do not attempt unauthenticated GitHub API calls.
+    token = (os.environ.get("GITHUB_TOKEN", "") or os.environ.get("GH_TOKEN", "")).strip()
+    if not token:
+        _fail("GITHUB_TOKEN/GH_TOKEN is missing; cannot verify artifacts fail-closed.")
+    return token
+
+
+def _curl_get(url: str, token: str) -> bytes:
+    # Use curl to match the workflow hardening requirement and to ensure non-2xx fails the job.
+    cmd = [
+        "curl",
+        "--fail-with-body",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--max-time",
+        "30",
+        "--header",
+        "Accept: application/vnd.github+json",
+        "--header",
+        "X-GitHub-Api-Version: 2022-11-28",
+        "--header",
+        f"Authorization: Bearer {token}",
+        "--user-agent",
+        "fileclassifier-verify-run-artifact",
+        url,
+    ]
+    try:
+        proc = subprocess.run(cmd, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except FileNotFoundError:
+        _fail("curl is not available; cannot verify artifacts fail-closed.")
+
+    if proc.returncode != 0:
+        # Keep error message bounded; body is in stdout for --fail-with-body.
+        stdout = proc.stdout.decode("utf-8", errors="replace").strip()
+        stderr = proc.stderr.decode("utf-8", errors="replace").strip()
+        _fail(f"curl failed (exit={proc.returncode}). stderr={stderr!r} body_prefix={stdout[:400]!r}")
+
+    return proc.stdout
 
 
 def main() -> int:
@@ -22,9 +63,7 @@ def main() -> int:
     parser.add_argument("--out", required=True, help="Where to write the API response JSON")
     args = parser.parse_args()
 
-    token = os.environ.get("GITHUB_TOKEN", "").strip()
-    if not token:
-        _fail("GITHUB_TOKEN is missing; cannot verify artifacts fail-closed.")
+    token = _get_token()
 
     repo = args.repo.strip()
     run_id = args.run_id.strip()
@@ -34,22 +73,7 @@ def main() -> int:
         _fail(f"--run-id must be numeric, got: {run_id!r}")
 
     url = f"https://api.github.com/repos/{repo}/actions/runs/{run_id}/artifacts"
-    req = urllib.request.Request(
-        url,
-        headers={
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28",
-            "Authorization": f"Bearer {token}",
-            "User-Agent": "fileclassifier-verify-run-artifact",
-        },
-        method="GET",
-    )
-
-    try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            raw = resp.read()
-    except (urllib.error.URLError, TimeoutError) as exc:
-        _fail(f"artifact listing request failed: {exc}")
+    raw = _curl_get(url, token)
 
     out_path = args.out
     os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)

@@ -381,15 +381,15 @@ run_pr_labeling() {
   run_or_fail "CI-LABEL-001" "Derive required versioning decision" env MODE=required BASE_REF=origin/main HEAD_REF="$head_sha" "${ROOT_DIR}/tools/versioning/check-versioning.sh"
 
   local files_json labels_json pr_title
-  if ! files_json="$(gh_retry gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_number}/files" --paginate --jq '.[].filename' | jq -Rsc 'split("\n")[:-1]')"; then
+  if ! files_json="$(gh_retry python3 "${ROOT_DIR}/tools/ci/bin/github_api.py" pr-files --repo "${GITHUB_REPOSITORY}" --pr "${pr_number}")"; then
     ci_result_add_violation "CI-LABEL-001" "fail" "Failed to read PR files from GitHub API." "$CI_RAW_LOG"
     return 1
   fi
-  if ! labels_json="$(gh_retry gh api "repos/${GITHUB_REPOSITORY}/issues/${pr_number}" --jq '[.labels[].name]')"; then
+  if ! labels_json="$(gh_retry python3 "${ROOT_DIR}/tools/ci/bin/github_api.py" issue-labels --repo "${GITHUB_REPOSITORY}" --issue "${pr_number}")"; then
     ci_result_add_violation "CI-LABEL-001" "fail" "Failed to read PR labels from GitHub API." "$CI_RAW_LOG"
     return 1
   fi
-  if ! pr_title="$(gh_retry gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_number}" --jq '.title')"; then
+  if ! pr_title="$(gh_retry python3 "${ROOT_DIR}/tools/ci/bin/github_api.py" pr-title --repo "${GITHUB_REPOSITORY}" --pr "${pr_number}")"; then
     ci_result_add_violation "CI-LABEL-001" "fail" "Failed to read PR title from GitHub API." "$CI_RAW_LOG"
     return 1
   fi
@@ -412,9 +412,9 @@ run_pr_labeling() {
   put_payload_path="${OUT_DIR}/labels-put.json"
   jq -cn --argjson labels "${expected_json}" '{labels:$labels}' > "${put_payload_path}"
 
-  run_or_fail "CI-LABEL-001" "Apply labels (single deterministic PUT)" gh_retry gh api --method PUT "repos/${GITHUB_REPOSITORY}/issues/${pr_number}/labels" --input "${put_payload_path}"
+  run_or_fail "CI-LABEL-001" "Apply labels (single deterministic PUT)" gh_retry python3 "${ROOT_DIR}/tools/ci/bin/github_api.py" put-issue-labels --repo "${GITHUB_REPOSITORY}" --issue "${pr_number}" --payload "${put_payload_path}"
 
-  if ! actual_json="$(gh_retry gh api "repos/${GITHUB_REPOSITORY}/issues/${pr_number}" --jq '[.labels[].name] | sort')"; then
+  if ! actual_json="$(gh_retry python3 "${ROOT_DIR}/tools/ci/bin/github_api.py" issue-labels --repo "${GITHUB_REPOSITORY}" --issue "${pr_number}" --sort)"; then
     ci_result_add_violation "CI-LABEL-001" "fail" "Failed to re-read PR labels after apply." "$CI_RAW_LOG"
     return 1
   fi
@@ -424,7 +424,7 @@ run_pr_labeling() {
     return 1
   fi
 
-  ci_run_capture "Post-apply labels confirmation" gh_retry gh api "repos/${GITHUB_REPOSITORY}/issues/${pr_number}" --jq '[.labels[].name] | sort'
+  ci_run_capture "Post-apply labels confirmation" gh_retry python3 "${ROOT_DIR}/tools/ci/bin/github_api.py" issue-labels --repo "${GITHUB_REPOSITORY}" --issue "${pr_number}" --sort
   ci_result_append_summary "PR labeling checks completed."
 }
 
