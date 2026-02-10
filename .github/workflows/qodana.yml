@@ -9,6 +9,8 @@ on:
 
 permissions:
   contents: read
+  checks: write
+  pull-requests: write
   security-events: write
 
 jobs:
@@ -44,11 +46,8 @@ jobs:
           if [ -f .editorconfig.qodana.bak ]; then
             mv .editorconfig.qodana.bak .editorconfig
           fi
-      - name: Skip Qodana (missing token)
-        if: env.QODANA_TOKEN == ''
-        run: echo "QODANA_TOKEN is not set; skipping Qodana scan."
       - name: Run Entry Check
-        if: env.QODANA_TOKEN != ''
+        if: always() && env.QODANA_TOKEN != ''
         run: bash tools/ci/bin/run.sh qodana
       - name: Upload SARIF To Code Scanning
         if: github.event_name != 'pull_request' && env.QODANA_TOKEN != ''

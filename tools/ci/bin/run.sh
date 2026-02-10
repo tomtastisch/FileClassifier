@@ -15,15 +15,6 @@ fi
 
 OUT_DIR="artifacts/ci/${CHECK_ID}"
 
-if [[ "$CHECK_ID" == "artifact_contract" || "$CHECK_ID" == "summary" ]]; then
-  cd "$ROOT_DIR"
-  dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
-  dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
-  dotnet restore --locked-mode "${ROOT_DIR}/tools/ci/checks/PolicyRunner/PolicyRunner.csproj"
-  dotnet build -c Release "${ROOT_DIR}/tools/ci/checks/PolicyRunner/PolicyRunner.csproj"
-  exec dotnet "${ROOT_DIR}/tools/ci/checks/PolicyRunner/bin/Release/net10.0/PolicyRunner.dll" --check-id "${CHECK_ID}" --repo-root "${ROOT_DIR}" --out-dir "${OUT_DIR}"
-fi
-
 ci_result_init "$CHECK_ID" "$OUT_DIR"
 
 finalized=0
@@ -44,6 +35,24 @@ run_or_fail() {
     ci_result_add_violation "$rule_id" "fail" "$message" "$CI_RAW_LOG"
     return 1
   fi
+}
+
+gh_retry() {
+  local max_attempts="${GH_RETRY_MAX_ATTEMPTS:-4}"
+  local delay_secs="${GH_RETRY_INITIAL_DELAY_SECS:-2}"
+  local attempt=1
+
+  while true; do
+    if "$@"; then
+      return 0
+    fi
+    if (( attempt >= max_attempts )); then
+      return 1
+    fi
+    sleep "$delay_secs"
+    attempt=$((attempt + 1))
+    delay_secs=$((delay_secs * 2))
+  done
 }
 
 log_contains_code() {
@@ -372,15 +381,50 @@ run_pr_labeling() {
   run_or_fail "CI-LABEL-001" "Derive required versioning decision" env MODE=required BASE_REF=origin/main HEAD_REF="$head_sha" "${ROOT_DIR}/tools/versioning/check-versioning.sh"
 
   local files_json labels_json pr_title
-  files_json="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_number}/files" --paginate --jq '.[].filename' | jq -Rsc 'split("\n")[:-1]')"
-  labels_json="$(gh api "repos/${GITHUB_REPOSITORY}/issues/${pr_number}" --jq '[.labels[].name]')"
-  pr_title="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_number}" --jq '.title')"
+  if ! files_json="$(gh_retry python3 "${ROOT_DIR}/tools/ci/bin/github_api.py" pr-files --repo "${GITHUB_REPOSITORY}" --pr "${pr_number}")"; then
+    ci_result_add_violation "CI-LABEL-001" "fail" "Failed to read PR files from GitHub API." "$CI_RAW_LOG"
+    return 1
+  fi
+  if ! labels_json="$(gh_retry python3 "${ROOT_DIR}/tools/ci/bin/github_api.py" issue-labels --repo "${GITHUB_REPOSITORY}" --issue "${pr_number}")"; then
+    ci_result_add_violation "CI-LABEL-001" "fail" "Failed to read PR labels from GitHub API." "$CI_RAW_LOG"
+    return 1
+  fi
+  if ! pr_title="$(gh_retry python3 "${ROOT_DIR}/tools/ci/bin/github_api.py" pr-title --repo "${GITHUB_REPOSITORY}" --pr "${pr_number}")"; then
+    ci_result_add_violation "CI-LABEL-001" "fail" "Failed to read PR title from GitHub API." "$CI_RAW_LOG"
+    return 1
+  fi
 
   mkdir -p "${OUT_DIR}"
   FILES_JSON="$files_json" EXISTING_LABELS_JSON="$labels_json" PR_TITLE="$pr_title" VERSION_REQUIRED="none" VERSION_ACTUAL="none" VERSION_REASON="contract-run" VERSION_GUARD_EXIT="0" OUTPUT_PATH="${OUT_DIR}/decision.json" \
     ci_run_capture "Compute deterministic labels" node "${ROOT_DIR}/tools/versioning/compute-pr-labels.js"
 
   run_or_fail "CI-LABEL-001" "Validate label decision" node "${ROOT_DIR}/tools/versioning/validate-label-decision.js" "${ROOT_DIR}/tools/versioning/label-schema.json" "${OUT_DIR}/decision.json"
+  local expected_json actual_json put_payload_path
+  expected_json="$(jq -cn \
+    --argjson existing "${labels_json}" \
+    --argjson add "$(jq -c '.labels_to_add // []' "${OUT_DIR}/decision.json")" \
+    --argjson remove "$(jq -c '.labels_to_remove // []' "${OUT_DIR}/decision.json")" \
+    '$existing
+      | map(select(. as $label | ($remove | index($label) | not)))
+      | . + $add
+      | unique
+      | sort')"
+  put_payload_path="${OUT_DIR}/labels-put.json"
+  jq -cn --argjson labels "${expected_json}" '{labels:$labels}' > "${put_payload_path}"
+
+  run_or_fail "CI-LABEL-001" "Apply labels (single deterministic PUT)" gh_retry python3 "${ROOT_DIR}/tools/ci/bin/github_api.py" put-issue-labels --repo "${GITHUB_REPOSITORY}" --issue "${pr_number}" --payload "${put_payload_path}"
+
+  if ! actual_json="$(gh_retry python3 "${ROOT_DIR}/tools/ci/bin/github_api.py" issue-labels --repo "${GITHUB_REPOSITORY}" --issue "${pr_number}" --sort)"; then
+    ci_result_add_violation "CI-LABEL-001" "fail" "Failed to re-read PR labels after apply." "$CI_RAW_LOG"
+    return 1
+  fi
+  if [[ "${actual_json}" != "${expected_json}" ]]; then
+    ci_result_add_violation "CI-LABEL-001" "fail" "Applied labels do not match decision.json." "${OUT_DIR}/decision.json" "${CI_RAW_LOG}"
+    ci_result_append_summary "PR labeling apply failed verification."
+    return 1
+  fi
+
+  ci_run_capture "Post-apply labels confirmation" gh_retry python3 "${ROOT_DIR}/tools/ci/bin/github_api.py" issue-labels --repo "${GITHUB_REPOSITORY}" --issue "${pr_number}" --sort
   ci_result_append_summary "PR labeling checks completed."
 }
 
@@ -406,6 +450,14 @@ run_qodana_contract() {
   ci_result_append_summary "Qodana contract validation completed."
 }
 
+run_policy_contract() {
+  build_validators
+  if ! run_policy_runner_bridge "$CHECK_ID" "$OUT_DIR" "Policy contract check (${CHECK_ID})" "tools/ci/policies/rules"; then
+    return 1
+  fi
+  ci_result_append_summary "Policy contract check '${CHECK_ID}' completed."
+}
+
 main() {
   cd "$ROOT_DIR"
   case "$CHECK_ID" in
@@ -420,10 +472,7 @@ main() {
     build) run_build ;;
     security-nuget) run_security_nuget ;;
     tests-bdd-coverage) run_tests_bdd_coverage ;;
-    summary)
-      ci_result_add_violation "CI-RUNNER-001" "fail" "summary must be executed via PolicyRunner bridge" "tools/ci/bin/run.sh"
-      return 2
-      ;;
+    summary|artifact_contract) run_policy_contract ;;
     pr-labeling) run_pr_labeling ;;
     qodana) run_qodana_contract ;;
     *)
@@ -434,6 +483,11 @@ main() {
 }
 
 main
+
+if [[ "$finalized" -eq 0 ]]; then
+  ci_result_finalize
+  finalized=1
+fi
 
 if [[ "$(cat "$CI_STATUS_FILE")" == "fail" ]]; then
   ci_result_append_summary "Check '${CHECK_ID}' failed."

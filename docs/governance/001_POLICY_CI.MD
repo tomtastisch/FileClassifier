@@ -11,6 +11,8 @@ Entry index:
 ## Global Rules
 - Fail-closed: no silent bypass paths.
 - Workflow YAML only calls entry scripts under `tools/ci/bin/`.
+- Required branch-protection contexts remain fixed: `preflight`, `version-policy`, `build`, `api-contract`, `pack`, `consumer-smoke`, `package-backed-tests`, `security-nuget`, `tests-bdd-coverage`.
+  Evidence: branch protection API (`required_status_checks.contexts`) and `.github/workflows/ci.yml:59-347`.
 
 ## Result Contract
 All required checks MUST write:
@@ -19,6 +21,17 @@ All required checks MUST write:
 - `artifacts/ci/<check_id>/result.json`
 
 `result.json` must comply with `tools/ci/schema/result.schema.json`.
+Implementation evidence: `tools/ci/lib/result.sh:12-20`, `tools/ci/lib/result.sh:28-34`, `tools/ci/lib/result.sh:78-112`.
+
+## Governance View (Execution Boundary)
+```mermaid
+flowchart LR
+  yml["Workflow declarations\n.github/workflows/*.yml"] --> run["Single entrypoint\n tools/ci/bin/run.sh <check_id>"]
+  run --> result["Result contract artifacts\nraw.log / summary.md / result.json / diag.json"]
+  result --> policy["Policy validators / schema\nPolicyRunner + result schema"]
+```
+
+The detailed job DAG and contract matrix are maintained in `docs/ci/001_PIPELINE_CI.MD` to avoid duplication.
 
 ## Rule Catalog
 - Rule IDs and file ownership are indexed in `docs/governance/POLICY_INDEX.md`.

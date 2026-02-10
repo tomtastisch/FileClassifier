@@ -2,4 +2,16 @@ version: "1.0"
 linter: jetbrains/qodana-dotnet:2025.3
 
 profile:
-    path: .qodana/profiles/fileclassifier.yaml
+  path: .qodana/profiles/fileclassifier.yaml
+
+# Scope-limited excludes for known non-security false positives on the VB codebase.
+exclude:
+  - name: CheckNamespace
+    paths:
+      - src/FileTypeDetection/**
+  - name: VBWarnings__BC40056
+    paths:
+      - src/FileTypeDetection/**
+  - name: UnusedImportClause
+    paths:
+      - src/FileTypeDetection/**

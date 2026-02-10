@@ -1,146 +1,94 @@
-# CI-Pipeline (SSOT)
+# CI Pipeline (SSOT)
 
-## 1. Zweck
-Diese Pipeline liefert auditierbare Nachweise für Produktionsreife:
-- Konsistenz/Format
-- Build-Korrektheit (`--warnaserror`)
-- Paket-Sicherheit (NuGet-Vulnerabilities)
-- BDD-Readable-Tests mit Coverage-Gate
-- Doku-Konsistenz
-- deterministisches PR-Labeling und Versionierungs-Nachweise
+## Scope
+This document describes the executable CI topology and artifact contract.
+Normative policy thresholds and rule parameters stay in `tools/ci/policies/rules/` and `docs/governance/001_POLICY_CI.MD`.
 
-## 2. Workflow-Struktur
-Der Workflow `CI` hat zwei klar getrennte Verantwortungswege:
-- `pull_request`: `pr-labeling` (Governance, nicht-gating)
-- `pull_request`/`push`: technische Qualitätsjobs (`preflight`, `versioning-svt`, `build`, `api-contract`, `pack`, `consumer-smoke`, `package-backed-tests`, `security-nuget`, `tests-bdd-coverage`, `summary`)
+## Required Status Contexts
+Main branch protection requires exactly these contexts (`strict: true`): `preflight`, `version-policy`, `build`, `api-contract`, `pack`, `consumer-smoke`, `package-backed-tests`, `security-nuget`, `tests-bdd-coverage`.
+Evidence: branch protection API output (`required_status_checks.contexts`) and `.github/workflows/ci.yml:59-347` plus `.github/workflows/version-policy.yml`.
 
-## 3. Jobs (1 Job = 1 Verantwortung)
-### Job: pr-labeling (Governance)
-- geänderte Dateien und aktuelle PR-Labels erfassen
-- `required/actual/reason` aus Versioning-Guard ableiten
-- deterministische Label-Entscheidung berechnen (`decision.json`)
-- Schema validieren
-- veraltete Auto-Labels entfernen und neue setzen
-- Artefakte hochladen
+## Workflow Topology
+- `pr-labeling` runs only on `pull_request` and is separate from the required technical gate path (`.github/workflows/ci.yml:22-58`).
+- The technical gate path starts at `preflight` and fans into downstream jobs via `needs` (`.github/workflows/ci.yml:89-427`).
+- `summary` aggregates downstream artifacts and runs contract checks (`.github/workflows/ci.yml:349-427`, `tools/ci/bin/run.sh:446`).
 
-### Job: preflight (fail-fast)
-1. Label-Engine Golden-Tests
-2. Doc-Consistency-Drift-Guard
-3. Format-Check
+```mermaid
+flowchart TD
+  pr["pr-labeling"]:::meta
+  pre["preflight"] --> docs["docs-links-full"]
+  pre --> svt["versioning-svt"]
+  pre --> naming["naming-snt"]
+  pre --> build["build"]
+  svt --> build
+  naming --> build
+  build --> api["api-contract"]
+  build --> pack["pack"]
+  svt --> pack
+  pack --> smoke["consumer-smoke"]
+  pack --> pkg["package-backed-tests"]
+  build --> sec["security-nuget"]
+  build --> bdd["tests-bdd-coverage"]
+  docs --> sum["summary"]
+  naming --> sum
+  svt --> sum
+  api --> sum
+  smoke --> sum
+  pkg --> sum
+  sec --> sum
+  bdd --> sum
 
-### Job: versioning-svt (fail-closed)
-1. Erzwingt Tag-SSOT (keine statischen Versionfelder im Repository)
-2. Blockiert Build/Test bei Policy-Verletzung
+  req["Branch protection required contexts"]:::gate
+  pre -.-> req
+  build -.-> req
+  api -.-> req
+  pack -.-> req
+  smoke -.-> req
+  pkg -.-> req
+  sec -.-> req
+  bdd -.-> req
+  vp["version-policy (separate workflow)"] -.-> req
 
-### Job: build
-1. Restore
-2. Build (`--warnaserror`)
-
-### Job: api-contract
-1. Public-API-Snapshot-Gate (`Category=ApiContract`)
-2. Fail-closed bei unbeabsichtigter API-Drift
-
-### Job: pack
-1. `dotnet pack` erzeugt `.nupkg` (Artefakt)
-2. Paket-Metadaten (`id`, `version`) werden verifiziert
-
-### Job: consumer-smoke
-1. Restore/Build/Run eines externen Consumers gegen das gepackte Paket
-2. Harte Regel: kein `ProjectReference` zur Source-Library
-
-### Job: package-backed-tests
-1. Definierter Kern-Test-Satz laeuft gegen das gepackte Paket
-2. Beweist Verhaltensidentitaet package-basiert (nicht Source-basiert)
-
-### Job: security-nuget
-1. Vulnerability-Scan (`--include-transitive`)
-2. Deprecated-Packages-Report
-
-### Job: tests-bdd-coverage
-1. Single-Run BDD-Tests + Coverage-Gate (`Line >= 85`, `Branch >= 69`)
-2. Runner-Stack: Reqnroll + `Reqnroll.xunit.v3` (xUnit v3)
-
-### Job: summary
-- Coverage- und Security-Zusammenfassung (nur Reporting)
-
-## 4. Required vs. Non-Required Checks
-Required in Branch-Protection:
-- `preflight`
-- `versioning-svt`
-- `build`
-- `api-contract`
-- `pack`
-- `consumer-smoke`
-- `package-backed-tests`
-- `security-nuget`
-- `tests-bdd-coverage`
-- optional: `qodana` (policy-abhängig)
-
-Nicht required:
-- `pr-labeling` (Governance-Automation, fail-open)
-Wenn Label-API-Aufrufe fehlschlagen, wird dies als Artefakt protokolliert, ohne technische Quality-Gates zu brechen.
-
-## 5. Stabile Artefaktpfade
-- `artifacts/labels/decision.json`
-- `artifacts/docs/doc-check.txt`
-- `artifacts/versioning/versioning-check.txt`
-- `artifacts/format/format-check.txt`
-- `artifacts/build/build-log.txt`
-- `artifacts/security/nuget-vuln.txt`
-- `artifacts/security/nuget-deprecated.txt`
-- `artifacts/tests/**` (TRX, readable output, raw test log)
-- `artifacts/coverage/coverage.cobertura.xml`
-- `artifacts/coverage/coverage-summary.txt`
-
-## 6. Labeling- und Versioning-SSOT
-- Policy: `docs/versioning/001_POLICY_VERSIONING.MD`
-- Verhalten + Diagramme: `docs/versioning/004_POLICY_LABELING.MD`
-- Ownership: `docs/governance/002_POLICY_LABELING.MD`
-
-## 7. Qodana
-Qodana bleibt ein separater Workflow und ergänzt die CI-Qualitätsgates.
-Coverage-SSOT bleibt CI (Coverage-Artefakte + Gate-Enforcement).
-Für `pull_request` wird SARIF als Workflow-Artefakt veröffentlicht.
-Code-Scanning-SARIF-Upload erfolgt nur auf non-PR-Runs, um PR-Noise zu vermeiden.
-Profil-Hinweis: In `.qodana/profiles/fileclassifier.yaml` sind nur testpfad-spezifische Excludes für reine Redundanz-Inspections gesetzt (`tests/**`), Produktionscode bleibt unverändert streng.
-
-### 7.1 Qodana Ergebnisse & Artefakte
-- Wenn `QODANA_TOKEN` fehlt, wird Qodana im Workflow übersprungen.
-- Qodana schreibt Ergebnisse in `artifacts/ci/qodana/` (inkl. `qodana.sarif.json`).
-- Für `pull_request`-Runs wird das Verzeichnis als Artefakt veröffentlicht.
-- Für non-PR-Runs wird `artifacts/ci/qodana/qodana.sarif.json` in GitHub Code Scanning hochgeladen.
-- Artefakte:
-  - `artifacts/ci/qodana/qodana.sarif.json`
-  - Verzeichnis `artifacts/ci/qodana/`
-
-Branch-Protection-Hinweis:
-- Der Workflow-Status `qodana` muss in GitHub als Required Check konfiguriert werden, damit PR-Merges blockiert werden.
-
-## 8. Lokale Reproduktion
-```bash
-node tools/versioning/test-compute-pr-labels.js
-python3 tools/check-doc-consistency.py
-python3 tools/check-docs.py
-bash tools/versioning/check-versioning-svt.sh
-dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --filter "Category=ApiContract" -v minimal
-dotnet pack src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -o artifacts/nuget -v minimal
-dotnet restore samples/PortableConsumer/PortableConsumer.csproj --configfile samples/PortableConsumer/NuGet.config -p:PortableConsumerPackageVersion=1.0.0 -v minimal
-dotnet build samples/PortableConsumer/PortableConsumer.csproj -c Release --no-restore -p:PortableConsumerPackageVersion=1.0.0 -v minimal
-dotnet restore tests/PackageBacked.Tests/PackageBacked.Tests.csproj --configfile tests/PackageBacked.Tests/NuGet.config -p:PackageBackedVersion=1.0.0 -v minimal
-dotnet test tests/PackageBacked.Tests/PackageBacked.Tests.csproj -c Release --no-restore -p:PackageBackedVersion=1.0.0 -v minimal
-dotnet format FileClassifier.sln --verify-no-changes
-dotnet restore FileClassifier.sln -v minimal
-dotnet build FileClassifier.sln --no-restore -warnaserror -v minimal
-
-dotnet list FileClassifier.sln package --vulnerable --include-transitive
-dotnet list FileClassifier.sln package --deprecated
-
-TEST_BDD_OUTPUT_DIR=artifacts/tests bash tools/test-bdd-readable.sh -- \
-  /p:CollectCoverage=true \
-  /p:Include="[FileTypeDetectionLib]*" \
-  /p:CoverletOutputFormat=cobertura \
-  /p:CoverletOutput="$(pwd)/artifacts/coverage/coverage" \
-  /p:Threshold=85%2c69 \
-  /p:ThresholdType=line%2cbranch \
-  /p:ThresholdStat=total
+  classDef gate fill:#e9f5ff,stroke:#2a6f97,color:#073b4c;
+  classDef meta fill:#f8f9fa,stroke:#6c757d,color:#343a40;
 ```
+
+## Artifact Contract
+Each `tools/ci/bin/run.sh <check_id>` invocation initializes and finalizes a fixed artifact set:
+- `raw.log`
+- `summary.md`
+- `result.json`
+- `diag.json`
+
+Evidence:
+- Artifact path initialization in `tools/ci/lib/result.sh:12-20`.
+- File materialization in `tools/ci/lib/result.sh:28-34`.
+- Final `result.json` composition in `tools/ci/lib/result.sh:78-112`.
+- Universal runner wiring in `tools/ci/bin/run.sh:16-28`.
+
+## Contract Matrix
+| Job | Entrypoint | Artifact path | Contract validation path | Evidence |
+|---|---|---|---|---|
+| `preflight` | `bash tools/ci/bin/run.sh preflight` | `artifacts/ci/preflight/` | Result contract + policy bridge | `.github/workflows/ci.yml:77-87`, `tools/ci/bin/run.sh:159-171` |
+| `version-policy` | `bash tools/ci/bin/run.sh versioning-svt` | `artifacts/ci/versioning-svt/` | Result contract + policy bridge | `tools/ci/bin/run.sh:242-250` |
+| `build` | `bash tools/ci/bin/run.sh build` | `artifacts/ci/build/` | Result contract | `.github/workflows/ci.yml:177-187`, `tools/ci/bin/run.sh:179-183` |
+| `api-contract` | `bash tools/ci/bin/run.sh api-contract` | `artifacts/ci/api-contract/` | Result contract | `.github/workflows/ci.yml:202-212`, `tools/ci/bin/run.sh:185-189` |
+| `pack` | `bash tools/ci/bin/run.sh pack` | `artifacts/ci/pack/` | Result contract + package metadata checks | `.github/workflows/ci.yml:227-237`, `tools/ci/bin/run.sh:191-230` |
+| `consumer-smoke` | `bash tools/ci/bin/run.sh consumer-smoke` | `artifacts/ci/consumer-smoke/` | Result contract + package-consumer execution | `.github/workflows/ci.yml:257-267`, `tools/ci/bin/run.sh:252-283` |
+| `package-backed-tests` | `bash tools/ci/bin/run.sh package-backed-tests` | `artifacts/ci/package-backed-tests/` | Result contract + package-backed tests | `.github/workflows/ci.yml:287-297`, `tools/ci/bin/run.sh:285-315` |
+| `security-nuget` | `bash tools/ci/bin/run.sh security-nuget` | `artifacts/ci/security-nuget/` | Result contract + High/Critical fail-close | `.github/workflows/ci.yml:312-322`, `tools/ci/bin/run.sh:317-329` |
+| `tests-bdd-coverage` | `bash tools/ci/bin/run.sh tests-bdd-coverage` | `artifacts/ci/tests-bdd-coverage/` | Result contract + coverage threshold execution | `.github/workflows/ci.yml:337-347`, `tools/ci/bin/run.sh:331-348` |
+| `summary` | `bash tools/ci/bin/run.sh summary` | `artifacts/ci/summary/` | Policy contract aggregation | `.github/workflows/ci.yml:417-427`, `tools/ci/bin/run.sh:424-430` |
+| `pr-labeling` | `bash tools/ci/bin/run.sh pr-labeling` | `artifacts/ci/pr-labeling/` | Label decision schema + apply+verify | `.github/workflows/ci.yml:45-57`, `tools/ci/bin/run.sh:350-400` |
+
+## Labeling and Versioning Decision Path
+- Decision generation: `compute-pr-labels.js` writes `decision.json` (`tools/ci/bin/run.sh:371-372`).
+- Schema validation: `validate-label-decision.js` (`tools/ci/bin/run.sh:374`).
+- Label application and post-apply verification: deterministic GitHub API PUT (curl-backed) and post-apply re-read (`tools/ci/bin/run.sh:375-399`, `tools/ci/bin/github_api.py`).
+- Workflow token source: `GH_TOKEN: ${{ github.token }}` (`.github/workflows/ci.yml:46-50`).
+
+## Qodana Contract Position
+Qodana runs in a separate workflow and is validated by `run.sh qodana`:
+- Qodana action execution and SARIF output path (`.github/workflows/qodana.yml:34-40`, `.github/workflows/qodana.yml:59`).
+- Contract check invocation (`.github/workflows/qodana.yml:47-48`, `tools/ci/bin/run.sh:402-422`).
+- Qodana artifact upload (`.github/workflows/qodana.yml:54-60`).
