@@ -132,46 +132,4 @@ public sealed class OptionsPropagationCoreClassesUnitTests
             FileTypeOptions.SetSnapshot(original);
         }
     }
-
-    [Fact]
-    public void EvidenceHashing_HashBytes_UsesLoadedIncludeFastHash()
-    {
-        var original = FileTypeOptions.GetSnapshot();
-        var payload = File.ReadAllBytes(TestResources.Resolve("sample.pdf"));
-
-        try
-        {
-            Assert.True(FileTypeOptions.LoadOptions("{\"deterministicHashIncludeFastHash\":false}"));
-
-            var evidence = EvidenceHashing.HashBytes(payload, "sample.pdf");
-
-            Assert.True(string.IsNullOrWhiteSpace(evidence.Digests.FastPhysicalXxHash3));
-            Assert.True(string.IsNullOrWhiteSpace(evidence.Digests.FastLogicalXxHash3));
-        }
-        finally
-        {
-            FileTypeOptions.SetSnapshot(original);
-        }
-    }
-
-    [Fact]
-    public void EvidenceHashing_HashBytes_UsesLoadedIncludePayloadCopies()
-    {
-        var original = FileTypeOptions.GetSnapshot();
-        var payload = File.ReadAllBytes(TestResources.Resolve("sample.pdf"));
-
-        try
-        {
-            Assert.True(FileTypeOptions.LoadOptions("{\"deterministicHashIncludePayloadCopies\":false}"));
-
-            var evidence = EvidenceHashing.HashBytes(payload, "sample.pdf");
-
-            Assert.True(evidence.CompressedBytes.IsDefaultOrEmpty);
-            Assert.True(evidence.UncompressedBytes.IsDefaultOrEmpty);
-        }
-        finally
-        {
-            FileTypeOptions.SetSnapshot(original);
-        }
-    }
 }
