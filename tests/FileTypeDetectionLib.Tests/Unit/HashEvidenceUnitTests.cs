@@ -2,13 +2,13 @@ using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
-public sealed class DeterministicHashEvidenceUnitTests
+public sealed class HashEvidenceUnitTests
 {
     [Fact]
     public void Constructor_SetsSafeDefaults_WhenInputsNull()
     {
-        var evidence = new DeterministicHashEvidence(
-            sourceType: DeterministicHashSourceType.Unknown,
+        var evidence = new HashEvidence(
+            sourceType: HashSourceType.Unknown,
             label: null,
             detectedType: null,
             entry: null,

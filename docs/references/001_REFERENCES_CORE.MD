@@ -17,7 +17,7 @@ Dieses Dokument sammelt die statischen Referenzen zur API: interne Dateipfade, e
 |---|---|---|
 | Detection | `src/FileTypeDetection/Abstractions/Detection/README.md` | `src/FileTypeDetection/Abstractions/Detection/FileKind.vb`, `src/FileTypeDetection/Abstractions/Detection/FileType.vb`, `src/FileTypeDetection/Abstractions/Detection/DetectionDetail.vb` |
 | Archive | `src/FileTypeDetection/Abstractions/Archive/README.md` | `src/FileTypeDetection/Abstractions/Archive/ZipExtractedEntry.vb` |
-| Hashing | `src/FileTypeDetection/Abstractions/Hashing/README.md` | `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashSourceType.vb`, `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashDigestSet.vb`, `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashEvidence.vb`, `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashRoundTripReport.vb`, `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashOptions.vb` |
+| Hashing | `src/FileTypeDetection/Abstractions/Hashing/README.md` | `src/FileTypeDetection/Abstractions/Hashing/HashSourceType.vb`, `src/FileTypeDetection/Abstractions/Hashing/HashDigestSet.vb`, `src/FileTypeDetection/Abstractions/Hashing/HashEvidence.vb`, `src/FileTypeDetection/Abstractions/Hashing/HashRoundTripReport.vb`, `src/FileTypeDetection/Abstractions/Hashing/HashOptions.vb` |
 
 ## 3. ReasonCode-Referenz (DetectDetailed)
 Quelle: `FileTypeDetector.vb`.

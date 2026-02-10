@@ -28,7 +28,7 @@ var detected = detector.Detect(payload);
 
 if (detected.Kind == FileKind.Pdf)
 {
-    var evidence = DeterministicHashing.HashBytes(payload, "sample.pdf");
+    var evidence = EvidenceHashing.HashBytes(payload, "sample.pdf");
     _ = FileMaterializer.Persist(payload, "out/sample.bin", overwrite: true, secureExtract: false);
 }
 ```

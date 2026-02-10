@@ -11,39 +11,38 @@ Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Öffentliche Fassade für deterministische Hash- und RoundTrip-Nachweise.
     ''' </summary>
-    Public NotInheritable Class DeterministicHashing
+    Public NotInheritable Class EvidenceHashing
         Private Const LogicalManifestVersion As String = "FTD-LOGICAL-HASH-V1"
         Private Const DefaultPayloadLabel As String = "payload.bin"
 
         Private Sub New()
         End Sub
 
-        Public Shared Function HashFile(path As String) As DeterministicHashEvidence
+        Public Shared Function HashFile(path As String) As HashEvidence
             Return HashFile(path, options:=Nothing)
         End Function
 
-        Public Shared Function HashFile(path As String, options As DeterministicHashOptions) _
-            As DeterministicHashEvidence
+        Public Shared Function HashFile(path As String, options As HashOptions) _
+            As HashEvidence
             Dim detectorOptions = FileTypeOptions.GetSnapshot()
             Dim normalizedOptions = ResolveHashOptions(detectorOptions, options)
 
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 Return _
-                    DeterministicHashEvidence.CreateFailure(DeterministicHashSourceType.FilePath, path,
-                                                            "Datei nicht gefunden.")
+                    HashEvidence.CreateFailure(HashSourceType.FilePath, path, "Datei nicht gefunden.")
             End If
 
             Dim fileBytes As Byte() = Array.Empty(Of Byte)()
             Dim readError As String = String.Empty
             If Not TryReadFileBounded(path, detectorOptions, fileBytes, readError) Then
-                Return DeterministicHashEvidence.CreateFailure(DeterministicHashSourceType.FilePath, path, readError)
+                Return HashEvidence.CreateFailure(HashSourceType.FilePath, path, readError)
             End If
 
             Dim detectedType = New FileTypeDetector().Detect(path)
             Dim entries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             If ArchiveEntryCollector.TryCollectFromFile(path, detectorOptions, entries) Then
                 Return BuildEvidenceFromEntries(
-                    sourceType:=DeterministicHashSourceType.FilePath,
+                    sourceType:=HashSourceType.FilePath,
                     label:=IO.Path.GetFileName(path),
                     detectedType:=detectedType,
                     compressedBytes:=fileBytes,
@@ -53,7 +52,7 @@ Namespace Global.Tomtastisch.FileClassifier
             End If
 
             Return BuildEvidenceFromRawPayload(
-                sourceType:=DeterministicHashSourceType.FilePath,
+                sourceType:=HashSourceType.FilePath,
                 label:=IO.Path.GetFileName(path),
                 detectedType:=detectedType,
                 payload:=fileBytes,
@@ -61,36 +60,34 @@ Namespace Global.Tomtastisch.FileClassifier
                 notes:="Raw payload hashed directly.")
         End Function
 
-        Public Shared Function HashBytes(data As Byte()) As DeterministicHashEvidence
+        Public Shared Function HashBytes(data As Byte()) As HashEvidence
             Return HashBytes(data, DefaultPayloadLabel, options:=Nothing)
         End Function
 
-        Public Shared Function HashBytes(data As Byte(), label As String) As DeterministicHashEvidence
+        Public Shared Function HashBytes(data As Byte(), label As String) As HashEvidence
             Return HashBytes(data, label, options:=Nothing)
         End Function
 
-        Public Shared Function HashBytes(data As Byte(), label As String, options As DeterministicHashOptions) _
-            As DeterministicHashEvidence
+        Public Shared Function HashBytes(data As Byte(), label As String, options As HashOptions) _
+            As HashEvidence
             Dim detectorOptions = FileTypeOptions.GetSnapshot()
             Dim normalizedOptions = ResolveHashOptions(detectorOptions, options)
 
             If data Is Nothing Then
                 Return _
-                    DeterministicHashEvidence.CreateFailure(DeterministicHashSourceType.RawBytes, label,
-                                                            "Payload ist null.")
+                    HashEvidence.CreateFailure(HashSourceType.RawBytes, label, "Payload ist null.")
             End If
 
             If CLng(data.Length) > detectorOptions.MaxBytes Then
                 Return _
-                    DeterministicHashEvidence.CreateFailure(DeterministicHashSourceType.RawBytes, label,
-                                                            "Payload groesser als MaxBytes.")
+                    HashEvidence.CreateFailure(HashSourceType.RawBytes, label, "Payload groesser als MaxBytes.")
             End If
 
             Dim detectedType = New FileTypeDetector().Detect(data)
             Dim entries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             If ArchiveEntryCollector.TryCollectFromBytes(data, detectorOptions, entries) Then
                 Return BuildEvidenceFromEntries(
-                    sourceType:=DeterministicHashSourceType.RawBytes,
+                    sourceType:=HashSourceType.RawBytes,
                     label:=NormalizeLabel(label),
                     detectedType:=detectedType,
                     compressedBytes:=data,
@@ -100,7 +97,7 @@ Namespace Global.Tomtastisch.FileClassifier
             End If
 
             Return BuildEvidenceFromRawPayload(
-                sourceType:=DeterministicHashSourceType.RawBytes,
+                sourceType:=HashSourceType.RawBytes,
                 label:=NormalizeLabel(label),
                 detectedType:=detectedType,
                 payload:=data,
@@ -108,21 +105,21 @@ Namespace Global.Tomtastisch.FileClassifier
                 notes:="Raw payload hashed directly.")
         End Function
 
-        Public Shared Function HashEntries(entries As IReadOnlyList(Of ZipExtractedEntry)) As DeterministicHashEvidence
+        Public Shared Function HashEntries(entries As IReadOnlyList(Of ZipExtractedEntry)) As HashEvidence
             Return HashEntries(entries, "archive-entries", options:=Nothing)
         End Function
 
         Public Shared Function HashEntries(entries As IReadOnlyList(Of ZipExtractedEntry), label As String) _
-            As DeterministicHashEvidence
+            As HashEvidence
             Return HashEntries(entries, label, options:=Nothing)
         End Function
 
         Public Shared Function HashEntries(entries As IReadOnlyList(Of ZipExtractedEntry), label As String,
-                                           options As DeterministicHashOptions) As DeterministicHashEvidence
+                                           options As HashOptions) As HashEvidence
             Dim projectOptions = FileTypeOptions.GetSnapshot()
             Dim normalizedOptions = ResolveHashOptions(projectOptions, options)
             Return BuildEvidenceFromEntries(
-                sourceType:=DeterministicHashSourceType.ArchiveEntries,
+                sourceType:=HashSourceType.ArchiveEntries,
                 label:=NormalizeLabel(label),
                 detectedType:=FileTypeRegistry.Resolve(FileKind.Zip),
                 compressedBytes:=Array.Empty(Of Byte)(),
@@ -131,47 +128,43 @@ Namespace Global.Tomtastisch.FileClassifier
                 notes:="Entries hashed via canonical manifest.")
         End Function
 
-        Public Shared Function VerifyRoundTrip(path As String) As DeterministicHashRoundTripReport
+        Public Shared Function VerifyRoundTrip(path As String) As HashRoundTripReport
             Return VerifyRoundTrip(path, options:=Nothing)
         End Function
 
-        Public Shared Function VerifyRoundTrip(path As String, options As DeterministicHashOptions) _
-            As DeterministicHashRoundTripReport
+        Public Shared Function VerifyRoundTrip(path As String, options As HashOptions) _
+            As HashRoundTripReport
             Dim detectorOptions = FileTypeOptions.GetSnapshot()
             Dim normalizedOptions = ResolveHashOptions(detectorOptions, options)
 
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
-                Dim failed = DeterministicHashEvidence.CreateFailure(DeterministicHashSourceType.FilePath, path,
-                                                                     "Datei nicht gefunden.")
+                Dim failed = HashEvidence.CreateFailure(HashSourceType.FilePath, path, "Datei nicht gefunden.")
                 Return _
-                    New DeterministicHashRoundTripReport(path, isArchiveInput:=False, h1:=failed, h2:=failed,
-                                                         h3:=failed, h4:=failed, notes:="Input file missing.")
+                    New HashRoundTripReport(path, isArchiveInput:=False, h1:=failed, h2:=failed, h3:=failed, h4:=failed,
+                                            notes:="Input file missing.")
             End If
 
             Dim h1 = HashFile(path, normalizedOptions)
             If Not h1.Digests.HasLogicalHash Then
-                Dim failed = DeterministicHashEvidence.CreateFailure(DeterministicHashSourceType.Unknown, path,
-                                                                     "h1 konnte nicht berechnet werden.")
+                Dim failed = HashEvidence.CreateFailure(HashSourceType.Unknown, path, "h1 konnte nicht berechnet werden.")
                 Return _
-                    New DeterministicHashRoundTripReport(path, isArchiveInput:=False, h1:=h1, h2:=failed,
-                                                         h3:=failed, h4:=failed,
-                                                         notes:="h1 missing logical digest.")
+                    New HashRoundTripReport(path, isArchiveInput:=False, h1:=h1, h2:=failed, h3:=failed, h4:=failed,
+                                            notes:="h1 missing logical digest.")
             End If
 
             Dim originalBytes As Byte() = Array.Empty(Of Byte)()
             Dim readError As String = String.Empty
             If Not TryReadFileBounded(path, detectorOptions, originalBytes, readError) Then
-                Dim failed = DeterministicHashEvidence.CreateFailure(DeterministicHashSourceType.Unknown, path,
-                                                                     readError)
+                Dim failed = HashEvidence.CreateFailure(HashSourceType.Unknown, path, readError)
                 Return _
-                    New DeterministicHashRoundTripReport(path, isArchiveInput:=False, h1:=h1, h2:=failed,
-                                                         h3:=failed, h4:=failed, notes:=readError)
+                    New HashRoundTripReport(path, isArchiveInput:=False, h1:=h1, h2:=failed, h3:=failed, h4:=failed,
+                                            notes:=readError)
             End If
 
             Dim archiveEntries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             Dim isArchiveInput = ArchiveEntryCollector.TryCollectFromFile(path, detectorOptions, archiveEntries)
 
-            Dim h2 As DeterministicHashEvidence
+            Dim h2 As HashEvidence
             Dim canonicalBytes As Byte()
 
             If isArchiveInput Then
@@ -189,16 +182,16 @@ Namespace Global.Tomtastisch.FileClassifier
             End If
 
             Dim h3 = BuildEvidenceFromRawPayload(
-                sourceType:=DeterministicHashSourceType.RawBytes,
+                sourceType:=HashSourceType.RawBytes,
                 label:="roundtrip-h3-logical-bytes",
                 detectedType:=FileTypeRegistry.Resolve(FileKind.Unknown),
                 payload:=canonicalBytes,
                 hashOptions:=normalizedOptions,
                 notes:="Canonical logical bytes hashed directly.")
 
-            Dim h4 As DeterministicHashEvidence =
-                    DeterministicHashEvidence.CreateFailure(DeterministicHashSourceType.MaterializedFile,
-                                                            "roundtrip-h4-file", "Materialization failed.")
+            Dim h4 As HashEvidence =
+                    HashEvidence.CreateFailure(HashSourceType.MaterializedFile, "roundtrip-h4-file",
+                                               "Materialization failed.")
             Dim roundTripTempRoot = IO.Path.Combine(IO.Path.GetTempPath(),
                                                     "ftd-roundtrip-" &
                                                     Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture))
@@ -220,22 +213,22 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Dim notes =
                     If(isArchiveInput, "Archive roundtrip (h1-h4) executed.", "Raw file roundtrip (h1-h4) executed.")
-            Return New DeterministicHashRoundTripReport(path, isArchiveInput, h1, h2, h3, h4, notes)
+            Return New HashRoundTripReport(path, isArchiveInput, h1, h2, h3, h4, notes)
         End Function
 
         Private Shared Function BuildEvidenceFromEntries(
-                                                         sourceType As DeterministicHashSourceType,
+                                                         sourceType As HashSourceType,
                                                          label As String,
                                                          detectedType As FileType,
                                                          compressedBytes As Byte(),
                                                          entries As IReadOnlyList(Of ZipExtractedEntry),
-                                                         hashOptions As DeterministicHashOptions,
+                                                         hashOptions As HashOptions,
                                                          notes As String
-                                                         ) As DeterministicHashEvidence
+                                                         ) As HashEvidence
             Dim normalizedEntries As List(Of NormalizedEntry) = Nothing
             Dim normalizeError As String = String.Empty
             If Not TryNormalizeEntries(entries, normalizedEntries, normalizeError) Then
-                Return DeterministicHashEvidence.CreateFailure(sourceType, label, normalizeError)
+                Return HashEvidence.CreateFailure(sourceType, label, normalizeError)
             End If
 
             Dim logicalBytes = BuildLogicalManifestBytes(normalizedEntries)
@@ -256,7 +249,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 firstEntry = New ZipExtractedEntry(normalizedEntries(0).RelativePath, normalizedEntries(0).Content)
             End If
 
-            Dim digestSet = New DeterministicHashDigestSet(
+            Dim digestSet = New HashDigestSet(
                 physicalSha256:=physicalSha,
                 logicalSha256:=logicalSha,
                 fastPhysicalXxHash3:=fastPhysical,
@@ -271,7 +264,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim persistedLogical =
                     If(hashOptions.IncludePayloadCopies, CopyBytes(logicalBytes), Array.Empty(Of Byte)())
 
-            Return New DeterministicHashEvidence(
+            Return New HashEvidence(
                 sourceType:=sourceType,
                 label:=NormalizeLabel(label),
                 detectedType:=If(detectedType, FileTypeRegistry.Resolve(FileKind.Unknown)),
@@ -285,13 +278,13 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function BuildEvidenceFromRawPayload(
-                                                            sourceType As DeterministicHashSourceType,
+                                                            sourceType As HashSourceType,
                                                             label As String,
                                                             detectedType As FileType,
                                                             payload As Byte(),
-                                                            hashOptions As DeterministicHashOptions,
+                                                            hashOptions As HashOptions,
                                                             notes As String
-                                                            ) As DeterministicHashEvidence
+                                                            ) As HashEvidence
             Dim safePayload = If(payload, Array.Empty(Of Byte)())
             Dim physicalSha = ComputeSha256Hex(safePayload)
             Dim logicalSha = physicalSha
@@ -300,7 +293,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim persistedPayload = If(hashOptions.IncludePayloadCopies, CopyBytes(safePayload), Array.Empty(Of Byte)())
             Dim entry = New ZipExtractedEntry(DefaultPayloadLabel, safePayload)
 
-            Dim digestSet = New DeterministicHashDigestSet(
+            Dim digestSet = New HashDigestSet(
                 physicalSha256:=physicalSha,
                 logicalSha256:=logicalSha,
                 fastPhysicalXxHash3:=fastPhysical,
@@ -308,7 +301,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 hasPhysicalHash:=True,
                 hasLogicalHash:=True)
 
-            Return New DeterministicHashEvidence(
+            Return New HashEvidence(
                 sourceType:=sourceType,
                 label:=NormalizeLabel(label),
                 detectedType:=If(detectedType, FileTypeRegistry.Resolve(FileKind.Unknown)),
@@ -394,7 +387,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Return Convert.ToHexString(SHA256.HashData(data)).ToLowerInvariant()
         End Function
 
-        Private Shared Function ComputeFastHash(payload As Byte(), options As DeterministicHashOptions) As String
+        Private Shared Function ComputeFastHash(payload As Byte(), options As HashOptions) As String
             If options Is Nothing OrElse Not options.IncludeFastHash Then Return String.Empty
             Dim data = If(payload, Array.Empty(Of Byte)())
             Dim value = System.IO.Hashing.XxHash3.HashToUInt64(data)
@@ -415,11 +408,11 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function ResolveHashOptions(projectOptions As FileTypeProjectOptions,
-                                                   options As DeterministicHashOptions) As DeterministicHashOptions
-            If options IsNot Nothing Then Return DeterministicHashOptions.Normalize(options)
+                                                   options As HashOptions) As HashOptions
+            If options IsNot Nothing Then Return HashOptions.Normalize(options)
             If projectOptions IsNot Nothing Then _
-                Return DeterministicHashOptions.Normalize(projectOptions.DeterministicHash)
-            Return DeterministicHashOptions.Normalize(Nothing)
+                Return HashOptions.Normalize(projectOptions.DeterministicHash)
+            Return HashOptions.Normalize(Nothing)
         End Function
 
         Private Shared Function TryReadFileBounded(path As String, detectorOptions As FileTypeProjectOptions,

@@ -75,7 +75,7 @@ Namespace Global.Tomtastisch.FileClassifier
                                 : allowUnknownArchiveEntrySize = ParseBoolean(p.Value, allowUnknownArchiveEntrySize,
                                                                               p.Name, logger)
                             Case "deterministichash", "deterministichashoptions"
-                                TryParseDeterministicHashOptions(
+                                TryParseHashOptions(
                                     p.Value,
                                     hashIncludePayloadCopies,
                                     hashIncludeFastHash,
@@ -94,7 +94,7 @@ Namespace Global.Tomtastisch.FileClassifier
                     Next
                 End Using
 
-                Dim nextHashOptions = New DeterministicHashOptions With {
+                Dim nextHashOptions = New HashOptions With {
                         .IncludePayloadCopies = hashIncludePayloadCopies,
                         .IncludeFastHash = hashIncludeFastHash,
                         .MaterializedFileName = hashMaterializedFileName
@@ -226,7 +226,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Return fallback
         End Function
 
-        Private Shared Sub TryParseDeterministicHashOptions(
+        Private Shared Sub TryParseHashOptions(
                                                             el As JsonElement,
                                                             ByRef includePayloadCopies As Boolean,
                                                             ByRef includeFastHash As Boolean,

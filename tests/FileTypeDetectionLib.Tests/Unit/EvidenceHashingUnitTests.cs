@@ -3,15 +3,15 @@ using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
-public sealed class DeterministicHashingUnitTests
+public sealed class EvidenceHashingUnitTests
 {
     [Fact]
     public void HashBytes_ReturnsStableDigests_ForSamePayload()
     {
         var payload = File.ReadAllBytes(TestResources.Resolve("sample.pdf"));
 
-        var first = DeterministicHashing.HashBytes(payload, "sample.pdf");
-        var second = DeterministicHashing.HashBytes(payload, "sample.pdf");
+        var first = EvidenceHashing.HashBytes(payload, "sample.pdf");
+        var second = EvidenceHashing.HashBytes(payload, "sample.pdf");
 
         Assert.True(first.Digests.HasPhysicalHash);
         Assert.True(first.Digests.HasLogicalHash);
@@ -27,8 +27,8 @@ public sealed class DeterministicHashingUnitTests
         var a = new ZipExtractedEntry("b.txt", new byte[] { 0x02, 0x03 });
         var b = new ZipExtractedEntry("a.txt", new byte[] { 0x01 });
 
-        var first = DeterministicHashing.HashEntries(new[] { a, b }, "entries");
-        var second = DeterministicHashing.HashEntries(new[] { b, a }, "entries");
+        var first = EvidenceHashing.HashEntries(new[] { a, b }, "entries");
+        var second = EvidenceHashing.HashEntries(new[] { b, a }, "entries");
 
         Assert.True(first.Digests.HasLogicalHash);
         Assert.True(second.Digests.HasLogicalHash);
@@ -42,7 +42,7 @@ public sealed class DeterministicHashingUnitTests
     {
         var invalid = new ZipExtractedEntry("../evil.txt", new byte[] { 0x42 });
 
-        var evidence = DeterministicHashing.HashEntries(new[] { invalid }, "invalid");
+        var evidence = EvidenceHashing.HashEntries(new[] { invalid }, "invalid");
 
         Assert.False(evidence.Digests.HasLogicalHash);
         Assert.Equal(FileKind.Unknown, evidence.DetectedType.Kind);
@@ -53,9 +53,9 @@ public sealed class DeterministicHashingUnitTests
     {
         var zipBytes = ArchivePayloadFactory.CreateZipWithSingleEntry("inner/note.txt", "hello");
 
-        var fromArchiveBytes = DeterministicHashing.HashBytes(zipBytes, "sample.zip");
+        var fromArchiveBytes = EvidenceHashing.HashBytes(zipBytes, "sample.zip");
         var entries = ArchiveProcessing.TryExtractToMemory(zipBytes);
-        var fromEntries = DeterministicHashing.HashEntries(entries, "entries");
+        var fromEntries = EvidenceHashing.HashEntries(entries, "entries");
 
         Assert.True(fromArchiveBytes.Digests.HasLogicalHash);
         Assert.True(fromArchiveBytes.Digests.HasPhysicalHash);
@@ -69,8 +69,8 @@ public sealed class DeterministicHashingUnitTests
         var path = TestResources.Resolve("sample.pdf");
         var payload = File.ReadAllBytes(path);
 
-        var fromFile = DeterministicHashing.HashFile(path);
-        var fromBytes = DeterministicHashing.HashBytes(payload, "sample.pdf");
+        var fromFile = EvidenceHashing.HashFile(path);
+        var fromBytes = EvidenceHashing.HashBytes(payload, "sample.pdf");
 
         Assert.Equal(fromFile.Digests.PhysicalSha256, fromFile.Digests.LogicalSha256);
         Assert.Equal(fromBytes.Digests.PhysicalSha256, fromBytes.Digests.LogicalSha256);
@@ -82,10 +82,10 @@ public sealed class DeterministicHashingUnitTests
     public void HashBytes_RespectsIncludePayloadCopiesOption()
     {
         var payload = File.ReadAllBytes(TestResources.Resolve("sample.pdf"));
-        var withoutCopies = DeterministicHashing.HashBytes(payload, "sample.pdf",
-            new DeterministicHashOptions { IncludePayloadCopies = false });
-        var withCopies = DeterministicHashing.HashBytes(payload, "sample.pdf",
-            new DeterministicHashOptions { IncludePayloadCopies = true });
+        var withoutCopies = EvidenceHashing.HashBytes(payload, "sample.pdf",
+            new HashOptions { IncludePayloadCopies = false });
+        var withCopies = EvidenceHashing.HashBytes(payload, "sample.pdf",
+            new HashOptions { IncludePayloadCopies = true });
 
         Assert.True(withoutCopies.CompressedBytes.IsDefaultOrEmpty);
         Assert.True(withoutCopies.UncompressedBytes.IsDefaultOrEmpty);
@@ -98,10 +98,10 @@ public sealed class DeterministicHashingUnitTests
     public void HashBytes_RespectsIncludeFastHashOption()
     {
         var payload = File.ReadAllBytes(TestResources.Resolve("sample.pdf"));
-        var withoutFast = DeterministicHashing.HashBytes(payload, "sample.pdf",
-            new DeterministicHashOptions { IncludeFastHash = false });
-        var withFast = DeterministicHashing.HashBytes(payload, "sample.pdf",
-            new DeterministicHashOptions { IncludeFastHash = true });
+        var withoutFast = EvidenceHashing.HashBytes(payload, "sample.pdf",
+            new HashOptions { IncludeFastHash = false });
+        var withFast = EvidenceHashing.HashBytes(payload, "sample.pdf",
+            new HashOptions { IncludeFastHash = true });
 
         Assert.True(string.IsNullOrWhiteSpace(withoutFast.Digests.FastPhysicalXxHash3));
         Assert.True(string.IsNullOrWhiteSpace(withoutFast.Digests.FastLogicalXxHash3));
@@ -110,11 +110,11 @@ public sealed class DeterministicHashingUnitTests
     }
 
     [Fact]
-    public void HashBytes_UsesGlobalDeterministicHashOptions_WhenNoOptionsProvided()
+    public void HashBytes_UsesGlobalHashOptions_WhenNoOptionsProvided()
     {
         using var scope = new DetectorOptionsScope();
         var global = FileTypeDetector.GetDefaultOptions();
-        global.DeterministicHash = new DeterministicHashOptions
+        global.DeterministicHash = new HashOptions
         {
             IncludeFastHash = false,
             IncludePayloadCopies = false,
@@ -123,9 +123,9 @@ public sealed class DeterministicHashingUnitTests
         scope.Set(global);
 
         var payload = File.ReadAllBytes(TestResources.Resolve("sample.pdf"));
-        var evidence = DeterministicHashing.HashBytes(payload, "sample.pdf");
-        var overrideEvidence = DeterministicHashing.HashBytes(payload, "sample.pdf",
-            new DeterministicHashOptions { IncludeFastHash = true });
+        var evidence = EvidenceHashing.HashBytes(payload, "sample.pdf");
+        var overrideEvidence = EvidenceHashing.HashBytes(payload, "sample.pdf",
+            new HashOptions { IncludeFastHash = true });
 
         Assert.True(string.IsNullOrWhiteSpace(evidence.Digests.FastPhysicalXxHash3));
         Assert.True(string.IsNullOrWhiteSpace(evidence.Digests.FastLogicalXxHash3));
@@ -136,7 +136,7 @@ public sealed class DeterministicHashingUnitTests
     public void HashBytes_FallsBackToArchiveByteMode_WhenArchivePayloadIsUnsafe()
     {
         var payload = ArchiveEntryPayloadFactory.CreateZipWithSingleEntry("../evil.txt", 8);
-        var evidence = DeterministicHashing.HashBytes(payload, "traversal.zip");
+        var evidence = EvidenceHashing.HashBytes(payload, "traversal.zip");
 
         Assert.True(evidence.Digests.HasPhysicalHash);
         Assert.True(evidence.Digests.HasLogicalHash);
@@ -145,9 +145,9 @@ public sealed class DeterministicHashingUnitTests
     }
 
     [Fact]
-    public void DeterministicHashOptions_Normalize_SanitizesMaterializedFileNameToFileName()
+    public void HashOptions_Normalize_SanitizesMaterializedFileNameToFileName()
     {
-        var normalized = DeterministicHashOptions.Normalize(new DeterministicHashOptions
+        var normalized = HashOptions.Normalize(new HashOptions
         {
             MaterializedFileName = "../nested/../../evidence.bin"
         });
@@ -156,9 +156,9 @@ public sealed class DeterministicHashingUnitTests
     }
 
     [Fact]
-    public void DeterministicHashOptions_Normalize_FallsBackForEmptyMaterializedFileName()
+    public void HashOptions_Normalize_FallsBackForEmptyMaterializedFileName()
     {
-        var normalized = DeterministicHashOptions.Normalize(new DeterministicHashOptions
+        var normalized = HashOptions.Normalize(new HashOptions
         {
             MaterializedFileName = "   "
         });

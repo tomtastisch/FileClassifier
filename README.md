@@ -10,7 +10,7 @@ Tomtastisch.FileClassifier liefert deterministische Dateityperkennung, sichere A
 - `FileTypeDetector`: inhaltsbasierte Erkennung aus Pfad/Bytes, optional mit Endungsprüfung und Detailtrace.
 - `ArchiveProcessing`: statische Fassade für Archiv-Validierung und sichere Memory-Extraktion.
 - `FileMaterializer`: persistiert ausschließlich `Byte[]` (raw write oder sichere Archiv-Extraktion nach Zielpfad).
-- `DeterministicHashing`: `HashFile`/`HashBytes`/`HashEntries` sowie `VerifyRoundTrip` mit deterministischer Evidence.
+- `EvidenceHashing`: `HashFile`/`HashBytes`/`HashEntries` sowie `VerifyRoundTrip` mit deterministischer Evidence.
 - `FileTypeOptions`: globaler Konfigurations-Snapshot für alle Pfade (wird von den Kernklassen gelesen).
 
 ## 4. Installation (NuGet)
@@ -50,7 +50,7 @@ EXPECTED_VERSION=X.Y.Z bash tools/ci/verify_nuget_release.sh
 | `FileTypeDetector` | `path`, `byte[]`, `verifyExtension` | `FileType`, `DetectionDetail`, `bool`, `IReadOnlyList<ZipExtractedEntry>` | Header/Magic (`FileTypeRegistry`) plus Archiv-Gate (`ArchiveTypeResolver` + `ArchiveSafetyGate`) und optionales OOXML-Refinement (`OpenXmlRefiner`). |
 | `ArchiveProcessing` | `path`, `byte[]` | `bool`, `IReadOnlyList<ZipExtractedEntry>` | Fassade: path-basierte Validierung/Extraktion delegiert an `FileTypeDetector` (`TryValidateArchive` / `ExtractArchiveSafeToMemory`); byte-basierte Pfade nutzen `ArchivePayloadGuard` und `ArchiveEntryCollector`. |
 | `FileMaterializer` | `byte[]`, `destinationPath`, `overwrite`, `secureExtract` | `bool` | Nur Byte-basierte Persistenz: raw write oder (bei `secureExtract=true` und archivfähigem Payload) sichere Extraktion via `ArchiveExtractor`. |
-| `DeterministicHashing` | `path`, `byte[]`, `IReadOnlyList<ZipExtractedEntry>`, optionale Hash-Optionen | `DeterministicHashEvidence`, `DeterministicHashRoundTripReport` | Erkennung + Archivsammlung (`ArchiveEntryCollector`) und deterministische Manifest-/Payload-Hashes, inkl. RoundTrip über `FileMaterializer`. |
+| `EvidenceHashing` | `path`, `byte[]`, `IReadOnlyList<ZipExtractedEntry>`, optionale Hash-Optionen | `HashEvidence`, `HashRoundTripReport` | Erkennung + Archivsammlung (`ArchiveEntryCollector`) und deterministische Manifest-/Payload-Hashes, inkl. RoundTrip über `FileMaterializer`. |
 
 Hinweis zur Typdomäne: `DetectedType.Kind` ist nicht nur "Datei roh", sondern kann auch Archiv/Container-Typen tragen (`Zip`, `Docx`, `Xlsx`, `Pptx`).
 
@@ -67,7 +67,7 @@ direction TB
   DET["FileTypeDetector"]
   AP["ArchiveProcessing"]
   MAT["FileMaterializer"]
-  DH["DeterministicHashing"]
+  DH["EvidenceHashing"]
 end
 
 %% =========================================
@@ -105,8 +105,8 @@ direction TB
   T_DETAIL["DetectionDetail"]
   T_ENTRIES["IReadOnlyList<ZipExtractedEntry>"]
 
-  T_HASH["DeterministicHashEvidence"]
-  T_RTR["DeterministicHashRoundTripReport"]
+  T_HASH["HashEvidence"]
+  T_RTR["HashRoundTripReport"]
 end
 
 %% =======
@@ -130,7 +130,7 @@ AP --> O_AP_EXTRACT --> T_ENTRIES
 %% FileMaterializer
 MAT --> O_MAT_PERSIST --> T_BOOL
 
-%% DeterministicHashing
+%% EvidenceHashing
 DH --> O_DH_HASH --> T_HASH
 DH --> O_DH_RTR --> T_RTR
 

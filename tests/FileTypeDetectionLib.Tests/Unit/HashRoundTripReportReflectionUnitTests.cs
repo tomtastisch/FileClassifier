@@ -4,12 +4,12 @@ using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
-public sealed class DeterministicHashRoundTripReportReflectionUnitTests
+public sealed class HashRoundTripReportReflectionUnitTests
 {
     [Fact]
     public void EqualLogical_ReturnsFalse_WhenEvidenceNull()
     {
-        var method = typeof(DeterministicHashRoundTripReport)
+        var method = typeof(HashRoundTripReport)
             .GetMethod("EqualLogical", BindingFlags.NonPublic | BindingFlags.Static)!;
 
         Assert.NotNull(method);
@@ -21,7 +21,7 @@ public sealed class DeterministicHashRoundTripReportReflectionUnitTests
     [Fact]
     public void EqualPhysical_ReturnsFalse_WhenEvidenceNull()
     {
-        var method = typeof(DeterministicHashRoundTripReport)
+        var method = typeof(HashRoundTripReport)
             .GetMethod("EqualPhysical", BindingFlags.NonPublic | BindingFlags.Static)!;
 
         Assert.NotNull(method);

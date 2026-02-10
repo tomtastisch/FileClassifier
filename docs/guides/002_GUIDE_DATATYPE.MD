@@ -123,7 +123,7 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 
 Bei Modell- oder Contract-Änderungen zusätzlich:
 ```bash
-dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj --filter "FullyQualifiedName~DeterministicHashingApiContractUnitTests|FullyQualifiedName~DeterministicHashingIntegrationTests" -v minimal
+dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj --filter "FullyQualifiedName~EvidenceHashingApiContractUnitTests|FullyQualifiedName~EvidenceHashingIntegrationTests" -v minimal
 ```
 
 ## 10. Implementierungs-Checklist und Done-Kriterien

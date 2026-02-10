@@ -24,7 +24,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 .MaxZipNestedBytes = 32L * 1024L * 1024L,
                 .RejectArchiveLinks = True,
                 .AllowUnknownArchiveEntrySize = False,
-                .DeterministicHash = New DeterministicHashOptions With {
+                .DeterministicHash = New HashOptions With {
                     .IncludePayloadCopies = False,
                     .IncludeFastHash = True,
                     .MaterializedFileName = "deterministic-roundtrip.bin"

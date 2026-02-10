@@ -75,7 +75,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <summary>
         '''     Optionen fuer deterministische Hash-/Evidence-Funktionen.
         ''' </summary>
-        Public Property DeterministicHash As DeterministicHashOptions = New DeterministicHashOptions()
+        Public Property DeterministicHash As HashOptions = New HashOptions()
 
         Public Sub New()
             Me.New(True)
@@ -98,7 +98,7 @@ Namespace Global.Tomtastisch.FileClassifier
                     .RejectArchiveLinks = RejectArchiveLinks,
                     .AllowUnknownArchiveEntrySize = AllowUnknownArchiveEntrySize,
                     .Logger = Logger,
-                    .DeterministicHash = DeterministicHashOptions.Normalize(DeterministicHash)
+                    .DeterministicHash = HashOptions.Normalize(DeterministicHash)
                     }
             cloned.NormalizeInPlace()
             Return cloned
@@ -113,7 +113,7 @@ Namespace Global.Tomtastisch.FileClassifier
             MaxZipCompressionRatio = Max(MinNonNegativeInt, MaxZipCompressionRatio)
             MaxZipNestingDepth = Max(MinNonNegativeInt, MaxZipNestingDepth)
             MaxZipNestedBytes = Max(MinPositiveLong, MaxZipNestedBytes)
-            DeterministicHash = DeterministicHashOptions.Normalize(DeterministicHash)
+            DeterministicHash = HashOptions.Normalize(DeterministicHash)
         End Sub
 
         Private Shared Function Max(minimum As Integer, value As Integer) As Integer

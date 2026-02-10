@@ -22,7 +22,7 @@ Direkter Nachweis von API-Korrektheit, Security-Regeln und Determinismus.
 | `ZipExtractedEntryUnitTests.cs`                          | In-Memory ZIP-Entry Objekt                                                    |
 | `MimeProviderUnitTests.cs`                               | MIME-Mapping Infrastruktur                                                    |
 | `DetectionDetailUnitTests.cs`                            | Detektionsdetail-Defaults                                                     |
-| `DeterministicHashDigestSetUnitTests.cs`                 | Hash-Sets Normalisierung                                                      |
+| `HashDigestSetUnitTests.cs`                 | Hash-Sets Normalisierung                                                      |
 | `CoreInternalsAdditionalUnitTests.cs`                    | weitere Core-Guards/Policies                                                  |
 | `ArchiveDescriptorUnitTests.cs`                          | Descriptor/Container-Logik                                                    |
 | `ArchiveManagedBackendUnitTests.cs`                      | Managed ZIP Backend + Entry-Model                                             |
@@ -30,33 +30,33 @@ Direkter Nachweis von API-Korrektheit, Security-Regeln und Determinismus.
 | `ArchiveAdversarialTests.cs`                             | adversarial Archiv-Fälle                                                      |
 | `ArchiveExtractionUnitTests.cs`                          | sichere Disk-/Memory-Extraktion                                               |
 | `CoreAndArchiveInternalsFailClosedUnitTests.cs`          | gezielte Fail-closed/Guard-Branches in `CoreInternals` und `ArchiveInternals` |
-| `DeterministicHashingUnitTests.cs`                       | deterministische Physical/Logical Hash-Evidence inkl. fail-closed Pfade       |
-| `DeterministicHashingFailureUnitTests.cs`                | deterministische Hash-Failures und RoundTrip-Fehlerpfade                      |
-| `DeterministicHashingApiContractUnitTests.cs`            | eingefrorener Public API-Contract von `DeterministicHashing`                  |
+| `EvidenceHashingUnitTests.cs`                       | deterministische Physical/Logical Hash-Evidence inkl. fail-closed Pfade       |
+| `EvidenceHashingFailureUnitTests.cs`                | deterministische Hash-Failures und RoundTrip-Fehlerpfade                      |
+| `EvidenceHashingApiContractUnitTests.cs`            | eingefrorener Public API-Contract von `EvidenceHashing`                  |
 | `OpenXmlRefinerUnitTests.cs`                             | OpenXML-Refinement (Docx/Xlsx/Pptx)                                           |
 | `ArchiveInternalsReflectionUnitTests.cs`                 | reflektierte Tests fuer Archiv-Guards und Entry-Checks                        |
 | `ArchiveExtractorAdditionalUnitTests.cs`                 | Extra-Branches fuer Extractor (Invalids/Nulls)                                |
 | `ArchiveExtractorEndToEndUnitTests.cs`                   | End-to-End Extract für ZIP-Streams                                            |
-| `DeterministicHashingEdgeUnitTests.cs`                   | Edge-Cases fuer Hash-Labels/Empty-Entries                                     |
+| `EvidenceHashingEdgeUnitTests.cs`                   | Edge-Cases fuer Hash-Labels/Empty-Entries                                     |
 | `LogGuardUnitTests.cs`                                   | Logger-Guard faengt Exceptions ab                                             |
 | `ArchiveStreamEngineUnitTests.cs`                        | Managed ZIP Stream-Engine Limits (EntryCount/Compression/Nesting)             |
 | `ArchiveStreamEngineExtraUnitTests.cs`                   | Extra Branches fuer ArchiveStreamEngine                                       |
-| `DeterministicHashEvidenceUnitTests.cs`                  | Hash-Evidence Defaults/Null-Handling                                          |
-| `DeterministicHashRoundTripReportUnitTests.cs`           | RoundTrip-Report Konsistenzlogik                                              |
-| `DeterministicHashOptionsUnitTests.cs`                   | DeterministicHashOptions Normalisierung und Defaults                          |
-| `DeterministicHashRoundTripReportReflectionUnitTests.cs` | Reflection-Branches fuer RoundTrip-Report                                     |
+| `HashEvidenceUnitTests.cs`                  | Hash-Evidence Defaults/Null-Handling                                          |
+| `HashRoundTripReportUnitTests.cs`           | RoundTrip-Report Konsistenzlogik                                              |
+| `HashOptionsUnitTests.cs`                   | HashOptions Normalisierung und Defaults                          |
+| `HashRoundTripReportReflectionUnitTests.cs` | Reflection-Branches fuer RoundTrip-Report                                     |
 | `FileTypeDetectorEdgeUnitTests.cs`                       | Edge-Cases fuer DetectDetailed/ReasonCodes                                    |
 | `FileTypeDetectorReflectionUnitTests.cs`                 | Reflection-Branches fuer ReadHeader                                           |
 | `ArchiveInternalsPrivateBranchUnitTests.cs`              | Private Branches in ArchiveInternals (Size/Recursive)                         |
 | `CoreInternalsBranchUnitTests.cs`                        | Core-Guard Branches (Payload/Path/Policy)                                     |
-| `DeterministicHashingPrivateUnitTests.cs`                | Reflection-Branches fuer Hash-Reader                                          |
+| `EvidenceHashingPrivateUnitTests.cs`                | Reflection-Branches fuer Hash-Reader                                          |
 | `ArchiveExtractorReflectionUnitTests.cs`                 | Reflection-Branches fuer ExtractEntry-ToDirectory/Memory                      |
-| `DeterministicHashingReflectionUnitTests.cs`             | Reflection-Branches fuer Optionen-Resolver                                    |
+| `EvidenceHashingReflectionUnitTests.cs`             | Reflection-Branches fuer Optionen-Resolver                                    |
 | `ArchiveInternalsEarlyReturnUnitTests.cs`                | Early-return Branches in ArchiveInternals                                     |
 | `ArchiveManagedInternalsExtraUnitTests.cs`               | Extra Branches fuer ArchiveStreamEngine                                       |
 | `CoreInternalsStreamUnitTests.cs`                        | Unreadable-Stream Branch in ArchiveSafetyGate                                 |
 | `ArchiveInternalsNestedBranchUnitTests.cs`               | Nested GZip Branches (SharpCompress)                                          |
-| `DeterministicHashingPrivateBranchUnitTests.cs`          | Private Branches fuer Hashing Helpers                                         |
+| `EvidenceHashingPrivateBranchUnitTests.cs`          | Private Branches fuer Hashing Helpers                                         |
 | `FileTypeDetectorExtensionUnitTests.cs`                  | Extension-Policy Branches                                                     |
 | `ArchiveEntryCollectorUnitTests.cs`                      | Collector Fail/Success Branches                                               |
 | `ArchiveTypeResolverAdditionalUnitTests.cs`              | Stream/Bytes Branches in ArchiveTypeResolver                                  |
@@ -64,7 +64,7 @@ Direkter Nachweis von API-Korrektheit, Security-Regeln und Determinismus.
 | `SharpCompressArchiveBackendUnitTests.cs`                | Branches fuer SharpCompress-Backend                                           |
 | `SharpCompressEntryModelUnitTests.cs`                    | Null-Entry Defaults im SharpCompressEntryModel                                |
 | `SharpCompressEntryModelNonNullUnitTests.cs`             | Real-Entry Pfade im SharpCompressEntryModel                                   |
-| `DeterministicHashingNormalizedEntryUnitTests.cs`        | NormalizedEntry-Defaults                                                      |
+| `EvidenceHashingNormalizedEntryUnitTests.cs`        | NormalizedEntry-Defaults                                                      |
 | `FileTypeDetectorAdditionalUnitTests.cs`                 | LoadOptions/ReadFileSafe/Detect Branches                                      |
 | `FileTypeDetectorPrivateBranchUnitTests.cs`              | Private Branches via Reflection                                               |
 

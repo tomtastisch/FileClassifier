@@ -243,7 +243,7 @@ public sealed class FileTypeOptionsFacadeUnitTests
                 MaxZipCompressionRatio = -5,
                 MaxZipNestingDepth = -3,
                 MaxZipNestedBytes = 0,
-                DeterministicHash = new DeterministicHashOptions { MaterializedFileName = "   " }
+                DeterministicHash = new HashOptions { MaterializedFileName = "   " }
             };
 
             FileTypeOptions.SetSnapshot(invalid);

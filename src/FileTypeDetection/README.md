@@ -4,14 +4,14 @@
 Dieses Verzeichnis stellt die öffentliche Bibliotheksoberfläche für Dateityperkennung, sichere Archivverarbeitung, deterministische Hashing-Nachweise und Byte-Materialisierung bereit.
 
 ## 2. Inhalt
-- Öffentliche API-Einstiegspunkte: `FileTypeDetector`, `ArchiveProcessing`, `FileMaterializer`, `FileTypeOptions`, `DeterministicHashing`.
+- Öffentliche API-Einstiegspunkte: `FileTypeDetector`, `ArchiveProcessing`, `FileMaterializer`, `FileTypeOptions`, `EvidenceHashing`.
 - Submodule für Modellklassen, Registry/Detection, Konfiguration und Infrastruktur.
 
 ## 3. API und Verhalten
 - `FileTypeDetector`: Typdetektion aus Pfad/Bytes, Detailnachweise und sichere Archivpfade.
 - `ArchiveProcessing`: statische Fassade für Validierung/Extraktion.
 - `FileMaterializer`: persistiert Byte-Payloads, optional sichere Archiv-Materialisierung.
-- `DeterministicHashing`: Physical/Logical Hash-Evidence und RoundTrip-Reports.
+- `EvidenceHashing`: Physical/Logical Hash-Evidence und RoundTrip-Reports.
 
 ## 4. Verifikation
 - Unit/Integration/BDD-Nachweise liegen unter dem Testprojekt.

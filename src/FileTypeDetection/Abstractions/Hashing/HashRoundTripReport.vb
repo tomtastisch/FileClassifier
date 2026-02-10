@@ -5,13 +5,13 @@ Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Ergebnisbericht fuer deterministische h1-h4 RoundTrip-Pruefungen.
     ''' </summary>
-    Public NotInheritable Class DeterministicHashRoundTripReport
+    Public NotInheritable Class HashRoundTripReport
         Public ReadOnly Property InputPath As String
         Public ReadOnly Property IsArchiveInput As Boolean
-        Public ReadOnly Property H1 As DeterministicHashEvidence
-        Public ReadOnly Property H2 As DeterministicHashEvidence
-        Public ReadOnly Property H3 As DeterministicHashEvidence
-        Public ReadOnly Property H4 As DeterministicHashEvidence
+        Public ReadOnly Property H1 As HashEvidence
+        Public ReadOnly Property H2 As HashEvidence
+        Public ReadOnly Property H3 As HashEvidence
+        Public ReadOnly Property H4 As HashEvidence
         Public ReadOnly Property LogicalH1EqualsH2 As Boolean
         Public ReadOnly Property LogicalH1EqualsH3 As Boolean
         Public ReadOnly Property LogicalH1EqualsH4 As Boolean
@@ -21,19 +21,19 @@ Namespace Global.Tomtastisch.FileClassifier
         Public ReadOnly Property LogicalConsistent As Boolean
         Public ReadOnly Property Notes As String
 
-        Friend Sub New(inputPath As String, isArchiveInput As Boolean, h1 As DeterministicHashEvidence,
-                       h2 As DeterministicHashEvidence, h3 As DeterministicHashEvidence, h4 As DeterministicHashEvidence,
+        Friend Sub New(inputPath As String, isArchiveInput As Boolean, h1 As HashEvidence, h2 As HashEvidence,
+                       h3 As HashEvidence, h4 As HashEvidence,
                        notes As String)
             Me.InputPath = If(inputPath, String.Empty)
             Me.IsArchiveInput = isArchiveInput
             Me.H1 =
-                If(h1, DeterministicHashEvidence.CreateFailure(DeterministicHashSourceType.Unknown, "h1", "missing"))
+                If(h1, HashEvidence.CreateFailure(HashSourceType.Unknown, "h1", "missing"))
             Me.H2 =
-                If(h2, DeterministicHashEvidence.CreateFailure(DeterministicHashSourceType.Unknown, "h2", "missing"))
+                If(h2, HashEvidence.CreateFailure(HashSourceType.Unknown, "h2", "missing"))
             Me.H3 =
-                If(h3, DeterministicHashEvidence.CreateFailure(DeterministicHashSourceType.Unknown, "h3", "missing"))
+                If(h3, HashEvidence.CreateFailure(HashSourceType.Unknown, "h3", "missing"))
             Me.H4 =
-                If(h4, DeterministicHashEvidence.CreateFailure(DeterministicHashSourceType.Unknown, "h4", "missing"))
+                If(h4, HashEvidence.CreateFailure(HashSourceType.Unknown, "h4", "missing"))
             Me.Notes = If(notes, String.Empty)
 
             LogicalH1EqualsH2 = EqualLogical(Me.H1, Me.H2)
@@ -45,8 +45,7 @@ Namespace Global.Tomtastisch.FileClassifier
             LogicalConsistent = LogicalH1EqualsH2 AndAlso LogicalH1EqualsH3 AndAlso LogicalH1EqualsH4
         End Sub
 
-        Private Shared Function EqualLogical(leftEvidence As DeterministicHashEvidence,
-                                             rightEvidence As DeterministicHashEvidence) As Boolean
+        Private Shared Function EqualLogical(leftEvidence As HashEvidence, rightEvidence As HashEvidence) As Boolean
             If leftEvidence Is Nothing OrElse rightEvidence Is Nothing Then Return False
             If leftEvidence.Digests Is Nothing OrElse rightEvidence.Digests Is Nothing Then Return False
             If Not leftEvidence.Digests.HasLogicalHash OrElse Not rightEvidence.Digests.HasLogicalHash Then Return False
@@ -55,8 +54,7 @@ Namespace Global.Tomtastisch.FileClassifier
                               StringComparison.Ordinal)
         End Function
 
-        Private Shared Function EqualPhysical(leftEvidence As DeterministicHashEvidence,
-                                              rightEvidence As DeterministicHashEvidence) As Boolean
+        Private Shared Function EqualPhysical(leftEvidence As HashEvidence, rightEvidence As HashEvidence) As Boolean
             If leftEvidence Is Nothing OrElse rightEvidence Is Nothing Then Return False
             If leftEvidence.Digests Is Nothing OrElse rightEvidence.Digests Is Nothing Then Return False
             If Not leftEvidence.Digests.HasPhysicalHash OrElse Not rightEvidence.Digests.HasPhysicalHash Then _

@@ -4,13 +4,13 @@ using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
-public sealed class DeterministicHashingPrivateUnitTests
+public sealed class EvidenceHashingPrivateUnitTests
 {
     [Fact]
     public void TryReadFileBounded_ReturnsFalse_ForMissingPathOrOptions()
     {
         var method =
-            typeof(DeterministicHashing).GetMethod("TryReadFileBounded", BindingFlags.NonPublic | BindingFlags.Static)!;
+            typeof(EvidenceHashing).GetMethod("TryReadFileBounded", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var bytes = Array.Empty<byte>();
@@ -29,7 +29,7 @@ public sealed class DeterministicHashingPrivateUnitTests
     public void TryReadFileBounded_ReturnsFalse_WhenFileTooLarge()
     {
         var method =
-            typeof(DeterministicHashing).GetMethod("TryReadFileBounded", BindingFlags.NonPublic | BindingFlags.Static)!;
+            typeof(EvidenceHashing).GetMethod("TryReadFileBounded", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         using var scope = TestTempPaths.CreateScope("ftd-hash-read");
@@ -51,7 +51,7 @@ public sealed class DeterministicHashingPrivateUnitTests
         var a = new ZipExtractedEntry("a.txt", new byte[] { 0x01 });
         var b = new ZipExtractedEntry("a.txt ", new byte[] { 0x02 });
 
-        var evidence = DeterministicHashing.HashEntries(new[] { a, b }, "entries");
+        var evidence = EvidenceHashing.HashEntries(new[] { a, b }, "entries");
 
         Assert.False(evidence.Digests.HasLogicalHash);
     }

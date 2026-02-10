@@ -60,7 +60,7 @@ flowchart LR
         FTD["FileTypeDetector"]
         AP["ArchiveProcessing"]
         FM["FileMaterializer"]
-        DH["DeterministicHashing"]
+        DH["EvidenceHashing"]
     end
 
     subgraph CORE["Kernkomponenten"]
@@ -366,7 +366,7 @@ flowchart TD
 | `FileMaterializer.Persist(..., secureExtract:=False)` | `F6` |
 | `FileTypeOptions.LoadOptions/GetOptions` / `FileTypeProjectBaseline.ApplyDeterministicDefaults` | `F7` |
 | `DetectAndVerifyExtension(path)` / `Detect(..., verifyExtension)` | `F8` |
-| `DeterministicHashing.HashFile/HashBytes/HashEntries/VerifyRoundTrip` | `F9` |
+| `EvidenceHashing.HashFile/HashBytes/HashEntries/VerifyRoundTrip` | `F9` |
 
 ## 8. Grenzen und Nicht-Ziele
 - Kein Ersatz für Quellcode-Reviews interner Guards (z. B. Payload-/Path-Guards).

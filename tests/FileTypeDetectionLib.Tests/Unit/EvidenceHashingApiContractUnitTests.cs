@@ -4,28 +4,28 @@ using Tomtastisch.FileClassifier;
 namespace FileTypeDetectionLib.Tests.Unit;
 
 [Trait("Category", "ApiContract")]
-public sealed class DeterministicHashingApiContractUnitTests
+public sealed class EvidenceHashingApiContractUnitTests
 {
     private static readonly string[] sourceArray = new[]
         {
-            "HashBytes(Byte[]):DeterministicHashEvidence",
-            "HashBytes(Byte[],String):DeterministicHashEvidence",
-            "HashBytes(Byte[],String,DeterministicHashOptions):DeterministicHashEvidence",
-            "HashEntries(IReadOnlyList`1):DeterministicHashEvidence",
-            "HashEntries(IReadOnlyList`1,String):DeterministicHashEvidence",
-            "HashEntries(IReadOnlyList`1,String,DeterministicHashOptions):DeterministicHashEvidence",
-            "HashFile(String):DeterministicHashEvidence",
-            "HashFile(String,DeterministicHashOptions):DeterministicHashEvidence",
-            "VerifyRoundTrip(String):DeterministicHashRoundTripReport",
-            "VerifyRoundTrip(String,DeterministicHashOptions):DeterministicHashRoundTripReport"
+            "HashBytes(Byte[]):HashEvidence",
+            "HashBytes(Byte[],String):HashEvidence",
+            "HashBytes(Byte[],String,HashOptions):HashEvidence",
+            "HashEntries(IReadOnlyList`1):HashEvidence",
+            "HashEntries(IReadOnlyList`1,String):HashEvidence",
+            "HashEntries(IReadOnlyList`1,String,HashOptions):HashEvidence",
+            "HashFile(String):HashEvidence",
+            "HashFile(String,HashOptions):HashEvidence",
+            "VerifyRoundTrip(String):HashRoundTripReport",
+            "VerifyRoundTrip(String,HashOptions):HashRoundTripReport"
         };
 
     [Fact]
     public void PublicStaticSurface_MatchesApprovedContract()
     {
-        var methods = typeof(DeterministicHashing)
+        var methods = typeof(EvidenceHashing)
             .GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .Where(m => m.DeclaringType == typeof(DeterministicHashing))
+            .Where(m => m.DeclaringType == typeof(EvidenceHashing))
             .Select(Describe)
             .OrderBy(x => x, StringComparer.Ordinal)
             .ToArray();
@@ -39,7 +39,7 @@ public sealed class DeterministicHashingApiContractUnitTests
     public void HashFile_MissingPath_FailsClosedWithoutThrowing()
     {
         var missingPath = Path.Combine(Path.GetTempPath(), $"does-not-exist-{Guid.NewGuid():N}.bin");
-        var evidence = DeterministicHashing.HashFile(missingPath);
+        var evidence = EvidenceHashing.HashFile(missingPath);
 
         Assert.Equal(FileKind.Unknown, evidence.DetectedType.Kind);
         Assert.False(evidence.Digests.HasLogicalHash);

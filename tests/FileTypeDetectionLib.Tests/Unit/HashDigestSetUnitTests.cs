@@ -2,12 +2,12 @@ using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
-public sealed class DeterministicHashDigestSetUnitTests
+public sealed class HashDigestSetUnitTests
 {
     [Fact]
     public void Constructor_NormalizesAndLowercases()
     {
-        var set = new DeterministicHashDigestSet(
+        var set = new HashDigestSet(
             " ABC ",
             "DeF",
             " 123 ",
@@ -26,7 +26,7 @@ public sealed class DeterministicHashDigestSetUnitTests
     [Fact]
     public void Empty_ReturnsAllEmptyAndFalse()
     {
-        var empty = DeterministicHashDigestSet.Empty;
+        var empty = HashDigestSet.Empty;
 
         Assert.Equal(string.Empty, empty.PhysicalSha256);
         Assert.Equal(string.Empty, empty.LogicalSha256);

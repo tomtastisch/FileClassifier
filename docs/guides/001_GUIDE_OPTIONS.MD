@@ -70,7 +70,7 @@ flowchart TD
     E --> F["FileTypeOptions.SetSnapshot(...)"]
     F --> G["Globale aktive Optionen"]
 
-    G --> H["FileTypeDetector / ArchiveProcessing / FileMaterializer / DeterministicHashing"]
+    G --> H["FileTypeDetector / ArchiveProcessing / FileMaterializer / EvidenceHashing"]
     H --> I["pro Aufruf: FileTypeOptions.GetSnapshot()"]
     I --> J["Runtime-Entscheidung mit aktivem Snapshot"]
 ```

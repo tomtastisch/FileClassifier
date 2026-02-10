@@ -1,7 +1,7 @@
-# 04 - DeterministicHashing API Contract
+# 04 - EvidenceHashing API Contract
 
 ## 1. Zweck und Scope
-Dieses Dokument friert den öffentlichen Vertrag von `DeterministicHashing` ein.
+Dieses Dokument friert den öffentlichen Vertrag von `EvidenceHashing` ein.
 Es dient als Freigabebasis vor Merge und als Guard gegen unabsichtliche API-Drifts.
 
 ## 2. Vertragsprinzipien
@@ -16,16 +16,16 @@ Es dient als Freigabebasis vor Merge und als Guard gegen unabsichtliche API-Drif
 ## 3. Public Surface (freigegeben)
 | Methode | Rückgabe | Vertrag |
 |---|---|---|
-| `HashFile(path)` | `DeterministicHashEvidence` | Hash aus Datei, mit Archiv-Kanonisierung falls möglich |
-| `HashFile(path, options)` | `DeterministicHashEvidence` | wie oben, optionsgesteuert |
-| `HashBytes(data)` | `DeterministicHashEvidence` | Hash aus Payload |
-| `HashBytes(data, label)` | `DeterministicHashEvidence` | wie oben, Label für Nachweis |
-| `HashBytes(data, label, options)` | `DeterministicHashEvidence` | wie oben, optionsgesteuert |
-| `HashEntries(entries)` | `DeterministicHashEvidence` | kanonischer Hash aus Entry-Liste |
-| `HashEntries(entries, label)` | `DeterministicHashEvidence` | wie oben, Label für Nachweis |
-| `HashEntries(entries, label, options)` | `DeterministicHashEvidence` | wie oben, optionsgesteuert |
-| `VerifyRoundTrip(path)` | `DeterministicHashRoundTripReport` | h1-h4 Nachweis für Datei/Archiv |
-| `VerifyRoundTrip(path, options)` | `DeterministicHashRoundTripReport` | wie oben, optionsgesteuert |
+| `HashFile(path)` | `HashEvidence` | Hash aus Datei, mit Archiv-Kanonisierung falls möglich |
+| `HashFile(path, options)` | `HashEvidence` | wie oben, optionsgesteuert |
+| `HashBytes(data)` | `HashEvidence` | Hash aus Payload |
+| `HashBytes(data, label)` | `HashEvidence` | wie oben, Label für Nachweis |
+| `HashBytes(data, label, options)` | `HashEvidence` | wie oben, optionsgesteuert |
+| `HashEntries(entries)` | `HashEvidence` | kanonischer Hash aus Entry-Liste |
+| `HashEntries(entries, label)` | `HashEvidence` | wie oben, Label für Nachweis |
+| `HashEntries(entries, label, options)` | `HashEvidence` | wie oben, optionsgesteuert |
+| `VerifyRoundTrip(path)` | `HashRoundTripReport` | h1-h4 Nachweis für Datei/Archiv |
+| `VerifyRoundTrip(path, options)` | `HashRoundTripReport` | wie oben, optionsgesteuert |
 
 ## 4. h1-h4 Semantik
 - `h1`: Ausgangsinput (`HashFile`)
@@ -38,7 +38,7 @@ Es dient als Freigabebasis vor Merge und als Guard gegen unabsichtliche API-Drif
 
 ## 5. Verifikation (Gate)
 ```bash
-dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj --filter "FullyQualifiedName~DeterministicHashingApiContractUnitTests" -v minimal
+dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj --filter "FullyQualifiedName~EvidenceHashingApiContractUnitTests" -v minimal
 ```
 
 ## 6. Freigabehinweis

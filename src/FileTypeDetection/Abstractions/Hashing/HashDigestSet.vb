@@ -5,7 +5,7 @@ Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Deterministische Hash-Sammlung fuer einen Verarbeitungsschritt.
     ''' </summary>
-    Public NotInheritable Class DeterministicHashDigestSet
+    Public NotInheritable Class HashDigestSet
         Public ReadOnly Property PhysicalSha256 As String
         Public ReadOnly Property LogicalSha256 As String
         Public ReadOnly Property FastPhysicalXxHash3 As String
@@ -28,9 +28,9 @@ Namespace Global.Tomtastisch.FileClassifier
             Me.HasLogicalHash = hasLogicalHash
         End Sub
 
-        Friend Shared ReadOnly Property Empty As DeterministicHashDigestSet
+        Friend Shared ReadOnly Property Empty As HashDigestSet
             Get
-                Return New DeterministicHashDigestSet(
+                Return New HashDigestSet(
                     physicalSha256:=String.Empty,
                     logicalSha256:=String.Empty,
                     fastPhysicalXxHash3:=String.Empty,

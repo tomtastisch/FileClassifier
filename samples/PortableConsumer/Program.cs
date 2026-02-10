@@ -8,7 +8,7 @@ if (detected.Kind != FileKind.Pdf)
     throw new InvalidOperationException($"Expected Pdf but got {detected.Kind}.");
 }
 
-var evidence = DeterministicHashing.HashBytes(payload, "portable.pdf");
+var evidence = EvidenceHashing.HashBytes(payload, "portable.pdf");
 if (!evidence.Digests.HasPhysicalHash || !evidence.Digests.HasLogicalHash)
 {
     throw new InvalidOperationException("Expected both physical and logical hashes.");

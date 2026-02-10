@@ -5,7 +5,7 @@ Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Quelle eines Hash-Nachweises.
     ''' </summary>
-    Public Enum DeterministicHashSourceType
+    Public Enum HashSourceType
         Unknown = 0
         FilePath = 1
         RawBytes = 2

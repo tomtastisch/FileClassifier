@@ -114,7 +114,7 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         Assert.False(string.IsNullOrWhiteSpace(state.CurrentPath));
-        state.LastRoundTripReport = DeterministicHashing.VerifyRoundTrip(state.CurrentPath!);
+        state.LastRoundTripReport = EvidenceHashing.VerifyRoundTrip(state.CurrentPath!);
     }
 
     [When("ich den deterministischen Hash der aktuellen Bytes berechne")]
@@ -122,7 +122,7 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         Assert.NotNull(state.CurrentPayload);
-        state.LastHashEvidence = DeterministicHashing.HashBytes(state.CurrentPayload!, "bdd-current-bytes");
+        state.LastHashEvidence = EvidenceHashing.HashBytes(state.CurrentPayload!, "bdd-current-bytes");
     }
 
     [When("ich den letzten logischen Hash als Referenz speichere")]

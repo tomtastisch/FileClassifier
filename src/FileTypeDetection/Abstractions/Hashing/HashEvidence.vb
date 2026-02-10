@@ -7,8 +7,8 @@ Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Nachweisobjekt fuer einen deterministischen Hash-Schritt.
     ''' </summary>
-    Public NotInheritable Class DeterministicHashEvidence
-        Public ReadOnly Property SourceType As DeterministicHashSourceType
+    Public NotInheritable Class HashEvidence
+        Public ReadOnly Property SourceType As HashSourceType
         Public ReadOnly Property Label As String
         Public ReadOnly Property DetectedType As FileType
         Public ReadOnly Property Entry As ZipExtractedEntry
@@ -16,11 +16,11 @@ Namespace Global.Tomtastisch.FileClassifier
         Public ReadOnly Property UncompressedBytes As ImmutableArray(Of Byte)
         Public ReadOnly Property EntryCount As Integer
         Public ReadOnly Property TotalUncompressedBytes As Long
-        Public ReadOnly Property Digests As DeterministicHashDigestSet
+        Public ReadOnly Property Digests As HashDigestSet
         Public ReadOnly Property Notes As String
 
         Friend Sub New(
-                       sourceType As DeterministicHashSourceType,
+                       sourceType As HashSourceType,
                        label As String,
                        detectedType As FileType,
                        entry As ZipExtractedEntry,
@@ -28,7 +28,7 @@ Namespace Global.Tomtastisch.FileClassifier
                        uncompressedBytes As Byte(),
                        entryCount As Integer,
                        totalUncompressedBytes As Long,
-                       digests As DeterministicHashDigestSet,
+                       digests As HashDigestSet,
                        notes As String)
             Me.SourceType = sourceType
             Me.Label = If(label, String.Empty)
@@ -36,15 +36,15 @@ Namespace Global.Tomtastisch.FileClassifier
             Me.Entry = entry
             Me.EntryCount = Math.Max(0, entryCount)
             Me.TotalUncompressedBytes = Math.Max(0, totalUncompressedBytes)
-            Me.Digests = If(digests, DeterministicHashDigestSet.Empty)
+            Me.Digests = If(digests, HashDigestSet.Empty)
             Me.Notes = If(notes, String.Empty)
             Me.CompressedBytes = ToImmutable(compressedBytes)
             Me.UncompressedBytes = ToImmutable(uncompressedBytes)
         End Sub
 
-        Friend Shared Function CreateFailure(sourceType As DeterministicHashSourceType, label As String, notes As String) _
-            As DeterministicHashEvidence
-            Return New DeterministicHashEvidence(
+        Friend Shared Function CreateFailure(sourceType As HashSourceType, label As String, notes As String) _
+            As HashEvidence
+            Return New HashEvidence(
                 sourceType:=sourceType,
                 label:=label,
                 detectedType:=FileTypeRegistry.Resolve(FileKind.Unknown),
@@ -53,7 +53,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 uncompressedBytes:=Array.Empty(Of Byte)(),
                 entryCount:=0,
                 totalUncompressedBytes:=0,
-                digests:=DeterministicHashDigestSet.Empty,
+                digests:=HashDigestSet.Empty,
                 notes:=notes)
         End Function
 

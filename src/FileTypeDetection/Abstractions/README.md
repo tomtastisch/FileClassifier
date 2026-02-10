@@ -6,7 +6,7 @@ Dieses Verzeichnis enthält immutable Rückgabemodelle der öffentlichen API.
 ## 2. Inhalt
 - Detection-Modelle (`FileKind`, `FileType`, `DetectionDetail`).
 - Archive-Modell (`ZipExtractedEntry`).
-- Hashing-Modelle (`DeterministicHash*`).
+- Hashing-Modelle (`Hash*`).
 
 ## 3. API und Verhalten
 - Modelle führen keine I/O aus und dienen als stabile Vertragsobjekte.

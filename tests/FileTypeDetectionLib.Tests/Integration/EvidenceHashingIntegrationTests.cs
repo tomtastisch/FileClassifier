@@ -3,7 +3,7 @@ using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Integration;
 
-public sealed class DeterministicHashingIntegrationTests
+public sealed class EvidenceHashingIntegrationTests
 {
     public static TheoryData<string> ArchiveFixtureCases()
     {
@@ -44,9 +44,9 @@ public sealed class DeterministicHashingIntegrationTests
         var tar = ArchivePayloadFactory.CreateTarWithSingleEntry("inner/note.txt", "hello");
         var tarGz = ArchivePayloadFactory.CreateTarGzWithSingleEntry("inner/note.txt", "hello");
 
-        var zipEvidence = DeterministicHashing.HashBytes(zip, "sample.zip");
-        var tarEvidence = DeterministicHashing.HashBytes(tar, "sample.tar");
-        var tarGzEvidence = DeterministicHashing.HashBytes(tarGz, "sample.tar.gz");
+        var zipEvidence = EvidenceHashing.HashBytes(zip, "sample.zip");
+        var tarEvidence = EvidenceHashing.HashBytes(tar, "sample.tar");
+        var tarGzEvidence = EvidenceHashing.HashBytes(tarGz, "sample.tar.gz");
 
         Assert.Equal(zipEvidence.Digests.LogicalSha256, tarEvidence.Digests.LogicalSha256);
         Assert.Equal(zipEvidence.Digests.LogicalSha256, tarGzEvidence.Digests.LogicalSha256);
@@ -58,7 +58,7 @@ public sealed class DeterministicHashingIntegrationTests
     public void VerifyRoundTrip_ProducesLogicalConsistency(string fixtureId, bool expectedArchive)
     {
         var path = TestResources.Resolve(fixtureId);
-        var report = DeterministicHashing.VerifyRoundTrip(path);
+        var report = EvidenceHashing.VerifyRoundTrip(path);
 
         Assert.Equal(expectedArchive, report.IsArchiveInput);
         Assert.True(report.LogicalConsistent);
@@ -72,8 +72,8 @@ public sealed class DeterministicHashingIntegrationTests
     public void HashFile_Determinism_HoldsAcrossRepeatedFixtureRuns(string fixtureId)
     {
         var path = TestResources.Resolve(fixtureId);
-        var first = DeterministicHashing.HashFile(path);
-        var second = DeterministicHashing.HashFile(path);
+        var first = EvidenceHashing.HashFile(path);
+        var second = EvidenceHashing.HashFile(path);
 
         Assert.Equal(first.Digests.LogicalSha256, second.Digests.LogicalSha256);
         Assert.Equal(first.Digests.PhysicalSha256, second.Digests.PhysicalSha256);
@@ -91,8 +91,8 @@ public sealed class DeterministicHashingIntegrationTests
         var extractedEntries = ArchiveProcessing.ExtractToMemory(path, true);
         Assert.NotEmpty(extractedEntries);
 
-        var archiveEvidence = DeterministicHashing.HashFile(path);
-        var extractedCombinedEvidence = DeterministicHashing.HashEntries(extractedEntries, $"{fixtureId}-extracted");
+        var archiveEvidence = EvidenceHashing.HashFile(path);
+        var extractedCombinedEvidence = EvidenceHashing.HashEntries(extractedEntries, $"{fixtureId}-extracted");
         Assert.True(archiveEvidence.Digests.HasLogicalHash);
         Assert.True(extractedCombinedEvidence.Digests.HasLogicalHash);
         Assert.Equal(archiveEvidence.Digests.LogicalSha256, extractedCombinedEvidence.Digests.LogicalSha256);
@@ -104,7 +104,7 @@ public sealed class DeterministicHashingIntegrationTests
         foreach (var entry in extractedEntries.OrderBy(e => e.RelativePath, StringComparer.Ordinal))
         {
             var entryBytes = entry.Content.ToArray();
-            var fromBytes = DeterministicHashing.HashBytes(entryBytes, entry.RelativePath);
+            var fromBytes = EvidenceHashing.HashBytes(entryBytes, entry.RelativePath);
             Assert.True(fromBytes.Digests.HasLogicalHash);
             Assert.True(fromBytes.Digests.HasPhysicalHash);
             Assert.Equal(fromBytes.Digests.PhysicalSha256, fromBytes.Digests.LogicalSha256);
@@ -113,7 +113,7 @@ public sealed class DeterministicHashingIntegrationTests
             var destinationPath = Path.Combine(scope.RootPath, ToPlatformRelativePath(entry.RelativePath));
             Assert.True(FileMaterializer.Persist(entryBytes, destinationPath, false, false));
 
-            var fromMaterializedFile = DeterministicHashing.HashFile(destinationPath);
+            var fromMaterializedFile = EvidenceHashing.HashFile(destinationPath);
             Assert.True(fromMaterializedFile.Digests.HasLogicalHash);
             Assert.True(fromMaterializedFile.Digests.HasPhysicalHash);
             Assert.Equal(fromBytes.Digests.LogicalSha256, fromMaterializedFile.Digests.LogicalSha256);
@@ -123,7 +123,7 @@ public sealed class DeterministicHashingIntegrationTests
         }
 
         var rematerializedCombinedEvidence =
-            DeterministicHashing.HashEntries(rematerializedEntries, $"{fixtureId}-materialized");
+            EvidenceHashing.HashEntries(rematerializedEntries, $"{fixtureId}-materialized");
         Assert.True(rematerializedCombinedEvidence.Digests.HasLogicalHash);
         Assert.Equal(extractedCombinedEvidence.Digests.LogicalSha256,
             rematerializedCombinedEvidence.Digests.LogicalSha256);
@@ -131,7 +131,7 @@ public sealed class DeterministicHashingIntegrationTests
 
         foreach (var entry in rematerializedEntries.OrderBy(e => e.RelativePath, StringComparer.Ordinal))
         {
-            var hashedEntry = DeterministicHashing.HashBytes(entry.Content.ToArray(), entry.RelativePath);
+            var hashedEntry = EvidenceHashing.HashBytes(entry.Content.ToArray(), entry.RelativePath);
             Assert.True(originalPerFileLogical.TryGetValue(entry.RelativePath, out var expectedLogical));
             Assert.Equal(expectedLogical, hashedEntry.Digests.LogicalSha256);
         }
@@ -148,8 +148,8 @@ public sealed class DeterministicHashingIntegrationTests
         var extractedEntries = ArchiveProcessing.TryExtractToMemory(archiveBytes);
         Assert.NotEmpty(extractedEntries);
 
-        var archiveFromBytesEvidence = DeterministicHashing.HashBytes(archiveBytes, $"{fixtureId}-bytes");
-        var extractedCombinedEvidence = DeterministicHashing.HashEntries(extractedEntries, $"{fixtureId}-entries");
+        var archiveFromBytesEvidence = EvidenceHashing.HashBytes(archiveBytes, $"{fixtureId}-bytes");
+        var extractedCombinedEvidence = EvidenceHashing.HashEntries(extractedEntries, $"{fixtureId}-entries");
         Assert.True(archiveFromBytesEvidence.Digests.HasLogicalHash);
         Assert.True(extractedCombinedEvidence.Digests.HasLogicalHash);
         Assert.Equal(archiveFromBytesEvidence.Digests.LogicalSha256, extractedCombinedEvidence.Digests.LogicalSha256);
@@ -160,11 +160,11 @@ public sealed class DeterministicHashingIntegrationTests
         foreach (var entry in extractedEntries.OrderBy(e => e.RelativePath, StringComparer.Ordinal))
         {
             var entryBytes = entry.Content.ToArray();
-            var perEntryEvidence = DeterministicHashing.HashBytes(entryBytes, entry.RelativePath);
+            var perEntryEvidence = EvidenceHashing.HashBytes(entryBytes, entry.RelativePath);
             var destinationPath = Path.Combine(scope.RootPath, ToPlatformRelativePath(entry.RelativePath));
             Assert.True(FileMaterializer.Persist(entryBytes, destinationPath, false, false));
 
-            var perMaterializedFileEvidence = DeterministicHashing.HashFile(destinationPath);
+            var perMaterializedFileEvidence = EvidenceHashing.HashFile(destinationPath);
             Assert.Equal(perEntryEvidence.Digests.LogicalSha256, perMaterializedFileEvidence.Digests.LogicalSha256);
             Assert.Equal(perEntryEvidence.Digests.PhysicalSha256, perMaterializedFileEvidence.Digests.PhysicalSha256);
 
@@ -172,7 +172,7 @@ public sealed class DeterministicHashingIntegrationTests
         }
 
         var rematerializedCombinedEvidence =
-            DeterministicHashing.HashEntries(rematerializedEntries, $"{fixtureId}-bytes-materialized");
+            EvidenceHashing.HashEntries(rematerializedEntries, $"{fixtureId}-bytes-materialized");
         Assert.Equal(extractedCombinedEvidence.Digests.LogicalSha256,
             rematerializedCombinedEvidence.Digests.LogicalSha256);
         Assert.Equal(archiveFromBytesEvidence.Digests.LogicalSha256,
@@ -186,7 +186,7 @@ public sealed class DeterministicHashingIntegrationTests
 
         Assert.Empty(ArchiveProcessing.TryExtractToMemory(payload));
 
-        var evidence = DeterministicHashing.HashBytes(payload, "unsafe-archive-candidate.zip");
+        var evidence = EvidenceHashing.HashBytes(payload, "unsafe-archive-candidate.zip");
         Assert.True(evidence.Digests.HasLogicalHash);
         Assert.True(evidence.Digests.HasPhysicalHash);
         Assert.Equal(evidence.Digests.PhysicalSha256, evidence.Digests.LogicalSha256);

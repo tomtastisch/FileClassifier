@@ -13,7 +13,7 @@ Zentrale Einstiegsstelle für alle Projektdokumente mit klarer Trennung nach Ver
 1. [01 - Funktionen](https://github.com/tomtastisch/FileClassifier/blob/main/docs/010_API_CORE.MD)
 2. [02 - Gesamtarchitektur und Ablaufflüsse](https://github.com/tomtastisch/FileClassifier/blob/main/docs/020_ARCH_CORE.MD)
 3. [03 - Referenzen](https://github.com/tomtastisch/FileClassifier/blob/main/docs/references/001_REFERENCES_CORE.MD)
-4. [04 - DeterministicHashing API Contract](https://github.com/tomtastisch/FileClassifier/blob/main/docs/contracts/001_CONTRACT_HASHING.MD)
+4. [04 - EvidenceHashing API Contract](https://github.com/tomtastisch/FileClassifier/blob/main/docs/contracts/001_CONTRACT_HASHING.MD)
 5. [DIN-orientierte Spezifikation (DE) - FileTypeDetection](https://github.com/tomtastisch/FileClassifier/blob/main/docs/specs/001_SPEC_DIN.MD)
 6. [Production Readiness Checklist - FileTypeDetection](https://github.com/tomtastisch/FileClassifier/blob/main/docs/quality/001_CHECKLIST_PRODUCTION.MD)
 

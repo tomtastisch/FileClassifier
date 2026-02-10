@@ -4,11 +4,11 @@
 Dieses Verzeichnis bündelt Modelle für deterministische Hash-Evidence und RoundTrip-Nachweise.
 
 ## 2. Inhalt
-- `DeterministicHashSourceType.vb`
-- `DeterministicHashDigestSet.vb`
-- `DeterministicHashEvidence.vb`
-- `DeterministicHashRoundTripReport.vb`
-- `DeterministicHashOptions.vb`
+- `HashSourceType.vb`
+- `HashDigestSet.vb`
+- `HashEvidence.vb`
+- `HashRoundTripReport.vb`
+- `HashOptions.vb`
 
 ## 3. API und Verhalten
 - Physical/Logical SHA-256 sind die zentralen Integritätsnachweise.

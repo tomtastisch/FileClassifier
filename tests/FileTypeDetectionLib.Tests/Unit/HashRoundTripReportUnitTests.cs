@@ -2,12 +2,12 @@ using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
-public sealed class DeterministicHashRoundTripReportUnitTests
+public sealed class HashRoundTripReportUnitTests
 {
     [Fact]
     public void Constructor_DefaultsToFailureEvidence_WhenInputsNull()
     {
-        var report = new DeterministicHashRoundTripReport("", isArchiveInput: false, h1: null, h2: null, h3: null,
+        var report = new HashRoundTripReport("", isArchiveInput: false, h1: null, h2: null, h3: null,
             h4: null, notes: null);
 
         Assert.False(report.LogicalConsistent);
@@ -22,7 +22,7 @@ public sealed class DeterministicHashRoundTripReportUnitTests
     [Fact]
     public void Constructor_ReportsConsistency_WhenLogicalAndPhysicalMatch()
     {
-        var digest = new DeterministicHashDigestSet(
+        var digest = new HashDigestSet(
             physicalSha256: "a",
             logicalSha256: "b",
             fastPhysicalXxHash3: string.Empty,
@@ -30,8 +30,8 @@ public sealed class DeterministicHashRoundTripReportUnitTests
             hasPhysicalHash: true,
             hasLogicalHash: true);
 
-        var evidence = new DeterministicHashEvidence(
-            sourceType: DeterministicHashSourceType.RawBytes,
+        var evidence = new HashEvidence(
+            sourceType: HashSourceType.RawBytes,
             label: "x",
             detectedType: FileTypeRegistry.Resolve(FileKind.Unknown),
             entry: null,
@@ -42,7 +42,7 @@ public sealed class DeterministicHashRoundTripReportUnitTests
             digests: digest,
             notes: "ok");
 
-        var report = new DeterministicHashRoundTripReport("x", isArchiveInput: false, h1: evidence, h2: evidence,
+        var report = new HashRoundTripReport("x", isArchiveInput: false, h1: evidence, h2: evidence,
             h3: evidence, h4: evidence, notes: "ok");
 
         Assert.True(report.LogicalConsistent);
@@ -57,7 +57,7 @@ public sealed class DeterministicHashRoundTripReportUnitTests
     [Fact]
     public void Constructor_DistinguishesPhysicalWhenLogicalMissing()
     {
-        var digest = new DeterministicHashDigestSet(
+        var digest = new HashDigestSet(
             physicalSha256: "abc",
             logicalSha256: string.Empty,
             fastPhysicalXxHash3: string.Empty,
@@ -65,8 +65,8 @@ public sealed class DeterministicHashRoundTripReportUnitTests
             hasPhysicalHash: true,
             hasLogicalHash: false);
 
-        var evidence = new DeterministicHashEvidence(
-            sourceType: DeterministicHashSourceType.RawBytes,
+        var evidence = new HashEvidence(
+            sourceType: HashSourceType.RawBytes,
             label: "x",
             detectedType: FileTypeRegistry.Resolve(FileKind.Unknown),
             entry: null,
@@ -77,7 +77,7 @@ public sealed class DeterministicHashRoundTripReportUnitTests
             digests: digest,
             notes: "ok");
 
-        var report = new DeterministicHashRoundTripReport("x", isArchiveInput: false, h1: evidence, h2: evidence,
+        var report = new HashRoundTripReport("x", isArchiveInput: false, h1: evidence, h2: evidence,
             h3: evidence, h4: evidence, notes: "ok");
 
         Assert.False(report.LogicalH1EqualsH2);

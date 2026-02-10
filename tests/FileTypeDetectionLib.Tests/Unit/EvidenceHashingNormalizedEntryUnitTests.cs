@@ -3,12 +3,12 @@ using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
-public sealed class DeterministicHashingNormalizedEntryUnitTests
+public sealed class EvidenceHashingNormalizedEntryUnitTests
 {
     [Fact]
     public void NormalizedEntry_Defaults_WhenConstructedWithNulls()
     {
-        var type = typeof(DeterministicHashing).GetNestedTypes(BindingFlags.NonPublic)
+        var type = typeof(EvidenceHashing).GetNestedTypes(BindingFlags.NonPublic)
             .First(t => t.Name == "NormalizedEntry");
 
         var ctor = type.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)

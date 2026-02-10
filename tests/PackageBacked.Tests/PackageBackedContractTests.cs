@@ -15,7 +15,7 @@ public sealed class PackageBackedContractTests
         Assert.Equal(FileKind.Pdf, detected.Kind);
         Assert.Equal(".pdf", detected.CanonicalExtension);
 
-        var evidence = DeterministicHashing.HashBytes(payload, "package-backed.pdf");
+        var evidence = EvidenceHashing.HashBytes(payload, "package-backed.pdf");
         Assert.True(evidence.Digests.HasPhysicalHash);
         Assert.True(evidence.Digests.HasLogicalHash);
         Assert.Equal(FileKind.Pdf, evidence.DetectedType.Kind);

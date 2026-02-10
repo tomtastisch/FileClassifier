@@ -61,16 +61,16 @@ Die Rückgabemodelle sind rein organisatorisch in Unterordner aufgeteilt; die AP
 | `FileMaterializer` | `Persist(data, destinationPath)` | `Byte()` + Zielpfad | `Boolean` | schreibt auf Disk | `F6` |
 | `FileMaterializer` | `Persist(data, destinationPath, overwrite)` | `Byte()` + Zielpfad + Bool | `Boolean` | schreibt auf Disk | `F6` |
 | `FileMaterializer` | `Persist(data, destinationPath, overwrite, secureExtract)` | `Byte()` + Zielpfad + 2 Bool | `Boolean` | schreibt auf Disk | `F5`/`F6` |
-| `DeterministicHashing` | `HashFile(path)` | Datei-Pfad | `DeterministicHashEvidence` | keine | `F9` |
-| `DeterministicHashing` | `HashFile(path, options)` | Datei-Pfad + Optionen | `DeterministicHashEvidence` | keine | `F9` |
-| `DeterministicHashing` | `HashBytes(data)` | `Byte()` | `DeterministicHashEvidence` | keine | `F9` |
-| `DeterministicHashing` | `HashBytes(data, label)` | `Byte()` + Label | `DeterministicHashEvidence` | keine | `F9` |
-| `DeterministicHashing` | `HashBytes(data, label, options)` | `Byte()` + Label + Optionen | `DeterministicHashEvidence` | keine | `F9` |
-| `DeterministicHashing` | `HashEntries(entries)` | `IReadOnlyList(Of ZipExtractedEntry)` | `DeterministicHashEvidence` | keine | `F9` |
-| `DeterministicHashing` | `HashEntries(entries, label)` | Entries + Label | `DeterministicHashEvidence` | keine | `F9` |
-| `DeterministicHashing` | `HashEntries(entries, label, options)` | Entries + Label + Optionen | `DeterministicHashEvidence` | keine | `F9` |
-| `DeterministicHashing` | `VerifyRoundTrip(path)` | Datei-Pfad | `DeterministicHashRoundTripReport` | schreibt temp-Datei intern und räumt auf | `F9` |
-| `DeterministicHashing` | `VerifyRoundTrip(path, options)` | Datei-Pfad + Optionen | `DeterministicHashRoundTripReport` | schreibt temp-Datei intern und räumt auf | `F9` |
+| `EvidenceHashing` | `HashFile(path)` | Datei-Pfad | `HashEvidence` | keine | `F9` |
+| `EvidenceHashing` | `HashFile(path, options)` | Datei-Pfad + Optionen | `HashEvidence` | keine | `F9` |
+| `EvidenceHashing` | `HashBytes(data)` | `Byte()` | `HashEvidence` | keine | `F9` |
+| `EvidenceHashing` | `HashBytes(data, label)` | `Byte()` + Label | `HashEvidence` | keine | `F9` |
+| `EvidenceHashing` | `HashBytes(data, label, options)` | `Byte()` + Label + Optionen | `HashEvidence` | keine | `F9` |
+| `EvidenceHashing` | `HashEntries(entries)` | `IReadOnlyList(Of ZipExtractedEntry)` | `HashEvidence` | keine | `F9` |
+| `EvidenceHashing` | `HashEntries(entries, label)` | Entries + Label | `HashEvidence` | keine | `F9` |
+| `EvidenceHashing` | `HashEntries(entries, label, options)` | Entries + Label + Optionen | `HashEvidence` | keine | `F9` |
+| `EvidenceHashing` | `VerifyRoundTrip(path)` | Datei-Pfad | `HashRoundTripReport` | schreibt temp-Datei intern und räumt auf | `F9` |
+| `EvidenceHashing` | `VerifyRoundTrip(path, options)` | Datei-Pfad + Optionen | `HashRoundTripReport` | schreibt temp-Datei intern und räumt auf | `F9` |
 | `FileTypeOptions` | `LoadOptions(json)` | JSON | `Boolean` | ändert globale Optionen | `F7` |
 | `FileTypeOptions` | `GetOptions()` | - | `String` (JSON) | keine | `F7` |
 | `FileTypeProjectBaseline` | `ApplyDeterministicDefaults()` | - | `Void` | ändert globale Optionen | `F7` |
@@ -184,9 +184,9 @@ string snapshot = FileTypeOptions.GetOptions();
 Console.WriteLine($"Loaded={loaded}; Snapshot={snapshot}");
 ```
 
-### 4.5 DeterministicHashing
+### 4.5 EvidenceHashing
 Details: [FileClassifier Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md), [Abstractions Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md).
-Formaler API-Contract: [04 - DeterministicHashing API Contract](https://github.com/tomtastisch/FileClassifier/blob/main/docs/contracts/001_CONTRACT_HASHING.MD).
+Formaler API-Contract: [04 - EvidenceHashing API Contract](https://github.com/tomtastisch/FileClassifier/blob/main/docs/contracts/001_CONTRACT_HASHING.MD).
 
 ```mermaid
 flowchart LR
@@ -205,8 +205,8 @@ flowchart LR
 ```csharp
 using Tomtastisch.FileClassifier;
 
-var evidence = DeterministicHashing.HashFile("/data/archive.zip");
-var report = DeterministicHashing.VerifyRoundTrip("/data/archive.zip");
+var evidence = EvidenceHashing.HashFile("/data/archive.zip");
+var report = EvidenceHashing.VerifyRoundTrip("/data/archive.zip");
 
 Console.WriteLine($"{evidence.Digests.PhysicalSha256} / {evidence.Digests.LogicalSha256}");
 Console.WriteLine($"LogicalConsistent={report.LogicalConsistent}");

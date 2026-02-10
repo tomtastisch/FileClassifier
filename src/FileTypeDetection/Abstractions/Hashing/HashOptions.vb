@@ -8,7 +8,7 @@ Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Steuerung fuer deterministic hashing APIs.
     ''' </summary>
-    Public NotInheritable Class DeterministicHashOptions
+    Public NotInheritable Class HashOptions
         ''' <summary>
         '''     Wenn True, werden komprimierte und unkomprimierte Bytes in Evidence als Kopie mitgefuehrt.
         ''' </summary>
@@ -24,16 +24,16 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public Property MaterializedFileName As String = "deterministic-roundtrip.bin"
 
-        Friend Function Clone() As DeterministicHashOptions
-            Return New DeterministicHashOptions With {
+        Friend Function Clone() As HashOptions
+            Return New HashOptions With {
                 .IncludePayloadCopies = IncludePayloadCopies,
                 .IncludeFastHash = IncludeFastHash,
                 .MaterializedFileName = If(MaterializedFileName, String.Empty)
                 }
         End Function
 
-        Friend Shared Function Normalize(options As DeterministicHashOptions) As DeterministicHashOptions
-            If options Is Nothing Then options = New DeterministicHashOptions()
+        Friend Shared Function Normalize(options As HashOptions) As HashOptions
+            If options Is Nothing Then options = New HashOptions()
 
             Dim cloned = options.Clone()
             cloned.MaterializedFileName = NormalizeMaterializedFileName(cloned.MaterializedFileName)

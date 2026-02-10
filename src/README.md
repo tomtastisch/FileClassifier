@@ -27,7 +27,7 @@ Im Root von `FileTypeDetection` liegen die öffentlichen API-Dateien:
 - `ArchiveProcessing.vb`
 - `FileMaterializer.vb`
 - `FileTypeOptions.vb`
-- `DeterministicHashing.vb`
+- `EvidenceHashing.vb`
 
 Zusätzlich liegen dort Projekt-/Build-Artefakte wie `FileTypeDetectionLib.vbproj`, `packages.lock.json`, `README.md` sowie die Unterordner `Abstractions/`, `Configuration/`, `Detection/`, `Infrastructure/`.
 
