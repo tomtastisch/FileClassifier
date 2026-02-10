@@ -18,4 +18,23 @@ jobs:
         with:
           dotnet-version: 10.0.x
       - name: Run versioning SVT (PR-safe)
+        env:
+          CI_DEFER_ARTIFACT_LINK_RESOLUTION: "1"
         run: bash tools/ci/bin/run.sh versioning-svt
+      - name: Upload versioning SVT artifact (ci-versioning-svt)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-versioning-svt
+          path: artifacts/ci/versioning-svt/
+          if-no-files-found: error
+      - name: Verify ci-versioning-svt artifact exists (post-upload)
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          out="artifacts/ci/versioning-svt/version-policy_artifacts.json"
+          mkdir -p "$(dirname "$out")"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts" --jq '{total_count, artifacts:[.artifacts[]|{name,expired,size_in_bytes}]}' | tee "$out"
+          jq -e '.artifacts | any(.name=="ci-versioning-svt")' "$out" >/dev/null
