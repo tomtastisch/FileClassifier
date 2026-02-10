@@ -48,7 +48,8 @@ jobs:
       - name: Run Qodana
         uses: JetBrains/qodana-action@v2025.3
         with:
-          args: --linter jetbrains/qodana-dotnet:2025.3
+          # gh-actions input is a single string; use --flag=value form to avoid passing a single argv containing a space.
+          args: --linter=jetbrains/qodana-dotnet:2025.3
           results-dir: artifacts/ci/qodana
           upload-result: false
 
@@ -63,6 +64,10 @@ jobs:
       - name: Run Entry Check
         if: always()
         shell: bash
+        env:
+          # The job uploads the qodana artifact after this step; defer artifact-link rendering to avoid false-negative
+          # "artifact_not_found" failures when earlier steps fail.
+          CI_DEFER_ARTIFACT_LINK_RESOLUTION: "1"
         run: bash tools/ci/bin/run.sh qodana
 
       - name: Upload SARIF To Code Scanning
