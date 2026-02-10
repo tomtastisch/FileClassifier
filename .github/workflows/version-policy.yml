@@ -31,10 +31,25 @@ jobs:
       - name: Verify ci-versioning-svt artifact exists (post-upload)
         if: always()
         env:
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           out="artifacts/ci/versioning-svt/version-policy_artifacts.json"
           mkdir -p "$(dirname "$out")"
-          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts" --jq '{total_count, artifacts:[.artifacts[]|{name,expired,size_in_bytes}]}' | tee "$out"
-          jq -e '.artifacts | any(.name=="ci-versioning-svt")' "$out" >/dev/null
+          curl -fsSL \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts" \
+            > "$out"
+          python3 - "$out" <<'PY'
+          import json, sys
+          path = sys.argv[1]
+          with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+          artifacts = data.get("artifacts", [])
+          if not isinstance(artifacts, list):
+            raise SystemExit("ERROR: artifacts payload invalid (expected list).")
+          if not any(isinstance(a, dict) and a.get("name") == "ci-versioning-svt" for a in artifacts):
+            raise SystemExit("ERROR: required artifact 'ci-versioning-svt' not found in run artifacts.")
+          PY
