@@ -76,6 +76,8 @@ P:Tomtastisch.FileClassifier.HashDigestSet.FastLogicalXxHash3:System.String
 P:Tomtastisch.FileClassifier.HashDigestSet.FastPhysicalXxHash3:System.String
 P:Tomtastisch.FileClassifier.HashDigestSet.HasLogicalHash:System.Boolean
 P:Tomtastisch.FileClassifier.HashDigestSet.HasPhysicalHash:System.Boolean
+P:Tomtastisch.FileClassifier.HashDigestSet.HmacLogicalSha256:System.String
+P:Tomtastisch.FileClassifier.HashDigestSet.HmacPhysicalSha256:System.String
 P:Tomtastisch.FileClassifier.HashDigestSet.LogicalSha256:System.String
 P:Tomtastisch.FileClassifier.HashDigestSet.PhysicalSha256:System.String
 P:Tomtastisch.FileClassifier.HashEvidence.CompressedBytes:System.Collections.Immutable.ImmutableArray<System.Byte>
@@ -90,6 +92,7 @@ P:Tomtastisch.FileClassifier.HashEvidence.TotalUncompressedBytes:System.Int64
 P:Tomtastisch.FileClassifier.HashEvidence.UncompressedBytes:System.Collections.Immutable.ImmutableArray<System.Byte>
 P:Tomtastisch.FileClassifier.HashOptions.IncludeFastHash:System.Boolean
 P:Tomtastisch.FileClassifier.HashOptions.IncludePayloadCopies:System.Boolean
+P:Tomtastisch.FileClassifier.HashOptions.IncludeSecureHash:System.Boolean
 P:Tomtastisch.FileClassifier.HashOptions.MaterializedFileName:System.String
 P:Tomtastisch.FileClassifier.HashRoundTripReport.H1:Tomtastisch.FileClassifier.HashEvidence
 P:Tomtastisch.FileClassifier.HashRoundTripReport.H2:Tomtastisch.FileClassifier.HashEvidence

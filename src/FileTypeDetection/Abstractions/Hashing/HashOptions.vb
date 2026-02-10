@@ -20,6 +20,13 @@ Namespace Global.Tomtastisch.FileClassifier
         Public Property IncludeFastHash As Boolean = True
 
         ''' <summary>
+        '''     Wenn True, wird zusaetzlich ein optionaler HMAC-SHA256 Digest berechnet (keyed).
+        '''     Der Key wird aus der Environment Variable 'FILECLASSIFIER_HMAC_KEY_B64' gelesen.
+        '''     Wenn der Key fehlt oder ungueltig ist, werden HMAC-Digests leer gelassen und Notes ergaenzt.
+        ''' </summary>
+        Public Property IncludeSecureHash As Boolean = False
+
+        ''' <summary>
         '''     Dateiname fuer den Materialisierungs-Schritt im RoundTrip-Report.
         ''' </summary>
         Public Property MaterializedFileName As String = "deterministic-roundtrip.bin"
@@ -28,6 +35,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Return New HashOptions With {
                 .IncludePayloadCopies = IncludePayloadCopies,
                 .IncludeFastHash = IncludeFastHash,
+                .IncludeSecureHash = IncludeSecureHash,
                 .MaterializedFileName = If(MaterializedFileName, String.Empty)
                 }
         End Function

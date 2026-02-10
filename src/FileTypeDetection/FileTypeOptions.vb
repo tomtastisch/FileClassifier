@@ -37,6 +37,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim allowUnknownArchiveEntrySize = defaults.AllowUnknownArchiveEntrySize
             Dim hashIncludePayloadCopies = defaults.DeterministicHash.IncludePayloadCopies
             Dim hashIncludeFastHash = defaults.DeterministicHash.IncludeFastHash
+            Dim hashIncludeSecureHash = defaults.DeterministicHash.IncludeSecureHash
             Dim hashMaterializedFileName = defaults.DeterministicHash.MaterializedFileName
             Dim logger = defaults.Logger
 
@@ -79,6 +80,7 @@ Namespace Global.Tomtastisch.FileClassifier
                                     p.Value,
                                     hashIncludePayloadCopies,
                                     hashIncludeFastHash,
+                                    hashIncludeSecureHash,
                                     hashMaterializedFileName,
                                     logger)
                             Case "deterministichashincludepayloadcopies"
@@ -86,6 +88,8 @@ Namespace Global.Tomtastisch.FileClassifier
                                                                         logger)
                             Case "deterministichashincludefasthash"
                                 hashIncludeFastHash = ParseBoolean(p.Value, hashIncludeFastHash, p.Name, logger)
+                            Case "deterministichashincludesecurehash"
+                                hashIncludeSecureHash = ParseBoolean(p.Value, hashIncludeSecureHash, p.Name, logger)
                             Case "deterministichashmaterializedfilename"
                                 hashMaterializedFileName = ParseString(p.Value, hashMaterializedFileName, p.Name, logger)
                             Case Else
@@ -97,6 +101,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Dim nextHashOptions = New HashOptions With {
                         .IncludePayloadCopies = hashIncludePayloadCopies,
                         .IncludeFastHash = hashIncludeFastHash,
+                        .IncludeSecureHash = hashIncludeSecureHash,
                         .MaterializedFileName = hashMaterializedFileName
                         }
 
@@ -143,6 +148,7 @@ Namespace Global.Tomtastisch.FileClassifier
                     {"deterministicHash", New Dictionary(Of String, Object) From {
                     {"includePayloadCopies", opt.DeterministicHash.IncludePayloadCopies},
                     {"includeFastHash", opt.DeterministicHash.IncludeFastHash},
+                    {"includeSecureHash", opt.DeterministicHash.IncludeSecureHash},
                     {"materializedFileName", opt.DeterministicHash.MaterializedFileName}
                     }}
                     }
@@ -230,6 +236,7 @@ Namespace Global.Tomtastisch.FileClassifier
                                                             el As JsonElement,
                                                             ByRef includePayloadCopies As Boolean,
                                                             ByRef includeFastHash As Boolean,
+                                                            ByRef includeSecureHash As Boolean,
                                                             ByRef materializedFileName As String,
                                                             logger As ILogger)
 
@@ -251,6 +258,13 @@ Namespace Global.Tomtastisch.FileClassifier
                         includeFastHash = ParseBoolean(
                             p.Value,
                             includeFastHash,
+                            $"deterministicHash.{p.Name}",
+                            logger
+                        )
+                    Case "includesecurehash"
+                        includeSecureHash = ParseBoolean(
+                            p.Value,
+                            includeSecureHash,
                             $"deterministicHash.{p.Name}",
                             logger
                         )

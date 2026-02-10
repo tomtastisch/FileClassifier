@@ -11,6 +11,9 @@ namespace FileTypeDetectionLib.Tests.Unit;
 public sealed class EvidenceHashingUnitTests
 {
     private const string LogicalManifestVersion = "FTD-LOGICAL-HASH-V1";
+    private const string HmacKeyEnvVarB64 = "FILECLASSIFIER_HMAC_KEY_B64";
+    private const string TestHmacKeyB64 = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=";
+    private static readonly object HmacEnvLock = new();
 
     [Fact]
     public void HashBytes_ReturnsStableDigests_ForSamePayload()
@@ -153,6 +156,133 @@ public sealed class EvidenceHashingUnitTests
     }
 
     [Fact]
+    public void SecureHash_WhenDisabled_LeavesHmacDigestsEmpty()
+    {
+        var payload = new byte[] { 0x10, 0x20, 0x30 };
+        var evidence = EvidenceHashing.HashBytes(payload, "payload.bin",
+            new HashOptions { IncludeSecureHash = false, IncludeFastHash = false });
+
+        Assert.True(string.IsNullOrWhiteSpace(evidence.Digests.HmacPhysicalSha256));
+        Assert.True(string.IsNullOrWhiteSpace(evidence.Digests.HmacLogicalSha256));
+    }
+
+    [Fact]
+    public void SecureHash_WhenEnabledAndKeyValid_ComputesHmacForRawPayload()
+    {
+        var payload = new byte[] { 0x10, 0x20, 0x30 };
+        var key = Convert.FromBase64String(TestHmacKeyB64);
+
+        lock (HmacEnvLock)
+        {
+            var prior = Environment.GetEnvironmentVariable(HmacKeyEnvVarB64);
+            try
+            {
+                Environment.SetEnvironmentVariable(HmacKeyEnvVarB64, TestHmacKeyB64);
+
+                var evidence = EvidenceHashing.HashBytes(payload, "payload.bin",
+                    new HashOptions { IncludeSecureHash = true, IncludeFastHash = false });
+
+                var expected = ComputeHmacSha256Hex(key, payload);
+                Assert.Equal(expected, evidence.Digests.HmacPhysicalSha256);
+                Assert.Equal(expected, evidence.Digests.HmacLogicalSha256);
+                Assert.DoesNotContain("HMAC digests omitted", evidence.Notes, StringComparison.Ordinal);
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(HmacKeyEnvVarB64, prior);
+            }
+        }
+    }
+
+    [Fact]
+    public void SecureHash_WhenEnabledAndKeyMissing_LeavesHmacEmpty_AndAppendsNote()
+    {
+        var payload = new byte[] { 0x10, 0x20, 0x30 };
+
+        lock (HmacEnvLock)
+        {
+            var prior = Environment.GetEnvironmentVariable(HmacKeyEnvVarB64);
+            try
+            {
+                Environment.SetEnvironmentVariable(HmacKeyEnvVarB64, null);
+
+                var evidence = EvidenceHashing.HashBytes(payload, "payload.bin",
+                    new HashOptions { IncludeSecureHash = true, IncludeFastHash = false });
+
+                Assert.True(string.IsNullOrWhiteSpace(evidence.Digests.HmacPhysicalSha256));
+                Assert.True(string.IsNullOrWhiteSpace(evidence.Digests.HmacLogicalSha256));
+                Assert.Contains(HmacKeyEnvVarB64, evidence.Notes, StringComparison.Ordinal);
+                Assert.Contains("HMAC digests omitted", evidence.Notes, StringComparison.Ordinal);
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(HmacKeyEnvVarB64, prior);
+            }
+        }
+    }
+
+    [Fact]
+    public void SecureHash_WhenEnabledAndKeyInvalidBase64_LeavesHmacEmpty_AndAppendsNote()
+    {
+        var payload = new byte[] { 0x10, 0x20, 0x30 };
+
+        lock (HmacEnvLock)
+        {
+            var prior = Environment.GetEnvironmentVariable(HmacKeyEnvVarB64);
+            try
+            {
+                Environment.SetEnvironmentVariable(HmacKeyEnvVarB64, "!!!not-base64!!!");
+
+                var evidence = EvidenceHashing.HashBytes(payload, "payload.bin",
+                    new HashOptions { IncludeSecureHash = true, IncludeFastHash = false });
+
+                Assert.True(string.IsNullOrWhiteSpace(evidence.Digests.HmacPhysicalSha256));
+                Assert.True(string.IsNullOrWhiteSpace(evidence.Digests.HmacLogicalSha256));
+                Assert.Contains("invalid Base64", evidence.Notes, StringComparison.Ordinal);
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(HmacKeyEnvVarB64, prior);
+            }
+        }
+    }
+
+    [Fact]
+    public void SecureHash_WhenEnabledForArchiveBytes_ComputesPhysicalAndLogicalHmacFromCorrectBytes()
+    {
+        var zipBytes = ArchivePayloadFactory.CreateZipWithSingleEntry("inner/note.txt", "hello");
+        var key = Convert.FromBase64String(TestHmacKeyB64);
+
+        lock (HmacEnvLock)
+        {
+            var prior = Environment.GetEnvironmentVariable(HmacKeyEnvVarB64);
+            try
+            {
+                Environment.SetEnvironmentVariable(HmacKeyEnvVarB64, TestHmacKeyB64);
+
+                var evidence = EvidenceHashing.HashBytes(zipBytes, "sample.zip",
+                    new HashOptions { IncludeSecureHash = true, IncludeFastHash = false });
+
+                Assert.True(evidence.Digests.HasPhysicalHash);
+                Assert.True(evidence.Digests.HasLogicalHash);
+
+                var extractedEntries = ArchiveProcessing.TryExtractToMemory(zipBytes);
+                var logicalManifestBytes = BuildLogicalManifestBytes(extractedEntries);
+
+                var expectedPhysical = ComputeHmacSha256Hex(key, zipBytes);
+                var expectedLogical = ComputeHmacSha256Hex(key, logicalManifestBytes);
+
+                Assert.Equal(expectedPhysical, evidence.Digests.HmacPhysicalSha256);
+                Assert.Equal(expectedLogical, evidence.Digests.HmacLogicalSha256);
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(HmacKeyEnvVarB64, prior);
+            }
+        }
+    }
+
+    [Fact]
     public void HashBytes_UsesGlobalHashOptions_WhenNoOptionsProvided()
     {
         using var scope = new DetectorOptionsScope();
@@ -242,5 +372,11 @@ public sealed class EvidenceHashingUnitTests
         }
 
         return ms.ToArray();
+    }
+
+    private static string ComputeHmacSha256Hex(byte[] key, byte[] payload)
+    {
+        using var hmac = new HMACSHA256(key);
+        return Convert.ToHexString(hmac.ComputeHash(payload)).ToLowerInvariant();
     }
 }

@@ -27,6 +27,8 @@ public sealed class HashRoundTripReportUnitTests
             logicalSha256: "b",
             fastPhysicalXxHash3: string.Empty,
             fastLogicalXxHash3: string.Empty,
+            hmacPhysicalSha256: string.Empty,
+            hmacLogicalSha256: string.Empty,
             hasPhysicalHash: true,
             hasLogicalHash: true);
 
@@ -62,6 +64,8 @@ public sealed class HashRoundTripReportUnitTests
             logicalSha256: string.Empty,
             fastPhysicalXxHash3: string.Empty,
             fastLogicalXxHash3: string.Empty,
+            hmacPhysicalSha256: string.Empty,
+            hmacLogicalSha256: string.Empty,
             hasPhysicalHash: true,
             hasLogicalHash: false);
 

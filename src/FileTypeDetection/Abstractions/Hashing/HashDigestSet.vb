@@ -10,6 +10,8 @@ Namespace Global.Tomtastisch.FileClassifier
         Public ReadOnly Property LogicalSha256 As String
         Public ReadOnly Property FastPhysicalXxHash3 As String
         Public ReadOnly Property FastLogicalXxHash3 As String
+        Public ReadOnly Property HmacPhysicalSha256 As String
+        Public ReadOnly Property HmacLogicalSha256 As String
         Public ReadOnly Property HasPhysicalHash As Boolean
         Public ReadOnly Property HasLogicalHash As Boolean
 
@@ -18,12 +20,16 @@ Namespace Global.Tomtastisch.FileClassifier
                        logicalSha256 As String,
                        fastPhysicalXxHash3 As String,
                        fastLogicalXxHash3 As String,
+                       hmacPhysicalSha256 As String,
+                       hmacLogicalSha256 As String,
                        hasPhysicalHash As Boolean,
                        hasLogicalHash As Boolean)
             Me.PhysicalSha256 = Normalize(physicalSha256)
             Me.LogicalSha256 = Normalize(logicalSha256)
             Me.FastPhysicalXxHash3 = Normalize(fastPhysicalXxHash3)
             Me.FastLogicalXxHash3 = Normalize(fastLogicalXxHash3)
+            Me.HmacPhysicalSha256 = Normalize(hmacPhysicalSha256)
+            Me.HmacLogicalSha256 = Normalize(hmacLogicalSha256)
             Me.HasPhysicalHash = hasPhysicalHash
             Me.HasLogicalHash = hasLogicalHash
         End Sub
@@ -35,6 +41,8 @@ Namespace Global.Tomtastisch.FileClassifier
                     logicalSha256:=String.Empty,
                     fastPhysicalXxHash3:=String.Empty,
                     fastLogicalXxHash3:=String.Empty,
+                    hmacPhysicalSha256:=String.Empty,
+                    hmacLogicalSha256:=String.Empty,
                     hasPhysicalHash:=False,
                     hasLogicalHash:=False)
             End Get

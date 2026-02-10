@@ -12,6 +12,8 @@ public sealed class HashDigestSetUnitTests
             "DeF",
             " 123 ",
             null,
+            " 0A ",
+            null,
             hasPhysicalHash: true,
             hasLogicalHash: false);
 
@@ -19,6 +21,8 @@ public sealed class HashDigestSetUnitTests
         Assert.Equal("def", set.LogicalSha256);
         Assert.Equal("123", set.FastPhysicalXxHash3);
         Assert.Equal(string.Empty, set.FastLogicalXxHash3);
+        Assert.Equal("0a", set.HmacPhysicalSha256);
+        Assert.Equal(string.Empty, set.HmacLogicalSha256);
         Assert.True(set.HasPhysicalHash);
         Assert.False(set.HasLogicalHash);
     }
@@ -32,6 +36,8 @@ public sealed class HashDigestSetUnitTests
         Assert.Equal(string.Empty, empty.LogicalSha256);
         Assert.Equal(string.Empty, empty.FastPhysicalXxHash3);
         Assert.Equal(string.Empty, empty.FastLogicalXxHash3);
+        Assert.Equal(string.Empty, empty.HmacPhysicalSha256);
+        Assert.Equal(string.Empty, empty.HmacLogicalSha256);
         Assert.False(empty.HasPhysicalHash);
         Assert.False(empty.HasLogicalHash);
     }

@@ -14,6 +14,7 @@ Namespace Global.Tomtastisch.FileClassifier
     Public NotInheritable Class EvidenceHashing
         Private Const LogicalManifestVersion As String = "FTD-LOGICAL-HASH-V1"
         Private Const DefaultPayloadLabel As String = "payload.bin"
+        Private Const HmacKeyEnvVarB64 As String = "FILECLASSIFIER_HMAC_KEY_B64"
 
         Private Sub New()
         End Sub
@@ -234,14 +235,28 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim logicalBytes = BuildLogicalManifestBytes(normalizedEntries)
             Dim logicalSha = ComputeSha256Hex(logicalBytes)
             Dim fastLogical = ComputeFastHash(logicalBytes, hashOptions)
+            Dim hmacLogical = String.Empty
             Dim physicalSha = String.Empty
             Dim fastPhysical = String.Empty
+            Dim hmacPhysical = String.Empty
             Dim hasPhysical = False
+            Dim secureNote = String.Empty
+            Dim hmacKey As Byte() = Array.Empty(Of Byte)()
+            Dim hasHmacKey = False
+            If hashOptions IsNot Nothing AndAlso hashOptions.IncludeSecureHash Then
+                hasHmacKey = TryResolveHmacKey(hmacKey, secureNote)
+                If hasHmacKey Then
+                    hmacLogical = ComputeHmacSha256Hex(hmacKey, logicalBytes)
+                End If
+            End If
 
             If compressedBytes IsNot Nothing AndAlso compressedBytes.Length > 0 Then
                 physicalSha = ComputeSha256Hex(compressedBytes)
                 fastPhysical = ComputeFastHash(compressedBytes, hashOptions)
                 hasPhysical = True
+                If hasHmacKey Then
+                    hmacPhysical = ComputeHmacSha256Hex(hmacKey, compressedBytes)
+                End If
             End If
 
             Dim firstEntry As ZipExtractedEntry = Nothing
@@ -254,8 +269,12 @@ Namespace Global.Tomtastisch.FileClassifier
                 logicalSha256:=logicalSha,
                 fastPhysicalXxHash3:=fastPhysical,
                 fastLogicalXxHash3:=fastLogical,
+                hmacPhysicalSha256:=hmacPhysical,
+                hmacLogicalSha256:=hmacLogical,
                 hasPhysicalHash:=hasPhysical,
                 hasLogicalHash:=True)
+
+            Dim combinedNotes = AppendNoteIfAny(notes, secureNote)
 
             Dim totalBytes As Long = normalizedEntries.Sum(Function(entry) CLng(entry.Content.LongLength))
 
@@ -274,7 +293,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 entryCount:=normalizedEntries.Count,
                 totalUncompressedBytes:=totalBytes,
                 digests:=digestSet,
-                notes:=notes)
+                notes:=combinedNotes)
         End Function
 
         Private Shared Function BuildEvidenceFromRawPayload(
@@ -290,6 +309,18 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim logicalSha = physicalSha
             Dim fastPhysical = ComputeFastHash(safePayload, hashOptions)
             Dim fastLogical = fastPhysical
+            Dim hmacPhysical = String.Empty
+            Dim hmacLogical = String.Empty
+            Dim secureNote = String.Empty
+
+            If hashOptions IsNot Nothing AndAlso hashOptions.IncludeSecureHash Then
+                Dim hmacKey As Byte() = Array.Empty(Of Byte)()
+                If TryResolveHmacKey(hmacKey, secureNote) Then
+                    hmacPhysical = ComputeHmacSha256Hex(hmacKey, safePayload)
+                    hmacLogical = hmacPhysical
+                End If
+            End If
+
             Dim persistedPayload = If(hashOptions.IncludePayloadCopies, CopyBytes(safePayload), Array.Empty(Of Byte)())
             Dim entry = New ZipExtractedEntry(DefaultPayloadLabel, safePayload)
 
@@ -298,8 +329,12 @@ Namespace Global.Tomtastisch.FileClassifier
                 logicalSha256:=logicalSha,
                 fastPhysicalXxHash3:=fastPhysical,
                 fastLogicalXxHash3:=fastLogical,
+                hmacPhysicalSha256:=hmacPhysical,
+                hmacLogicalSha256:=hmacLogical,
                 hasPhysicalHash:=True,
                 hasLogicalHash:=True)
+
+            Dim combinedNotes = AppendNoteIfAny(notes, secureNote)
 
             Return New HashEvidence(
                 sourceType:=sourceType,
@@ -311,7 +346,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 entryCount:=1,
                 totalUncompressedBytes:=safePayload.LongLength,
                 digests:=digestSet,
-                notes:=notes)
+                notes:=combinedNotes)
         End Function
 
         Private Shared Function TryNormalizeEntries(
@@ -387,11 +422,52 @@ Namespace Global.Tomtastisch.FileClassifier
             Return Convert.ToHexString(SHA256.HashData(data)).ToLowerInvariant()
         End Function
 
+        Private Shared Function TryResolveHmacKey(ByRef key As Byte(), ByRef note As String) As Boolean
+            key = Array.Empty(Of Byte)()
+            note = String.Empty
+
+            Dim b64 = Environment.GetEnvironmentVariable(HmacKeyEnvVarB64)
+            If String.IsNullOrWhiteSpace(b64) Then
+                note = $"Secure hashing requested but env var '{HmacKeyEnvVarB64}' is missing; HMAC digests omitted."
+                Return False
+            End If
+
+            Try
+                key = Convert.FromBase64String(b64.Trim())
+                If key Is Nothing OrElse key.Length = 0 Then
+                    key = Array.Empty(Of Byte)()
+                    note = $"Secure hashing requested but env var '{HmacKeyEnvVarB64}' is empty; HMAC digests omitted."
+                    Return False
+                End If
+                Return True
+            Catch
+                key = Array.Empty(Of Byte)()
+                note = $"Secure hashing requested but env var '{HmacKeyEnvVarB64}' is invalid Base64; HMAC digests omitted."
+                Return False
+            End Try
+        End Function
+
+        Private Shared Function ComputeHmacSha256Hex(key As Byte(), payload As Byte()) As String
+            Dim safeKey = If(key, Array.Empty(Of Byte)())
+            Dim data = If(payload, Array.Empty(Of Byte)())
+            Using hmac As New HMACSHA256(safeKey)
+                Return Convert.ToHexString(hmac.ComputeHash(data)).ToLowerInvariant()
+            End Using
+        End Function
+
         Private Shared Function ComputeFastHash(payload As Byte(), options As HashOptions) As String
             If options Is Nothing OrElse Not options.IncludeFastHash Then Return String.Empty
             Dim data = If(payload, Array.Empty(Of Byte)())
             Dim value = System.IO.Hashing.XxHash3.HashToUInt64(data)
             Return value.ToString("x16", CultureInfo.InvariantCulture)
+        End Function
+
+        Private Shared Function AppendNoteIfAny(baseNotes As String, toAppend As String) As String
+            Dim left = If(baseNotes, String.Empty).Trim()
+            Dim right = If(toAppend, String.Empty).Trim()
+            If right.Length = 0 Then Return left
+            If left.Length = 0 Then Return right
+            Return left & " " & right
         End Function
 
         Private Shared Function NormalizeLabel(label As String) As String
