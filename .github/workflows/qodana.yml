@@ -23,39 +23,61 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Assert QODANA_TOKEN present
+        # Fail-closed for push/workflow_dispatch AND same-repo PRs.
+        # Do not fail fork PRs (secrets not provided there).
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
+        shell: bash
+        run: |
+          test -n "${QODANA_TOKEN:-}" || (echo "FAIL: QODANA_TOKEN missing" >&2; exit 1)
+          echo "OK: QODANA_TOKEN present"
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.102"
+
       - name: Temporarily disable .editorconfig for Qodana
-        if: env.QODANA_TOKEN != ''
+        shell: bash
         run: |
           if [ -f .editorconfig ]; then
             mv .editorconfig .editorconfig.qodana.bak
           fi
+
       - name: Run Qodana
-        if: env.QODANA_TOKEN != ''
         uses: JetBrains/qodana-action@v2025.3
         with:
-          args: --linter,jetbrains/qodana-dotnet:2025.3
+          # gh-actions input is a single string; use --flag=value form to avoid passing a single argv containing a space.
+          args: --linter=jetbrains/qodana-dotnet:2025.3
           results-dir: artifacts/ci/qodana
           upload-result: false
+
       - name: Restore .editorconfig
-        if: always() && env.QODANA_TOKEN != ''
+        if: always()
+        shell: bash
         run: |
           if [ -f .editorconfig.qodana.bak ]; then
             mv .editorconfig.qodana.bak .editorconfig
           fi
+
       - name: Run Entry Check
-        if: always() && env.QODANA_TOKEN != ''
+        if: always()
+        shell: bash
+        env:
+          # The job uploads the qodana artifact after this step; defer artifact-link rendering to avoid false-negative
+          # "artifact_not_found" failures when earlier steps fail.
+          CI_DEFER_ARTIFACT_LINK_RESOLUTION: "1"
         run: bash tools/ci/bin/run.sh qodana
+
       - name: Upload SARIF To Code Scanning
-        if: github.event_name != 'pull_request' && env.QODANA_TOKEN != ''
+        if: github.event_name != 'pull_request'
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: artifacts/ci/qodana/qodana.sarif.json
+
       - name: Upload Artifact
-        if: always() && env.QODANA_TOKEN != ''
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ci-qodana

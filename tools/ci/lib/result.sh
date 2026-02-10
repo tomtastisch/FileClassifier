@@ -212,13 +212,15 @@ ci_emit_error_ux() {
   # In that case, artifact URL resolution would be a guaranteed false-negative pre-upload.
   # This flag defers artifact-link rendering to a post-upload verification step in the workflow.
   if [[ "${CI_DEFER_ARTIFACT_LINK_RESOLUTION:-}" == "1" ]]; then
+    local msg
+    msg="Artifact URL resolution deferred (CI_DEFER_ARTIFACT_LINK_RESOLUTION=1). Verify artifact existence after upload-artifact."
     jq -cn \
       --arg check_id "$CI_CHECK_ID" \
       --arg artifact_name "$CI_ARTIFACT_NAME" \
       --arg run_url "$run_url" \
       --arg rule_id "$rule_id" \
       --arg ts "$(ci_now_utc)" \
-      --arg msg "Artifact URL resolution deferred (CI_DEFER_ARTIFACT_LINK_RESOLUTION=1). Verify artifact existence after upload-artifact." \
+      --arg msg "$msg" \
       '{
         error_code:"deferred",
         check_id:$check_id,
