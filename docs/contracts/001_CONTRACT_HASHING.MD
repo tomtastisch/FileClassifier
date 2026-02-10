@@ -11,6 +11,10 @@ Es dient als Freigabebasis vor Merge und als Guard gegen unabsichtliche API-Drif
   - `PhysicalSha256` = Rohbytes
   - `LogicalSha256` = kanonisierter Inhalt
 - `Fast*XxHash3` ist optional und nicht-kryptografisch.
+- `Hmac*Sha256` ist optionaler keyed Digest (HMAC-SHA256) für Authentizität/Tamper-Evidence.
+  - Aktivierung: `HashOptions.IncludeSecureHash = true`
+  - Key: Environment Variable `FILECLASSIFIER_HMAC_KEY_B64` (Base64)
+  - Wenn Key fehlt/ungueltig: HMAC-Digests bleiben leer und Evidence-Notes enthalten einen Hinweis.
 - Overloads ohne `options` verwenden `FileTypeOptions.GetSnapshot().DeterministicHash` als globale Default-Policy.
 
 ## 3. Public Surface (freigegeben)
@@ -38,7 +42,7 @@ Es dient als Freigabebasis vor Merge und als Guard gegen unabsichtliche API-Drif
 
 ## 5. Verifikation (Gate)
 ```bash
-dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj --filter "FullyQualifiedName~EvidenceHashingApiContractUnitTests" -v minimal
+dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj --filter "FullyQualifiedName~HashingEvidenceApiContractTests" -v minimal
 ```
 
 ## 6. Freigabehinweis

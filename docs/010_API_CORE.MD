@@ -20,7 +20,7 @@ Dieses Dokument beschreibt alle öffentlichen Einstiegspunkte der API mit Signat
 | `FileTypeDetector` / `ArchiveProcessing` | [Detection Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Detection/README.md) | SSOT-Detektion, Header-Magic, Aliaslogik |
 | `FileTypeDetector` / `ArchiveProcessing` / `FileMaterializer` | [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md) | Archive-Gate, Guards, Extraktions-Engine |
 | `FileTypeOptions` / `FileTypeProjectBaseline` | [Configuration Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/README.md) | globale Optionen und Baseline |
-| Rückgabemodelle (`FileType`, `DetectionDetail`, `ZipExtractedEntry`, `DeterministicHash*`) | [Abstractions Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md) | Modellverträge der Public API |
+| Rückgabemodelle (`FileType`, `DetectionDetail`, `ZipExtractedEntry`, `Hash*`) | [Abstractions Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md) | Modellverträge der Public API |
 | Modulnavigation | [FileClassifier Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md) | Übersicht und Einstieg je Leserrolle |
 
 ## 2.2.1 Physische Modellablage (ohne Funktionsänderung)
@@ -38,6 +38,7 @@ Die Rückgabemodelle sind rein organisatorisch in Unterordner aufgeteilt; die AP
 | PhysicalHash | SHA-256 über die unveränderten Rohbytes einer Datei oder eines Byte-Arrays. |
 | LogicalHash | SHA-256 über kanonisierten Inhaltszustand (Entry-Pfad + Inhalt), unabhängig von Containerdetails. |
 | FastHash | Optionaler, nicht-kryptografischer Vergleichsdigest (`XxHash3`) für Performance-Shortcuts. |
+| SecureHash | Optionaler, keyed Digest (`HMAC-SHA256`) für Authentizität/Tamper-Evidence (via `FILECLASSIFIER_HMAC_KEY_B64`). |
 | Fail-closed | Unsichere oder ungültige Eingaben liefern nur sichere Rückgaben (`Unknown`, `False`, leere Liste). |
 
 ## 3. Vollständige Methodenmatrix (Public API)

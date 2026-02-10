@@ -12,7 +12,7 @@ Zentraler Einstieg für alle ausführbaren BDD-Feature-Dateien der Test-Suite.
 | `FTD_BDD_020_ARCHIVE_REFINEMENT_UND_VALIDIERUNG.feature`           | Archiv-Gate, OOXML-Refinement und Typisierung auf `Zip` bzw. `Docx`/`Xlsx`/`Pptx`                             | `@integration`, `@detector`, `@processing`, `@archive`, `@refinement`      |
 | `FTD_BDD_030_MATERIALIZER_UND_PAYLOAD_FLOWS.feature`               | Materializer- und Payload-Flows inkl. Negativfälle                                                          | `@e2e`, `@materializer`, `@processing`, `@archive`, `@positiv`, `@negativ` |
 | `FTD_BDD_040_ARCHIVE_TYPEN_BYTEARRAY_UND_MATERIALISIERUNG.feature` | Einheitliches Byte-Array-Verhalten für mehrere Archivformate bei Detect/Validate/Extract/Materialize        | `@integration`, `@archive`, `@processing`, `@materializer`, `@positiv`     |
-| `FTD_BDD_050_DETERMINISTISCHES_HASHING_UND_ROUNDTRIP.feature`      | Deterministische Hash-Evidence, h1-h4 RoundTrip sowie Entry-Byte->Materialize Invarianz inkl. Negativfällen | `@e2e`, `@hashing`, `@deterministic`, `@roundtrip`, `@positiv`, `@negativ` |
+| `FTD_BDD_050_HASHING_UND_ROUNDTRIP.feature`      | Deterministische Hash-Evidence, h1-h4 RoundTrip sowie Entry-Byte->Materialize Invarianz inkl. Negativfällen | `@e2e`, `@hashing`, `@deterministic`, `@roundtrip`, `@positiv`, `@negativ` |
 
 ## 3. Konventionen
 

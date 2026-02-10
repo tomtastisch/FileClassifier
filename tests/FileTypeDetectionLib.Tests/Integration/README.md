@@ -8,7 +8,7 @@ Nachweise für deterministisches Verhalten über mehrere Containerformate und ec
 
 | Testdatei                                 | Fokus                                                                                                                                     |
 |-------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
-| `EvidenceHashingIntegrationTests.cs` | formatübergreifende LogicalHash-Stabilität, h1-h4 RoundTrip-Konsistenz sowie Extract->Bytes->Materialize Hash-Invarianz (positiv/negativ) |
+| `../Unit/HashingEvidenceTests.cs` | formatübergreifende LogicalHash-Stabilität, h1-h4 RoundTrip-Konsistenz sowie Extract->Bytes->Materialize Hash-Invarianz (positiv/negativ) |
 
 ## Dokumentpflege-Checkliste
 

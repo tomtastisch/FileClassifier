@@ -16,6 +16,7 @@ Zentrale Einstiegsstelle für alle Projektdokumente mit klarer Trennung nach Ver
 4. [04 - EvidenceHashing API Contract](https://github.com/tomtastisch/FileClassifier/blob/main/docs/contracts/001_CONTRACT_HASHING.MD)
 5. [DIN-orientierte Spezifikation (DE) - FileTypeDetection](https://github.com/tomtastisch/FileClassifier/blob/main/docs/specs/001_SPEC_DIN.MD)
 6. [Production Readiness Checklist - FileTypeDetection](https://github.com/tomtastisch/FileClassifier/blob/main/docs/quality/001_CHECKLIST_PRODUCTION.MD)
+7. [Secure Hash Key Setup (HMAC)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/secure/001_HMAC_KEY_SETUP.MD)
 
 ## 4. Versionierung und Governance
 1. [Versionierungs- und Release-Policy (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/versioning/001_POLICY_VERSIONING.MD)
@@ -27,6 +28,9 @@ Zentrale Einstiegsstelle für alle Projektdokumente mit klarer Trennung nach Ver
 1. [Guides - Change Playbooks](https://github.com/tomtastisch/FileClassifier/blob/main/docs/guides/000_INDEX_GUIDES.MD)
 2. [Playbook: Options anlegen und anpassen](https://github.com/tomtastisch/FileClassifier/blob/main/docs/guides/001_GUIDE_OPTIONS.MD)
 3. [Playbook: Neue Datatypes und API-Modelle erweitern](https://github.com/tomtastisch/FileClassifier/blob/main/docs/guides/002_GUIDE_DATATYPE.MD)
+
+## 5.1 Migration Notes
+1. [Migration: Hashing Rename](https://github.com/tomtastisch/FileClassifier/blob/main/docs/migrations/001_HASHING_RENAME.MD)
 
 ## 6. Test- und Nachweisdokumente
 1. [Test Matrix - Deterministic Hashing](https://github.com/tomtastisch/FileClassifier/blob/main/docs/tests/004_MATRIX_HASHING.MD)

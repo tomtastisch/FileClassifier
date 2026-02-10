@@ -13,6 +13,7 @@ Dieses Verzeichnis bündelt Modelle für deterministische Hash-Evidence und Roun
 ## 3. API und Verhalten
 - Physical/Logical SHA-256 sind die zentralen Integritätsnachweise.
 - Optionaler FastHash bleibt nicht-kryptografisch.
+- Optionaler SecureHash (HMAC-SHA256) ist keyed und dient Authentizität/Tamper-Evidence.
 
 ## 4. Verifikation
 - Unit- und Integrationstests prüfen Stage-Konsistenz und RoundTrip-Verhalten.
