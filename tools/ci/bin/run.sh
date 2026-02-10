@@ -19,25 +19,10 @@ ci_result_init "$CHECK_ID" "$OUT_DIR"
 
 finalized=0
 finalize_and_exit() {
-  local exit_status=$?
   if [[ "$finalized" -eq 0 ]]; then
-    # ci_result_finalize performs schema validation; that can change CI_STATUS_FILE to "fail".
-    # We must base the process exit code on the final status (fail-closed), not the pre-finalize status.
-    set +e
     ci_result_finalize
-    set -e
     finalized=1
   fi
-
-  # Override "green with ERROR": if finalize switched the status to fail (e.g. schema validation),
-  # ensure the overall process exits non-zero.
-  if [[ "$exit_status" -eq 0 && "$(cat "$CI_STATUS_FILE")" == "fail" ]]; then
-    exit_status=1
-  fi
-
-  # Disable EXIT trap recursion before forcing the exit status.
-  trap - EXIT
-  exit "$exit_status"
 }
 trap finalize_and_exit EXIT
 trap 'ci_result_append_summary "Check '\''${CHECK_ID}'\'' failed."' ERR
@@ -499,4 +484,14 @@ main() {
 
 main
 
-true
+if [[ "$finalized" -eq 0 ]]; then
+  ci_result_finalize
+  finalized=1
+fi
+
+if [[ "$(cat "$CI_STATUS_FILE")" == "fail" ]]; then
+  ci_result_append_summary "Check '${CHECK_ID}' failed."
+  exit 1
+fi
+
+ci_result_append_summary "Check '${CHECK_ID}' passed."
