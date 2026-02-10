@@ -1,10 +1,17 @@
 using FileTypeDetectionLib.Tests.Support;
+using System.Globalization;
+using System.IO.Hashing;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
 using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
 public sealed class EvidenceHashingUnitTests
 {
+    private const string LogicalManifestVersion = "FTD-LOGICAL-HASH-V1";
+
     [Fact]
     public void HashBytes_ReturnsStableDigests_ForSamePayload()
     {
@@ -110,6 +117,42 @@ public sealed class EvidenceHashingUnitTests
     }
 
     [Fact]
+    public void FastHash_ForRawPayload_MatchesXxHash3_UInt64LowerHex()
+    {
+        var payload = new byte[] { 0x00, 0x01, 0x02, 0xFF };
+        var evidence = EvidenceHashing.HashBytes(payload, "payload.bin", new HashOptions { IncludeFastHash = true });
+
+        var expected = XxHash3.HashToUInt64(payload).ToString("x16", CultureInfo.InvariantCulture);
+        Assert.Equal(expected, evidence.Digests.FastPhysicalXxHash3);
+        Assert.Equal(expected, evidence.Digests.FastLogicalXxHash3);
+
+        Assert.Matches(new Regex("^[0-9a-f]{16}$"), evidence.Digests.FastPhysicalXxHash3);
+        Assert.Matches(new Regex("^[0-9a-f]{16}$"), evidence.Digests.FastLogicalXxHash3);
+    }
+
+    [Fact]
+    public void FastHash_ForArchiveBytes_HashesPhysicalBytesAndCanonicalLogicalManifest()
+    {
+        var zipBytes = ArchivePayloadFactory.CreateZipWithSingleEntry("inner/note.txt", "hello");
+        var evidence = EvidenceHashing.HashBytes(zipBytes, "sample.zip", new HashOptions { IncludeFastHash = true });
+
+        Assert.True(evidence.Digests.HasPhysicalHash);
+        Assert.True(evidence.Digests.HasLogicalHash);
+
+        var expectedPhysicalFast = XxHash3.HashToUInt64(zipBytes).ToString("x16", CultureInfo.InvariantCulture);
+        Assert.Equal(expectedPhysicalFast, evidence.Digests.FastPhysicalXxHash3);
+
+        var extractedEntries = ArchiveProcessing.TryExtractToMemory(zipBytes);
+        var logicalManifestBytes = BuildLogicalManifestBytes(extractedEntries);
+
+        var expectedLogicalSha256 = Convert.ToHexString(SHA256.HashData(logicalManifestBytes)).ToLowerInvariant();
+        var expectedLogicalFast = XxHash3.HashToUInt64(logicalManifestBytes).ToString("x16", CultureInfo.InvariantCulture);
+
+        Assert.Equal(expectedLogicalSha256, evidence.Digests.LogicalSha256);
+        Assert.Equal(expectedLogicalFast, evidence.Digests.FastLogicalXxHash3);
+    }
+
+    [Fact]
     public void HashBytes_UsesGlobalHashOptions_WhenNoOptionsProvided()
     {
         using var scope = new DetectorOptionsScope();
@@ -164,5 +207,40 @@ public sealed class EvidenceHashingUnitTests
         });
 
         Assert.Equal("deterministic-roundtrip.bin", normalized.MaterializedFileName);
+    }
+
+    private static byte[] BuildLogicalManifestBytes(IReadOnlyList<ZipExtractedEntry> entries)
+    {
+        var normalizedEntries = entries
+            .Select(entry => new
+            {
+                RelativePath = entry.RelativePath,
+                Content = entry.Content.IsDefaultOrEmpty ? Array.Empty<byte>() : entry.Content.ToArray()
+            })
+            .OrderBy(entry => entry.RelativePath, StringComparer.Ordinal)
+            .ToArray();
+
+        using var ms = new MemoryStream();
+        using (var writer = new BinaryWriter(ms, Encoding.UTF8, leaveOpen: true))
+        {
+            var versionBytes = Encoding.UTF8.GetBytes(LogicalManifestVersion);
+            writer.Write(versionBytes.Length);
+            writer.Write(versionBytes);
+            writer.Write(normalizedEntries.Length);
+
+            foreach (var entry in normalizedEntries)
+            {
+                var pathBytes = Encoding.UTF8.GetBytes(entry.RelativePath);
+                var contentHash = SHA256.HashData(entry.Content);
+
+                writer.Write(pathBytes.Length);
+                writer.Write(pathBytes);
+                writer.Write((long)entry.Content.Length);
+                writer.Write(contentHash.Length);
+                writer.Write(contentHash);
+            }
+        }
+
+        return ms.ToArray();
     }
 }
