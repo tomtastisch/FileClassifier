@@ -115,12 +115,12 @@ ci_result_finalize() {
   }
 
   ci_result_validate_schema() {
-    local lib_dir root_dir schema_path validator_project validator_dll
+    local lib_dir repo_root schema_path validator_project validator_dll
     lib_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-    root_dir="$(cd -- "${lib_dir}/../.." && pwd)"
-    schema_path="${root_dir}/tools/ci/schema/result.schema.json"
-    validator_project="${root_dir}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
-    validator_dll="${root_dir}/tools/ci/checks/ResultSchemaValidator/bin/Release/net10.0/ResultSchemaValidator.dll"
+    repo_root="$(cd -- "${lib_dir}/../../.." && pwd)"
+    schema_path="${repo_root}/tools/ci/schema/result.schema.json"
+    validator_project="${repo_root}/tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj"
+    validator_dll="${repo_root}/tools/ci/checks/ResultSchemaValidator/bin/Release/net10.0/ResultSchemaValidator.dll"
 
     if [[ ! -f "$schema_path" ]]; then
       ci_result_add_violation "CI-SCHEMA-001" "fail" "result schema missing" "$schema_path"
