@@ -50,7 +50,8 @@ Namespace Global.Tomtastisch.FileClassifier
                     For Each p In doc.RootElement.EnumerateObject()
                         Select Case p.Name.ToLowerInvariant()
                             Case "headeronlynonzip" _
-                                : headerOnlyNonZip = ParseBoolean(p.Value, headerOnlyNonZip, p.Name, logger)
+                                : headerOnlyNonZip = ParseBoolean(
+                                    p.Value, headerOnlyNonZip, p.Name, logger)
                             Case "maxbytes" : maxBytes = ParsePositiveLong(p.Value, maxBytes, p.Name, logger)
                             Case "sniffbytes" : sniffBytes = ParsePositiveInt(p.Value, sniffBytes, p.Name, logger)
                             Case "maxzipentries" _
@@ -231,6 +232,7 @@ Namespace Global.Tomtastisch.FileClassifier
                                                             ByRef includeFastHash As Boolean,
                                                             ByRef materializedFileName As String,
                                                             logger As ILogger)
+            
             If el.ValueKind <> JsonValueKind.Object Then
                 LogGuard.Warn(logger, "[Config] 'deterministicHash' muss ein JSON-Objekt sein.")
                 Return
@@ -239,13 +241,27 @@ Namespace Global.Tomtastisch.FileClassifier
             For Each p In el.EnumerateObject()
                 Select Case p.Name.ToLowerInvariant()
                     Case "includepayloadcopies"
-                        includePayloadCopies = ParseBoolean(p.Value, includePayloadCopies, $"deterministicHash.{p.Name}",
-                                                            logger)
+                        includePayloadCopies = ParseBoolean(
+                            p.Value, 
+                            includePayloadCopies, 
+                            $"deterministicHash.{p.Name}",
+                            logger
+                        )
                     Case "includefasthash"
-                        includeFastHash = ParseBoolean(p.Value, includeFastHash, $"deterministicHash.{p.Name}", logger)
+                        includeFastHash = ParseBoolean(
+                            p.Value, 
+                            includeFastHash, 
+                            $"deterministicHash.{p.Name}", 
+                            logger
+                        )
                     Case "materializedfilename"
-                        materializedFileName = ParseString(p.Value, materializedFileName, $"deterministicHash.{p.Name}",
-                                                           logger)
+                        materializedFileName = ParseString(
+                            p.Value, 
+                            materializedFileName, 
+                            $"deterministicHash.{p.Name}",
+                            logger
+                        )
+                            
                     Case Else
                         LogGuard.Warn(logger, $"[Config] Unbekannter Schluessel 'deterministicHash.{p.Name}' ignoriert.")
                 End Select
