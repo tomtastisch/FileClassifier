@@ -37,7 +37,6 @@ EXPECTED_VERSION=X.Y.Z bash tools/ci/verify_nuget_release.sh
 - Portable-Integration: [Portable Adoption Guide](https://github.com/tomtastisch/FileClassifier/blob/main/docs/guides/003_GUIDE_PORTABLE.MD)
 - Maintainer-Hinweis: Das Publish-Helper-Skript nutzt `NUGET_API_KEY` aus dem Keychain und gibt den Token nicht aus.
 - Migration: Verwende ausschließlich `Tomtastisch.FileClassifier` (Details in `docs/guides/004_GUIDE_MIGRATE_LEGACY_NUGET.MD`).
-  - Siehe: [NuGet Usage Guide](https://github.com/tomtastisch/FileClassifier/blob/main/docs/021_USAGE_NUGET.MD)
 
 ## 5. Compatibility / TFMs
 - Library-Zielplattformen: `net8.0` und `net10.0`
@@ -164,9 +163,12 @@ Delegationshinweis: `ArchiveProcessing` ist bei path-basierten Archivpfaden eine
 
 ## 9. Verifikation
 ```bash
+dotnet build FileClassifier.sln -v minimal
+dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release -v minimal
 python3 tools/check-docs.py
 python3 tools/check-policy-roc.py --out artifacts/policy_roc_matrix.tsv
-bash tools/versioning/check-version-policy.sh
+bash tools/ci/bin/run.sh versioning-svt
+bash tools/ci/bin/run.sh naming-snt
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --filter "Category=ApiContract" -v minimal
 dotnet pack src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -o artifacts/nuget -v minimal
 EXPECTED_VERSION=X.Y.Z bash tools/ci/verify_nuget_release.sh

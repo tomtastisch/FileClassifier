@@ -9,6 +9,18 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 - Fixed:
 - Docs/CI/Tooling:
 
+## [5.0.0]
+- Added:
+  - Optionale HMAC-SHA256-Digests fuer physische und logische Evidence-Hashes (`HmacPhysicalSha256`, `HmacLogicalSha256`) inkl. ENV-Key-Resolver (`FILECLASSIFIER_HMAC_KEY_B64`).
+- Changed:
+  - Breaking Rename der oeffentlichen Hashing-Fassade von `DeterministicHashing` auf `EvidenceHashing`.
+  - Breaking Rename der oeffentlichen Hashing-Modelle auf `HashEvidence`, `HashDigestSet`, `HashOptions`, `HashRoundTripReport`, `HashSourceType`.
+  - Hashing-Tests konsolidiert in eine zentrale Datei `tests/FileTypeDetectionLib.Tests/Unit/HashingEvidenceTests.cs`.
+- Fixed:
+  - xxHash3-Formatierung und Optionen deterministisch vereinheitlicht (lowercase, `x16`, leere Fast-Hashes bei deaktivierter Option).
+- Docs/CI/Tooling:
+  - Migrationsdoku fuer Hashing-Renames und HMAC-Key-Setup ergänzt.
+
 ## [4.4.0]
 - Added:
   - Neue Governance-Policies fuer einheitliches Naming und SVT-Versioning (`CI-NAMING-001`, `CI-VERSION-001`).
