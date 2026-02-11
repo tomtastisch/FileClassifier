@@ -1,0 +1,141 @@
+name: NuGet Online Convergence
+
+on:
+  workflow_run:
+    workflows: ["Release Publish"]
+    types: [completed]
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  verify-convergence:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    outputs:
+      release_tag: ${{ steps.meta.outputs.release_tag }}
+      release_version: ${{ steps.meta.outputs.release_version }}
+      release_run_url: ${{ steps.meta.outputs.release_run_url }}
+      verify_log_path: ${{ steps.meta.outputs.verify_log_path }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.102
+
+      - name: Resolve release metadata
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_tag="${{ github.event.workflow_run.head_branch }}"
+          if [[ ! "${release_tag}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Unexpected release tag in workflow_run.head_branch: '${release_tag}'" >&2
+            exit 1
+          fi
+          release_version="${release_tag#v}"
+          verify_log_path="artifacts/ci/nuget-online-convergence/verify.log"
+          mkdir -p artifacts/ci/nuget-online-convergence
+          {
+            echo "release_tag=${release_tag}"
+            echo "release_version=${release_version}"
+            echo "release_run_url=${{ github.event.workflow_run.html_url }}"
+            echo "verify_log_path=${verify_log_path}"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Download release package artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-package
+          path: artifacts/nuget
+          run-id: ${{ github.event.workflow_run.id }}
+          repository: ${{ github.repository }}
+          github-token: ${{ github.token }}
+
+      - name: Resolve nupkg path
+        id: nupkg
+        shell: bash
+        run: bash tools/ci/release/resolve_nupkg_path.sh artifacts/nuget
+
+      - name: Verify NuGet online convergence (all endpoints required)
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_VERSION="${{ steps.meta.outputs.release_version }}" \
+          NUPKG_PATH="${{ steps.nupkg.outputs.path }}" \
+          VERIFY_ONLINE=1 \
+          REQUIRE_SEARCH=1 \
+          REQUIRE_REGISTRATION=1 \
+          REQUIRE_FLATCONTAINER=1 \
+          RETRY_COUNT=179 \
+          RETRY_SLEEP_SECONDS=10 \
+          bash tools/ci/verify_nuget_release.sh | tee "${{ steps.meta.outputs.verify_log_path }}"
+
+      - name: Upload convergence artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-online-convergence
+          path: artifacts/ci/nuget-online-convergence/
+          if-no-files-found: error
+
+  escalate-on-failure:
+    needs: verify-convergence
+    if: needs.verify-convergence.result == 'failure'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Create or update convergence incident issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const tag = `${{ needs.verify-convergence.outputs.release_tag }}`;
+            const version = `${{ needs.verify-convergence.outputs.release_version }}`;
+            const releaseRunUrl = `${{ needs.verify-convergence.outputs.release_run_url }}`;
+            const thisRunUrl = `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`;
+            const title = `[nuget-convergence] ${tag} not converged within async window`;
+            const body = [
+              "NuGet online convergence failed after async retry window.",
+              "",
+              `- Tag: \`${tag}\``,
+              `- Version: \`${version}\``,
+              `- Source Release Run: ${releaseRunUrl}`,
+              `- Convergence Run: ${thisRunUrl}`,
+              "",
+              "Please inspect the `nuget-online-convergence` artifact (`verify.log`) for endpoint-level evidence."
+            ].join("\n");
+
+            const issues = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: "open",
+              per_page: 100
+            });
+
+            const existing = issues.data.find((issue) => issue.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: existing.number,
+                body
+              });
+            } else {
+              await github.rest.issues.create({
+                owner,
+                repo,
+                title,
+                body
+              });
+            }

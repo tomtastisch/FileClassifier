@@ -10,4 +10,7 @@ EXPECTED_VERSION="${expected_version}" \
 NUPKG_PATH="${nupkg_path}" \
 RETRY_COUNT="${retry_count}" \
 RETRY_SLEEP_SECONDS="${retry_sleep_seconds}" \
+REQUIRE_SEARCH=0 \
+REQUIRE_REGISTRATION=1 \
+REQUIRE_FLATCONTAINER=1 \
 bash tools/ci/verify_nuget_release.sh

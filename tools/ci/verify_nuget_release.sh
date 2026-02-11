@@ -12,6 +12,9 @@ TIMEOUT_SECONDS="${TIMEOUT_SECONDS:-30}"
 RETRY_COUNT="${RETRY_COUNT:-6}"
 RETRY_SLEEP_SECONDS="${RETRY_SLEEP_SECONDS:-10}"
 VERIFY_ONLINE="${VERIFY_ONLINE:-1}"
+REQUIRE_SEARCH="${REQUIRE_SEARCH:-1}"
+REQUIRE_REGISTRATION="${REQUIRE_REGISTRATION:-1}"
+REQUIRE_FLATCONTAINER="${REQUIRE_FLATCONTAINER:-1}"
 
 SEARCH_OK="skipped"
 REGISTRATION_OK="skipped"
@@ -32,6 +35,14 @@ info() {
 require_cmd() {
   local cmd="$1"
   command -v "$cmd" >/dev/null 2>&1 || fail "Required command missing: ${cmd}"
+}
+
+require_bool_flag() {
+  local name="$1"
+  local value="$2"
+  if [[ "${value}" != "0" && "${value}" != "1" ]]; then
+    fail "${name} must be 0 or 1 (actual='${value}')"
+  fi
 }
 
 retry_network() {
@@ -194,6 +205,12 @@ PY
 }
 
 query_registration() {
+  if [[ -z "${REGISTRATION_URL}" ]]; then
+    local pkg_id_lc
+    pkg_id_lc="$(printf '%s' "${PKG_ID}" | tr '[:upper:]' '[:lower:]')"
+    REGISTRATION_URL="https://api.nuget.org/v3/registration5-semver1/${pkg_id_lc}/index.json"
+  fi
+
   local response
   response="$(curl -fsS --max-time "${TIMEOUT_SECONDS}" "${REGISTRATION_URL}")" || return 1
 
@@ -258,6 +275,10 @@ print(json.dumps({
     "id": os.environ.get("PKG_ID", ""),
     "version": os.environ.get("PKG_VER", ""),
     "expected": os.environ.get("EXPECTED_VERSION", ""),
+    "verify_online": os.environ.get("VERIFY_ONLINE", ""),
+    "require_search": os.environ.get("REQUIRE_SEARCH", ""),
+    "require_registration": os.environ.get("REQUIRE_REGISTRATION", ""),
+    "require_flatcontainer": os.environ.get("REQUIRE_FLATCONTAINER", ""),
     "registration": os.environ.get("REGISTRATION_URL", ""),
     "search": os.environ.get("SEARCH_OK", "skipped"),
     "registration_check": os.environ.get("REGISTRATION_OK", "skipped"),
@@ -270,6 +291,9 @@ main() {
   require_cmd curl
   require_cmd unzip
   require_cmd python3
+  require_bool_flag "REQUIRE_SEARCH" "${REQUIRE_SEARCH}"
+  require_bool_flag "REQUIRE_REGISTRATION" "${REQUIRE_REGISTRATION}"
+  require_bool_flag "REQUIRE_FLATCONTAINER" "${REQUIRE_FLATCONTAINER}"
 
   resolve_nupkg_path
   info "Using package file: ${NUPKG_PATH}"
@@ -319,17 +343,31 @@ main() {
   fi
 
   if [[ "${VERIFY_ONLINE}" == "1" ]]; then
-    retry_network "search" query_search
-    info "Search check OK: ${SEARCH_URL}"
-    retry_network "registration" query_registration
-    info "Registration check OK: ${REGISTRATION_URL}"
-    retry_network "flatcontainer" query_flatcontainer
-    info "Flatcontainer check OK: ${FLAT_URL}"
+    if [[ "${REQUIRE_SEARCH}" == "1" ]]; then
+      retry_network "search" query_search
+      info "Search check OK: ${SEARCH_URL}"
+    else
+      info "Search check skipped (REQUIRE_SEARCH=${REQUIRE_SEARCH})."
+    fi
+
+    if [[ "${REQUIRE_REGISTRATION}" == "1" ]]; then
+      retry_network "registration" query_registration
+      info "Registration check OK: ${REGISTRATION_URL}"
+    else
+      info "Registration check skipped (REQUIRE_REGISTRATION=${REQUIRE_REGISTRATION})."
+    fi
+
+    if [[ "${REQUIRE_FLATCONTAINER}" == "1" ]]; then
+      retry_network "flatcontainer" query_flatcontainer
+      info "Flatcontainer check OK: ${FLAT_URL}"
+    else
+      info "Flatcontainer check skipped (REQUIRE_FLATCONTAINER=${REQUIRE_FLATCONTAINER})."
+    fi
   else
     info "Online checks skipped (VERIFY_ONLINE=${VERIFY_ONLINE})."
   fi
 
-  export PKG_ID PKG_VER EXPECTED_VERSION REGISTRATION_URL SEARCH_OK REGISTRATION_OK FLATCONTAINER_OK
+  export PKG_ID PKG_VER EXPECTED_VERSION VERIFY_ONLINE REQUIRE_SEARCH REQUIRE_REGISTRATION REQUIRE_FLATCONTAINER REGISTRATION_URL SEARCH_OK REGISTRATION_OK FLATCONTAINER_OK
   emit_summary_json
   echo "OK: verify_nuget_release completed."
 }
