@@ -52,6 +52,7 @@ jobs:
           args: --linter=jetbrains/qodana-dotnet:2025.3
           results-dir: artifacts/ci/qodana
           upload-result: false
+          use-caches: false
 
       - name: Restore .editorconfig
         if: always()
