@@ -6,7 +6,7 @@
     <IsPackable>false</IsPackable>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
     <!-- GitHub autosubmission restores only public feeds before a release tag exists. -->
-    <PackageBackedVersion Condition="'$(GITHUB_WORKFLOW)' == 'Automatic Dependency Submission' and '$(PackageBackedVersion)' == ''">[0.0.0,)</PackageBackedVersion>
+    <PackageBackedVersion Condition="(('$(GITHUB_WORKFLOW)' == 'Automatic Dependency Submission') Or ('$(GITHUB_EVENT_NAME)' == 'dynamic')) And '$(PackageBackedVersion)' == ''">[0.0.0,)</PackageBackedVersion>
     <PackageBackedVersion Condition="'$(PackageBackedVersion)' == ''">$(RepoVersion)</PackageBackedVersion>
   </PropertyGroup>
 

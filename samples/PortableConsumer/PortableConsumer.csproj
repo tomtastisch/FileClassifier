@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
     <!-- GitHub autosubmission restores only public feeds before a release tag exists. -->
-    <PortableConsumerPackageVersion Condition="'$(GITHUB_WORKFLOW)' == 'Automatic Dependency Submission' and '$(PortableConsumerPackageVersion)' == ''">[0.0.0,)</PortableConsumerPackageVersion>
+    <PortableConsumerPackageVersion Condition="(('$(GITHUB_WORKFLOW)' == 'Automatic Dependency Submission') Or ('$(GITHUB_EVENT_NAME)' == 'dynamic')) And '$(PortableConsumerPackageVersion)' == ''">[0.0.0,)</PortableConsumerPackageVersion>
     <PortableConsumerPackageVersion Condition="'$(PortableConsumerPackageVersion)' == ''">$(RepoVersion)</PortableConsumerPackageVersion>
   </PropertyGroup>
 
