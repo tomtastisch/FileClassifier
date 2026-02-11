@@ -20,4 +20,4 @@ REQUIRE_REGISTRATION=1 \
 REQUIRE_FLATCONTAINER=1 \
 RETRY_COUNT=179 \
 RETRY_SLEEP_SECONDS=10 \
-bash tools/ci/verify_nuget_release.sh | tee "${verify_log_path}"
+bash tools/ci/verify_nuget_release.sh 2>&1 | tee "${verify_log_path}"
