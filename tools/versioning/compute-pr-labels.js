@@ -21,7 +21,7 @@ const AREA_RULES = [
   { exact: 'qodana.yaml', label: 'area:qodana' },
   { prefix: 'src/FileTypeDetection/Infrastructure/Archive', label: 'area:archive' },
   { prefix: 'src/FileTypeDetection/ArchiveProcessing', label: 'area:archive' },
-  { prefix: 'src/FileTypeDetection/EvidenceHashing', label: 'area:hashing' },
+  { exact: 'src/FileTypeDetection/EvidenceHashing.vb', label: 'area:hashing' },
   { prefix: 'src/FileTypeDetection/Detection/', label: 'area:detection' },
   { prefix: 'src/FileTypeDetection/FileTypeDetector', label: 'area:detection' },
   { prefix: 'src/FileTypeDetection/FileMaterializer', label: 'area:materializer' },
