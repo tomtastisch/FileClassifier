@@ -32,8 +32,11 @@ jobs:
 
       - name: Resolve release metadata
         id: meta
+        env:
+          RELEASE_TAG: ${{ github.event.workflow_run.head_branch }}
+          RELEASE_RUN_URL: ${{ github.event.workflow_run.html_url }}
         shell: bash
-        run: bash tools/ci/release/resolve_workflow_run_release_meta.sh "${{ github.event.workflow_run.head_branch }}" "${{ github.event.workflow_run.html_url }}"
+        run: bash tools/ci/release/resolve_workflow_run_release_meta.sh "${RELEASE_TAG}" "${RELEASE_RUN_URL}"
 
       - name: Download release package artifact
         uses: actions/download-artifact@v4
