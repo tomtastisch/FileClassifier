@@ -51,11 +51,20 @@ Relevante Inputs:
 - `VERIFY_ONLINE=0`: überspringt Netzwerkchecks deterministisch.
 - `RETRY_COUNT`: Anzahl zusaetzlicher Retry-Schleifen fuer Online-Checks (Default `6`).
 - `RETRY_SLEEP_SECONDS`: Wartezeit zwischen Retries in Sekunden (Default `10`).
+- `REQUIRE_SEARCH`: aktiviert/deaktiviert Search als Pflichtcheck (`1`/`0`, Default `1`).
+- `REQUIRE_REGISTRATION`: aktiviert/deaktiviert Registration als Pflichtcheck (`1`/`0`, Default `1`).
+- `REQUIRE_FLATCONTAINER`: aktiviert/deaktiviert Flatcontainer als Pflichtcheck (`1`/`0`, Default `1`).
 
 Release-Gate-4 (post-publish) nutzt eigene Defaults ueber den Wrapper:
 - `SVT_POSTPUBLISH_RETRY_COUNT` (Default `59`)
 - `SVT_POSTPUBLISH_RETRY_SLEEP_SECONDS` (Default `10`)
-- Search bleibt dabei ein hartes Gate.
+- Blocking-Scope im Release:
+  - `REQUIRE_SEARCH=0`
+  - `REQUIRE_REGISTRATION=1`
+  - `REQUIRE_FLATCONTAINER=1`
+
+Asynchrone Full-Convergence:
+- Workflow `/.github/workflows/nuget-online-convergence.yml` prueft nach erfolgreichem Release weiterhin alle drei Endpunkte mit laengerem Retry-Fenster.
 
 ## E) Maintainer: Token Storage and Local Publish (Secure)
 Keychain (prompt-basiert):
@@ -85,3 +94,4 @@ Hinweise:
 ```bash
 EXPECTED_VERSION=X.Y.Z VERIFY_ONLINE=1 RETRY_COUNT=60 RETRY_SLEEP_SECONDS=10 bash tools/ci/verify_nuget_release.sh
 ```
+- Release-Gate-4 prueft Search bewusst nicht blockierend. Search-Konvergenz wird separat im Async-Workflow geprueft und bei Fehlern als Incident eskaliert.
