@@ -1,5 +1,12 @@
 using System.Text.Json;
 
+var nonBlockingHighRuleIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+{
+    // Style/noise findings that are not security/reliability regressions for CI gate purposes.
+    "CheckNamespace",
+    "RedundantQualifier"
+};
+
 var argsList = args.ToList();
 string? sarifPath = null;
 for (var i = 0; i < argsList.Count; i++)
@@ -69,10 +76,26 @@ try
 
     var blockingFindings = findings
         .Where(finding => SeverityRank(finding.Severity) >= SeverityRank("High"))
+        .Where(finding => !nonBlockingHighRuleIds.Contains(finding.RuleId))
         .OrderBy(finding => finding.Location, StringComparer.Ordinal)
         .ThenBy(finding => finding.RuleId, StringComparer.Ordinal)
         .ThenBy(finding => finding.Message, StringComparer.Ordinal)
         .ToList();
+
+    var ignoredHighFindings = findings
+        .Where(finding => SeverityRank(finding.Severity) >= SeverityRank("High"))
+        .Where(finding => nonBlockingHighRuleIds.Contains(finding.RuleId))
+        .ToList();
+
+    if (ignoredHighFindings.Count > 0)
+    {
+        foreach (var groupedIgnored in ignoredHighFindings
+                     .GroupBy(finding => finding.RuleId, StringComparer.OrdinalIgnoreCase)
+                     .OrderBy(group => group.Key, StringComparer.OrdinalIgnoreCase))
+        {
+            Console.WriteLine($"QODANA_IGNORED|rule_id={groupedIgnored.Key}|count={groupedIgnored.Count()}");
+        }
+    }
 
     foreach (var finding in blockingFindings.Take(20))
     {
