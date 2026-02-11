@@ -135,9 +135,15 @@ fi
 
 current_version=$(sed -n 's/.*<Version>\(.*\)<\/Version>.*/\1/p' Directory.Build.props | head -n1)
 
-if [[ -z "${base_version}" || -z "${current_version}" ]]; then
-  echo "versioning-guard: unable to parse versions (base='${base_version}', current='${current_version}')" >&2
+if [[ -z "$base_version" ]]; then
+  echo "versioning-guard: unable to determine base version (tags missing?)"
   exit 2
+fi
+
+# In PRs is it valid that Directory.Build.props has no <Version> (tag SSOT).
+# Treat empty as "inherits base" so the guard can still classify required bump.
+if [[ -z "${current_version:-}" ]]; then
+  current_version="$base_version"
 fi
 
 history_file="docs/versioning/002_HISTORY_VERSIONS.MD"
