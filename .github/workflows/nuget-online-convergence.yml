@@ -33,22 +33,7 @@ jobs:
       - name: Resolve release metadata
         id: meta
         shell: bash
-        run: |
-          set -euo pipefail
-          release_tag="${{ github.event.workflow_run.head_branch }}"
-          if [[ ! "${release_tag}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$ ]]; then
-            echo "Unexpected release tag in workflow_run.head_branch: '${release_tag}'" >&2
-            exit 1
-          fi
-          release_version="${release_tag#v}"
-          verify_log_path="artifacts/ci/nuget-online-convergence/verify.log"
-          mkdir -p artifacts/ci/nuget-online-convergence
-          {
-            echo "release_tag=${release_tag}"
-            echo "release_version=${release_version}"
-            echo "release_run_url=${{ github.event.workflow_run.html_url }}"
-            echo "verify_log_path=${verify_log_path}"
-          } >> "${GITHUB_OUTPUT}"
+        run: bash tools/ci/release/resolve_workflow_run_release_meta.sh "${{ github.event.workflow_run.head_branch }}" "${{ github.event.workflow_run.html_url }}"
 
       - name: Download release package artifact
         uses: actions/download-artifact@v4
@@ -66,17 +51,7 @@ jobs:
 
       - name: Verify NuGet online convergence (all endpoints required)
         shell: bash
-        run: |
-          set -euo pipefail
-          EXPECTED_VERSION="${{ steps.meta.outputs.release_version }}" \
-          NUPKG_PATH="${{ steps.nupkg.outputs.path }}" \
-          VERIFY_ONLINE=1 \
-          REQUIRE_SEARCH=1 \
-          REQUIRE_REGISTRATION=1 \
-          REQUIRE_FLATCONTAINER=1 \
-          RETRY_COUNT=179 \
-          RETRY_SLEEP_SECONDS=10 \
-          bash tools/ci/verify_nuget_release.sh | tee "${{ steps.meta.outputs.verify_log_path }}"
+        run: bash tools/ci/release/verify_nuget_online_convergence.sh "${{ steps.meta.outputs.release_version }}" "${{ steps.nupkg.outputs.path }}" "${{ steps.meta.outputs.verify_log_path }}"
 
       - name: Upload convergence artifact
         if: always()
