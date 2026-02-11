@@ -58,6 +58,9 @@ tools/ci/checks/**/obj/
 !tools/versioning/
 !tools/versioning/check-versioning.sh
 !tools/versioning/labels.json
+!tools/tests/
+tools/tests/__pycache__/
+!tools/tests/test_check_docs.py
 
 # local secrets
 .secrets/
