@@ -1,8 +1,6 @@
 Option Strict On
 Option Explicit On
 
-Imports Microsoft.Extensions.Logging
-
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Konfiguration fuer Dateityp-Erkennung und ZIP-Sicherheitsgrenzen.
@@ -70,7 +68,7 @@ Namespace Global.Tomtastisch.FileClassifier
         Public Property AllowUnknownArchiveEntrySize As Boolean = False
 
         ''' <summary>Optionaler Logger fuer Diagnosezwecke.</summary>
-        Public Property Logger As ILogger = Nothing
+        Public Property Logger As Global.Microsoft.Extensions.Logging.ILogger = Nothing
 
         ''' <summary>
         '''     Optionen fuer deterministische Hash-/Evidence-Funktionen.

@@ -1,8 +1,6 @@
 Option Strict On
 Option Explicit On
 
-Imports System.Collections.Immutable
-
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Nachweisobjekt fuer einen deterministischen Hash-Schritt.
@@ -12,8 +10,8 @@ Namespace Global.Tomtastisch.FileClassifier
         Public ReadOnly Property Label As String
         Public ReadOnly Property DetectedType As FileType
         Public ReadOnly Property Entry As ZipExtractedEntry
-        Public ReadOnly Property CompressedBytes As ImmutableArray(Of Byte)
-        Public ReadOnly Property UncompressedBytes As ImmutableArray(Of Byte)
+        Public ReadOnly Property CompressedBytes As Global.System.Collections.Immutable.ImmutableArray(Of Byte)
+        Public ReadOnly Property UncompressedBytes As Global.System.Collections.Immutable.ImmutableArray(Of Byte)
         Public ReadOnly Property EntryCount As Integer
         Public ReadOnly Property TotalUncompressedBytes As Long
         Public ReadOnly Property Digests As HashDigestSet
@@ -57,11 +55,11 @@ Namespace Global.Tomtastisch.FileClassifier
                 notes:=notes)
         End Function
 
-        Private Shared Function ToImmutable(data As Byte()) As ImmutableArray(Of Byte)
+        Private Shared Function ToImmutable(data As Byte()) As Global.System.Collections.Immutable.ImmutableArray(Of Byte)
             If data Is Nothing OrElse data.Length = 0 Then
-                Return ImmutableArray(Of Byte).Empty
+                Return Global.System.Collections.Immutable.ImmutableArray(Of Byte).Empty
             End If
-            Return ImmutableArray.Create(data)
+            Return Global.System.Collections.Immutable.ImmutableArray.Create(data)
         End Function
     End Class
 End Namespace

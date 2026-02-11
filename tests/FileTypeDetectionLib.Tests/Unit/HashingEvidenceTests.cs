@@ -25,7 +25,7 @@ internal static class HashingEvidenceTestHelpers
         var normalizedEntries = entries
             .Select(entry => new
             {
-                RelativePath = entry.RelativePath,
+                entry.RelativePath,
                 Content = entry.Content.IsDefaultOrEmpty ? Array.Empty<byte>() : entry.Content.ToArray()
             })
             .OrderBy(entry => entry.RelativePath, StringComparer.Ordinal)
@@ -949,9 +949,9 @@ public sealed class HashingEvidenceModelTests
 
         var instance = ctor.Invoke(new object?[] { null, null });
         var relativePath =
-            (string)type.GetField("RelativePath", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(instance)!;
+            (string)type.GetProperty("RelativePath", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(instance)!;
         var content =
-            (byte[])type.GetField("Content", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(instance)!;
+            (byte[])type.GetProperty("Content", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(instance)!;
 
         Assert.Equal(string.Empty, relativePath);
         Assert.NotNull(content);

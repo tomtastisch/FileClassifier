@@ -1,9 +1,6 @@
 Option Strict On
 Option Explicit On
 
-Imports System.IO
-Imports System.Linq
-
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Steuerung fuer deterministic hashing APIs.
@@ -53,16 +50,18 @@ Namespace Global.Tomtastisch.FileClassifier
             If String.IsNullOrWhiteSpace(normalized) Then Return "deterministic-roundtrip.bin"
 
             Try
-                normalized = Path.GetFileName(normalized)
+                normalized = Global.System.IO.Path.GetFileName(normalized)
             Catch
                 Return "deterministic-roundtrip.bin"
             End Try
 
             If String.IsNullOrWhiteSpace(normalized) Then Return "deterministic-roundtrip.bin"
 
-            If Path.GetInvalidFileNameChars().Any(Function(invalidChar) normalized.Contains(invalidChar)) Then
-                Return "deterministic-roundtrip.bin"
-            End If
+            For Each invalidChar In Global.System.IO.Path.GetInvalidFileNameChars()
+                If normalized.IndexOf(invalidChar) >= 0 Then
+                    Return "deterministic-roundtrip.bin"
+                End If
+            Next
 
             Return normalized
         End Function

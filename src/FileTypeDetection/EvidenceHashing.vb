@@ -1,12 +1,6 @@
 Option Strict On
 Option Explicit On
 
-Imports System.Globalization
-Imports System.IO
-Imports System.Linq
-Imports System.Security.Cryptography
-Imports System.Text
-
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Öffentliche Fassade für deterministische Hash- und RoundTrip-Nachweise.
@@ -28,7 +22,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim detectorOptions = FileTypeOptions.GetSnapshot()
             Dim normalizedOptions = ResolveHashOptions(detectorOptions, options)
 
-            If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
+            If String.IsNullOrWhiteSpace(path) OrElse Not Global.System.IO.File.Exists(path) Then
                 Return _
                     HashEvidence.CreateFailure(HashSourceType.FilePath, path, "Datei nicht gefunden.")
             End If
@@ -44,7 +38,7 @@ Namespace Global.Tomtastisch.FileClassifier
             If ArchiveEntryCollector.TryCollectFromFile(path, detectorOptions, entries) Then
                 Return BuildEvidenceFromEntries(
                     sourceType:=HashSourceType.FilePath,
-                    label:=IO.Path.GetFileName(path),
+                    label:=Global.System.IO.Path.GetFileName(path),
                     detectedType:=detectedType,
                     compressedBytes:=fileBytes,
                     entries:=entries,
@@ -54,7 +48,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Return BuildEvidenceFromRawPayload(
                 sourceType:=HashSourceType.FilePath,
-                label:=IO.Path.GetFileName(path),
+                label:=Global.System.IO.Path.GetFileName(path),
                 detectedType:=detectedType,
                 payload:=fileBytes,
                 hashOptions:=normalizedOptions,
@@ -138,7 +132,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim detectorOptions = FileTypeOptions.GetSnapshot()
             Dim normalizedOptions = ResolveHashOptions(detectorOptions, options)
 
-            If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
+            If String.IsNullOrWhiteSpace(path) OrElse Not Global.System.IO.File.Exists(path) Then
                 Dim failed = HashEvidence.CreateFailure(HashSourceType.FilePath, path, "Datei nicht gefunden.")
                 Return _
                     New HashRoundTripReport(path, isArchiveInput:=False, h1:=failed, h2:=failed, h3:=failed, h4:=failed,
@@ -193,20 +187,20 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim h4 As HashEvidence =
                     HashEvidence.CreateFailure(HashSourceType.MaterializedFile, "roundtrip-h4-file",
                                                "Materialization failed.")
-            Dim roundTripTempRoot = IO.Path.Combine(IO.Path.GetTempPath(),
+            Dim roundTripTempRoot = Global.System.IO.Path.Combine(Global.System.IO.Path.GetTempPath(),
                                                     "ftd-roundtrip-" &
-                                                    Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture))
+                                                    Guid.NewGuid().ToString("N", Global.System.Globalization.CultureInfo.InvariantCulture))
             Try
-                Directory.CreateDirectory(roundTripTempRoot)
-                Dim targetFile = IO.Path.Combine(roundTripTempRoot,
+                Global.System.IO.Directory.CreateDirectory(roundTripTempRoot)
+                Dim targetFile = Global.System.IO.Path.Combine(roundTripTempRoot,
                                                  NormalizeLabel(normalizedOptions.MaterializedFileName))
                 If FileMaterializer.Persist(canonicalBytes, targetFile, overwrite:=False, secureExtract:=False) Then
                     h4 = HashFile(targetFile, normalizedOptions)
                 End If
             Finally
                 Try
-                    If Directory.Exists(roundTripTempRoot) Then
-                        Directory.Delete(roundTripTempRoot, recursive:=True)
+                    If Global.System.IO.Directory.Exists(roundTripTempRoot) Then
+                        Global.System.IO.Directory.Delete(roundTripTempRoot, recursive:=True)
                     End If
                 Catch
                 End Try
@@ -276,7 +270,10 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Dim combinedNotes = AppendNoteIfAny(notes, secureNote)
 
-            Dim totalBytes As Long = normalizedEntries.Sum(Function(entry) CLng(entry.Content.LongLength))
+            Dim totalBytes As Long = 0
+            For Each entry In normalizedEntries
+                totalBytes += CLng(entry.Content.LongLength)
+            Next
 
             Dim persistedCompressed =
                     If(hashOptions.IncludePayloadCopies, CopyBytes(compressedBytes), Array.Empty(Of Byte)())
@@ -396,16 +393,16 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function BuildLogicalManifestBytes(entries As IReadOnlyList(Of NormalizedEntry)) As Byte()
-            Using ms As New MemoryStream()
-                Using writer As New BinaryWriter(ms, Encoding.UTF8, leaveOpen:=True)
-                    Dim versionBytes = Encoding.UTF8.GetBytes(LogicalManifestVersion)
+            Using ms As New Global.System.IO.MemoryStream()
+                Using writer As New Global.System.IO.BinaryWriter(ms, Global.System.Text.Encoding.UTF8, leaveOpen:=True)
+                    Dim versionBytes = Global.System.Text.Encoding.UTF8.GetBytes(LogicalManifestVersion)
                     writer.Write(versionBytes.Length)
                     writer.Write(versionBytes)
                     writer.Write(entries.Count)
 
                     For Each entry In entries
-                        Dim pathBytes = Encoding.UTF8.GetBytes(entry.RelativePath)
-                        Dim contentHash = SHA256.HashData(entry.Content)
+                        Dim pathBytes = Global.System.Text.Encoding.UTF8.GetBytes(entry.RelativePath)
+                        Dim contentHash = Global.System.Security.Cryptography.SHA256.HashData(entry.Content)
                         writer.Write(pathBytes.Length)
                         writer.Write(pathBytes)
                         writer.Write(CLng(entry.Content.LongLength))
@@ -419,7 +416,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function ComputeSha256Hex(payload As Byte()) As String
             Dim data = If(payload, Array.Empty(Of Byte)())
-            Return Convert.ToHexString(SHA256.HashData(data)).ToLowerInvariant()
+            Return Convert.ToHexString(Global.System.Security.Cryptography.SHA256.HashData(data)).ToLowerInvariant()
         End Function
 
         Private Shared Function TryResolveHmacKey(ByRef key As Byte(), ByRef note As String) As Boolean
@@ -450,7 +447,7 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Shared Function ComputeHmacSha256Hex(key As Byte(), payload As Byte()) As String
             Dim safeKey = If(key, Array.Empty(Of Byte)())
             Dim data = If(payload, Array.Empty(Of Byte)())
-            Using hmac As New HMACSHA256(safeKey)
+            Using hmac As New Global.System.Security.Cryptography.HMACSHA256(safeKey)
                 Return Convert.ToHexString(hmac.ComputeHash(data)).ToLowerInvariant()
             End Using
         End Function
@@ -458,8 +455,8 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Shared Function ComputeFastHash(payload As Byte(), options As HashOptions) As String
             If options Is Nothing OrElse Not options.IncludeFastHash Then Return String.Empty
             Dim data = If(payload, Array.Empty(Of Byte)())
-            Dim value = System.IO.Hashing.XxHash3.HashToUInt64(data)
-            Return value.ToString("x16", CultureInfo.InvariantCulture)
+            Dim value = Global.System.IO.Hashing.XxHash3.HashToUInt64(data)
+            Return value.ToString("x16", Global.System.Globalization.CultureInfo.InvariantCulture)
         End Function
 
         Private Shared Function AppendNoteIfAny(baseNotes As String, toAppend As String) As String
@@ -506,7 +503,7 @@ Namespace Global.Tomtastisch.FileClassifier
             End If
 
             Try
-                Dim fi As New FileInfo(path)
+                Dim fi As New Global.System.IO.FileInfo(path)
                 If Not fi.Exists Then
                     errorMessage = "Datei existiert nicht."
                     Return False
@@ -519,9 +516,9 @@ Namespace Global.Tomtastisch.FileClassifier
 
                 Using _
                     fs As _
-                        New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read,
-                                       InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
-                    Using ms As New MemoryStream(CInt(Math.Min(Math.Max(fi.Length, 0), Integer.MaxValue)))
+                        New Global.System.IO.FileStream(path, Global.System.IO.FileMode.Open, Global.System.IO.FileAccess.Read, Global.System.IO.FileShare.Read,
+                                       InternalIoDefaults.FileStreamBufferSize, Global.System.IO.FileOptions.SequentialScan)
+                    Using ms As New Global.System.IO.MemoryStream(CInt(Math.Min(Math.Max(fi.Length, 0), Integer.MaxValue)))
                         StreamBounds.CopyBounded(fs, ms, detectorOptions.MaxBytes)
                         bytes = ms.ToArray()
                     End Using
@@ -533,14 +530,14 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Private Structure NormalizedEntry
-            Friend ReadOnly RelativePath As String
-            Friend ReadOnly Content As Byte()
+        Private NotInheritable Class NormalizedEntry
+            Friend ReadOnly Property RelativePath As String
+            Friend ReadOnly Property Content As Byte()
 
             Friend Sub New(relativePath As String, content As Byte())
                 Me.RelativePath = If(relativePath, String.Empty)
                 Me.Content = If(content, Array.Empty(Of Byte)())
             End Sub
-        End Structure
+        End Class
     End Class
 End Namespace
