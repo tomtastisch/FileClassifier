@@ -141,48 +141,11 @@ def check_internal_repo_url(url: str, cache: dict[str, str | None]) -> str | Non
     ref = match.group("ref")
     rel_path = match.group("path")
 
-    def local_ref_exists(git_ref: str) -> bool:
-        local = subprocess.run(
-            ["git", "rev-parse", "--verify", "--quiet", git_ref],
-            cwd=ROOT,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        return local.returncode == 0
-
-    def ref_exists_locally_or_remote(git_ref: str) -> bool:
-        if git_ref in REF_EXISTS_CACHE:
-            return REF_EXISTS_CACHE[git_ref]
-
-        if local_ref_exists(git_ref):
-            REF_EXISTS_CACHE[git_ref] = True
-            return True
-
-        # CI often uses shallow checkouts without local refs like "main".
-        # Fallback to remote ref existence to keep checks deterministic.
-        for remote_ref in (f"refs/heads/{git_ref}", f"refs/tags/{git_ref}", f"refs/tags/{git_ref}^{{}}"):
-            remote = subprocess.run(
-                ["git", "ls-remote", "--exit-code", "origin", remote_ref],
-                cwd=ROOT,
-                capture_output=True,
-                text=True,
-                check=False,
-            )
-            if remote.returncode == 0:
-                REF_EXISTS_CACHE[git_ref] = True
-                return True
-
-        REF_EXISTS_CACHE[git_ref] = False
-        return False
-
-    if not ref_exists_locally_or_remote(ref):
-        cache[url] = f"ref not found ({ref})"
-        return cache[url]
-
-    # In shallow CI clones, refs like "main" may exist only remotely.
-    # In that case, validate path/type against current workspace content.
-    if not local_ref_exists(ref):
+    # Deterministic behavior across local + CI:
+    # Validate mutable refs (for example "main") against current workspace content.
+    # This avoids environment-dependent outcomes caused by varying local ref availability
+    # (full clone vs shallow checkout).
+    if not re.fullmatch(r"[0-9a-fA-F]{7,40}", ref):
         path = ROOT / rel_path
         if kind == "blob":
             if not path.is_file():
@@ -194,6 +157,24 @@ def check_internal_repo_url(url: str, cache: dict[str, str | None]) -> str | Non
                 return cache[url]
         cache[url] = None
         return None
+
+    # Immutable commit-like refs are verified against git objects.
+    if ref in REF_EXISTS_CACHE:
+        ref_exists = REF_EXISTS_CACHE[ref]
+    else:
+        exists = subprocess.run(
+            ["git", "cat-file", "-e", f"{ref}^{{commit}}"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        ref_exists = exists.returncode == 0
+        REF_EXISTS_CACHE[ref] = ref_exists
+
+    if not ref_exists:
+        cache[url] = f"commit ref not found locally ({ref})"
+        return cache[url]
 
     spec = f"{ref}:{rel_path}"
     exists = subprocess.run(
