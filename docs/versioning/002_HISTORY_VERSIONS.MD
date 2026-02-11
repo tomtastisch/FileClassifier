@@ -57,7 +57,7 @@ Aktueller Entwicklungsstand:
 | `1.3.17` | test(bdd): reorganize features, tags, and cleanup infrastructure | [feb4bbc](https://github.com/tomtastisch/FileClassifier/commit/feb4bbc) | test |
 | `1.3.18` | docs: add production readiness checklist | [b5edeef](https://github.com/tomtastisch/FileClassifier/commit/b5edeef) | docs |
 | `1.3.19` | docs: link production readiness checklist in indexes | [8c14563](https://github.com/tomtastisch/FileClassifier/commit/8c14563) | docs |
-| `1.4.0` | feat: add unified archive backend and update docs/tests | [99a7405](https://github.com/tomtastisch/FileClassifier/commit/99a7405) | feature |
+| `1.4.0` | feat: add unified archive backend and update test documentation | [99a7405](https://github.com/tomtastisch/FileClassifier/commit/99a7405) | feature |
 | `1.4.1` | refactor: normalize option snapshots and archive validation flow | [9378f50](https://github.com/tomtastisch/FileClassifier/commit/9378f50) | refactor |
 | `1.4.2` | refactor(tests): use disposable temp scope for deterministic cleanup | [fa201eb](https://github.com/tomtastisch/FileClassifier/commit/fa201eb) | refactor |
 | `1.5.0` | feat: add DeterministicHashEvidence class for hash calculations | [4179164](https://github.com/tomtastisch/FileClassifier/commit/4179164) | feature |
