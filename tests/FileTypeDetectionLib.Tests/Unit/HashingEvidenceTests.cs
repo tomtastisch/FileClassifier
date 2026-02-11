@@ -400,6 +400,37 @@ public sealed class HashingEvidenceXxHash3Tests
 public sealed class HashingEvidenceHmacTests
 {
     [Fact]
+    public void EvidenceHashing_HashBytes_UsesLoadedIncludeSecureHash()
+    {
+        var original = FileTypeOptions.GetSnapshot();
+        var payload = new byte[] { 0x10, 0x20, 0x30 };
+        var key = Convert.FromBase64String(HashingEvidenceTestHelpers.TestHmacKeyB64);
+
+        lock (HashingEvidenceTestHelpers.HmacEnvLock)
+        {
+            var prior = Environment.GetEnvironmentVariable(HashingEvidenceTestHelpers.HmacKeyEnvVarB64);
+            try
+            {
+                Environment.SetEnvironmentVariable(HashingEvidenceTestHelpers.HmacKeyEnvVarB64,
+                    HashingEvidenceTestHelpers.TestHmacKeyB64);
+                Assert.True(FileTypeOptions.LoadOptions(
+                    "{\"deterministicHashIncludeSecureHash\":true,\"deterministicHashIncludeFastHash\":false}"));
+
+                var evidence = EvidenceHashing.HashBytes(payload, "payload.bin");
+                var expected = HashingEvidenceTestHelpers.ComputeHmacSha256Hex(key, payload);
+
+                Assert.Equal(expected, evidence.Digests.HmacPhysicalSha256);
+                Assert.Equal(expected, evidence.Digests.HmacLogicalSha256);
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(HashingEvidenceTestHelpers.HmacKeyEnvVarB64, prior);
+                FileTypeOptions.SetSnapshot(original);
+            }
+        }
+    }
+
+    [Fact]
     public void SecureHash_WhenDisabled_LeavesHmacDigestsEmpty()
     {
         var payload = new byte[] { 0x10, 0x20, 0x30 };
