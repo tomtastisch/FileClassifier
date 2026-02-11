@@ -10,7 +10,7 @@ Tomtastisch.FileClassifier liefert deterministische Dateityperkennung, sichere A
 - `FileTypeDetector`: inhaltsbasierte Erkennung aus Pfad/Bytes, optional mit Endungsprüfung und Detailtrace.
 - `ArchiveProcessing`: statische Fassade für Archiv-Validierung und sichere Memory-Extraktion.
 - `FileMaterializer`: persistiert ausschließlich `Byte[]` (raw write oder sichere Archiv-Extraktion nach Zielpfad).
-- `EvidenceHashing`: `HashFile`/`HashBytes`/`HashEntries` sowie `VerifyRoundTrip` mit deterministischer Evidence.
+- `EvidenceHashing`: `HashFile`/`HashBytes`/`HashEntries` sowie `VerifyRoundTrip` mit deterministischer Evidence (optional mit HMAC-SHA256 über `HashOptions.IncludeSecureHash` und `FILECLASSIFIER_HMAC_KEY_B64`).
 - `FileTypeOptions`: globaler Konfigurations-Snapshot für alle Pfade (wird von den Kernklassen gelesen).
 
 ## 4. Installation (NuGet)
@@ -141,7 +141,7 @@ OPT -. snapshot/read .-> MAT
 OPT -. snapshot/read .-> DH
 ```
 
-Detailierte Ablaufdiagramme liegen in [Architektur und Flows (Detail)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/020_ARCH_CORE.MD).
+Detaillierte Ablaufdiagramme liegen in [Architektur und Flows (Detail)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/020_ARCH_CORE.MD).
 
 Delegationshinweis: `ArchiveProcessing` ist bei path-basierten Archivpfaden eine Fassade auf `FileTypeDetector`; nur die byte-basierten Archivpfade laufen direkt über `ArchivePayloadGuard`/`ArchiveEntryCollector`.
 
@@ -150,6 +150,8 @@ Delegationshinweis: `ArchiveProcessing` ist bei path-basierten Archivpfaden eine
 - [Dokumentationsindex](https://github.com/tomtastisch/FileClassifier/blob/main/docs/001_INDEX_CORE.MD)
 - [API-Kernübersicht](https://github.com/tomtastisch/FileClassifier/blob/main/docs/010_API_CORE.MD)
 - [Architektur und Flows](https://github.com/tomtastisch/FileClassifier/blob/main/docs/020_ARCH_CORE.MD)
+- [HMAC Key Setup (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/secure/001_HMAC_KEY_SETUP.MD)
+- [Migration: Hashing Rename](https://github.com/tomtastisch/FileClassifier/blob/main/docs/migrations/001_HASHING_RENAME.MD)
 - [Governance und Policies](https://github.com/tomtastisch/FileClassifier/blob/main/docs/governance/001_POLICY_CI.MD)
 - [Versioning-Policy](https://github.com/tomtastisch/FileClassifier/blob/main/docs/versioning/001_POLICY_VERSIONING.MD)
 
@@ -167,7 +169,7 @@ python3 tools/check-policy-roc.py --out artifacts/policy_roc_matrix.tsv
 bash tools/versioning/check-version-policy.sh
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --filter "Category=ApiContract" -v minimal
 dotnet pack src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -o artifacts/nuget -v minimal
-EXPECTED_VERSION=4.4.0 bash tools/ci/verify_nuget_release.sh
-EXPECTED_VERSION=4.4.0 bash tools/ci/publish_nuget_local.sh
+EXPECTED_VERSION=X.Y.Z bash tools/ci/verify_nuget_release.sh
+EXPECTED_VERSION=X.Y.Z bash tools/ci/publish_nuget_local.sh
 node tools/versioning/test-compute-pr-labels.js
 ```
