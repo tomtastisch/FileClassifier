@@ -94,14 +94,14 @@ jobs:
               "Please inspect the `nuget-online-convergence` artifact (`verify.log`) for endpoint-level evidence."
             ].join("\n");
 
-            const issues = await github.rest.issues.listForRepo({
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
               owner,
               repo,
               state: "open",
               per_page: 100
             });
 
-            const existing = issues.data.find((issue) => issue.title === title);
+            const existing = issues.find((issue) => !issue.pull_request && issue.title === title);
             if (existing) {
               await github.rest.issues.createComment({
                 owner,
