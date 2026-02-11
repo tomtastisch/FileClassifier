@@ -21,6 +21,7 @@ jobs:
       release_version: ${{ steps.meta.outputs.release_version }}
       release_run_url: ${{ steps.meta.outputs.release_run_url }}
       verify_log_path: ${{ steps.meta.outputs.verify_log_path }}
+      package_id: ${{ steps.meta.outputs.package_id }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,23 +34,9 @@ jobs:
         shell: bash
         run: bash tools/ci/release/resolve_workflow_run_release_meta.sh "${RELEASE_TAG}" "${RELEASE_RUN_URL}"
 
-      - name: Download release package artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: nuget-package
-          path: artifacts/nuget
-          run-id: ${{ github.event.workflow_run.id }}
-          repository: ${{ github.repository }}
-          github-token: ${{ github.token }}
-
-      - name: Resolve nupkg path
-        id: nupkg
-        shell: bash
-        run: bash tools/ci/release/resolve_nupkg_path.sh artifacts/nuget
-
       - name: Verify NuGet online convergence (all endpoints required)
         shell: bash
-        run: bash tools/ci/release/verify_nuget_online_convergence.sh "${{ steps.meta.outputs.release_version }}" "${{ steps.nupkg.outputs.path }}" "${{ steps.meta.outputs.verify_log_path }}"
+        run: bash tools/ci/release/verify_nuget_online_convergence.sh "${{ steps.meta.outputs.release_version }}" "${{ steps.meta.outputs.verify_log_path }}" "${{ steps.meta.outputs.package_id }}"
 
       - name: Upload convergence artifact
         if: always()

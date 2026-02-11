@@ -333,45 +333,52 @@ PY
 
 main() {
   require_cmd curl
-  require_cmd unzip
   require_cmd python3
   require_bool_flag "REQUIRE_SEARCH" "${REQUIRE_SEARCH}"
   require_bool_flag "REQUIRE_REGISTRATION" "${REQUIRE_REGISTRATION}"
   require_bool_flag "REQUIRE_FLATCONTAINER" "${REQUIRE_FLATCONTAINER}"
 
-  resolve_nupkg_path
-  info "Using package file: ${NUPKG_PATH}"
-
-  local fn_id fn_ver
-  fn_id=""
-  fn_ver=""
-  mapfile -t parsed_from_filename < <(derive_from_filename)
-  if [[ "${#parsed_from_filename[@]}" -ge 2 ]]; then
-    fn_id="${parsed_from_filename[0]}"
-    fn_ver="${parsed_from_filename[1]}"
-  fi
-
-  if [[ -z "${PKG_ID}" && -n "${fn_id}" ]]; then
-    PKG_ID="${fn_id}"
-  fi
-  if [[ -z "${PKG_VER}" && -n "${fn_ver}" ]]; then
-    PKG_VER="${fn_ver}"
-  fi
-
-  if [[ -z "${PKG_ID}" || -z "${PKG_VER}" ]]; then
-    local ns_id ns_ver
-    ns_id=""
-    ns_ver=""
-    mapfile -t parsed_from_nuspec < <(derive_from_nuspec)
-    if [[ "${#parsed_from_nuspec[@]}" -ge 2 ]]; then
-      ns_id="${parsed_from_nuspec[0]}"
-      ns_ver="${parsed_from_nuspec[1]}"
+  if [[ -n "${PKG_ID}" || -n "${PKG_VER}" ]]; then
+    if [[ -z "${PKG_ID}" || -z "${PKG_VER}" ]]; then
+      fail "When using explicit package metadata, both PKG_ID and PKG_VER must be set."
     fi
-    if [[ -z "${PKG_ID}" ]]; then
-      PKG_ID="${ns_id}"
+    info "Using explicit package metadata: ${PKG_ID} ${PKG_VER}"
+  else
+    require_cmd unzip
+    resolve_nupkg_path
+    info "Using package file: ${NUPKG_PATH}"
+
+    local fn_id fn_ver
+    fn_id=""
+    fn_ver=""
+    mapfile -t parsed_from_filename < <(derive_from_filename)
+    if [[ "${#parsed_from_filename[@]}" -ge 2 ]]; then
+      fn_id="${parsed_from_filename[0]}"
+      fn_ver="${parsed_from_filename[1]}"
     fi
-    if [[ -z "${PKG_VER}" ]]; then
-      PKG_VER="${ns_ver}"
+
+    if [[ -z "${PKG_ID}" && -n "${fn_id}" ]]; then
+      PKG_ID="${fn_id}"
+    fi
+    if [[ -z "${PKG_VER}" && -n "${fn_ver}" ]]; then
+      PKG_VER="${fn_ver}"
+    fi
+
+    if [[ -z "${PKG_ID}" || -z "${PKG_VER}" ]]; then
+      local ns_id ns_ver
+      ns_id=""
+      ns_ver=""
+      mapfile -t parsed_from_nuspec < <(derive_from_nuspec)
+      if [[ "${#parsed_from_nuspec[@]}" -ge 2 ]]; then
+        ns_id="${parsed_from_nuspec[0]}"
+        ns_ver="${parsed_from_nuspec[1]}"
+      fi
+      if [[ -z "${PKG_ID}" ]]; then
+        PKG_ID="${ns_id}"
+      fi
+      if [[ -z "${PKG_VER}" ]]; then
+        PKG_VER="${ns_ver}"
+      fi
     fi
   fi
 
