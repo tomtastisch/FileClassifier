@@ -15,7 +15,7 @@ Ziel ist eine konsistente, auditierbare und schnell erfassbare Dokumentation.
   - `docs/versioning/`
   - `docs/guides/`
   - `docs/governance/`
-  - `docs/tests/`
+  - `docs/verification/`
 - Auch in Unterordnern gilt `UPPER_SNAKE_CASE.md` (Ausnahme: `README.md` als Einstieg).
 
 ## 4. Pflichtstruktur pro Dokument

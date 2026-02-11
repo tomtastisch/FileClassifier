@@ -10,8 +10,8 @@ Diese Seite ist der Einstieg fuer die testbezogene SSOT-Dokumentation im Bereich
 - Runner/Adapter: Reqnroll mit `Reqnroll.xunit.v3` (xUnit v3)
 
 ## 3. Dokumente
-1. [BDD-Satzkatalog (Deutsch, kanonisch)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/tests/003_CATALOG_BDD.MD)
-2. [BDD-Ausfuehrung und Gherkin-Flow](https://github.com/tomtastisch/FileClassifier/blob/main/docs/tests/002_FLOW_BDD.MD)
+1. [BDD-Satzkatalog (Deutsch, kanonisch)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/003_CATALOG_BDD.MD)
+2. [BDD-Ausfuehrung und Gherkin-Flow](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/002_FLOW_BDD.MD)
 
 ## 4. Verifikation
 ```bash

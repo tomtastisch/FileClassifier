@@ -7,7 +7,7 @@ Zentrale Einstiegsstelle für alle Projektdokumente mit klarer Trennung nach Ver
 - Dokumentationsstandard (verbindlich): [Dokumentationsstandard (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/governance/004_POLICY_DOCUMENTATION.MD)
 - CI-/Qualitätsnachweise: [CI-Pipeline (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/ci/001_PIPELINE_CI.MD)
 - Auto-Labeling und Auto-Versionierung: [Auto-Labeling und Auto-Versionierung (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/versioning/004_POLICY_LABELING.MD)
-- Testdokumentation (BDD): [Testdokumentation (BDD)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/tests/001_INDEX_TESTS.MD)
+- Testdokumentation (BDD): [Testdokumentation (BDD)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/001_INDEX_TESTS.MD)
 
 ## 3. Kernarchitektur (SSOT)
 1. [01 - Funktionen](https://github.com/tomtastisch/FileClassifier/blob/main/docs/010_API_CORE.MD)
@@ -33,9 +33,9 @@ Zentrale Einstiegsstelle für alle Projektdokumente mit klarer Trennung nach Ver
 1. [Migration: Hashing Rename](https://github.com/tomtastisch/FileClassifier/blob/main/docs/migrations/001_HASHING_RENAME.MD)
 
 ## 6. Test- und Nachweisdokumente
-1. [Test Matrix - Deterministic Hashing](https://github.com/tomtastisch/FileClassifier/blob/main/docs/tests/004_MATRIX_HASHING.MD)
-2. [BDD-Satzkatalog (Deutsch, kanonisch)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/tests/003_CATALOG_BDD.MD)
-3. [BDD-Ausfuehrung und Gherkin-Flow](https://github.com/tomtastisch/FileClassifier/blob/main/docs/tests/002_FLOW_BDD.MD)
+1. [Test Matrix - Deterministic Hashing](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/004_MATRIX_HASHING.MD)
+2. [BDD-Satzkatalog (Deutsch, kanonisch)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/003_CATALOG_BDD.MD)
+3. [BDD-Ausfuehrung und Gherkin-Flow](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/002_FLOW_BDD.MD)
 
 ## 7. Modulnahe Dokumentation
 - [FileTypeDetection Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md)
