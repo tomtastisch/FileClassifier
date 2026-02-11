@@ -45,6 +45,14 @@ require_bool_flag() {
   fi
 }
 
+require_nonnegative_integer() {
+  local name="$1"
+  local value="$2"
+  if [[ ! "${value}" =~ ^[0-9]+$ ]]; then
+    fail "${name} must be a non-negative integer (actual='${value}')"
+  fi
+}
+
 retry_network() {
   local name="$1"
   shift
@@ -334,6 +342,8 @@ PY
 main() {
   require_cmd curl
   require_cmd python3
+  require_nonnegative_integer "RETRY_COUNT" "${RETRY_COUNT}"
+  require_nonnegative_integer "RETRY_SLEEP_SECONDS" "${RETRY_SLEEP_SECONDS}"
   require_bool_flag "REQUIRE_SEARCH" "${REQUIRE_SEARCH}"
   require_bool_flag "REQUIRE_REGISTRATION" "${REQUIRE_REGISTRATION}"
   require_bool_flag "REQUIRE_FLATCONTAINER" "${REQUIRE_FLATCONTAINER}"
