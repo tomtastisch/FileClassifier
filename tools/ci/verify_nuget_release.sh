@@ -51,17 +51,18 @@ retry_network() {
   local attempt=0
   local max_attempts=$((RETRY_COUNT + 1))
   while true; do
+    local current_attempt=$((attempt + 1))
     if "$@"; then
       if [[ "${attempt}" -gt 0 ]]; then
-        info "Network check '${name}' succeeded on attempt $((attempt + 1))/${max_attempts}."
+        info "Network check '${name}' succeeded on attempt ${current_attempt}/${max_attempts}."
       fi
       return 0
     fi
     if [[ "${attempt}" -ge "${RETRY_COUNT}" ]]; then
       fail "Network check '${name}' failed after $((RETRY_COUNT + 1)) attempts."
     fi
+    info "Network check '${name}' attempt ${current_attempt}/${max_attempts} failed; retrying in ${RETRY_SLEEP_SECONDS}s."
     attempt=$((attempt + 1))
-    info "Network check '${name}' attempt ${attempt}/${max_attempts} failed; retrying in ${RETRY_SLEEP_SECONDS}s."
     sleep "${RETRY_SLEEP_SECONDS}"
   done
 }
@@ -206,9 +207,52 @@ PY
 
 query_registration() {
   if [[ -z "${REGISTRATION_URL}" ]]; then
-    local pkg_id_lc
-    pkg_id_lc="$(printf '%s' "${PKG_ID}" | tr '[:upper:]' '[:lower:]')"
-    REGISTRATION_URL="https://api.nuget.org/v3/registration5-semver1/${pkg_id_lc}/index.json"
+    local discovered_url
+    if discovered_url="$(curl -fsS --max-time "${TIMEOUT_SECONDS}" "https://api.nuget.org/v3/index.json" \
+      | python3 - "$PKG_ID" <<'PY'
+import json
+import sys
+
+pkg_id = sys.argv[1].lower()
+index = json.load(sys.stdin)
+resources = index.get("resources", [])
+
+reg_urls = []
+for resource in resources:
+    if not isinstance(resource, dict):
+        continue
+    rid = resource.get("@id")
+    rtype = resource.get("@type")
+    if not isinstance(rid, str) or not isinstance(rtype, str):
+        continue
+    if "RegistrationsBaseUrl".lower() in rtype.lower():
+        reg_urls.append((rtype.lower(), rid.rstrip("/")))
+
+chosen = ""
+for rtype, rid in reg_urls:
+    if "semver2" in rtype:
+        chosen = rid
+        break
+if not chosen and reg_urls:
+    chosen = reg_urls[0][1]
+if not chosen:
+    print("")
+    sys.exit(0)
+
+print(f"{chosen}/{pkg_id}/index.json")
+PY
+    )"; then
+      :
+    else
+      discovered_url=""
+    fi
+    if [[ -n "${discovered_url}" ]]; then
+      REGISTRATION_URL="${discovered_url}"
+    else
+      local pkg_id_lc
+      pkg_id_lc="$(printf '%s' "${PKG_ID}" | tr '[:upper:]' '[:lower:]')"
+      REGISTRATION_URL="https://api.nuget.org/v3/registration5-semver1/${pkg_id_lc}/index.json"
+    fi
   fi
 
   local response

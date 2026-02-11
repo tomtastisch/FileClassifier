@@ -8,7 +8,7 @@ if [[ -z "${release_tag}" ]]; then
   echo "Missing release tag argument" >&2
   exit 1
 fi
-if [[ ! "${release_tag}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$ ]]; then
+if [[ ! "${release_tag}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]; then
   echo "Unexpected release tag: '${release_tag}'" >&2
   exit 1
 fi

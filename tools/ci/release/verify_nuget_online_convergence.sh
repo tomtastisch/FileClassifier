@@ -10,6 +10,8 @@ if [[ -z "${release_version}" || -z "${nupkg_path}" || -z "${verify_log_path}" ]
   exit 1
 fi
 
+mkdir -p "$(dirname -- "${verify_log_path}")"
+
 EXPECTED_VERSION="${release_version}" \
 NUPKG_PATH="${nupkg_path}" \
 VERIFY_ONLINE=1 \
