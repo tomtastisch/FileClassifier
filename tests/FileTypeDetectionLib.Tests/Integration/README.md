@@ -1,14 +1,17 @@
-# Index - Integration
+# Integration - Scope Hinweis
 
 ## Zweck
 
-Nachweise für deterministisches Verhalten über mehrere Containerformate und echte Fixture-Dateien.
+Dieser Ordner enthält aktuell keine eigenen Integration-Testklassen.
+Die hashing-bezogenen Integrationsnachweise wurden bewusst in die Unit-Suite konsolidiert, um alle Hashing-Assertions in einer Datei zu halten.
 
-## Testabdeckung
+## Aktueller Stand
 
-| Testdatei                                 | Fokus                                                                                                                                     |
-|-------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
-| `../Unit/HashingEvidenceTests.cs` | formatübergreifende LogicalHash-Stabilität, h1-h4 RoundTrip-Konsistenz sowie Extract->Bytes->Materialize Hash-Invarianz (positiv/negativ) |
+- Keine `.cs`-Testklassen unter `tests/FileTypeDetectionLib.Tests/Integration/`.
+- Hashing-RoundTrip- und Invarianz-Nachweise liegen in der Unit-Suite:
+  [HashingEvidenceTests](https://github.com/tomtastisch/FileClassifier/blob/main/tests/FileTypeDetectionLib.Tests/Unit/HashingEvidenceTests.cs).
+- Ergänzende End-to-End-Flows liegen in der BDD-Feature-Suite:
+  [FTD_BDD_050_HASHING_UND_ROUNDTRIP.feature](https://github.com/tomtastisch/FileClassifier/blob/main/tests/FileTypeDetectionLib.Tests/Features/FTD_BDD_050_HASHING_UND_ROUNDTRIP.feature).
 
 ## Dokumentpflege-Checkliste
 
