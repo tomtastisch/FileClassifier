@@ -38,14 +38,19 @@ retry_network() {
   local name="$1"
   shift
   local attempt=0
+  local max_attempts=$((RETRY_COUNT + 1))
   while true; do
     if "$@"; then
+      if [[ "${attempt}" -gt 0 ]]; then
+        info "Network check '${name}' succeeded on attempt $((attempt + 1))/${max_attempts}."
+      fi
       return 0
     fi
     if [[ "${attempt}" -ge "${RETRY_COUNT}" ]]; then
       fail "Network check '${name}' failed after $((RETRY_COUNT + 1)) attempts."
     fi
     attempt=$((attempt + 1))
+    info "Network check '${name}' attempt ${attempt}/${max_attempts} failed; retrying in ${RETRY_SLEEP_SECONDS}s."
     sleep "${RETRY_SLEEP_SECONDS}"
   done
 }

@@ -49,6 +49,13 @@ Relevante Inputs:
 - `NUPKG_PATH`: expliziter Paketpfad (optional).
 - `NUPKG_DIR`: Suchverzeichnis (Default `artifacts/nuget`, falls `NUPKG_PATH` nicht gesetzt).
 - `VERIFY_ONLINE=0`: überspringt Netzwerkchecks deterministisch.
+- `RETRY_COUNT`: Anzahl zusaetzlicher Retry-Schleifen fuer Online-Checks (Default `6`).
+- `RETRY_SLEEP_SECONDS`: Wartezeit zwischen Retries in Sekunden (Default `10`).
+
+Release-Gate-4 (post-publish) nutzt eigene Defaults ueber den Wrapper:
+- `SVT_POSTPUBLISH_RETRY_COUNT` (Default `59`)
+- `SVT_POSTPUBLISH_RETRY_SLEEP_SECONDS` (Default `10`)
+- Search bleibt dabei ein hartes Gate.
 
 ## E) Maintainer: Token Storage and Local Publish (Secure)
 Keychain (prompt-basiert):
@@ -74,3 +81,7 @@ Hinweise:
 ## F) Troubleshooting
 - `404` bei Registration/Flatcontainer kann durch Replikationsverzögerung entstehen; der Verifier retried deterministisch.
 - Bei Versionsabweichung (`expected != actual`) failt der Gate vor Publish; Version-Quelle (Tag/Pack-Overrides) korrigieren.
+- Wenn direkt nach Publish `missing_version` erscheint, ist das meist NuGet-Propagation. Fuer Incident-Checks:
+```bash
+EXPECTED_VERSION=X.Y.Z VERIFY_ONLINE=1 RETRY_COUNT=60 RETRY_SLEEP_SECONDS=10 bash tools/ci/verify_nuget_release.sh
+```
