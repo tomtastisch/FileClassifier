@@ -33,6 +33,8 @@ ANCHOR_RE = re.compile(r'^#[A-Za-z0-9\-_\.]+$')
 DOC_NAME_RE = re.compile(r'^[0-9]{3}_(?:[A-Z0-9]+_)*[A-Z0-9]+\.MD$')
 PLAIN_URL_RE = re.compile(r'(?P<url>https?://[^\s<>"\)\]]+)')
 REF_EXISTS_CACHE: dict[str, bool] = {}
+REF_COMMIT_CACHE: dict[str, str | None] = {}
+MUTABLE_WORKSPACE_REFS = {"main", "master"}
 
 DOC_TYPES_REQUIRE_DIAGRAM = (
     "_API_",
@@ -142,10 +144,9 @@ def check_internal_repo_url(url: str, cache: dict[str, str | None]) -> str | Non
     rel_path = match.group("path")
 
     # Deterministic behavior across local + CI:
-    # Validate mutable refs (for example "main") against current workspace content.
-    # This avoids environment-dependent outcomes caused by varying local ref availability
-    # (full clone vs shallow checkout).
-    if not re.fullmatch(r"[0-9a-fA-F]{7,40}", ref):
+    # - `main`/`master` are workspace-validated mutable refs.
+    # - all other named refs must resolve to a locally available commit; otherwise fail-closed.
+    if not re.fullmatch(r"[0-9a-fA-F]{7,40}", ref) and ref in MUTABLE_WORKSPACE_REFS:
         path = ROOT / rel_path
         if kind == "blob":
             if not path.is_file():
@@ -158,25 +159,32 @@ def check_internal_repo_url(url: str, cache: dict[str, str | None]) -> str | Non
         cache[url] = None
         return None
 
-    # Immutable commit-like refs are verified against git objects.
-    if ref in REF_EXISTS_CACHE:
-        ref_exists = REF_EXISTS_CACHE[ref]
+    resolved_ref = ref
+    if not re.fullmatch(r"[0-9a-fA-F]{7,40}", ref):
+        resolved_ref = resolve_named_ref_to_commit(ref)
+        if not resolved_ref:
+            cache[url] = f"named ref not found locally ({ref})"
+            return cache[url]
+
+    # Immutable commit-like refs (or resolved named refs) are verified against git objects.
+    if resolved_ref in REF_EXISTS_CACHE:
+        ref_exists = REF_EXISTS_CACHE[resolved_ref]
     else:
         exists = subprocess.run(
-            ["git", "cat-file", "-e", f"{ref}^{{commit}}"],
+            ["git", "cat-file", "-e", f"{resolved_ref}^{{commit}}"],
             cwd=ROOT,
             capture_output=True,
             text=True,
             check=False,
         )
         ref_exists = exists.returncode == 0
-        REF_EXISTS_CACHE[ref] = ref_exists
+        REF_EXISTS_CACHE[resolved_ref] = ref_exists
 
     if not ref_exists:
-        cache[url] = f"commit ref not found locally ({ref})"
+        cache[url] = f"commit ref not found locally ({resolved_ref})"
         return cache[url]
 
-    spec = f"{ref}:{rel_path}"
+    spec = f"{resolved_ref}:{rel_path}"
     exists = subprocess.run(
         ["git", "cat-file", "-e", spec],
         cwd=ROOT,
@@ -206,6 +214,33 @@ def check_internal_repo_url(url: str, cache: dict[str, str | None]) -> str | Non
         return cache[url]
 
     cache[url] = None
+    return None
+
+
+def resolve_named_ref_to_commit(ref: str) -> str | None:
+    if ref in REF_COMMIT_CACHE:
+        return REF_COMMIT_CACHE[ref]
+
+    candidates = (
+        f"refs/remotes/origin/{ref}^{{commit}}",
+        f"refs/heads/{ref}^{{commit}}",
+        f"refs/tags/{ref}^{{commit}}",
+    )
+    for candidate in candidates:
+        result = subprocess.run(
+            ["git", "rev-parse", "--verify", "--quiet", candidate],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode == 0:
+            commit = result.stdout.strip()
+            if commit:
+                REF_COMMIT_CACHE[ref] = commit
+                return commit
+
+    REF_COMMIT_CACHE[ref] = None
     return None
 
 
