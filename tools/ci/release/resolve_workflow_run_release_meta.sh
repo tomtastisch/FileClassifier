@@ -19,6 +19,14 @@ fi
 
 release_version="${release_tag#v}"
 verify_log_path="artifacts/ci/nuget-online-convergence/verify.log"
+package_id="$(python3 - <<'PY'
+import json
+from pathlib import Path
+p = Path("tools/ci/policies/data/naming.json")
+obj = json.loads(p.read_text(encoding="utf-8"))
+print(obj.get("package_id", "Tomtastisch.FileClassifier"))
+PY
+)"
 mkdir -p artifacts/ci/nuget-online-convergence
 
 {
@@ -26,4 +34,5 @@ mkdir -p artifacts/ci/nuget-online-convergence
   echo "release_version=${release_version}"
   echo "release_run_url=${release_run_url}"
   echo "verify_log_path=${verify_log_path}"
+  echo "package_id=${package_id}"
 } >> "${GITHUB_OUTPUT}"
