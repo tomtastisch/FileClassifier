@@ -21,3 +21,5 @@ jobs:
           comment-summary-in-pr: on-failure
           fail-on-severity: moderate
           retry-on-snapshot-warnings: true
+          show-openssf-scorecard: false
+          warn-on-openssf-scorecard-level: 9
