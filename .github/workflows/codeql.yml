@@ -1,0 +1,43 @@
+name: CodeQL
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  schedule:
+    - cron: '41 2 * * 1'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: csharp
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.102
+
+      - name: Restore solution (build context)
+        run: dotnet restore --locked-mode FileClassifier.sln -v minimal
+
+      - name: Build solution (build context)
+        run: dotnet build FileClassifier.sln --no-restore -c Release -v minimal
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3

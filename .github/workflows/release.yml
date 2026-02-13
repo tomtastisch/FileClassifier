@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: read
+  attestations: write
+  id-token: write
 
 jobs:
   version-policy:
@@ -91,6 +93,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      attestations: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -138,6 +141,20 @@ jobs:
         env:
           NUGET_API_KEY: ${{ steps.nuget_login.outputs.NUGET_API_KEY }}
         run: bash tools/ci/release/publish_nuget.sh "${{ steps.nupkg.outputs.path }}"
+
+      - name: Attest package provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: "${{ steps.nupkg.outputs.path }}"
+
+      - name: Verify package attestation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/nuget
+          gh attestation verify "${{ steps.nupkg.outputs.path }}" --repo "${{ github.repository }}" > artifacts/nuget/attestation-verify.txt
 
       - name: Gate 4 - SVT post-publish (git version == package version == nuget version)
         shell: bash
