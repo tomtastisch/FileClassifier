@@ -15,7 +15,9 @@ Tomtastisch.FileClassifier liefert deterministische Dateityperkennung, sichere A
 
 ## 4. Installation (NuGet)
 - PackageId: `Tomtastisch.FileClassifier`
-- Feed: NuGet.org (online such- und installierbar)
+- Feeds:
+  - NuGet.org (online such- und installierbar)
+  - GitHub Packages (Repository Feed)
 - Installation:
 ```bash
 dotnet add package Tomtastisch.FileClassifier --version X.Y.Z
@@ -151,10 +153,18 @@ Delegationshinweis: `ArchiveProcessing` ist bei path-basierten Archivpfaden eine
 - [API-Kernübersicht](https://github.com/tomtastisch/FileClassifier/blob/main/docs/010_API_CORE.MD)
 - [Architektur und Flows](https://github.com/tomtastisch/FileClassifier/blob/main/docs/020_ARCH_CORE.MD)
 - [Audit Index](https://github.com/tomtastisch/FileClassifier/blob/main/docs/audit/000_INDEX.MD)
+- [Security Assurance Index](https://github.com/tomtastisch/FileClassifier/blob/main/SECURITY_ASSURANCE_INDEX.md)
 - [HMAC Key Setup (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/secure/001_HMAC_KEY_SETUP.MD)
 - [Migration: Hashing Rename](https://github.com/tomtastisch/FileClassifier/blob/main/docs/migrations/001_HASHING_RENAME.MD)
 - [Governance und Policies](https://github.com/tomtastisch/FileClassifier/blob/main/docs/governance/001_POLICY_CI.MD)
 - [Versioning-Policy](https://github.com/tomtastisch/FileClassifier/blob/main/docs/versioning/001_POLICY_VERSIONING.MD)
+
+## Security Assurance & Evidence
+- [Security Assurance Index](https://github.com/tomtastisch/FileClassifier/blob/main/SECURITY_ASSURANCE_INDEX.md)
+- [Claim Traceability](https://github.com/tomtastisch/FileClassifier/blob/main/docs/audit/003_SECURITY_ASSERTION_TRACEABILITY.MD)
+- [Attestation Roadmap](https://github.com/tomtastisch/FileClassifier/blob/main/docs/audit/004_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD)
+- [Threat Model](https://github.com/tomtastisch/FileClassifier/blob/main/docs/audit/007_THREAT_MODEL.MD)
+- [Incident Response Runbook](https://github.com/tomtastisch/FileClassifier/blob/main/docs/audit/008_INCIDENT_RESPONSE_RUNBOOK.MD)
 
 ## 8. Modul-READMEs
 - [Bibliotheksmodul Index](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md)

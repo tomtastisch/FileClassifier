@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Tag to publish (format: vMAJOR.MINOR.PATCH[-prerelease])"
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -13,15 +19,15 @@ permissions:
 jobs:
   version-policy:
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
         with:
           dotnet-version: |
             8.0.x
@@ -36,6 +42,8 @@ jobs:
       - name: Gate 1 - Validate release tag and derive version
         id: tag
         shell: bash
+        env:
+          GITHUB_REF_NAME: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
         run: bash tools/ci/release/derive_tag_outputs.sh
 
       - name: Restore (locked mode)
@@ -73,14 +81,14 @@ jobs:
         run: bash tools/ci/release/package_backed_from_pack.sh "${{ steps.tag.outputs.version }}"
 
       - name: Upload package artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: nuget-package
           path: artifacts/nuget/
           if-no-files-found: error
 
       - name: Upload naming SNT summary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: release-naming-snt-summary
           path: artifacts/nuget/naming-snt-summary.json
@@ -89,30 +97,31 @@ jobs:
   publish-nuget:
     runs-on: ubuntu-latest
     needs: version-policy
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
+      packages: write
       id-token: write
       attestations: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
         with:
           dotnet-version: |
             8.0.x
             10.0.102
 
       - name: Download package artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: nuget-package
           path: artifacts/nuget/
 
       - name: Download naming SNT summary
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: release-naming-snt-summary
           path: artifacts/nuget/
@@ -126,7 +135,7 @@ jobs:
         run: bash tools/ci/release/resolve_nupkg_path.sh artifacts/nuget
 
       - name: NuGet login (OIDC / Trusted Publishing)
-        uses: NuGet/login@v1
+        uses: NuGet/login@d22cc5f58ff5b88bf9bd452535b4335137e24544 # v1
         id: nuget_login
         with:
           user: Tomtastisch
@@ -142,8 +151,13 @@ jobs:
           NUGET_API_KEY: ${{ steps.nuget_login.outputs.NUGET_API_KEY }}
         run: bash tools/ci/release/publish_nuget.sh "${{ steps.nupkg.outputs.path }}"
 
+      - name: Publish to GitHub Packages (NuGet Registry)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bash tools/ci/release/publish_github_packages.sh "${{ steps.nupkg.outputs.path }}" "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+
       - name: Attest package provenance
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
         with:
           subject-path: "${{ steps.nupkg.outputs.path }}"
 
@@ -158,7 +172,7 @@ jobs:
 
       - name: Upload attestation verification artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: nuget-attestation-verify
           path: artifacts/nuget/attestation-verify.txt

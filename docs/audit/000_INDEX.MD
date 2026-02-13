@@ -2,6 +2,7 @@
 
 ## Scope
 Central index for evidence-hardening artifacts that support claims in `SECURITY.md` without modifying `SECURITY.md` itself.
+Root landing page for third parties: `SECURITY_ASSURANCE_INDEX.md`.
 
 ## Documents
 - `docs/audit/000_HASHING_BASELINE.MD`

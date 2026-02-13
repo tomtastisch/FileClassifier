@@ -11,20 +11,19 @@ on:
 permissions:
   security-events: write
   contents: read
-  actions: read
 
 jobs:
   scorecard:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Prepare scorecard artifact directory
         run: mkdir -p artifacts/ci/scorecard
 
       - name: Run OpenSSF Scorecard
-        uses: ossf/scorecard-action@v2.3.3
+        uses: ossf/scorecard-action@dc50aa9510b46c811795eb24b2f1ba02a914e534 # v2.3.3
         with:
           results_file: artifacts/ci/scorecard/results.sarif
           results_format: sarif
@@ -33,13 +32,13 @@ jobs:
           publish_results: false
 
       - name: Upload SARIF to code scanning
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@f5c2471be782132e47a6e6f9c725e56730d6e9a3 # v3
         with:
           sarif_file: artifacts/ci/scorecard/results.sarif
 
       - name: Upload Artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ci-scorecard
           path: artifacts/ci/scorecard/

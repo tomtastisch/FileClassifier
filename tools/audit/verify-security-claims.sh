@@ -21,6 +21,7 @@ VIOLATIONS_JSONL="${OUT_DIR}/.violations.jsonl"
 PASS_COUNT=0
 WARN_COUNT=0
 FAIL_COUNT=0
+LAST_GH_API_REASON="unknown"
 
 log() {
   printf '%s\n' "$*" | tee -a "${RAW_LOG}" >/dev/null
@@ -73,10 +74,26 @@ retry_gh_api() {
   local attempts=3
   local delay=2
   local i
+  local err_file
+  err_file="${OUT_DIR}/.gh_api_err.log"
+  : > "${err_file}"
 
   for i in $(seq 1 "${attempts}"); do
-    if gh api "${endpoint}" > "${out_file}" 2>> "${RAW_LOG}"; then
+    if gh api "${endpoint}" > "${out_file}" 2> "${err_file}"; then
+      LAST_GH_API_REASON="none"
       return 0
+    fi
+    cat "${err_file}" >> "${RAW_LOG}" || true
+    if grep -Eq "401|403|Unauthorized|Bad credentials|Resource not accessible by integration" "${err_file}"; then
+      LAST_GH_API_REASON="auth"
+    elif grep -Eq "rate limit|secondary rate limit|HTTP 429" "${err_file}"; then
+      LAST_GH_API_REASON="rate-limit"
+    elif grep -Eq "timeout|timed out|TLS|connection reset|could not resolve host|network" "${err_file}"; then
+      LAST_GH_API_REASON="network"
+    elif grep -Eq "HTTP 5[0-9]{2}" "${err_file}"; then
+      LAST_GH_API_REASON="5xx"
+    else
+      LAST_GH_API_REASON="unknown"
     fi
     if [[ "${i}" -lt "${attempts}" ]]; then
       sleep "${delay}"
@@ -155,7 +172,7 @@ else
 fi
 
 # Claim: OIDC trusted publishing present in release workflow
-if match_file "NuGet/login@v1" "${ROOT_DIR}/.github/workflows/release.yml" && match_file "assert OIDC temp key present" "${ROOT_DIR}/.github/workflows/release.yml"; then
+if match_file "NuGet/login@" "${ROOT_DIR}/.github/workflows/release.yml" && match_file "assert OIDC temp key present" "${ROOT_DIR}/.github/workflows/release.yml"; then
   add_pass
 else
   add_violation "CI-SEC-CLAIM-004" "fail" "OIDC trusted publishing markers missing" ".github/workflows/release.yml"
@@ -200,7 +217,7 @@ if [[ -n "${REPO_FULL}" ]]; then
         add_violation "CI-SEC-CLAIM-007" "fail" "Private vulnerability reporting expected true" "${OUT_DIR_REL}/raw.log"
       fi
     else
-      add_violation "CI-SEC-CLAIM-007" "fail" "GitHub API failed for private-vulnerability-reporting after retries" "${OUT_DIR_REL}/raw.log"
+      add_violation "CI-SEC-CLAIM-007" "fail" "GitHub API failed for private-vulnerability-reporting after retries (reason=${LAST_GH_API_REASON})" "${OUT_DIR_REL}/raw.log"
     fi
 
     if retry_gh_api_optional "repos/${REPO_FULL}/rules/branches/${default_branch}" "${tmp_branch_rules_json}"; then
@@ -238,13 +255,13 @@ if [[ -n "${REPO_FULL}" ]]; then
         add_violation "CI-SEC-CLAIM-008" "fail" "Branch protection contexts do not match SECURITY evidence baseline" "${OUT_DIR_REL}/raw.log"
       fi
     else
-      add_violation "CI-SEC-CLAIM-008" "fail" "GitHub API failed for branch rules/protection after retries" "${OUT_DIR_REL}/raw.log"
+      add_violation "CI-SEC-CLAIM-008" "fail" "GitHub API failed for branch rules/protection after retries (reason=${LAST_GH_API_REASON})" "${OUT_DIR_REL}/raw.log"
     fi
   else
-    add_violation "CI-SEC-CLAIM-005" "fail" "GitHub API failed for repository metadata after retries" "${OUT_DIR_REL}/raw.log"
-    add_violation "CI-SEC-CLAIM-006" "fail" "GitHub API failed for repository metadata after retries" "${OUT_DIR_REL}/raw.log"
-    add_violation "CI-SEC-CLAIM-007" "fail" "GitHub API failed for repository metadata after retries" "${OUT_DIR_REL}/raw.log"
-    add_violation "CI-SEC-CLAIM-008" "fail" "GitHub API failed for repository metadata after retries" "${OUT_DIR_REL}/raw.log"
+    add_violation "CI-SEC-CLAIM-005" "fail" "GitHub API failed for repository metadata after retries (reason=${LAST_GH_API_REASON})" "${OUT_DIR_REL}/raw.log"
+    add_violation "CI-SEC-CLAIM-006" "fail" "GitHub API failed for repository metadata after retries (reason=${LAST_GH_API_REASON})" "${OUT_DIR_REL}/raw.log"
+    add_violation "CI-SEC-CLAIM-007" "fail" "GitHub API failed for repository metadata after retries (reason=${LAST_GH_API_REASON})" "${OUT_DIR_REL}/raw.log"
+    add_violation "CI-SEC-CLAIM-008" "fail" "GitHub API failed for repository metadata after retries (reason=${LAST_GH_API_REASON})" "${OUT_DIR_REL}/raw.log"
   fi
 fi
 

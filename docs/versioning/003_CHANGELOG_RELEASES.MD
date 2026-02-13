@@ -5,9 +5,16 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 
 ## [Unreleased]
 - Added:
+  - `dependency-review`, `actionlint`, `pr-path-labeler` und `fuzzing-baseline` Workflows zur Security-/Governance-Haertung.
+  - Root-Level Security-Nachweisindex `SECURITY_ASSURANCE_INDEX.md`.
 - Changed:
+  - GitHub Actions `uses:`-Referenzen auf commit-SHA gepinnt.
+  - PR-Labeling nutzt nun den real ermittelten `VERSION_REQUIRED`-Wert statt statischem `none`.
+  - Paket-/Repo-Version auf `5.1.0` nachgezogen (policy-konformer Minor-Nachzug fuer offene Drift seit PR #25).
 - Fixed:
+  - `verify-security-claims.sh` liefert nun API-Reason-Codes fuer fail-closed Blocker (`auth|rate-limit|network|5xx|unknown`).
 - Docs/CI/Tooling:
+  - README um Section "Security Assurance & Evidence" erweitert.
 
 ## [5.0.0]
 - Added:

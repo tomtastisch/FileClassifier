@@ -1,6 +1,9 @@
+# Default ownership
+* @tomtastisch
+
 # CI and release governance ownership
-/.github/workflows/ci.yml @tomtastisch
+/.github/workflows/* @tomtastisch
 /tools/versioning/* @tomtastisch
-/docs/versioning/POLICY.md @tomtastisch
-/docs/AUTO_LABELING_AND_VERSIONING.md @tomtastisch
-/docs/governance/LABELING_OWNERSHIP.md @tomtastisch
+/tools/ci/* @tomtastisch
+/docs/versioning/* @tomtastisch
+/docs/governance/* @tomtastisch

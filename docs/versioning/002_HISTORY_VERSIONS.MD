@@ -8,10 +8,11 @@ Heuristik fuer die Rueckwirkungs-Zuordnung:
 - `docs|test|ci|chore|tooling|refactor|fix` => Patch
 
 Aktueller Entwicklungsstand:
-- Aktuelle Entwicklungslinie enthält `5.x` (aktuell veroeffentlichtes Tag: `v4.4.0`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
+- Aktuelle Entwicklungslinie enthält `5.x` (aktuell veroeffentlichtes Tag: `v5.0.0`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
 
 | Version | Kurzbeschreibung | Commit | Keyword |
 |---|---|---|---|
+| `5.1.0` | Security/Governance hardening wave: pinned actions, dependency review, labeler fixes, root assurance index | pending (branch `codex/tomtastisch-patch-3`) | minor |
 | `5.0.0` | Finalize hashing API rename to EvidenceHashing and add optional HMAC digests | [444d027](https://github.com/tomtastisch/FileClassifier/commit/444d027) | breaking |
 | `4.2.1` | Bump version to 4.2.1 for quality-gate hardening | [8ab274d](https://github.com/tomtastisch/FileClassifier/commit/8ab274d) | chore |
 | `4.2.0` | docs: fix root readme parity, link sha targets, and preflight version gate | [9691bec](https://github.com/tomtastisch/FileClassifier/commit/9691bec) | docs |
