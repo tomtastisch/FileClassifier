@@ -9,6 +9,7 @@ Evidence-backed candidates are tracked in:
 - `artifacts/audit/dead_code_candidates.json`
 - `artifacts/audit/redundancy_candidates.json`
 - `artifacts/audit/hardening_candidates.json`
+- `artifacts/ci/code-analysis-evidence/result.json`
 
 ## Baseline Findings (Wave 1)
 1. `Catch ex As Exception` broad catches appear repeatedly in production code and should be reviewed for narrower exception types or enriched reason codes.
@@ -29,6 +30,13 @@ Evidence-backed candidates are tracked in:
 
 3. Dead-code candidate scan currently returned no low-reference source declarations in `src/` under the implemented heuristic.
    - Evidence: `artifacts/audit/dead_code_candidates.json`
+
+## Repro Evidence Commands
+```bash
+bash tools/audit/verify-code-analysis-evidence.sh
+jq '.candidates | length' artifacts/audit/hardening_candidates.json
+jq '.candidates | length' artifacts/audit/redundancy_candidates.json
+```
 
 ## Findings Format (for next PRs)
 - ID

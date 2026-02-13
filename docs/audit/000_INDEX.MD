@@ -17,6 +17,7 @@ Central index for evidence-hardening artifacts that support claims in `SECURITY.
 
 ## Machine Evidence
 - `artifacts/ci/security-claims-evidence/`
+- `artifacts/ci/code-analysis-evidence/`
 - `artifacts/audit/code_inventory.json`
 - `artifacts/audit/callgraph_inventory.json`
 - `artifacts/audit/dead_code_candidates.json`
@@ -26,6 +27,7 @@ Central index for evidence-hardening artifacts that support claims in `SECURITY.
 ## Repro Commands
 ```bash
 bash tools/audit/verify-security-claims.sh
+bash tools/audit/verify-code-analysis-evidence.sh
 bash tools/audit/generate-code-analysis-json.sh
 python3 tools/check-docs.py
 ```
@@ -33,4 +35,5 @@ python3 tools/check-docs.py
 ## External Assurance
 - OpenSSF Scorecard workflow: `.github/workflows/scorecard.yml`
 - Artifact attestations in release workflow: `.github/workflows/release.yml`
+- Deep analysis evidence workflow: `.github/workflows/code-analysis-evidence.yml`
 - GitHub Code Scanning Default Setup (configured): `gh api repos/<owner>/<repo>/code-scanning/default-setup`
