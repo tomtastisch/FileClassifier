@@ -5,16 +5,14 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 
 ## [Unreleased]
 - Added:
-  - `dependency-review`, `actionlint`, `pr-path-labeler` und `fuzzing-baseline` Workflows zur Security-/Governance-Haertung.
-  - Root-Level Security-Nachweisindex `SECURITY_ASSURANCE_INDEX.md`.
+  - Dependabot-Schutz fuer secret-pflichtige Workflows (`qodana`, `security-claims-evidence`) bei Dependabot-PR-Kontext.
 - Changed:
-  - GitHub Actions `uses:`-Referenzen auf commit-SHA gepinnt.
-  - PR-Labeling nutzt nun den real ermittelten `VERSION_REQUIRED`-Wert statt statischem `none`.
-  - Paket-/Repo-Version auf `5.1.0` nachgezogen (policy-konformer Minor-Nachzug fuer offene Drift seit PR #25).
+  - Dependabot auf security-only fuer geplante Version-Bumps gestellt (`open-pull-requests-limit: 0` je Ecosystem).
+  - `security-claims-evidence` auf explizites fail-closed Secret-Assert (`SECURITY_CLAIMS_TOKEN`) gehaertet.
 - Fixed:
-  - `verify-security-claims.sh` liefert nun API-Reason-Codes fuer fail-closed Blocker (`auth|rate-limit|network|5xx|unknown`).
+  - Secret-bedingte CI-Fehler auf Dependabot-PRs fuer `qodana` / `security-claims-evidence` beseitigt.
 - Docs/CI/Tooling:
-  - README um Section "Security Assurance & Evidence" erweitert.
+  - Versionshistorie semver-absteigend sortiert und veraltete Release-Referenzen korrigiert.
 
 ## [5.0.0]
 - Added:
