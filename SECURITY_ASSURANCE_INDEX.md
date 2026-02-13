@@ -19,11 +19,14 @@ This index is the root-level entry point for reproducible security evidence that
 - Dependency review workflow: `.github/workflows/dependency-review.yml`
 
 ## Verification Commands
+All commands are intended to run from the repository root.
 ```bash
 bash tools/audit/verify-security-claims.sh
 bash tools/audit/verify-code-analysis-evidence.sh
-gh api repos/tomtastisch/FileClassifier/code-scanning/alerts?state=open&per_page=100 --paginate
-gh attestation verify artifacts/nuget/*.nupkg --repo tomtastisch/FileClassifier
+gh api 'repos/tomtastisch/FileClassifier/code-scanning/alerts?state=open&per_page=100' --paginate
+NUPKG="$(find artifacts/nuget -maxdepth 1 -type f -name '*.nupkg' | head -n 1)"
+test -n "$NUPKG"
+gh attestation verify "$NUPKG" --repo tomtastisch/FileClassifier
 ```
 
 ## Coming Soon

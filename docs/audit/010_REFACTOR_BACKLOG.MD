@@ -25,6 +25,7 @@ Rules:
 - preserve current public API and return contracts
 
 Required checks:
+All commands are intended to run from the repository root.
 ```bash
 dotnet build FileClassifier.sln -v minimal
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release -v minimal

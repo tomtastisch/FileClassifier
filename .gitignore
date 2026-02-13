@@ -45,6 +45,7 @@ benchmark_detect_ms.txt
 tools/*
 !tools/check-docs.py
 !tools/check-doc-consistency.py
+!tools/check-doc-shell-compat.py
 !tools/check-policy-roc.py
 !tools/check-quality.sh
 !tools/run-coverage.sh
@@ -61,6 +62,7 @@ tools/ci/checks/**/obj/
 !tools/tests/
 tools/tests/__pycache__/
 !tools/tests/test_check_docs.py
+!tools/tests/test_check_doc_shell_compat.py
 
 # local secrets
 .secrets/

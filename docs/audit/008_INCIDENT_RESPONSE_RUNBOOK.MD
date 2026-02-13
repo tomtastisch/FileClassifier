@@ -40,6 +40,7 @@
 
 5. Verification
 - Run security-relevant checks and document exact command outputs:
+  All commands are intended to run from the repository root.
 ```bash
 dotnet build FileClassifier.sln -v minimal
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release -v minimal

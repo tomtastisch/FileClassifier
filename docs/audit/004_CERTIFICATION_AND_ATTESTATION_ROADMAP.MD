@@ -16,13 +16,18 @@ No formal certification claim is made by this repository.
 - OpenSSF Best Practices Badge (self-attested program, externally visible)
 
 ## 4. NuGet-Relevant Evidence
+All commands are intended to run from the repository root.
 - Verify package signatures:
 ```bash
-dotnet nuget verify artifacts/nuget/*.nupkg
+NUPKG="$(find artifacts/nuget -maxdepth 1 -type f -name '*.nupkg' | head -n 1)"
+test -n "$NUPKG"
+dotnet nuget verify "$NUPKG"
 ```
 - Verify build provenance attestation:
 ```bash
-gh attestation verify artifacts/nuget/*.nupkg --repo tomtastisch/FileClassifier
+NUPKG="$(find artifacts/nuget -maxdepth 1 -type f -name '*.nupkg' | head -n 1)"
+test -n "$NUPKG"
+gh attestation verify "$NUPKG" --repo tomtastisch/FileClassifier
 ```
 
 ## 5. Acceptance Criteria
