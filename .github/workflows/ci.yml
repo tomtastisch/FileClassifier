@@ -53,7 +53,7 @@ jobs:
         run: bash -euo pipefail tools/ci/bin/run.sh pr-labeling
       - name: Upload Artifact
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ci-pr-labeling
           path: artifacts/ci/pr-labeling/
@@ -81,7 +81,7 @@ jobs:
         run: bash -euo pipefail tools/ci/bin/run.sh preflight
       - name: Upload Artifact
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ci-preflight
           path: artifacts/ci/preflight/
@@ -103,7 +103,7 @@ jobs:
         run: bash -euo pipefail tools/ci/bin/run.sh docs-links-full
       - name: Upload Artifact
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ci-docs-links-full
           path: artifacts/ci/docs-links-full/
@@ -128,7 +128,7 @@ jobs:
         run: bash -euo pipefail tools/ci/bin/run.sh versioning-svt
       - name: Upload Artifact
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ci-versioning-svt
           path: artifacts/ci/versioning-svt/
@@ -150,7 +150,7 @@ jobs:
         run: bash -euo pipefail tools/ci/bin/run.sh naming-snt
       - name: Upload Artifact
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ci-naming-snt
           path: artifacts/ci/naming-snt/
@@ -172,7 +172,7 @@ jobs:
         run: bash -euo pipefail tools/ci/bin/run.sh build
       - name: Upload Artifact
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ci-build
           path: artifacts/ci/build/
@@ -194,7 +194,7 @@ jobs:
         run: bash -euo pipefail tools/ci/bin/run.sh api-contract
       - name: Upload Artifact
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ci-api-contract
           path: artifacts/ci/api-contract/
@@ -216,7 +216,7 @@ jobs:
         run: bash -euo pipefail tools/ci/bin/run.sh pack
       - name: Upload Artifact
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ci-pack
           path: artifacts/ci/pack/
@@ -243,7 +243,7 @@ jobs:
         run: bash -euo pipefail tools/ci/bin/run.sh consumer-smoke
       - name: Upload Artifact
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ci-consumer-smoke
           path: artifacts/ci/consumer-smoke/
@@ -270,7 +270,7 @@ jobs:
         run: bash -euo pipefail tools/ci/bin/run.sh package-backed-tests
       - name: Upload Artifact
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ci-package-backed-tests
           path: artifacts/ci/package-backed-tests/
@@ -292,7 +292,7 @@ jobs:
         run: bash -euo pipefail tools/ci/bin/run.sh security-nuget
       - name: Upload Artifact
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ci-security-nuget
           path: artifacts/ci/security-nuget/
@@ -314,7 +314,7 @@ jobs:
         run: bash -euo pipefail tools/ci/bin/run.sh tests-bdd-coverage
       - name: Upload Artifact
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ci-tests-bdd-coverage
           path: artifacts/ci/tests-bdd-coverage/
@@ -391,7 +391,7 @@ jobs:
         run: bash -euo pipefail tools/ci/bin/run.sh summary
       - name: Upload Artifact
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ci-summary
           path: artifacts/ci/summary/

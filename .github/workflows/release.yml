@@ -81,14 +81,14 @@ jobs:
         run: bash tools/ci/release/package_backed_from_pack.sh "${{ steps.tag.outputs.version }}"
 
       - name: Upload package artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: nuget-package
           path: artifacts/nuget/
           if-no-files-found: error
 
       - name: Upload naming SNT summary
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: release-naming-snt-summary
           path: artifacts/nuget/naming-snt-summary.json
@@ -172,7 +172,7 @@ jobs:
 
       - name: Upload attestation verification artifact
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: nuget-attestation-verify
           path: artifacts/nuget/attestation-verify.txt
