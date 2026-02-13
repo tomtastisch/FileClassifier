@@ -32,12 +32,15 @@ Define minimum reproducible controls for source-to-package integrity in this rep
   - `artifacts/nuget/attestation-verify.txt` (when release workflow runs)
 
 ## 4. Verification Commands
+All commands are intended to run from the repository root.
 ```bash
 bash tools/ci/bin/run.sh security-nuget
 bash tools/audit/verify-security-claims.sh
 bash tools/audit/verify-code-analysis-evidence.sh
-dotnet nuget verify <package.nupkg>
-gh attestation verify <artifact> --repo tomtastisch/FileClassifier
+NUPKG="$(find artifacts/nuget -maxdepth 1 -type f -name '*.nupkg' | head -n 1)"
+test -n "$NUPKG"
+dotnet nuget verify "$NUPKG"
+gh attestation verify "$NUPKG" --repo tomtastisch/FileClassifier
 ```
 
 ## 5. Operational Cadence

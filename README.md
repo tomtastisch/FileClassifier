@@ -174,13 +174,16 @@ Delegationshinweis: `ArchiveProcessing` ist bei path-basierten Archivpfaden eine
 - [Abstractions](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md)
 
 ## 9. Verifikation
+Alle Befehle werden vom Repository-Root ausgeführt.
 ```bash
 dotnet build FileClassifier.sln -v minimal
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release -v minimal
 python3 tools/check-docs.py
 bash tools/audit/verify-security-claims.sh
 bash tools/audit/generate-code-analysis-json.sh
-gh attestation verify artifacts/nuget/*.nupkg --repo tomtastisch/FileClassifier
+NUPKG="$(find artifacts/nuget -maxdepth 1 -type f -name '*.nupkg' | head -n 1)"
+test -n "$NUPKG"
+gh attestation verify "$NUPKG" --repo tomtastisch/FileClassifier
 python3 tools/check-policy-roc.py --out artifacts/policy_roc_matrix.tsv
 bash tools/ci/bin/run.sh versioning-svt
 bash tools/ci/bin/run.sh naming-snt

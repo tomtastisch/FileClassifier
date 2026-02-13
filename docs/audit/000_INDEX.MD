@@ -29,6 +29,7 @@ Root landing page for third parties: `SECURITY_ASSURANCE_INDEX.md`.
 - `artifacts/audit/hardening_candidates.json`
 
 ## Repro Commands
+All commands are intended to run from the repository root.
 ```bash
 bash tools/audit/verify-security-claims.sh
 bash tools/audit/verify-code-analysis-evidence.sh
@@ -40,4 +41,4 @@ python3 tools/check-docs.py
 - OpenSSF Scorecard workflow: `.github/workflows/scorecard.yml`
 - Artifact attestations in release workflow: `.github/workflows/release.yml`
 - Deep analysis evidence workflow: `.github/workflows/code-analysis-evidence.yml`
-- GitHub Code Scanning Default Setup (configured): `gh api repos/<owner>/<repo>/code-scanning/default-setup`
+- GitHub Code Scanning Default Setup (configured): `gh api "repos/<owner>/<repo>/code-scanning/default-setup"`

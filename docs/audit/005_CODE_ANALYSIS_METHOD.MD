@@ -30,6 +30,7 @@ For high-confidence refactors, each candidate must be validated by:
 3. passing regression tests after change
 
 ## 5. Repro
+All commands are intended to run from the repository root.
 ```bash
 bash tools/audit/generate-code-analysis-json.sh
 bash tools/audit/verify-code-analysis-evidence.sh

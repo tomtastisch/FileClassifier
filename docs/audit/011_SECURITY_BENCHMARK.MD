@@ -74,13 +74,15 @@ Diese Punkte sind ausserhalb einer einzelnen `SECURITY.md`, aber notwendig fuer 
 
 ## 7. Reproduzierbarkeit
 Verwendete Kommandos (Auszug):
+All commands are intended to run from the repository root.
 ```bash
-gh api 'repos/<owner>/<repo>'
-gh api 'repos/<owner>/<repo>/private-vulnerability-reporting'
-gh api 'repos/<owner>/<repo>/contents/SECURITY.md'
-gh api 'repos/<owner>/<repo>/contents/.github/SECURITY.md'
-gh api 'repos/<owner>/<repo>/contents/.github/workflows'
-gh api 'repos/<owner>/<repo>/contents/.github/dependabot.yml'
+REPO="<owner>/<repo>"
+gh api "repos/$REPO"
+gh api "repos/$REPO/private-vulnerability-reporting"
+gh api "repos/$REPO/contents/SECURITY.md"
+gh api "repos/$REPO/contents/.github/SECURITY.md"
+gh api "repos/$REPO/contents/.github/workflows"
+gh api "repos/$REPO/contents/.github/dependabot.yml"
 ```
 
 Lokale Verifikation fuer FileClassifier:

@@ -33,6 +33,7 @@ Evidence-backed candidates are tracked in:
    - Evidence: `artifacts/audit/dead_code_candidates.json`
 
 ## Repro Evidence Commands
+All commands are intended to run from the repository root.
 ```bash
 bash tools/audit/verify-code-analysis-evidence.sh
 jq '.candidates | length' artifacts/audit/hardening_candidates.json

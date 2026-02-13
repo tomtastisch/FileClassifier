@@ -62,8 +62,11 @@ Out of scope:
 - R3: third-party platform outages can delay triage/release actions.
 
 ## 8. Reproducible Verification
+All commands are intended to run from the repository root.
 ```bash
 bash tools/audit/verify-security-claims.sh
 bash tools/ci/bin/run.sh security-nuget
-gh attestation verify <artifact> --repo tomtastisch/FileClassifier
+NUPKG="$(find artifacts/nuget -maxdepth 1 -type f -name '*.nupkg' | head -n 1)"
+test -n "$NUPKG"
+gh attestation verify "$NUPKG" --repo tomtastisch/FileClassifier
 ```
