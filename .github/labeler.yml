@@ -1,0 +1,23 @@
+area:docs:
+  - changed-files:
+      - any-glob-to-any-file: ['docs/**', '**/*.md', 'README.md']
+
+area:tests:
+  - changed-files:
+      - any-glob-to-any-file: ['tests/**']
+
+area:versioning:
+  - changed-files:
+      - any-glob-to-any-file: ['tools/versioning/**', 'docs/versioning/**', 'Directory.Build.props', 'src/FileTypeDetection/FileTypeDetectionLib.vbproj']
+
+area:pipeline:
+  - changed-files:
+      - any-glob-to-any-file: ['.github/workflows/**', 'tools/ci/**']
+
+area:tooling:
+  - changed-files:
+      - any-glob-to-any-file: ['tools/**']
+
+impl:security:
+  - changed-files:
+      - any-glob-to-any-file: ['SECURITY.md', '.github/workflows/**security**', 'tools/audit/**', 'docs/audit/**', '.github/dependabot.yml']

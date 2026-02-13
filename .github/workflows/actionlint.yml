@@ -1,0 +1,20 @@
+name: actionlint
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  actionlint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Run actionlint
+        uses: rhysd/actionlint@e7d448ef7507c20fc4c88a95d0c448b848cd6127 # v1.7.8

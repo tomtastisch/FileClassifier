@@ -22,15 +22,6 @@ Tomtastisch.FileClassifier liefert deterministische Dateityperkennung, sichere A
 ```bash
 dotnet add package Tomtastisch.FileClassifier --version X.Y.Z
 ```
-- Installation via GitHub Packages:
-```bash
-dotnet nuget add source "https://nuget.pkg.github.com/tomtastisch/index.json" \
-  --name github-tomtastisch \
-  --username <github-username> \
-  --password <github-token-with-read:packages> \
-  --store-password-in-clear-text
-dotnet add package Tomtastisch.FileClassifier --version X.Y.Z --source github-tomtastisch
-```
 - `PackageReference`:
 ```xml
 <ItemGroup>

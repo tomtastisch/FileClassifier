@@ -379,7 +379,16 @@ run_pr_labeling() {
   local head_sha
   head_sha="$(jq -r '.pull_request.head.sha // empty' "${GITHUB_EVENT_PATH}")"
 
-  run_or_fail "CI-LABEL-001" "Derive required versioning decision" env MODE=required BASE_REF=origin/main HEAD_REF="$head_sha" "${ROOT_DIR}/tools/versioning/check-versioning.sh"
+  local version_required
+  if ! version_required="$(env MODE=required BASE_REF=origin/main HEAD_REF="$head_sha" "${ROOT_DIR}/tools/versioning/check-versioning.sh")"; then
+    ci_result_add_violation "CI-LABEL-001" "fail" "Failed to derive required versioning decision." "$CI_RAW_LOG"
+    return 1
+  fi
+  if [[ -z "${version_required}" ]]; then
+    ci_result_add_violation "CI-LABEL-001" "fail" "Required versioning decision is empty." "$CI_RAW_LOG"
+    return 1
+  fi
+  ci_run_capture "Derive required versioning decision" bash -lc "printf 'required=%s\n' '${version_required}'"
 
   local files_json labels_json pr_title
   if ! files_json="$(gh_retry python3 "${ROOT_DIR}/tools/ci/bin/github_api.py" pr-files --repo "${GITHUB_REPOSITORY}" --pr "${pr_number}")"; then
@@ -396,7 +405,7 @@ run_pr_labeling() {
   fi
 
   mkdir -p "${OUT_DIR}"
-  FILES_JSON="$files_json" EXISTING_LABELS_JSON="$labels_json" PR_TITLE="$pr_title" VERSION_REQUIRED="none" VERSION_ACTUAL="none" VERSION_REASON="contract-run" VERSION_GUARD_EXIT="0" OUTPUT_PATH="${OUT_DIR}/decision.json" \
+  FILES_JSON="$files_json" EXISTING_LABELS_JSON="$labels_json" PR_TITLE="$pr_title" VERSION_REQUIRED="${version_required}" VERSION_ACTUAL="none" VERSION_REASON="contract-run" VERSION_GUARD_EXIT="0" OUTPUT_PATH="${OUT_DIR}/decision.json" \
     ci_run_capture "Compute deterministic labels" node "${ROOT_DIR}/tools/versioning/compute-pr-labels.js"
 
   run_or_fail "CI-LABEL-001" "Validate label decision" node "${ROOT_DIR}/tools/versioning/validate-label-decision.js" "${ROOT_DIR}/tools/versioning/label-schema.json" "${OUT_DIR}/decision.json"
