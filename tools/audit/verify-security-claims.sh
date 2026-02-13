@@ -84,6 +84,15 @@ retry_gh_api() {
   return 1
 }
 
+retry_gh_api_optional() {
+  local endpoint="$1"
+  local out_file="$2"
+  if retry_gh_api "${endpoint}" "${out_file}"; then
+    return 0
+  fi
+  return 1
+}
+
 require_tool() {
   local t="$1"
   if ! command -v "${t}" >/dev/null 2>&1; then
@@ -152,23 +161,32 @@ fi
 if [[ -n "${REPO_FULL}" ]]; then
   tmp_repo_json="${OUT_DIR}/.repo.json"
   tmp_pvr_json="${OUT_DIR}/.pvr.json"
-  tmp_branch_json="${OUT_DIR}/.branch-protection.json"
+  tmp_branch_rules_json="${OUT_DIR}/.branch-rules.json"
+  tmp_branch_protection_json="${OUT_DIR}/.branch-protection.json"
+  tmp_asf_json="${OUT_DIR}/.automated-security-fixes.json"
+  tmp_secret_scanning_json="${OUT_DIR}/.secret-scanning-alerts.json"
 
   if retry_gh_api "repos/${REPO_FULL}" "${tmp_repo_json}"; then
-    dep_status="$(jq -r '.security_and_analysis.dependabot_security_updates.status // "unknown"' "${tmp_repo_json}")"
-    sec_status="$(jq -r '.security_and_analysis.secret_scanning.status // "unknown"' "${tmp_repo_json}")"
+    dep_status="$(jq -r '.security_and_analysis.dependabot_security_updates.status // empty' "${tmp_repo_json}")"
+    sec_status="$(jq -r '.security_and_analysis.secret_scanning.status // empty' "${tmp_repo_json}")"
     default_branch="$(jq -r '.default_branch' "${tmp_repo_json}")"
 
     if [[ "${dep_status}" == "enabled" ]]; then
       add_pass
+    elif retry_gh_api_optional "repos/${REPO_FULL}/automated-security-fixes" "${tmp_asf_json}" && [[ "$(jq -r '.enabled // false' "${tmp_asf_json}")" == "true" ]]; then
+      add_pass
     else
-      add_violation "CI-SEC-CLAIM-005" "fail" "Dependabot security updates expected enabled, got ${dep_status}" "${OUT_DIR_REL}/raw.log"
+      dep_effective="${dep_status:-unknown}"
+      add_violation "CI-SEC-CLAIM-005" "fail" "Dependabot security updates expected enabled, got ${dep_effective}" "${OUT_DIR_REL}/raw.log"
     fi
 
     if [[ "${sec_status}" == "enabled" ]]; then
       add_pass
+    elif retry_gh_api_optional "repos/${REPO_FULL}/secret-scanning/alerts?per_page=1" "${tmp_secret_scanning_json}"; then
+      add_pass
     else
-      add_violation "CI-SEC-CLAIM-006" "fail" "Secret scanning expected enabled, got ${sec_status}" "${OUT_DIR_REL}/raw.log"
+      sec_effective="${sec_status:-unknown}"
+      add_violation "CI-SEC-CLAIM-006" "fail" "Secret scanning expected enabled, got ${sec_effective}" "${OUT_DIR_REL}/raw.log"
     fi
 
     if retry_gh_api "repos/${REPO_FULL}/private-vulnerability-reporting" "${tmp_pvr_json}"; then
@@ -182,11 +200,31 @@ if [[ -n "${REPO_FULL}" ]]; then
       add_violation "CI-SEC-CLAIM-007" "fail" "GitHub API failed for private-vulnerability-reporting after retries" "${OUT_DIR_REL}/raw.log"
     fi
 
-    if retry_gh_api "repos/${REPO_FULL}/branches/${default_branch}/protection" "${tmp_branch_json}"; then
+    if retry_gh_api_optional "repos/${REPO_FULL}/rules/branches/${default_branch}" "${tmp_branch_rules_json}"; then
       required_contexts=("preflight" "version-policy" "build" "api-contract" "pack" "consumer-smoke" "package-backed-tests" "security-nuget" "tests-bdd-coverage")
       missing=0
       for ctx in "${required_contexts[@]}"; do
-        if ! jq -e --arg ctx "${ctx}" '.required_status_checks.contexts | index($ctx)' "${tmp_branch_json}" >/dev/null; then
+        if ! jq -e --arg ctx "${ctx}" '
+          map(select(.type=="required_status_checks"))
+          | map(.parameters.required_status_checks // [])
+          | add
+          | map(.context)
+          | index($ctx)
+        ' "${tmp_branch_rules_json}" >/dev/null; then
+          log "Missing branch protection context: ${ctx}"
+          missing=1
+        fi
+      done
+      if [[ "${missing}" -eq 0 ]]; then
+        add_pass
+      else
+        add_violation "CI-SEC-CLAIM-008" "fail" "Branch protection contexts do not match SECURITY evidence baseline" "${OUT_DIR_REL}/raw.log"
+      fi
+    elif retry_gh_api_optional "repos/${REPO_FULL}/branches/${default_branch}/protection" "${tmp_branch_protection_json}"; then
+      required_contexts=("preflight" "version-policy" "build" "api-contract" "pack" "consumer-smoke" "package-backed-tests" "security-nuget" "tests-bdd-coverage")
+      missing=0
+      for ctx in "${required_contexts[@]}"; do
+        if ! jq -e --arg ctx "${ctx}" '.required_status_checks.contexts | index($ctx)' "${tmp_branch_protection_json}" >/dev/null; then
           log "Missing branch protection context: ${ctx}"
           missing=1
         fi
@@ -197,7 +235,7 @@ if [[ -n "${REPO_FULL}" ]]; then
         add_violation "CI-SEC-CLAIM-008" "fail" "Branch protection contexts do not match SECURITY evidence baseline" "${OUT_DIR_REL}/raw.log"
       fi
     else
-      add_violation "CI-SEC-CLAIM-008" "fail" "GitHub API failed for branch protection after retries" "${OUT_DIR_REL}/raw.log"
+      add_violation "CI-SEC-CLAIM-008" "fail" "GitHub API failed for branch rules/protection after retries" "${OUT_DIR_REL}/raw.log"
     fi
   else
     add_violation "CI-SEC-CLAIM-005" "fail" "GitHub API failed for repository metadata after retries" "${OUT_DIR_REL}/raw.log"

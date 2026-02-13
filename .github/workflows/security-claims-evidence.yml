@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  security-events: read
 
 jobs:
   security-claims-evidence:
@@ -26,18 +27,13 @@ jobs:
 
       - name: Verify security claims
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.SECURITY_CLAIMS_TOKEN != '' && secrets.SECURITY_CLAIMS_TOKEN || github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: bash tools/audit/verify-security-claims.sh
 
       - name: Validate result schema
         if: always()
-        run: |
-          dotnet restore --locked-mode tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj
-          dotnet build -c Release tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj
-          dotnet tools/ci/checks/ResultSchemaValidator/bin/Release/net10.0/ResultSchemaValidator.dll \
-            --schema tools/ci/schema/result.schema.json \
-            --result artifacts/ci/security-claims-evidence/result.json
+        run: dotnet restore --locked-mode tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj && dotnet build -c Release tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj && dotnet tools/ci/checks/ResultSchemaValidator/bin/Release/net10.0/ResultSchemaValidator.dll --schema tools/ci/schema/result.schema.json --result artifacts/ci/security-claims-evidence/result.json
 
       - name: Upload Artifact
         if: always()
