@@ -11,6 +11,7 @@ This index is the root-level entry point for reproducible security evidence that
 - Threat model: `docs/audit/007_THREAT_MODEL.MD`
 - Incident response runbook: `docs/audit/008_INCIDENT_RESPONSE_RUNBOOK.MD`
 - Supply chain baseline: `docs/audit/009_SUPPLY_CHAIN_BASELINE.MD`
+- Execution DoD matrix: `docs/audit/012_WAVE_EXECUTION_DOD.MD`
 
 ## External Assurance
 - OpenSSF Scorecard workflow: `.github/workflows/scorecard.yml`
