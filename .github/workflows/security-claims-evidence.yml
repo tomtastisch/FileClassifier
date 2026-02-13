@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   security-claims-evidence:
+    if: github.event_name != 'pull_request' || github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,11 +28,22 @@ jobs:
       - name: Assert required CLI tools
         run: command -v gh && command -v jq
 
+      - name: Assert SECURITY_CLAIMS_TOKEN present
+        shell: bash
+        run: |
+          test -n "${SECURITY_CLAIMS_TOKEN:-}" || (echo "FAIL: SECURITY_CLAIMS_TOKEN missing" >&2; exit 1)
+          echo "OK: SECURITY_CLAIMS_TOKEN present"
+        env:
+          SECURITY_CLAIMS_TOKEN: ${{ secrets.SECURITY_CLAIMS_TOKEN }}
+
       - name: Verify security claims
         env:
-          GH_TOKEN: ${{ secrets.SECURITY_CLAIMS_TOKEN }}
+          SECURITY_CLAIMS_TOKEN: ${{ secrets.SECURITY_CLAIMS_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: bash tools/audit/verify-security-claims.sh
+        run: |
+          set -euo pipefail
+          export GH_TOKEN="${SECURITY_CLAIMS_TOKEN}"
+          bash tools/audit/verify-security-claims.sh
 
       - name: Validate result schema
         if: always()
