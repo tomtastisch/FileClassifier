@@ -26,7 +26,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          # Security hardening: do not checkout workflow_run head_sha in a privileged workflow.
+          # Always use the trusted default branch content for verifier scripts.
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
 
       - name: Resolve release metadata
         id: meta
