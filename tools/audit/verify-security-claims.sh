@@ -95,7 +95,20 @@ require_tool() {
 
 require_tool gh || true
 require_tool jq || true
-require_tool rg || true
+
+has_rg() {
+  command -v rg >/dev/null 2>&1
+}
+
+match_file() {
+  local pattern="$1"
+  local file="$2"
+  if has_rg; then
+    rg -q "$pattern" "$file"
+  else
+    grep -Eq "$pattern" "$file"
+  fi
+}
 
 REPO_FULL="${GITHUB_REPOSITORY:-}"
 if [[ -z "${REPO_FULL}" ]]; then
@@ -123,14 +136,14 @@ else
 fi
 
 # Claim: security-nuget gate exists in CI
-if rg -q "^[[:space:]]+security-nuget:" "${ROOT_DIR}/.github/workflows/ci.yml" && rg -q "run\.sh security-nuget" "${ROOT_DIR}/.github/workflows/ci.yml"; then
+if match_file "^[[:space:]]+security-nuget:" "${ROOT_DIR}/.github/workflows/ci.yml" && match_file "run\\.sh security-nuget" "${ROOT_DIR}/.github/workflows/ci.yml"; then
   add_pass
 else
   add_violation "CI-SEC-CLAIM-003" "fail" "security-nuget gate missing from CI workflow" ".github/workflows/ci.yml"
 fi
 
 # Claim: OIDC trusted publishing present in release workflow
-if rg -q "NuGet/login@v1" "${ROOT_DIR}/.github/workflows/release.yml" && rg -q "assert OIDC temp key present" "${ROOT_DIR}/.github/workflows/release.yml"; then
+if match_file "NuGet/login@v1" "${ROOT_DIR}/.github/workflows/release.yml" && match_file "assert OIDC temp key present" "${ROOT_DIR}/.github/workflows/release.yml"; then
   add_pass
 else
   add_violation "CI-SEC-CLAIM-004" "fail" "OIDC trusted publishing markers missing" ".github/workflows/release.yml"

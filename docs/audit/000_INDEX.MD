@@ -33,4 +33,4 @@ python3 tools/check-docs.py
 ## External Assurance
 - OpenSSF Scorecard workflow: `.github/workflows/scorecard.yml`
 - Artifact attestations in release workflow: `.github/workflows/release.yml`
-- CodeQL with build context: `.github/workflows/codeql.yml`
+- GitHub Code Scanning Default Setup (configured): `gh api repos/<owner>/<repo>/code-scanning/default-setup`

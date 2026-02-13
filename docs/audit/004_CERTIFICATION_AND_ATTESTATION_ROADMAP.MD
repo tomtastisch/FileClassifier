@@ -29,3 +29,10 @@ gh attestation verify <artifact> --repo <owner/repo>
 - Scorecard workflow runs and stores artifacts.
 - Release workflow emits attestations for nupkg artifacts.
 - Verification commands are documented and reproducible.
+
+## 6. Code Scanning Mode Constraint
+This repository currently uses GitHub Code Scanning Default Setup (state: `configured`).
+When Default Setup is enabled, additional advanced CodeQL workflow uploads can be rejected by GitHub.
+Operational rule for this repo:
+- Keep Default Setup active for CodeQL until an explicit migration decision is made.
+- Do not run parallel advanced CodeQL workflow uploads in the same repository state.
