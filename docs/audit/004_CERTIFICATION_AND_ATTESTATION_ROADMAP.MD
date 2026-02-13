@@ -37,3 +37,14 @@ Operational rule for this repo:
 - Keep Default Setup active for CodeQL until an explicit migration decision is made.
 - Do not run parallel advanced CodeQL workflow uploads in the same repository state.
 - Non-CodeQL SARIF uploads (for example OpenSSF Scorecard SARIF) are permitted.
+
+## 7. OpenSSF Scorecard Constraint for Third-Party GitHub Actions
+- Score values shown by `actions/dependency-review-action` for reused GitHub Actions are computed from the upstream action repositories (not from this repository).
+- This repository can pin SHAs and choose actions, but cannot directly increase upstream Scorecard values.
+- Operational handling:
+  - PR comments do not include the OpenSSF Scorecard table (`show-openssf-scorecard: false`).
+  - Warning threshold remains defined (`warn-on-openssf-scorecard-level: 9`) for machine-readable policy intent.
+- Repro command for upstream scores:
+```bash
+curl -fsSL "https://api.securityscorecards.dev/projects/github.com/actions/checkout" | jq -r '.date,.score,.repo.name'
+```

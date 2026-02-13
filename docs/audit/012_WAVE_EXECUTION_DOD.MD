@@ -42,6 +42,8 @@ Scope: Finalisierung aller offenen Security-/Governance-Punkte nach Wave-Plan.
 ## Snapshot Warning Hardening (Dependency Review)
 - DoD-SW.1: `dependency-review` verwendet `retry-on-snapshot-warnings: true`.
 - DoD-SW.2: PR-Kommentar-Output erfolgt nur bei Failure (`comment-summary-in-pr: on-failure`), damit Warnhinweise nicht als Dauerrauschen erscheinen.
+- DoD-SW.3: OpenSSF-Scorecard-Tabelle in PR-Kommentaren ist deaktiviert (`show-openssf-scorecard: false`), um nicht steuerbare Fremd-Repo-Scores nicht als Merge-Rauschen zu propagieren.
+- DoD-SW.4: Policy-Schwelle für Action-Score ist explizit gesetzt (`warn-on-openssf-scorecard-level: 9`) und im Workflow nachweisbar.
 
 ## Release Finalisierung
 - DoD-R.1: Nach Merge ist Tag `v5.1.0` erstellt und Release-Pipeline erfolgreich abgeschlossen.
