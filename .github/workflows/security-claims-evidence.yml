@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   security-claims-evidence:
+    if: github.event_name != 'pull_request' || github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,9 +30,13 @@ jobs:
 
       - name: Verify security claims
         env:
-          GH_TOKEN: ${{ secrets.SECURITY_CLAIMS_TOKEN }}
+          SECURITY_CLAIMS_TOKEN: ${{ secrets.SECURITY_CLAIMS_TOKEN }}
+          GH_TOKEN_FALLBACK: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: bash tools/audit/verify-security-claims.sh
+        run: |
+          set -euo pipefail
+          export GH_TOKEN="${SECURITY_CLAIMS_TOKEN:-${GH_TOKEN_FALLBACK:-}}"
+          bash tools/audit/verify-security-claims.sh
 
       - name: Validate result schema
         if: always()
