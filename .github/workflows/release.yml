@@ -115,13 +115,13 @@ jobs:
             10.0.102
 
       - name: Download package artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: nuget-package
           path: artifacts/nuget/
 
       - name: Download naming SNT summary
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: release-naming-snt-summary
           path: artifacts/nuget/
