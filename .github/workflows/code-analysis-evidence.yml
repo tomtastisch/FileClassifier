@@ -1,0 +1,46 @@
+name: code-analysis-evidence
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  code-analysis-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.102
+
+      - name: Verify code analysis evidence
+        run: bash tools/audit/verify-code-analysis-evidence.sh
+
+      - name: Validate result schema
+        if: always()
+        run: dotnet restore --locked-mode tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj && dotnet build -c Release tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj && dotnet tools/ci/checks/ResultSchemaValidator/bin/Release/net10.0/ResultSchemaValidator.dll --schema tools/ci/schema/result.schema.json --result artifacts/ci/code-analysis-evidence/result.json
+
+      - name: Upload Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-code-analysis-evidence
+          path: |
+            artifacts/ci/code-analysis-evidence/
+            artifacts/audit/code_inventory.json
+            artifacts/audit/callgraph_inventory.json
+            artifacts/audit/dead_code_candidates.json
+            artifacts/audit/redundancy_candidates.json
+            artifacts/audit/hardening_candidates.json
+          if-no-files-found: error

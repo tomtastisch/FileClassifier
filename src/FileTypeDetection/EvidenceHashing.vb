@@ -524,10 +524,24 @@ Namespace Global.Tomtastisch.FileClassifier
                     End Using
                 End Using
                 Return True
+            Catch ex As UnauthorizedAccessException
+                Return SetReadFileError(ex, errorMessage)
+            Catch ex As Global.System.IO.IOException
+                Return SetReadFileError(ex, errorMessage)
+            Catch ex As Global.System.IO.InvalidDataException
+                Return SetReadFileError(ex, errorMessage)
+            Catch ex As NotSupportedException
+                Return SetReadFileError(ex, errorMessage)
+            Catch ex As ArgumentException
+                Return SetReadFileError(ex, errorMessage)
             Catch ex As Exception
-                errorMessage = $"Datei konnte nicht gelesen werden: {ex.Message}"
-                Return False
+                Return SetReadFileError(ex, errorMessage)
             End Try
+        End Function
+
+        Private Shared Function SetReadFileError(ex As Exception, ByRef errorMessage As String) As Boolean
+            errorMessage = $"Datei konnte nicht gelesen werden: {ex.Message}"
+            Return False
         End Function
 
         Private NotInheritable Class NormalizedEntry

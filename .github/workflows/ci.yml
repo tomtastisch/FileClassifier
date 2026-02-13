@@ -17,6 +17,7 @@ concurrency:
 env:
   LC_ALL: C.UTF-8
   LANG: C.UTF-8
+  CI_DEFER_ARTIFACT_LINK_RESOLUTION: "1"
 
 defaults:
   run:

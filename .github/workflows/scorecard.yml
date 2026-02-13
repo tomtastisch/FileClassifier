@@ -1,0 +1,45 @@
+name: scorecard
+
+on:
+  branch_protection_rule:
+  schedule:
+    - cron: '23 3 * * 1'
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  security-events: write
+  id-token: write
+  contents: read
+  actions: read
+
+jobs:
+  scorecard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare scorecard artifact directory
+        run: mkdir -p artifacts/ci/scorecard
+
+      - name: Run OpenSSF Scorecard
+        uses: ossf/scorecard-action@v2.3.3
+        with:
+          results_file: artifacts/ci/scorecard/results.sarif
+          results_format: sarif
+          publish_results: true
+
+      - name: Upload SARIF to code scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: artifacts/ci/scorecard/results.sarif
+
+      - name: Upload Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-scorecard
+          path: artifacts/ci/scorecard/
+          if-no-files-found: error

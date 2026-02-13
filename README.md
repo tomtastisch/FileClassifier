@@ -150,6 +150,7 @@ Delegationshinweis: `ArchiveProcessing` ist bei path-basierten Archivpfaden eine
 - [Dokumentationsindex](https://github.com/tomtastisch/FileClassifier/blob/main/docs/001_INDEX_CORE.MD)
 - [API-Kernübersicht](https://github.com/tomtastisch/FileClassifier/blob/main/docs/010_API_CORE.MD)
 - [Architektur und Flows](https://github.com/tomtastisch/FileClassifier/blob/main/docs/020_ARCH_CORE.MD)
+- [Audit Index](https://github.com/tomtastisch/FileClassifier/blob/main/docs/audit/000_INDEX.MD)
 - [HMAC Key Setup (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/secure/001_HMAC_KEY_SETUP.MD)
 - [Migration: Hashing Rename](https://github.com/tomtastisch/FileClassifier/blob/main/docs/migrations/001_HASHING_RENAME.MD)
 - [Governance und Policies](https://github.com/tomtastisch/FileClassifier/blob/main/docs/governance/001_POLICY_CI.MD)
@@ -167,6 +168,9 @@ Delegationshinweis: `ArchiveProcessing` ist bei path-basierten Archivpfaden eine
 dotnet build FileClassifier.sln -v minimal
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release -v minimal
 python3 tools/check-docs.py
+bash tools/audit/verify-security-claims.sh
+bash tools/audit/generate-code-analysis-json.sh
+gh attestation verify artifacts/nuget/*.nupkg --repo tomtastisch/FileClassifier
 python3 tools/check-policy-roc.py --out artifacts/policy_roc_matrix.tsv
 bash tools/ci/bin/run.sh versioning-svt
 bash tools/ci/bin/run.sh naming-snt

@@ -1,0 +1,46 @@
+name: security-claims-evidence
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  security-claims-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.102
+
+      - name: Assert required CLI tools
+        run: command -v gh && command -v jq
+
+      - name: Verify security claims
+        env:
+          GH_TOKEN: ${{ secrets.SECURITY_CLAIMS_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: bash tools/audit/verify-security-claims.sh
+
+      - name: Validate result schema
+        if: always()
+        run: dotnet restore --locked-mode tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj && dotnet build -c Release tools/ci/checks/ResultSchemaValidator/ResultSchemaValidator.csproj && dotnet tools/ci/checks/ResultSchemaValidator/bin/Release/net10.0/ResultSchemaValidator.dll --schema tools/ci/schema/result.schema.json --result artifacts/ci/security-claims-evidence/result.json
+
+      - name: Upload Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-security-claims-evidence
+          path: artifacts/ci/security-claims-evidence/
+          if-no-files-found: error
