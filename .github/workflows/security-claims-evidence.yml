@@ -28,14 +28,21 @@ jobs:
       - name: Assert required CLI tools
         run: command -v gh && command -v jq
 
+      - name: Assert SECURITY_CLAIMS_TOKEN present
+        shell: bash
+        run: |
+          test -n "${SECURITY_CLAIMS_TOKEN:-}" || (echo "FAIL: SECURITY_CLAIMS_TOKEN missing" >&2; exit 1)
+          echo "OK: SECURITY_CLAIMS_TOKEN present"
+        env:
+          SECURITY_CLAIMS_TOKEN: ${{ secrets.SECURITY_CLAIMS_TOKEN }}
+
       - name: Verify security claims
         env:
           SECURITY_CLAIMS_TOKEN: ${{ secrets.SECURITY_CLAIMS_TOKEN }}
-          GH_TOKEN_FALLBACK: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
-          export GH_TOKEN="${SECURITY_CLAIMS_TOKEN:-${GH_TOKEN_FALLBACK:-}}"
+          export GH_TOKEN="${SECURITY_CLAIMS_TOKEN}"
           bash tools/audit/verify-security-claims.sh
 
       - name: Validate result schema

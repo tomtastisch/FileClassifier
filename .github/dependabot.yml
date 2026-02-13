@@ -1,5 +1,7 @@
 version: 2
 updates:
+  # Dependabot security updates are controlled at repository settings level.
+  # open-pull-requests-limit: 0 disables scheduled version-update PRs only.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
