@@ -75,20 +75,15 @@ Namespace Global.Tomtastisch.FileClassifier
                     End Using
                 End Using
             Catch ex As UnauthorizedAccessException
-                LogGuard.Error(opt.Logger, "[Detect] ReadFileSafe Fehler.", ex)
-                Return Array.Empty(Of Byte)()
+                Return LogReadFileSafeFailure(opt, ex)
             Catch ex As IOException
-                LogGuard.Error(opt.Logger, "[Detect] ReadFileSafe Fehler.", ex)
-                Return Array.Empty(Of Byte)()
+                Return LogReadFileSafeFailure(opt, ex)
             Catch ex As InvalidDataException
-                LogGuard.Error(opt.Logger, "[Detect] ReadFileSafe Fehler.", ex)
-                Return Array.Empty(Of Byte)()
+                Return LogReadFileSafeFailure(opt, ex)
             Catch ex As NotSupportedException
-                LogGuard.Error(opt.Logger, "[Detect] ReadFileSafe Fehler.", ex)
-                Return Array.Empty(Of Byte)()
+                Return LogReadFileSafeFailure(opt, ex)
             Catch ex As ArgumentException
-                LogGuard.Error(opt.Logger, "[Detect] ReadFileSafe Fehler.", ex)
-                Return Array.Empty(Of Byte)()
+                Return LogReadFileSafeFailure(opt, ex)
             End Try
         End Function
 
@@ -216,25 +211,15 @@ Namespace Global.Tomtastisch.FileClassifier
                     Return ResolveByHeaderForPath(header, opt, trace, fs)
                 End Using
             Catch ex As UnauthorizedAccessException
-                LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
-                trace.ReasonCode = ReasonException
-                Return UnknownType()
+                Return LogDetectFailure(opt, trace, ex)
             Catch ex As IOException
-                LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
-                trace.ReasonCode = ReasonException
-                Return UnknownType()
+                Return LogDetectFailure(opt, trace, ex)
             Catch ex As InvalidDataException
-                LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
-                trace.ReasonCode = ReasonException
-                Return UnknownType()
+                Return LogDetectFailure(opt, trace, ex)
             Catch ex As NotSupportedException
-                LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
-                trace.ReasonCode = ReasonException
-                Return UnknownType()
+                Return LogDetectFailure(opt, trace, ex)
             Catch ex As ArgumentException
-                LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
-                trace.ReasonCode = ReasonException
-                Return UnknownType()
+                Return LogDetectFailure(opt, trace, ex)
             End Try
         End Function
 
@@ -279,20 +264,15 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return _
                     FileMaterializer.Persist(payload, destinationDirectory, overwrite:=False, secureExtract:=True)
             Catch ex As UnauthorizedAccessException
-                LogGuard.Error(opt.Logger, "[ArchiveExtract] Ausnahme, fail-closed.", ex)
-                Return False
+                Return LogArchiveExtractFailure(opt, ex)
             Catch ex As IOException
-                LogGuard.Error(opt.Logger, "[ArchiveExtract] Ausnahme, fail-closed.", ex)
-                Return False
+                Return LogArchiveExtractFailure(opt, ex)
             Catch ex As InvalidDataException
-                LogGuard.Error(opt.Logger, "[ArchiveExtract] Ausnahme, fail-closed.", ex)
-                Return False
+                Return LogArchiveExtractFailure(opt, ex)
             Catch ex As NotSupportedException
-                LogGuard.Error(opt.Logger, "[ArchiveExtract] Ausnahme, fail-closed.", ex)
-                Return False
+                Return LogArchiveExtractFailure(opt, ex)
             Catch ex As ArgumentException
-                LogGuard.Error(opt.Logger, "[ArchiveExtract] Ausnahme, fail-closed.", ex)
-                Return False
+                Return LogArchiveExtractFailure(opt, ex)
             End Try
         End Function
 
@@ -318,20 +298,15 @@ Namespace Global.Tomtastisch.FileClassifier
                     Return ArchiveExtractor.TryExtractArchiveStreamToMemory(fs, opt)
                 End Using
             Catch ex As UnauthorizedAccessException
-                LogGuard.Error(opt.Logger, "[ArchiveExtract] Ausnahme, fail-closed.", ex)
-                Return emptyResult
+                Return LogArchiveExtractFailure(opt, ex, emptyResult)
             Catch ex As IOException
-                LogGuard.Error(opt.Logger, "[ArchiveExtract] Ausnahme, fail-closed.", ex)
-                Return emptyResult
+                Return LogArchiveExtractFailure(opt, ex, emptyResult)
             Catch ex As InvalidDataException
-                LogGuard.Error(opt.Logger, "[ArchiveExtract] Ausnahme, fail-closed.", ex)
-                Return emptyResult
+                Return LogArchiveExtractFailure(opt, ex, emptyResult)
             Catch ex As NotSupportedException
-                LogGuard.Error(opt.Logger, "[ArchiveExtract] Ausnahme, fail-closed.", ex)
-                Return emptyResult
+                Return LogArchiveExtractFailure(opt, ex, emptyResult)
             Catch ex As ArgumentException
-                LogGuard.Error(opt.Logger, "[ArchiveExtract] Ausnahme, fail-closed.", ex)
-                Return emptyResult
+                Return LogArchiveExtractFailure(opt, ex, emptyResult)
             End Try
         End Function
 
@@ -346,20 +321,15 @@ Namespace Global.Tomtastisch.FileClassifier
                 Dim trace As DetectionTrace = DetectionTrace.Empty
                 Return ResolveByHeaderForBytes(data, opt, trace, data)
             Catch ex As UnauthorizedAccessException
-                LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
-                Return UnknownType()
+                Return LogDetectFailure(opt, ex)
             Catch ex As IOException
-                LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
-                Return UnknownType()
+                Return LogDetectFailure(opt, ex)
             Catch ex As InvalidDataException
-                LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
-                Return UnknownType()
+                Return LogDetectFailure(opt, ex)
             Catch ex As NotSupportedException
-                LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
-                Return UnknownType()
+                Return LogDetectFailure(opt, ex)
             Catch ex As ArgumentException
-                LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
-                Return UnknownType()
+                Return LogDetectFailure(opt, ex)
             End Try
         End Function
 
@@ -607,6 +577,35 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function UnknownType() As FileType
             Return FileTypeRegistry.Resolve(FileKind.Unknown)
+        End Function
+
+        Private Shared Function LogReadFileSafeFailure(opt As FileTypeProjectOptions, ex As Exception) As Byte()
+            LogGuard.Error(opt.Logger, "[Detect] ReadFileSafe Fehler.", ex)
+            Return Array.Empty(Of Byte)()
+        End Function
+
+        Private Shared Function LogDetectFailure(opt As FileTypeProjectOptions, ex As Exception) As FileType
+            LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
+            Return UnknownType()
+        End Function
+
+        Private Shared Function LogDetectFailure(opt As FileTypeProjectOptions, ByRef trace As DetectionTrace,
+                                                 ex As Exception) As FileType
+            LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
+            trace.ReasonCode = ReasonException
+            Return UnknownType()
+        End Function
+
+        Private Shared Function LogArchiveExtractFailure(opt As FileTypeProjectOptions, ex As Exception) As Boolean
+            LogGuard.Error(opt.Logger, "[ArchiveExtract] Ausnahme, fail-closed.", ex)
+            Return False
+        End Function
+
+        Private Shared Function LogArchiveExtractFailure(opt As FileTypeProjectOptions, ex As Exception,
+                                                         emptyResult As IReadOnlyList(Of ZipExtractedEntry)) _
+            As IReadOnlyList(Of ZipExtractedEntry)
+            LogGuard.Error(opt.Logger, "[ArchiveExtract] Ausnahme, fail-closed.", ex)
+            Return emptyResult
         End Function
 
         Private Shared Function CreateReadOnlyMemoryStream(data As Byte()) As MemoryStream
