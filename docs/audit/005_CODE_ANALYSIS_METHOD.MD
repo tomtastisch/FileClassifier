@@ -21,7 +21,7 @@ Heuristic baseline (wave 1):
 - declaration extraction by regex
 - repository symbol reference counts
 - repeated long-line redundancy heuristic
-- broad exception catch detection
+- broad exception catch detection (only explicit generic forms: `As Exception`)
 
 ## 4. Escalation Path
 For high-confidence refactors, each candidate must be validated by:
@@ -40,4 +40,4 @@ bash tools/audit/verify-code-analysis-evidence.sh
 - method declarations (heuristic): `698`
 - dead code candidates (heuristic): `0`
 - redundancy candidates (heuristic): `18`
-- hardening candidates (broad catches): `21`
+- hardening candidates (broad catches): `12`

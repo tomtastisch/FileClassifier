@@ -524,7 +524,19 @@ Namespace Global.Tomtastisch.FileClassifier
                     End Using
                 End Using
                 Return True
-            Catch ex As Exception
+            Catch ex As UnauthorizedAccessException
+                errorMessage = $"Datei konnte nicht gelesen werden: {ex.Message}"
+                Return False
+            Catch ex As Global.System.IO.IOException
+                errorMessage = $"Datei konnte nicht gelesen werden: {ex.Message}"
+                Return False
+            Catch ex As Global.System.IO.InvalidDataException
+                errorMessage = $"Datei konnte nicht gelesen werden: {ex.Message}"
+                Return False
+            Catch ex As NotSupportedException
+                errorMessage = $"Datei konnte nicht gelesen werden: {ex.Message}"
+                Return False
+            Catch ex As ArgumentException
                 errorMessage = $"Datei konnte nicht gelesen werden: {ex.Message}"
                 Return False
             End Try

@@ -4,7 +4,7 @@
 Wave 1 baseline findings from JSON analysis artifacts.
 
 ## Current State
-No high-confidence refactor was auto-applied in wave 1.
+Package A (Cluster 7C) has been started and reduced generic entry-point catches.
 Evidence-backed candidates are tracked in:
 - `artifacts/audit/dead_code_candidates.json`
 - `artifacts/audit/redundancy_candidates.json`
@@ -12,12 +12,13 @@ Evidence-backed candidates are tracked in:
 - `artifacts/ci/code-analysis-evidence/result.json`
 
 ## Baseline Findings (Wave 1)
-1. `Catch ex As Exception` broad catches appear repeatedly in production code and should be reviewed for narrower exception types or enriched reason codes.
+1. Generic `Catch ex As Exception` usage was reduced in Package A for entry-point files (`FileTypeDetector`, `FileMaterializer`, `EvidenceHashing`).
+   Remaining broad catches still require follow-up in infrastructure internals.
    - Examples:
-     - `src/FileTypeDetection/FileTypeDetector.vb:77`
-     - `src/FileTypeDetection/FileTypeDetector.vb:206`
-     - `src/FileTypeDetection/FileTypeDetector.vb:296`
+     - `src/FileTypeDetection/Infrastructure/CoreInternals.vb:58`
+     - `src/FileTypeDetection/Infrastructure/ArchiveManagedInternals.vb:70`
      - `src/FileTypeDetection/Infrastructure/ArchiveInternals.vb:99`
+     - `src/FileTypeDetection/Infrastructure/ArchiveInternals.vb:201`
      - `src/FileTypeDetection/Infrastructure/ArchiveInternals.vb:546`
    - Evidence: `artifacts/audit/hardening_candidates.json`
 

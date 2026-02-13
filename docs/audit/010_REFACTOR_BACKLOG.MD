@@ -7,7 +7,7 @@ Backlog is derived from:
 - `docs/audit/006_CODE_REVIEW_FINDINGS.MD`
 
 Current baseline snapshot:
-- hardening candidates: `21`
+- hardening candidates: `12`
 - redundancy candidates: `18`
 - dead-code candidates: `0`
 

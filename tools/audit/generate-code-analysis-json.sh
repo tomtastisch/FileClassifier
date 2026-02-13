@@ -114,12 +114,14 @@ for norm,count in line_hits.items():
         })
 
 # Hardening candidates: broad catch blocks in src
+# Only classify explicit generic catch forms (`As Exception`) as broad.
 hard=[]
+broad_catch=re.compile(r'Catch\s+\w+\s+As\s+(?:Global\.System\.)?Exception\b')
 for fp,txt in source_texts.items():
     if not fp.startswith('src/'):
         continue
     for i,line in enumerate(txt.splitlines(), start=1):
-        if re.search(r'Catch\s+.*Exception', line):
+        if broad_catch.search(line):
             hard.append({
                 'type':'broad_exception_catch',
                 'file':fp,
