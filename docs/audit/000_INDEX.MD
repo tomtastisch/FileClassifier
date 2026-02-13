@@ -4,9 +4,10 @@
 Central index for evidence-hardening artifacts that support claims in `SECURITY.md` without modifying `SECURITY.md` itself.
 
 ## Documents
+- `docs/audit/000_HASHING_BASELINE.MD`
 - `docs/audit/000_INDEX.MD`
 - `docs/audit/002_AUDIT_CONTRACT_AND_GUARDRAILS.MD`
-- `docs/audit/002_SECURITY_BENCHMARK.MD`
+- `docs/audit/011_SECURITY_BENCHMARK.MD`
 - `docs/audit/003_SECURITY_ASSERTION_TRACEABILITY.MD`
 - `docs/audit/004_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD`
 - `docs/audit/005_CODE_ANALYSIS_METHOD.MD`

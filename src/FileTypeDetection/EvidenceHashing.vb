@@ -534,6 +534,8 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return SetReadFileError(ex, errorMessage)
             Catch ex As ArgumentException
                 Return SetReadFileError(ex, errorMessage)
+            Catch ex As Exception
+                Return SetReadFileError(ex, errorMessage)
             End Try
         End Function
 

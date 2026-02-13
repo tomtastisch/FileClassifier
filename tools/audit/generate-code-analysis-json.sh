@@ -23,12 +23,13 @@ for p in sorted((root/'src').rglob('*')):
     if '/obj/' in p.as_posix() or '/bin/' in p.as_posix():
         continue
     rel=p.relative_to(root).as_posix()
-    txt=p.read_text(encoding='utf-8', errors='replace')
+    data=p.read_bytes()
+    txt=data.decode('utf-8', errors='replace')
     files.append({
         'path': rel,
         'language': 'vb' if p.suffix.lower()=='.vb' else 'cs',
         'loc': len(txt.splitlines()),
-        'sha256': hashlib.sha256(txt.encode('utf-8', errors='ignore')).hexdigest(),
+        'sha256': hashlib.sha256(data).hexdigest(),
     })
 generated_at=datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z')
 out.write_text(json.dumps({'generated_at': generated_at, 'files': files}, ensure_ascii=True), encoding='utf-8')
@@ -44,7 +45,7 @@ hard_path=pathlib.Path(sys.argv[5])
 
 decls=[]
 vb_decl=re.compile(r'^\s*(Public|Private|Friend|Protected)?\s*(Shared\s+)?(Function|Sub)\s+([A-Za-z_][A-Za-z0-9_]*)')
-cs_decl=re.compile(r'^\s*(public|private|internal|protected)\s+.*?\b([A-Za-z_][A-Za-z0-9_]*)\s*\(')
+cs_decl=re.compile(r'^\s*(public|private|internal|protected)\s+(?:static\s+|virtual\s+|override\s+|sealed\s+|async\s+|unsafe\s+|new\s+|partial\s+)*(?:[\w<>\[\],\.\?]+\s+)+([A-Za-z_][A-Za-z0-9_]*)\s*\(')
 
 # Reference counts
 source_texts={}
@@ -74,17 +75,18 @@ for d in decls:
     count=0
     for txt in source_texts.values():
         count += len(pattern.findall(txt))
-    ref_counts.append({**d,'reference_count':count})
+    external_ref_count=max(count - 1, 0)
+    ref_counts.append({**d,'reference_count':count,'reference_count_excluding_self':external_ref_count})
 
 dead=[]
 for r in ref_counts:
-    if r['reference_count']<=1 and '/src/' in ('/'+r['file']):
+    if r['reference_count_excluding_self']==0 and '/src/' in ('/'+r['file']):
         dead.append({
             'type':'potential_dead_code',
             'file':r['file'],
             'line':r['line'],
             'symbol':r['symbol'],
-            'evidence':'symbol appears only once in repository text search',
+            'evidence':'symbol has no detected references outside declaration in repository text search',
             'confidence':'low',
         })
 
@@ -97,6 +99,8 @@ for fp,txt in source_texts.items():
     for i,line in enumerate(txt.splitlines(), start=1):
         norm=line.strip()
         if len(norm)<40:
+            continue
+        if norm.startswith('Namespace ') or norm.startswith("'''") or 'LogGuard.' in norm:
             continue
         line_hits[norm]+=1
         if len(line_locations[norm])<5:

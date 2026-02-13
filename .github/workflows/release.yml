@@ -156,6 +156,14 @@ jobs:
           mkdir -p artifacts/nuget
           gh attestation verify "${{ steps.nupkg.outputs.path }}" --repo "${{ github.repository }}" > artifacts/nuget/attestation-verify.txt
 
+      - name: Upload attestation verification artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-attestation-verify
+          path: artifacts/nuget/attestation-verify.txt
+          if-no-files-found: error
+
       - name: Gate 4 - SVT post-publish (git version == package version == nuget version)
         shell: bash
         run: bash tools/ci/release/gate4_verify_postpublish.sh "${GITHUB_REF_NAME#v}" "${{ steps.nupkg.outputs.path }}"

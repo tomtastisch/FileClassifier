@@ -84,6 +84,8 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return LogReadFileSafeFailure(opt, ex)
             Catch ex As ArgumentException
                 Return LogReadFileSafeFailure(opt, ex)
+            Catch ex As Exception
+                Return LogReadFileSafeFailure(opt, ex)
             End Try
         End Function
 
@@ -220,6 +222,8 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return LogDetectFailure(opt, trace, ex)
             Catch ex As ArgumentException
                 Return LogDetectFailure(opt, trace, ex)
+            Catch ex As Exception
+                Return LogDetectFailure(opt, trace, ex)
             End Try
         End Function
 
@@ -273,6 +277,8 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return LogArchiveExtractFailure(opt, ex)
             Catch ex As ArgumentException
                 Return LogArchiveExtractFailure(opt, ex)
+            Catch ex As Exception
+                Return LogArchiveExtractFailure(opt, ex)
             End Try
         End Function
 
@@ -307,6 +313,8 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return LogArchiveExtractFailure(opt, ex, emptyResult)
             Catch ex As ArgumentException
                 Return LogArchiveExtractFailure(opt, ex, emptyResult)
+            Catch ex As Exception
+                Return LogArchiveExtractFailure(opt, ex, emptyResult)
             End Try
         End Function
 
@@ -329,6 +337,8 @@ Namespace Global.Tomtastisch.FileClassifier
             Catch ex As NotSupportedException
                 Return LogDetectFailure(opt, ex)
             Catch ex As ArgumentException
+                Return LogDetectFailure(opt, ex)
+            Catch ex As Exception
                 Return LogDetectFailure(opt, ex)
             End Try
         End Function

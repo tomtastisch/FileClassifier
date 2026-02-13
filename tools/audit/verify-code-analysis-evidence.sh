@@ -40,6 +40,8 @@ add_violation() {
 
   python3 - "$rule_id" "$severity" "$message" "$evidence" >> "${VIOLATIONS_JSONL}" <<'PY'
 import json,sys
+if len(sys.argv) < 5:
+    raise SystemExit("expected 4 arguments: rule_id severity message evidence")
 rule_id,severity,message,evidence=sys.argv[1:5]
 print(json.dumps({
   "rule_id": rule_id,
@@ -65,6 +67,15 @@ run_cmd_capture() {
   return 1
 }
 
+require_tool() {
+  local t="$1"
+  if ! command -v "${t}" >/dev/null 2>&1; then
+    add_violation "CI-CODE-ANALYSIS-003" "fail" "Missing required tool '${t}'" "tools/audit/verify-code-analysis-evidence.sh"
+    return 1
+  fi
+  return 0
+}
+
 validate_json_doc() {
   local file_path="$1"
   local jq_expr="$2"
@@ -80,6 +91,8 @@ validate_json_doc() {
   return 0
 }
 
+require_tool jq
+
 if ! run_cmd_capture "Generate code analysis JSON artifacts" bash "${ROOT_DIR}/tools/audit/generate-code-analysis-json.sh"; then
   add_violation "CI-CODE-ANALYSIS-000" "fail" "Generator script failed" "tools/audit/generate-code-analysis-json.sh"
 fi
@@ -90,10 +103,12 @@ validate_json_doc "${ROOT_DIR}/artifacts/audit/dead_code_candidates.json" '.gene
 validate_json_doc "${ROOT_DIR}/artifacts/audit/redundancy_candidates.json" '.generated_at and (.candidates | type=="array")' || true
 validate_json_doc "${ROOT_DIR}/artifacts/audit/hardening_candidates.json" '.generated_at and (.candidates | type=="array")' || true
 
-if [[ "${FAIL_COUNT}" -eq 0 ]]; then
-  STATUS="pass"
-else
+if [[ "${FAIL_COUNT}" -gt 0 ]]; then
   STATUS="fail"
+elif [[ "${WARN_COUNT}" -gt 0 ]]; then
+  STATUS="warn"
+else
+  STATUS="pass"
 fi
 
 FINISHED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
@@ -118,6 +133,8 @@ import json
 import pathlib
 import sys
 
+if len(sys.argv) < 8:
+    raise SystemExit("expected 7 arguments: violations result status started finished duration out_rel")
 viol_path, result_path, status, started_at, finished_at, duration_ms, out_rel = sys.argv[1:8]
 violations = []
 vp = pathlib.Path(viol_path)

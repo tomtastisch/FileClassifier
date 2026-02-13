@@ -25,9 +25,12 @@ jobs:
             8.0.x
             10.0.102
 
+      - name: Assert required CLI tools
+        run: command -v gh && command -v jq
+
       - name: Verify security claims
         env:
-          GH_TOKEN: ${{ secrets.SECURITY_CLAIMS_TOKEN != '' && secrets.SECURITY_CLAIMS_TOKEN || github.token }}
+          GH_TOKEN: ${{ secrets.SECURITY_CLAIMS_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: bash tools/audit/verify-security-claims.sh
 

@@ -2,6 +2,7 @@
 
 ## 1. Ziel und Scope
 Vergleich der Security-Policy-Reife von `tomtastisch/FileClassifier` (PR-Branch `tomtastisch-patch-1`) mit verbreiteten .NET-Open-Source-Repositories anhand nachweisbarer GitHub- und Repository-Fakten.
+Dieser Benchmark ist ein Snapshot vor Merge in `main` (Stand 2026-02-13).
 
 Verglichene Repositories:
 - `tomtastisch/FileClassifier`
@@ -28,7 +29,7 @@ Erhoben via GitHub API und lokale Dateiinspektion:
 ## 3. Ergebnis A - Plattform-/Repo-Merkmale
 | Repository | SECURITY.md | Private Vulnerability Reporting | Dependabot Security Updates | Secret Scanning | CodeQL Workflow-Datei | dependabot.yml |
 |---|---|---|---|---|---|---|
-| tomtastisch/FileClassifier | nein (auf `main`) | true | enabled | enabled | nein | nein |
+| tomtastisch/FileClassifier | nein (Snapshot vor Merge in `main`) | true | enabled | enabled | nein | nein |
 | dotnet/runtime | ja | false_or_unavailable | unknown | unknown | nein | ja |
 | dotnet/aspnetcore | ja | false_or_unavailable | unknown | unknown | nein | ja |
 | JamesNK/Newtonsoft.Json | nein | false_or_unavailable | unknown | unknown | ja | nein |
@@ -56,7 +57,7 @@ Hinweis:
 
 ## 5. Interpretation (faktennah)
 - Die neue `SECURITY.md` von FileClassifier ist inhaltlich umfangreicher als die untersuchten Vergleichsdateien (insbesondere Safe Harbor, ISO/IEC-Orientierung, koordinierte Offenlegung).
-- Auf `main` ist die Datei noch nicht vorhanden; sie liegt im PR-Branch `tomtastisch-patch-1`.
+- Snapshot-Hinweis: Zum Erhebungszeitpunkt lag die Datei im PR-Branch `tomtastisch-patch-1` und noch nicht in `main`.
 - Repo-seitige Sicherheitsmechanismen sind fuer FileClassifier nachweisbar aktiv:
   - Private Vulnerability Reporting (`enabled=true`)
   - Dependabot Security Updates (`enabled`)

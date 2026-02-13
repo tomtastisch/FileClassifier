@@ -170,7 +170,7 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 python3 tools/check-docs.py
 bash tools/audit/verify-security-claims.sh
 bash tools/audit/generate-code-analysis-json.sh
-gh attestation verify <artifact> --repo tomtastisch/FileClassifier
+gh attestation verify artifacts/nuget/*.nupkg --repo tomtastisch/FileClassifier
 python3 tools/check-policy-roc.py --out artifacts/policy_roc_matrix.tsv
 bash tools/ci/bin/run.sh versioning-svt
 bash tools/ci/bin/run.sh naming-snt

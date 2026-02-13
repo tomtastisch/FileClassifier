@@ -19,7 +19,7 @@ Blocking checks are allowed only if deterministic.
 Live GitHub API checks are blocker-eligible with strict anti-flake controls:
 - 3 retries
 - exponential backoff (2s, 4s, 8s)
-- explicit error reason classes in logs (`auth`, `rate-limit`, `network`, `5xx`, `other`)
+- current implementation emits generic API failure messages after retries
 
 If retries are exhausted:
 - blocker claims fail with reason code

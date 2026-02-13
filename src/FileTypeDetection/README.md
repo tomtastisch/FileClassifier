@@ -37,6 +37,6 @@ flowchart LR
 
 ## 7. Provenance Verification
 ```bash
-dotnet nuget verify <package.nupkg>
-gh attestation verify <artifact> --repo tomtastisch/FileClassifier
+dotnet nuget verify artifacts/nuget/*.nupkg
+gh attestation verify artifacts/nuget/*.nupkg --repo tomtastisch/FileClassifier
 ```

@@ -24,3 +24,14 @@ Mapping of claims in `SECURITY.md` to evidence sources and verification commands
 
 ## Full Coverage Note
 Claims that are normative process statements (policy intent) are classified as `report-only` unless they can be turned into deterministic machine checks.
+
+## CI Claim Mapping
+The verification script uses `CI-SEC-CLAIM-*` rule IDs. Mapping to normative claims:
+- `CI-SEC-CLAIM-001` -> `SEC-CLAIM-002` (repository/reporting context resolvable)
+- `CI-SEC-CLAIM-002` -> `SEC-CLAIM-001` (supported major version claim)
+- `CI-SEC-CLAIM-003` -> `SEC-CLAIM-006` (`security-nuget` CI gate exists)
+- `CI-SEC-CLAIM-004` -> `SEC-CLAIM-007` (OIDC trusted publishing markers)
+- `CI-SEC-CLAIM-005` -> `SEC-CLAIM-003` (Dependabot security updates enabled/equivalent endpoint)
+- `CI-SEC-CLAIM-006` -> `SEC-CLAIM-004` (secret scanning enabled/equivalent endpoint)
+- `CI-SEC-CLAIM-007` -> `SEC-CLAIM-002` (private vulnerability reporting enabled)
+- `CI-SEC-CLAIM-008` -> `SEC-CLAIM-005` (required status checks baseline)

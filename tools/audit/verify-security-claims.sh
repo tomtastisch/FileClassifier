@@ -40,6 +40,8 @@ add_violation() {
 
   python3 - "$rule_id" "$severity" "$message" "$evidence" >> "${VIOLATIONS_JSONL}" <<'PY'
 import json,sys
+if len(sys.argv) < 5:
+    raise SystemExit("expected 4 arguments: rule_id severity message evidence")
 rule_id,severity,message,evidence=sys.argv[1:5]
 print(json.dumps({
   "rule_id": rule_id,
@@ -102,8 +104,8 @@ require_tool() {
   return 0
 }
 
-require_tool gh || true
-require_tool jq || true
+require_tool gh
+require_tool jq
 
 has_rg() {
   command -v rg >/dev/null 2>&1
@@ -122,6 +124,7 @@ match_file() {
 REPO_FULL="${GITHUB_REPOSITORY:-}"
 if [[ -z "${REPO_FULL}" ]]; then
   origin_url="$(git -C "${ROOT_DIR}" remote get-url origin 2>/dev/null || true)"
+  origin_url="${origin_url%/}"
   if [[ "${origin_url}" =~ github.com[:/]([^/]+/[^/.]+)(\.git)?$ ]]; then
     REPO_FULL="${BASH_REMATCH[1]}"
   fi
@@ -207,7 +210,7 @@ if [[ -n "${REPO_FULL}" ]]; then
         if ! jq -e --arg ctx "${ctx}" '
           map(select(.type=="required_status_checks"))
           | map(.parameters.required_status_checks // [])
-          | add
+          | add // []
           | map(.context)
           | index($ctx)
         ' "${tmp_branch_rules_json}" >/dev/null; then
@@ -245,10 +248,12 @@ if [[ -n "${REPO_FULL}" ]]; then
   fi
 fi
 
-if [[ "${FAIL_COUNT}" -eq 0 ]]; then
-  STATUS="pass"
-else
+if [[ "${FAIL_COUNT}" -gt 0 ]]; then
   STATUS="fail"
+elif [[ "${WARN_COUNT}" -gt 0 ]]; then
+  STATUS="warn"
+else
+  STATUS="pass"
 fi
 
 FINISHED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
@@ -273,6 +278,8 @@ import json
 import pathlib
 import sys
 
+if len(sys.argv) < 8:
+    raise SystemExit("expected 7 arguments: violations result status started finished duration out_rel")
 viol_path, result_path, status, started_at, finished_at, duration_ms, out_rel = sys.argv[1:8]
 violations = []
 vp = pathlib.Path(viol_path)

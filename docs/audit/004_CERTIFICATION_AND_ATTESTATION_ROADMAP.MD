@@ -18,11 +18,11 @@ No formal certification claim is made by this repository.
 ## 4. NuGet-Relevant Evidence
 - Verify package signatures:
 ```bash
-dotnet nuget verify <package.nupkg>
+dotnet nuget verify artifacts/nuget/*.nupkg
 ```
 - Verify build provenance attestation:
 ```bash
-gh attestation verify <artifact> --repo <owner/repo>
+gh attestation verify artifacts/nuget/*.nupkg --repo tomtastisch/FileClassifier
 ```
 
 ## 5. Acceptance Criteria
@@ -36,3 +36,4 @@ When Default Setup is enabled, additional advanced CodeQL workflow uploads can b
 Operational rule for this repo:
 - Keep Default Setup active for CodeQL until an explicit migration decision is made.
 - Do not run parallel advanced CodeQL workflow uploads in the same repository state.
+- Non-CodeQL SARIF uploads (for example OpenSSF Scorecard SARIF) are permitted.

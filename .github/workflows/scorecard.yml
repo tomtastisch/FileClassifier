@@ -21,6 +21,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Prepare scorecard artifact directory
+        run: mkdir -p artifacts/ci/scorecard
+
       - name: Run OpenSSF Scorecard
         uses: ossf/scorecard-action@v2.3.3
         with:
