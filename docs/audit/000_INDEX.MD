@@ -14,6 +14,7 @@ Central index for evidence-hardening artifacts that support claims in `SECURITY.
 - `docs/audit/007_THREAT_MODEL.MD`
 - `docs/audit/008_INCIDENT_RESPONSE_RUNBOOK.MD`
 - `docs/audit/009_SUPPLY_CHAIN_BASELINE.MD`
+- `docs/audit/010_REFACTOR_BACKLOG.MD`
 
 ## Machine Evidence
 - `artifacts/ci/security-claims-evidence/`
