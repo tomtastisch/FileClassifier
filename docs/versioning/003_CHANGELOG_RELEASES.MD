@@ -12,6 +12,26 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 
 ## [5.1.1]
 - Added:
+  - Verbindliches PR-Template in deutscher Sprache mit Checklisten, Nachbesserungs-Tracking und DoD-Matrix.
+  - Governance-Policy fuer Branch-/PR-Naming (`docs/governance/007_POLICY_BRANCH_PR_NAMING_DE.MD`).
+- Changed:
+  - `preflight` erzwingt jetzt fail-closed:
+    - PR-Governance-Check (Branch/Titel/PR-Body),
+    - `security/code-scanning/tools` muss 0 offene Alerts liefern.
+  - Agent-Regelwerk (`AGENTS.md`) auf verbindliche iterative Abarbeitung und Merge-Gates erweitert.
+- Fixed:
+  - Versionskonvergenz auf `5.1.3` nachgezogen (`RepoVersion`, `Version`, `PackageVersion`, Versionshistorie).
+- Docs/CI/Tooling:
+  - Governance-Index um Branch-/PR-Naming-Policy erweitert.
+
+## [5.1.2]
+- Changed:
+  - Gate4 Pollingdauer fuer Release-Verifikation optimiert.
+- Fixed:
+  - Release-/SVT-Ablauf fuer `release_tag` deterministisch stabilisiert.
+
+## [5.1.1]
+- Added:
   - Dependabot-Schutz fuer secret-pflichtige Workflows (`qodana`, `security-claims-evidence`) bei Dependabot-PR-Kontext.
 - Changed:
   - Dependabot auf security-only fuer geplante Version-Bumps gestellt (`open-pull-requests-limit: 0` je Ecosystem).

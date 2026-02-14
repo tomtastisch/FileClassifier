@@ -1,12 +1,11 @@
 # Codex Operating Rules (Repository Contract)
 
-## 1) Mission
-- Work deterministic, evidence-based, and fail-closed.
-- Prefer correctness, reproducibility, and security over speed.
-- Never change `SECURITY.md`.
+## 1) Ziel und Leitlinie
+- Deterministisch, evidenzbasiert, fail-closed arbeiten.
+- Korrektheit, Reproduzierbarkeit, Security und Auditierbarkeit vor Geschwindigkeit.
+- `SECURITY.md` ist eingefroren und darf nicht geaendert werden.
 
-## 2) Mandatory Response Structure
-Use this exact structure for substantial tasks:
+## 2) Pflicht-Struktur fuer substanzielle Antworten
 1. GOAL & SCOPE
 2. DEFINITIONS & ASSUMPTIONS
 3. PLAN (STEPS + CHECKS)
@@ -15,61 +14,77 @@ Use this exact structure for substantial tasks:
 6. RESULT & DECISION LOG
 7. RISKS / OPEN ITEMS / NEXT STEPS (PRIORITIZED)
 
-## 3) Iterative Delivery Model (Hard Process)
-- WIP limit is 1: one topic per branch/PR.
-- Branch naming must use `codex/tomtastisch-patch-<n>`.
-- After each push:
-  - Wait for required checks to finish.
-  - Address review comments.
-  - Resolve all threads, including outdated threads.
-- Merge only if:
-  - Required checks are green.
-  - No unresolved review threads remain.
-  - PR is mergeable by ruleset/branch protection.
-- After merge:
-  - Verify latest `main` run is green.
-  - Start next topic in a new patch branch.
+## 3) Iteratives Arbeitsmodell (verbindlich)
+- WIP-Limit 1: genau ein Thema pro Branch/PR.
+- Branch-Namensschema:
+  - `codex/<tag>/<kurztext-kebab>`
+  - erlaubte `<tag>`: `fix|release|feat|refactor|docs|test|ci|chore|security`
+- PR-Titelschema:
+  - `<tag>(<scope>): <deutsche kurzbeschreibung>`
+- Nach jedem Push:
+  - auf alle erforderlichen Checks warten,
+  - alle Review-Kommentare abarbeiten,
+  - alle Threads auf `resolved` setzen (inkl. outdated).
+- Merge nur wenn:
+  - required checks gruener Status,
+  - keine offenen Review-Threads,
+  - PR laut Ruleset/Branch-Protection mergebar,
+  - Code-Scanning-Toolstatus fuer offene Alerts ist `0` (kein offener Alert).
+- Nach Merge:
+  - neuesten `main`-Run auf `success` verifizieren,
+  - naechstes Thema in neuem Branch starten.
 
-## 4) Fail-Closed Policy
-- Blocker checks must pass; no silent bypass.
-- `unknown` is allowed only for explicitly report-only claims.
-- Live API checks are blocker-grade:
-  - retries with backoff required,
-  - explicit reason codes required,
-  - final timeout/error => fail.
+## 4) PR-Beschreibung (verbindlich)
+- PR-Beschreibung auf Deutsch.
+- Muss enthalten:
+  - Ziel/Scope,
+  - umgesetzte Aufgaben als Checkliste,
+  - Nachbesserungen als Checkliste,
+  - Evidence (Befehle/Artefakte),
+  - DoD-Matrix mit mindestens zwei auditierbaren DoD je umgesetztem Punkt.
+- Bei Review-Fixes wird die PR-Beschreibung aktiv aktualisiert.
 
-## 5) Evidence Requirements
-- Every material claim needs evidence:
-  - command,
-  - artifact/log output,
-  - file path.
-- If unverifiable, mark as `ASSUMPTION` and add a concrete verification command.
+## 5) Fail-Closed und Live-API-Regeln
+- Blocker-Checks muessen bestehen; kein stilles Bypass.
+- `unknown` nur fuer explizite report-only Claims.
+- Live-API-Claims sind blocker:
+  - Retry + Exponential Backoff,
+  - reason codes (`auth|rate-limit|network|5xx|unknown`),
+  - finaler Fehler => `fail`.
 
-## 6) Security and Workflow Guardrails
-- Least privilege for GitHub Actions permissions:
+## 6) Evidence-Pflicht
+- Jede materielle Aussage benoetigt:
+  - Kommando,
+  - Artefakt/Log,
+  - Datei-/Pfadangabe.
+- Nicht verifizierbare Aussagen sind `ASSUMPTION` plus Verifikationskommando.
+
+## 7) Security- und Workflow-Guardrails
+- GitHub Actions mit Least Privilege:
   - top-level read-only,
-  - write permissions only at job-level where required.
-- Pin action references to immutable SHAs.
-- No secret values in logs/output.
-- Do not enable risky patterns like `pull_request_target` + secrets unless explicitly approved.
+  - write nur job-lokal bei Bedarf.
+- Actions nur SHA-gepinnt.
+- Keine Secret-Werte in Logs.
+- Kein `pull_request_target` + Secrets ohne explizite Freigabe.
+- Scorecard/Governance-Drift wird nicht ignoriert; offene Alerts sind vor Merge zu schliessen.
 
-## 7) Versioning Convergence (Mandatory)
-The following must stay equal by policy:
+## 8) Versionierungs-Konvergenz (blocker)
+Die folgenden Werte muessen immer identisch sein:
 - `Directory.Build.props` -> `RepoVersion`
 - `src/FileTypeDetection/FileTypeDetectionLib.vbproj` -> `Version`
 - `src/FileTypeDetection/FileTypeDetectionLib.vbproj` -> `PackageVersion`
-- Top entry in `docs/versioning/002_HISTORY_VERSIONS.MD`
-- GitHub latest release tag version
-- NuGet latest package version
+- Top-Eintrag in `docs/versioning/002_HISTORY_VERSIONS.MD`
+- neuestes GitHub-Release-Tag
+- neueste NuGet-Paketversion
 
-If any mismatch exists, treat as blocker and fix before merge/release.
+Abweichung ist blocker und vor Merge/Release zu beheben.
 
-## 8) Scope and Safety Constraints
-- Never revert unrelated user changes.
-- Never use destructive git commands (`reset --hard`, `checkout --`) unless explicitly requested.
-- Keep changes minimal and scoped to the current topic.
-- If unexpected workspace drift is detected, stop and ask before proceeding.
+## 9) Scope/Safety
+- Keine Ruecknahme fremder, nicht beauftragter Aenderungen.
+- Keine destruktiven Git-Befehle ohne explizite Freigabe.
+- Aenderungen klein, fokussiert, nachvollziehbar.
+- Unerwarteter Drift => stoppen und klaeren.
 
-## 9) Local Overrides
-- If `AGENTS.override.md` exists locally, apply it in addition to this file.
-- `AGENTS.override.md` is local-only and must not be committed.
+## 10) Lokale Overrides
+- Optional: `AGENTS.override.md` wird zusaetzlich angewendet.
+- `AGENTS.override.md` ist lokal-only und darf nicht committed werden.

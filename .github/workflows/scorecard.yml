@@ -27,6 +27,7 @@ jobs:
       - name: Run OpenSSF Scorecard
         uses: ossf/scorecard-action@dc50aa9510b46c811795eb24b2f1ba02a914e534 # v2.3.3
         with:
+          repo_token: ${{ secrets.SECURITY_CLAIMS_TOKEN }}
           results_file: artifacts/ci/scorecard/results.sarif
           results_format: sarif
           # Keep deterministic local evidence + SARIF upload, avoid remote publish rejection

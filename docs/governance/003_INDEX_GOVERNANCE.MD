@@ -13,3 +13,6 @@ This index is non-normative. Normative policy definitions are the rule files und
 | `CI-DOCS-002` | `tools/ci/policies/rules/docs_drift.yaml` |
 | `CI-NAMING-001` | `tools/ci/policies/rules/naming_snt.yaml` |
 | `CI-VERSION-001` | `tools/ci/policies/rules/versioning_svt.yaml` |
+
+## Zusatzrichtlinien (dokumentativ)
+- Branch/PR Naming (DE): `docs/governance/007_POLICY_BRANCH_PR_NAMING_DE.MD`

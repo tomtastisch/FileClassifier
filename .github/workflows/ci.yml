@@ -9,6 +9,8 @@ on:
 
 permissions:
   contents: read
+  security-events: read
+  pull-requests: read
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -78,6 +80,8 @@ jobs:
         with:
           node-version: "20"
       - name: Run Entry Check
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: bash -euo pipefail tools/ci/bin/run.sh preflight
       - name: Upload Artifact
         if: always()

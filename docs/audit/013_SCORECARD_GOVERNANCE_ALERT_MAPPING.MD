@@ -45,3 +45,5 @@ Diese Datei mappt die repo-/governance-basierten Scorecard-Alerts ohne konkrete 
 2. Für jeden Governance-Alert Evidence-Befehl ausführen und Artefakt in `artifacts/security/` persistieren.
 3. Bei Drift (`fail`) sofortige Korrektur in Ruleset/Workflow.
 4. Nach Korrektur Re-Run von Scorecard + Security-Claims-Evidence.
+5. Merge-Gate: `security/code-scanning/tools` muss `0` offene Alerts liefern.
+6. Nicht technisch remediierbare Heuristik-Alerts (z. B. Repo-Alter `<90 Tage`) werden nur mit begruendetem Dismissal-Kommentar geschlossen und im PR-Evidence protokolliert.
