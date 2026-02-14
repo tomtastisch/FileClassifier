@@ -66,7 +66,7 @@ while true; do
   fi
   export GH_TOKEN="${BASE_GH_TOKEN}"
   if (( attempt >= max_attempts )); then
-    if rg -n "Resource not accessible by integration \\(HTTP 403\\)" "${RAW_LOG}" >/dev/null 2>&1; then
+    if grep -qF "Resource not accessible by integration (HTTP 403)" "${RAW_LOG}"; then
       fail "GitHub API 403 fuer CodeQL Default Setup. GITHUB_TOKEN reicht hier nicht aus; setze Secret CODEQL_DEFAULT_SETUP_GUARDRAIL_TOKEN (Fine-Grained PAT, Repo: Administration Read, Security Events Read)."
     fi
     fail "GitHub API fuer CodeQL Default Setup fehlgeschlagen"
