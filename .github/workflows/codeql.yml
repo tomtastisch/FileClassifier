@@ -1,5 +1,8 @@
 name: codeql
 
+# NOTE: This workflow is an "advanced configuration". GitHub CodeQL "default setup"
+# must be set to "not-configured" for this repository, otherwise SARIF uploads will fail.
+
 on:
   push:
     branches: ["main"]
@@ -61,4 +64,3 @@ jobs:
         uses: github/codeql-action/analyze@f5c2471be782132e47a6e6f9c725e56730d6e9a3 # v3
         with:
           category: "/language:${{ matrix.language }}"
-
