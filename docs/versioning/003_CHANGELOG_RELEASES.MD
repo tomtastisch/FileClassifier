@@ -4,6 +4,11 @@ Alle Aenderungen werden hier technisch dokumentiert. Die Release-Version selbst 
 der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 
 ## [Unreleased]
+- Changed:
+  - NuGet Post-Publish SVT (`Gate 4`) auf adaptiven Retry-Schedule umgestellt, um die durchschnittliche Laufzeit bei unverändert fail-closed Verhalten zu senken.
+  - Repo-/Package-Version auf `5.1.2` (Patch `Z + 1`) angehoben.
+
+## [5.1.1]
 - Added:
   - Dependabot-Schutz fuer secret-pflichtige Workflows (`qodana`, `security-claims-evidence`) bei Dependabot-PR-Kontext.
 - Changed:

@@ -11,6 +11,7 @@ EXPECTED_VERSION="${EXPECTED_VERSION:-}"
 TIMEOUT_SECONDS="${TIMEOUT_SECONDS:-30}"
 RETRY_COUNT="${RETRY_COUNT:-6}"
 RETRY_SLEEP_SECONDS="${RETRY_SLEEP_SECONDS:-10}"
+RETRY_SCHEDULE_SECONDS="${RETRY_SCHEDULE_SECONDS:-}"
 VERIFY_ONLINE="${VERIFY_ONLINE:-1}"
 REQUIRE_SEARCH="${REQUIRE_SEARCH:-1}"
 REQUIRE_REGISTRATION="${REQUIRE_REGISTRATION:-1}"
@@ -69,9 +70,18 @@ retry_network() {
     if [[ "${attempt}" -ge "${RETRY_COUNT}" ]]; then
       fail "Network check '${name}' failed after $((RETRY_COUNT + 1)) attempts."
     fi
-    info "Network check '${name}' attempt ${current_attempt}/${max_attempts} failed; retrying in ${RETRY_SLEEP_SECONDS}s."
+    local sleep_seconds="${RETRY_SLEEP_SECONDS}"
+    if [[ -n "${RETRY_SCHEDULE_SECONDS}" ]]; then
+      local schedule_value
+      schedule_value="$(awk -F',' -v idx="${current_attempt}" '{ if (idx <= NF) print $idx; else print $NF }' <<<"${RETRY_SCHEDULE_SECONDS}")"
+      if [[ -z "${schedule_value}" || ! "${schedule_value}" =~ ^[0-9]+$ ]]; then
+        fail "RETRY_SCHEDULE_SECONDS must contain only comma-separated non-negative integers."
+      fi
+      sleep_seconds="${schedule_value}"
+    fi
+    info "Network check '${name}' attempt ${current_attempt}/${max_attempts} failed; retrying in ${sleep_seconds}s."
     attempt=$((attempt + 1))
-    sleep "${RETRY_SLEEP_SECONDS}"
+    sleep "${sleep_seconds}"
   done
 }
 
@@ -301,6 +311,11 @@ main() {
   require_cmd python3
   require_nonnegative_integer "RETRY_COUNT" "${RETRY_COUNT}"
   require_nonnegative_integer "RETRY_SLEEP_SECONDS" "${RETRY_SLEEP_SECONDS}"
+  if [[ -n "${RETRY_SCHEDULE_SECONDS}" ]]; then
+    if [[ ! "${RETRY_SCHEDULE_SECONDS}" =~ ^[0-9]+(,[0-9]+)*$ ]]; then
+      fail "RETRY_SCHEDULE_SECONDS must be comma-separated non-negative integers (actual='${RETRY_SCHEDULE_SECONDS}')"
+    fi
+  fi
   require_bool_flag "REQUIRE_SEARCH" "${REQUIRE_SEARCH}"
   require_bool_flag "REQUIRE_REGISTRATION" "${REQUIRE_REGISTRATION}"
   require_bool_flag "REQUIRE_FLATCONTAINER" "${REQUIRE_FLATCONTAINER}"
