@@ -1,6 +1,3 @@
-using System.Linq;
-using Xunit;
-
 namespace FileTypeDetectionLib.Tests.Unit.Fuzzing;
 
 public sealed class FsCheckSmokeTests
