@@ -4,20 +4,15 @@ Alle Aenderungen werden hier technisch dokumentiert. Die Release-Version selbst 
 der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 
 ## [Unreleased]
-- Changed:
-  - NuGet Post-Publish SVT (`Gate 4`) auf adaptiven Retry-Schedule umgestellt, um die durchschnittliche Laufzeit bei unverändert fail-closed Verhalten zu senken.
-  - Repo-/Package-Version auf `5.1.2` (Patch `Z + 1`) angehoben.
-- Docs/CI/Tooling:
-  - Retry-Schedule-Defaults und neues ENV `SVT_POSTPUBLISH_RETRY_SCHEDULE_SECONDS` in `docs/021_USAGE_NUGET.MD` und `docs/ci/002_NUGET_TRUSTED_PUBLISHING.MD` nachgezogen.
-
-## [5.1.1]
 - Added:
   - Verbindliches PR-Template in deutscher Sprache mit Checklisten, Nachbesserungs-Tracking und DoD-Matrix.
   - Governance-Policy fuer Branch-/PR-Naming (`docs/governance/007_POLICY_BRANCH_PR_NAMING_DE.MD`).
+  - FsCheck-basierter Fuzzing-Smoke-Test als nachweisbarer Fuzzing-Signaltest.
 - Changed:
   - `preflight` erzwingt jetzt fail-closed:
     - PR-Governance-Check (Branch/Titel/PR-Body),
     - `security/code-scanning/tools` muss 0 offene Alerts liefern.
+  - Scorecard-Workflow nutzt `SECURITY_CLAIMS_TOKEN` als PAT-basierte Tokenquelle fuer robuste Governance-Auswertung.
   - Agent-Regelwerk (`AGENTS.md`) auf verbindliche iterative Abarbeitung und Merge-Gates erweitert.
 - Fixed:
   - Versionskonvergenz auf `5.1.3` nachgezogen (`RepoVersion`, `Version`, `PackageVersion`, Versionshistorie).

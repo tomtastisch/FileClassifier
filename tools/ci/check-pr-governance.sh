@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+IFS=$'\n\t'
+export LC_ALL=C
 
 ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
 OUT_DIR="${ROOT_DIR}/artifacts/ci/pr-governance"
