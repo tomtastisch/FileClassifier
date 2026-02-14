@@ -22,6 +22,30 @@ require_cmd() {
   command -v "$1" >/dev/null 2>&1 || fail "Missing command: $1"
 }
 
+retry_with_backoff() {
+  local name="$1"
+  shift
+  local max_retries="${REMOTE_RETRY_COUNT:-3}"
+  local sleep_seconds="${REMOTE_RETRY_INITIAL_DELAY_SECONDS:-2}"
+  local attempt=1
+
+  [[ "${max_retries}" =~ ^[0-9]+$ ]] || fail "REMOTE_RETRY_COUNT must be numeric"
+  [[ "${sleep_seconds}" =~ ^[0-9]+$ ]] || fail "REMOTE_RETRY_INITIAL_DELAY_SECONDS must be numeric"
+
+  while true; do
+    if "$@"; then
+      return 0
+    fi
+    if (( attempt > max_retries )); then
+      fail "${name} failed after $((max_retries + 1)) attempts."
+    fi
+    info "${name} attempt ${attempt}/$((max_retries + 1)) failed; retrying in ${sleep_seconds}s."
+    sleep "${sleep_seconds}"
+    sleep_seconds=$((sleep_seconds * 2))
+    attempt=$((attempt + 1))
+  done
+}
+
 read_repo_version() {
   sed -n 's/.*<RepoVersion>\([^<]*\)<\/RepoVersion>.*/\1/p' "${ROOT_DIR}/Directory.Build.props" | head -n1
 }
@@ -42,10 +66,14 @@ normalize_tag() {
   printf '%s' "$1" | sed -E 's/^v//'
 }
 
+read_nuget_latest_version() {
+  local package_id_lc="$1"
+  curl -fsSL "https://api.nuget.org/v3-flatcontainer/${package_id_lc}/index.json" | jq -r '.versions[-1]'
+}
+
 main() {
   require_cmd sed
   require_cmd awk
-  require_cmd curl
   require_cmd jq
 
   mkdir -p "${ROOT_DIR}/${OUT_DIR}"
@@ -67,15 +95,18 @@ main() {
 
   local release_tag="" release_version="" nuget_latest=""
   if [[ "${REQUIRE_REMOTE}" == "1" ]]; then
+    require_cmd curl
     require_cmd gh
     export GH_TOKEN="${GH_TOKEN:-${GITHUB_TOKEN:-}}"
     [[ -n "${GH_TOKEN}" ]] || fail "REQUIRE_REMOTE=1 needs GH_TOKEN/GITHUB_TOKEN"
 
-    release_tag="$(gh api "repos/${REPO_SLUG}/releases/latest" --jq '.tag_name')"
+    release_tag="$(retry_with_backoff "github_release_lookup" gh api "repos/${REPO_SLUG}/releases/latest" --jq '.tag_name')"
     release_version="$(normalize_tag "${release_tag}")"
     [[ "${release_version}" == "${repo_version}" ]] || fail "GitHub latest release (${release_tag}) != RepoVersion (${repo_version})"
 
-    nuget_latest="$(curl -fsSL "https://api.nuget.org/v3-flatcontainer/$(printf '%s' "${PACKAGE_ID}" | tr '[:upper:]' '[:lower:]')/index.json" | jq -r '.versions[-1]')"
+    local package_id_lc
+    package_id_lc="$(printf '%s' "${PACKAGE_ID}" | tr '[:upper:]' '[:lower:]')"
+    nuget_latest="$(retry_with_backoff "nuget_version_lookup" read_nuget_latest_version "${package_id_lc}")"
     [[ -n "${nuget_latest}" && "${nuget_latest}" != "null" ]] || fail "Could not read latest NuGet version for ${PACKAGE_ID}"
     [[ "${nuget_latest}" == "${repo_version}" ]] || fail "NuGet latest (${nuget_latest}) != RepoVersion (${repo_version})"
   fi

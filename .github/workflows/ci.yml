@@ -140,16 +140,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - name: Run Entry Check (local convergence)
-        if: github.ref != 'refs/heads/main'
+      - name: Run Entry Check (repo-local convergence)
+        # Remote release/NuGet convergence is enforced in release gates and
+        # NuGet Online Convergence workflow to avoid main-branch deadlocks
+        # during the normal sequence merge -> tag/release -> registry propagation.
         env:
           REQUIRE_REMOTE: "0"
-        run: bash -euo pipefail tools/ci/bin/run.sh version-convergence
-      - name: Run Entry Check (remote convergence)
-        if: github.ref == 'refs/heads/main'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REQUIRE_REMOTE: "1"
         run: bash -euo pipefail tools/ci/bin/run.sh version-convergence
       - name: Upload Artifact
         if: always()

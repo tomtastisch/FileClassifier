@@ -35,6 +35,13 @@ jobs:
           name: ci-versioning-svt
           path: artifacts/ci/versioning-svt/
           if-no-files-found: error
+      - name: Upload version convergence artifact (ci-version-convergence)
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ci-version-convergence
+          path: artifacts/ci/version-convergence/
+          if-no-files-found: error
       - name: Verify ci-versioning-svt artifact exists (post-upload)
         if: always()
         env:
@@ -43,3 +50,11 @@ jobs:
           set -euo pipefail
           out="artifacts/ci/versioning-svt/version-policy_artifacts.json"
           python3 tools/ci/bin/verify_run_artifact.py --repo "${GITHUB_REPOSITORY}" --run-id "${GITHUB_RUN_ID}" --artifact-name "ci-versioning-svt" --out "$out"
+      - name: Verify ci-version-convergence artifact exists (post-upload)
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          out="artifacts/ci/version-convergence/version-policy_artifacts.json"
+          python3 tools/ci/bin/verify_run_artifact.py --repo "${GITHUB_REPOSITORY}" --run-id "${GITHUB_RUN_ID}" --artifact-name "ci-version-convergence" --out "$out"
