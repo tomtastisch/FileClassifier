@@ -29,6 +29,7 @@ jobs:
           repo_token: ${{ secrets.SECURITY_CLAIMS_TOKEN }}
           results_file: artifacts/ci/scorecard/results.sarif
           results_format: sarif
+          # Intentionally do not upload SARIF to Code Scanning; Scorecard findings are kept as artifacts only.
           # Keep deterministic local evidence + SARIF upload, avoid remote publish rejection
           # when workflow permissions include security-events write for SARIF upload.
           publish_results: false
