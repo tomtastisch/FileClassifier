@@ -54,3 +54,6 @@ Diese Policy definiert ein einheitliches, professionelles und maschinenpruefbare
 ## 5. DoD
 - DoD A: `pr-governance` laeuft erfolgreich fuer die PR.
 - DoD B: Branch- und PR-Name entsprechen exakt der Konvention.
+
+## 6. Rule Mapping
+- Normative Rule-Datei: `tools/ci/policies/rules/naming_snt.yaml`
