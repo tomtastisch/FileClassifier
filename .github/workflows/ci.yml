@@ -11,6 +11,7 @@ permissions:
   contents: read
   security-events: read
   pull-requests: read
+  administration: read
 
 concurrency:
   group: ci-${{ github.ref }}

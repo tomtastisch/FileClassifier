@@ -9,6 +9,7 @@ on:
 permissions:
   contents: read
   issues: write
+  administration: read
 
 concurrency:
   group: codeql-default-setup-guardrail
