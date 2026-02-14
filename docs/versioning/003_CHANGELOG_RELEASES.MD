@@ -5,6 +5,16 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 
 ## [Unreleased]
 - Added:
+  - TBD
+- Changed:
+  - TBD
+- Fixed:
+  - TBD
+- Docs/CI/Tooling:
+  - TBD
+
+## [5.1.3]
+- Added:
   - Verbindliches PR-Template in deutscher Sprache mit Checklisten, Nachbesserungs-Tracking und DoD-Matrix.
   - Governance-Policy fuer Branch-/PR-Naming (`docs/governance/007_POLICY_BRANCH_PR_NAMING_DE.MD`).
   - FsCheck-basierter Fuzzing-Smoke-Test als nachweisbarer Fuzzing-Signaltest.

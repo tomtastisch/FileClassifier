@@ -4,7 +4,7 @@ IFS=$'\n\t'
 export LC_ALL=C
 
 ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
-OUT_DIR="${ROOT_DIR}/artifacts/ci/code-scanning-tools-zero"
+OUT_DIR="${ROOT_DIR}/artifacts/ci/preflight/code-scanning-tools-zero"
 RAW_LOG="${OUT_DIR}/raw.log"
 SUMMARY_MD="${OUT_DIR}/summary.md"
 RESULT_JSON="${OUT_DIR}/result.json"
@@ -19,16 +19,26 @@ log() {
 
 fail() {
   local reason="$1"
+  local alerts_rel_path=""
+  local evidence_paths='["artifacts/ci/preflight/code-scanning-tools-zero/raw.log","artifacts/ci/preflight/code-scanning-tools-zero/summary.md"]'
+
+  if [[ -f "${ALERTS_JSON}" ]]; then
+    alerts_rel_path="artifacts/ci/preflight/code-scanning-tools-zero/open-alerts.json"
+    evidence_paths='["artifacts/ci/preflight/code-scanning-tools-zero/raw.log","artifacts/ci/preflight/code-scanning-tools-zero/open-alerts.json","artifacts/ci/preflight/code-scanning-tools-zero/summary.md"]'
+  fi
+
   log "FAIL: ${reason}"
   {
     echo "# Code Scanning Tools Zero"
     echo
     echo "- status: fail"
     echo "- reason: ${reason}"
-    echo "- alerts_file: artifacts/ci/code-scanning-tools-zero/open-alerts.json"
+    if [[ -n "${alerts_rel_path}" ]]; then
+      echo "- alerts_file: ${alerts_rel_path}"
+    fi
   } > "${SUMMARY_MD}"
-  jq -n --arg reason "${reason}" \
-    '{schema_version:1,check_id:"code-scanning-tools-zero",status:"fail",reason:$reason,evidence_paths:["artifacts/ci/code-scanning-tools-zero/raw.log","artifacts/ci/code-scanning-tools-zero/open-alerts.json","artifacts/ci/code-scanning-tools-zero/summary.md"]}' > "${RESULT_JSON}"
+  jq -n --arg reason "${reason}" --argjson evidence_paths "${evidence_paths}" \
+    '{schema_version:1,check_id:"code-scanning-tools-zero",status:"fail",reason:$reason,evidence_paths:$evidence_paths}' > "${RESULT_JSON}"
   exit 1
 }
 
@@ -83,6 +93,6 @@ fi
 } > "${SUMMARY_MD}"
 
 jq -n \
-  '{schema_version:1,check_id:"code-scanning-tools-zero",status:"pass",open_alerts:0,evidence_paths:["artifacts/ci/code-scanning-tools-zero/raw.log","artifacts/ci/code-scanning-tools-zero/open-alerts.json","artifacts/ci/code-scanning-tools-zero/summary.md"]}' > "${RESULT_JSON}"
+  '{schema_version:1,check_id:"code-scanning-tools-zero",status:"pass",open_alerts:0,evidence_paths:["artifacts/ci/preflight/code-scanning-tools-zero/raw.log","artifacts/ci/preflight/code-scanning-tools-zero/open-alerts.json","artifacts/ci/preflight/code-scanning-tools-zero/summary.md"]}' > "${RESULT_JSON}"
 
 log "PASS: Keine offenen Code-Scanning-Alerts."

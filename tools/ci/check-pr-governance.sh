@@ -4,7 +4,7 @@ IFS=$'\n\t'
 export LC_ALL=C
 
 ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
-OUT_DIR="${ROOT_DIR}/artifacts/ci/pr-governance"
+OUT_DIR="${ROOT_DIR}/artifacts/ci/preflight/pr-governance"
 RAW_LOG="${OUT_DIR}/raw.log"
 SUMMARY_MD="${OUT_DIR}/summary.md"
 
@@ -105,7 +105,7 @@ if [[ "${CHECKLIST_COUNT}" -lt 8 ]]; then
   fail "Zu wenige Checklistenpunkte (${CHECKLIST_COUNT} < 8)"
 fi
 
-if ! grep -Fq -- "security/code-scanning/tools" <<< "${PR_BODY}" && ! grep -Fq -- "0 offene Alerts" <<< "${PR_BODY}"; then
+if ! grep -Fq -- "security/code-scanning/tools" <<< "${PR_BODY}" || ! grep -Fq -- "0 offene Alerts" <<< "${PR_BODY}"; then
   fail "Pflichtaussage fuer Code-Scanning-0-Alert fehlt"
 fi
 
