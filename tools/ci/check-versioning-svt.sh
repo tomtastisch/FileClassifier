@@ -59,6 +59,7 @@ report_path = repo_root / "artifacts" / "versioning_report.json"
 violations = []
 checks = []
 require_release_tag = os.environ.get("REQUIRE_RELEASE_TAG", "0") == "1"
+expected_release_tag = os.environ.get("EXPECTED_RELEASE_TAG", "").strip()
 
 
 def rel(p: Path) -> str:
@@ -123,13 +124,26 @@ except Exception as ex:
     fail("git.tag_lookup", "command succeeds", "failed", ".git", f"Failed to resolve HEAD tags: {ex}")
 
 head_tags = sorted(set(head_tags))
-if len(head_tags) == 0:
+expected_version = ""
+if expected_release_tag:
+    if not re.match(r"^v[0-9]+\.[0-9]+\.[0-9]+$", expected_release_tag):
+        fail("svt.expected_release_tag", "vX.Y.Z", expected_release_tag, "env:EXPECTED_RELEASE_TAG", "Invalid EXPECTED_RELEASE_TAG format")
+    else:
+        expected_version = expected_release_tag[1:]
+        checks.append({
+            "scope": "svt.expected_release_tag",
+            "status": "pass",
+            "expected": expected_release_tag,
+            "actual": expected_release_tag,
+            "evidence": "env:EXPECTED_RELEASE_TAG",
+        })
+elif len(head_tags) == 0:
     if require_release_tag:
         fail("svt.head_tag", "exactly one tag vX.Y.Z on HEAD", "none", ".git", "No exact release tag on HEAD")
 elif len(head_tags) > 1:
     fail("svt.head_tag", "exactly one tag vX.Y.Z on HEAD", ",".join(head_tags), ".git", "Multiple release tags on HEAD")
-
-expected_version = head_tags[0][1:] if len(head_tags) == 1 else ""
+else:
+    expected_version = head_tags[0][1:]
 # --- repo SSOT version consistency (no mixed versions) ---
 def read_repo_version(props_path: Path) -> str:
     if not props_path.exists():
