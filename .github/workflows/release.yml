@@ -43,7 +43,7 @@ jobs:
         id: tag
         shell: bash
         env:
-          GITHUB_REF_NAME: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag || github.ref_name }}
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag || github.ref_name }}
         run: bash tools/ci/release/derive_tag_outputs.sh
 
       - name: Restore (locked mode)
