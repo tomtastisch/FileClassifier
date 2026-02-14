@@ -20,9 +20,10 @@ Die aktive Trusted-Publishing-Policy ist an folgende Identität gebunden:
   - `REQUIRE_REGISTRATION=1`
   - `REQUIRE_SEARCH=0` (Search ist aus dem blocking Gate entkoppelt).
 - Default-Wartefenster für Gate 4:
-  - `SVT_POSTPUBLISH_RETRY_COUNT=59`
+  - `SVT_POSTPUBLISH_RETRY_SCHEDULE_SECONDS=2,3,5,8,13,21,34,55,89,89,89`
+  - `SVT_POSTPUBLISH_RETRY_COUNT=11` (dynamisch aus Schedule-Länge, sofern nicht explizit gesetzt)
   - `SVT_POSTPUBLISH_RETRY_SLEEP_SECONDS=10`
-  - entspricht deterministisch einem Retry-Sleep-Budget von bis zu 590s (9m50s) zuzüglich HTTP-Timeout-Anteilen pro Versuch.
+  - entspricht deterministisch einem Retry-Sleep-Budget von bis zu 408s (6m48s) zuzüglich HTTP-Timeout-Anteilen pro Versuch.
 - Bei Incident-Diagnose kann das Fenster über die beiden Variablen erhöht werden, ohne Workflow-Jobnamen oder Required Contexts zu ändern.
 
 ## 5. Entkoppelte Online-Konvergenz (Async)

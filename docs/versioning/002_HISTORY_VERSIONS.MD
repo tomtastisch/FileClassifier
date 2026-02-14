@@ -8,10 +8,11 @@ Heuristik fuer die Rueckwirkungs-Zuordnung:
 - `docs|test|ci|chore|tooling|refactor|fix` => Patch
 
 Aktueller Entwicklungsstand:
-- Aktuelle Entwicklungslinie enthält `5.x` (aktuell veroeffentlichtes Tag: `v5.1.0`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
+- Aktuelle Entwicklungslinie enthält `5.x` (aktuell veroeffentlichtes Tag: `v5.1.1`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
 
 | Version | Kurzbeschreibung | Commit | Keyword |
 |---|---|---|---|
+| `5.1.2` | Optimize Gate4 NuGet post-publish polling with adaptive retry schedule and bump patch version | pending merge commit | patch |
 | `5.1.1` | Dependabot security-only mode und fail-closed Guards fuer secret-pflichtige Workflows | [d0ad8ec](https://github.com/tomtastisch/FileClassifier/commit/d0ad8ec) | patch |
 | `5.1.0` | Security/Governance hardening wave: pinned actions, dependency review, labeler fixes, root assurance index | [e2a4a42](https://github.com/tomtastisch/FileClassifier/commit/e2a4a42) | minor |
 | `5.0.0` | Finalize hashing API rename to EvidenceHashing and add optional HMAC digests | [444d027](https://github.com/tomtastisch/FileClassifier/commit/444d027) | breaking |

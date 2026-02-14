@@ -56,7 +56,8 @@ Relevante Inputs:
 - `REQUIRE_FLATCONTAINER`: aktiviert/deaktiviert Flatcontainer als Pflichtcheck (`1`/`0`, Default `1`).
 
 Release-Gate-4 (post-publish) nutzt eigene Defaults über den Wrapper:
-- `SVT_POSTPUBLISH_RETRY_COUNT` (Default `59`)
+- `SVT_POSTPUBLISH_RETRY_SCHEDULE_SECONDS` (Default `2,3,5,8,13,21,34,55,89,89,89`)
+- `SVT_POSTPUBLISH_RETRY_COUNT` (Default: Anzahl Schedule-Elemente, aktuell `11`; optional explizit überschreibbar)
 - `SVT_POSTPUBLISH_RETRY_SLEEP_SECONDS` (Default `10`)
 - Blocking-Scope im Release:
   - `REQUIRE_SEARCH=0`
