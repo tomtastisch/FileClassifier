@@ -269,6 +269,12 @@ run_versioning_svt() {
   ci_result_append_summary "Versioning SVT checks completed."
 }
 
+run_version_convergence() {
+  local remote_required="${REQUIRE_REMOTE:-0}"
+  run_or_fail "CI-VERSION-002" "Version convergence (repo/docs/package, require_remote=${remote_required})" env ROOT_DIR="${ROOT_DIR}" OUT_DIR="${OUT_DIR}" REQUIRE_REMOTE="${remote_required}" bash "${ROOT_DIR}/tools/versioning/verify-version-convergence.sh"
+  ci_result_append_summary "Version convergence checks completed."
+}
+
 run_consumer_smoke() {
   local pack_out_dir="${ROOT_DIR}/artifacts/ci/pack/nuget"
   local consumer_project="${ROOT_DIR}/samples/PortableConsumer/PortableConsumer.csproj"
@@ -478,6 +484,7 @@ main() {
     pack) run_pack ;;
     naming-snt) run_naming_snt ;;
     versioning-svt) run_versioning_svt ;;
+    version-convergence) run_version_convergence ;;
     consumer-smoke) run_consumer_smoke ;;
     package-backed-tests) run_package_backed_tests ;;
     build) run_build ;;

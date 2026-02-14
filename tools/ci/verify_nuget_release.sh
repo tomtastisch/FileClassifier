@@ -215,52 +215,9 @@ PY
 
 query_registration() {
   if [[ -z "${REGISTRATION_URL}" ]]; then
-    local discovered_url
-    if discovered_url="$(curl -fsS --max-time "${TIMEOUT_SECONDS}" "https://api.nuget.org/v3/index.json" \
-      | python3 - "$PKG_ID" <<'PY'
-import json
-import sys
-
-pkg_id = sys.argv[1].lower()
-index = json.load(sys.stdin)
-resources = index.get("resources", [])
-
-reg_urls = []
-for resource in resources:
-    if not isinstance(resource, dict):
-        continue
-    rid = resource.get("@id")
-    rtype = resource.get("@type")
-    if not isinstance(rid, str) or not isinstance(rtype, str):
-        continue
-    if "RegistrationsBaseUrl".lower() in rtype.lower():
-        reg_urls.append((rtype.lower(), rid.rstrip("/")))
-
-chosen = ""
-for rtype, rid in reg_urls:
-    if "semver2" in rtype:
-        chosen = rid
-        break
-if not chosen and reg_urls:
-    chosen = reg_urls[0][1]
-if not chosen:
-    print("")
-    sys.exit(0)
-
-print(f"{chosen}/{pkg_id}/index.json")
-PY
-    )"; then
-      :
-    else
-      discovered_url=""
-    fi
-    if [[ -n "${discovered_url}" ]]; then
-      REGISTRATION_URL="${discovered_url}"
-    else
-      local pkg_id_lc
-      pkg_id_lc="$(printf '%s' "${PKG_ID}" | tr '[:upper:]' '[:lower:]')"
-      REGISTRATION_URL="https://api.nuget.org/v3/registration5-semver1/${pkg_id_lc}/index.json"
-    fi
+    local pkg_id_lc
+    pkg_id_lc="$(printf '%s' "${PKG_ID}" | tr '[:upper:]' '[:lower:]')"
+    REGISTRATION_URL="https://api.nuget.org/v3/registration5-semver1/${pkg_id_lc}/index.json"
   fi
 
   local response
