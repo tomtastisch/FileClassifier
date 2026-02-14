@@ -7,6 +7,9 @@ if [[ -z "${repo}" ]]; then
   exit 2
 fi
 
+BASE_GH_TOKEN="${GH_TOKEN:-}"
+CODEQL_TOKEN="${CODEQL_DEFAULT_SETUP_GUARDRAIL_TOKEN:-}"
+
 retry() {
   local -r max="${1}"; shift
   local -r base_sleep="${1}"; shift
@@ -27,10 +30,15 @@ retry() {
 }
 
 state=""
+if [[ -n "${CODEQL_TOKEN}" ]]; then
+  export GH_TOKEN="${CODEQL_TOKEN}"
+fi
 if ! state="$(retry 4 1 gh api "repos/${repo}/code-scanning/default-setup" --jq .state)"; then
+  export GH_TOKEN="${BASE_GH_TOKEN}"
   echo "ERROR: failed to query CodeQL default-setup state via GitHub API." >&2
   exit 3
 fi
+export GH_TOKEN="${BASE_GH_TOKEN}"
 
 if [[ "${state}" == "not-configured" ]]; then
   echo "INFO: state is not-configured; no drift issue required."
@@ -75,4 +83,3 @@ for label in "${desired_labels[@]}"; do
     echo "INFO: label '${label}' not present in repo; skipping."
   fi
 done
-

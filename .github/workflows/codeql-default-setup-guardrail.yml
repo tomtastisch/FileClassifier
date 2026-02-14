@@ -9,7 +9,6 @@ on:
 permissions:
   contents: read
   issues: write
-  administration: read
 
 concurrency:
   group: codeql-default-setup-guardrail
@@ -30,6 +29,7 @@ jobs:
         id: state
         env:
           GH_TOKEN: ${{ github.token }}
+          CODEQL_DEFAULT_SETUP_GUARDRAIL_TOKEN: ${{ secrets.CODEQL_DEFAULT_SETUP_GUARDRAIL_TOKEN }}
         run: bash tools/ci/codeql-default-setup-guardrail/get_state.sh
 
       - name: Open Issue On Drift (idempotent)
@@ -37,6 +37,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+          CODEQL_DEFAULT_SETUP_GUARDRAIL_TOKEN: ${{ secrets.CODEQL_DEFAULT_SETUP_GUARDRAIL_TOKEN }}
         run: bash tools/ci/codeql-default-setup-guardrail/ensure_issue.sh
 
       - name: Fail Run On Drift (fail-closed)

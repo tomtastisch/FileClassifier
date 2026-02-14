@@ -13,6 +13,9 @@ DEFAULT_SETUP_JSON="${OUT_DIR}/default-setup.json"
 mkdir -p "${OUT_DIR}"
 : > "${RAW_LOG}"
 
+BASE_GH_TOKEN="${GH_TOKEN:-}"
+CODEQL_TOKEN="${CODEQL_DEFAULT_SETUP_GUARDRAIL_TOKEN:-}"
+
 log() {
   printf '%s\n' "$*" | tee -a "${RAW_LOG}" >/dev/null
 }
@@ -54,10 +57,18 @@ attempt=1
 delay=2
 max_attempts=3
 while true; do
+  if [[ -n "${CODEQL_TOKEN}" ]]; then
+    export GH_TOKEN="${CODEQL_TOKEN}"
+  fi
   if gh api "repos/${REPO}/code-scanning/default-setup" > "${DEFAULT_SETUP_JSON}" 2>> "${RAW_LOG}"; then
+    export GH_TOKEN="${BASE_GH_TOKEN}"
     break
   fi
+  export GH_TOKEN="${BASE_GH_TOKEN}"
   if (( attempt >= max_attempts )); then
+    if rg -n "Resource not accessible by integration \\(HTTP 403\\)" "${RAW_LOG}" >/dev/null 2>&1; then
+      fail "GitHub API 403 fuer CodeQL Default Setup. GITHUB_TOKEN reicht hier nicht aus; setze Secret CODEQL_DEFAULT_SETUP_GUARDRAIL_TOKEN (Fine-Grained PAT, Repo: Administration Read, Security Events Read)."
+    fi
     fail "GitHub API fuer CodeQL Default Setup fehlgeschlagen"
   fi
   log "WARN: API-Fehler, retry ${attempt}/${max_attempts}"

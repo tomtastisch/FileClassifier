@@ -11,7 +11,6 @@ permissions:
   contents: read
   security-events: read
   pull-requests: read
-  administration: read
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -83,6 +82,7 @@ jobs:
       - name: Run Entry Check
         env:
           GH_TOKEN: ${{ github.token }}
+          CODEQL_DEFAULT_SETUP_GUARDRAIL_TOKEN: ${{ secrets.CODEQL_DEFAULT_SETUP_GUARDRAIL_TOKEN }}
         run: bash -euo pipefail tools/ci/bin/run.sh preflight
       - name: Upload Artifact
         if: always()
