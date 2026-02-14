@@ -15,10 +15,10 @@ jobs:
     name: ci
     runs-on: ubuntu-latest
     steps:
-      - run: echo "ruleset placeholder check: ci"
+      - run: 'echo "ruleset placeholder check: ci"'
 
   version-policy:
     name: version-policy
     runs-on: ubuntu-latest
     steps:
-      - run: echo "ruleset placeholder check: version-policy"
+      - run: 'echo "ruleset placeholder check: version-policy"'
