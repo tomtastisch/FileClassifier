@@ -1,0 +1,66 @@
+name: codeql
+
+# NOTE: This workflow is an "advanced configuration". GitHub CodeQL "default setup"
+# must be set to "not-configured" for this repository, otherwise SARIF uploads will fail.
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  schedule:
+    # Weekly scan to catch new CodeQL queries or dependency drift.
+    - cron: "23 3 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  analyze:
+    name: Analyze (csharp)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ["csharp"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: "10.0.102"
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@f5c2471be782132e47a6e6f9c725e56730d6e9a3 # v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: manual
+          queries: security-and-quality
+
+      - name: Build (CodeQL traced)
+        run: |
+          dotnet restore --locked-mode -v minimal FileClassifier.sln
+          dotnet build -c Release --no-restore -v minimal FileClassifier.sln
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@f5c2471be782132e47a6e6f9c725e56730d6e9a3 # v3
+        with:
+          category: "/language:${{ matrix.language }}"
