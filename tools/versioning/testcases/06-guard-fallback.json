@@ -6,7 +6,7 @@
   "version_reason": "guard-unavailable-fallback",
   "pr_title": "chore: metadata",
   "expect": {
-    "version_label": "version:none",
+    "version_label": "versioning:none",
     "primary": "chore",
     "impl": "impl:config",
     "area_contains": ["area:versioning"]

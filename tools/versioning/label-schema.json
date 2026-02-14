@@ -13,10 +13,10 @@
     "chore"
   ],
   "allowed_labels": [
-    "version:major",
-    "version:minor",
-    "version:patch",
-    "version:none",
+    "versioning:major",
+    "versioning:minor",
+    "versioning:patch",
+    "versioning:none",
     "breaking",
     "feature",
     "fix",

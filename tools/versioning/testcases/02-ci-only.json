@@ -6,7 +6,7 @@
   "version_reason": "pipeline-or-tooling-changed",
   "pr_title": "ci: adjust pipeline",
   "expect": {
-    "version_label": "version:patch",
+    "version_label": "versioning:patch",
     "primary": "ci",
     "impl": "impl:config",
     "area_contains": ["area:pipeline"]
