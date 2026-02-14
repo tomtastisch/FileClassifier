@@ -1,0 +1,24 @@
+name: ruleset-placeholders
+
+on:
+  pull_request:
+    branches: ["main"]
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: ci
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "ruleset placeholder check: ci"
+
+  version-policy:
+    name: version-policy
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "ruleset placeholder check: version-policy"
