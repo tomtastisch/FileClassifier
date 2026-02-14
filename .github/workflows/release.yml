@@ -180,4 +180,4 @@ jobs:
 
       - name: Gate 4 - SVT post-publish (git version == package version == nuget version)
         shell: bash
-        run: bash tools/ci/release/gate4_verify_postpublish.sh "${GITHUB_REF_NAME#v}" "${{ steps.nupkg.outputs.path }}"
+        run: bash tools/ci/release/gate4_verify_postpublish.sh "${{ steps.tag.outputs.version }}" "${{ steps.nupkg.outputs.path }}"
