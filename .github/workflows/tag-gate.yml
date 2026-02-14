@@ -1,0 +1,63 @@
+name: Tag Gate
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.102
+
+      - name: Gate - validate tag format (stable/rc)
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+
+          STABLE_RE='^v[0-9]+\.[0-9]+\.[0-9]+$'
+          RC_RE='^v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$'
+
+          if [[ "$TAG" =~ $STABLE_RE ]]; then
+            echo "OK: stable tag $TAG"
+          elif [[ "$TAG" =~ $RC_RE ]]; then
+            echo "OK: rc tag $TAG"
+          else
+            echo "FAIL: invalid tag format: $TAG" >&2
+            exit 1
+          fi
+
+      - name: Gate - derive tag outputs (SSOT)
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: bash tools/ci/release/derive_tag_outputs.sh
+
+      - name: Evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/tag-gate
+          printf '%s\n' "${GITHUB_REF_NAME}" > artifacts/tag-gate/tag.txt
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: tag-gate-evidence
+          path: artifacts/tag-gate/
+          if-no-files-found: error
