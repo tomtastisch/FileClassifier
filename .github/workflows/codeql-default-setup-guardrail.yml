@@ -1,0 +1,43 @@
+name: codeql-default-setup-guardrail
+
+on:
+  schedule:
+    # Daily drift detection for security settings that cannot be protected by branch rules.
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: codeql-default-setup-guardrail
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  guardrail:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Read CodeQL Default Setup State
+        id: state
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash tools/ci/codeql-default-setup-guardrail/get_state.sh
+
+      - name: Open Issue On Drift (idempotent)
+        if: steps.state.outputs.drift == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: bash tools/ci/codeql-default-setup-guardrail/ensure_issue.sh
+
+      - name: Fail Run On Drift (fail-closed)
+        if: steps.state.outputs.drift == 'true'
+        run: exit 1
