@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "channels": {
+    "stable": {
+      "tag_regex": "^v\\d+\\.\\d+\\.\\d+$"
+    },
+    "rc": {
+      "tag_regex": "^v\\d+\\.\\d+\\.\\d+-rc\\.\\d+$"
+    },
+    "baseline": {
+      "description": "X.Y.0 baseline of latest stable minor"
+    }
+  },
+  "semver": {
+    "strip_leading_v": true,
+    "stable_precedence_over_prerelease": true
+  },
+  "enforcement": {
+    "fail_if_rc_matches_any_existing_stable_same_xyz": true,
+    "fail_if_rc_version_lte_latest_stable": true
+  },
+  "labels": {
+    "versioning": {
+      "required_exactly_one": true,
+      "allowed": [
+        "versioning:none",
+        "versioning:patch",
+        "versioning:minor",
+        "versioning:major"
+      ],
+      "map": {
+        "none": "versioning:none",
+        "patch": "versioning:patch",
+        "minor": "versioning:minor",
+        "major": "versioning:major"
+      }
+    },
+    "informational": [
+      "release:rc"
+    ]
+  },
+  "classification": {
+    "api_relevant_prefixes": [
+      "src/",
+      "src/FileTypeDetection/",
+      "src/FileClassifier.App/"
+    ],
+    "api_relevant_files": [
+      "docs/010_API_CORE.MD",
+      "docs/references/001_REFERENCES_CORE.MD",
+      "docs/contracts/001_CONTRACT_HASHING.MD"
+    ],
+    "non_api_prefixes": [
+      "docs/",
+      ".github/",
+      "tools/"
+    ],
+    "non_api_files": [
+      "README.md"
+    ]
+  },
+  "retention": {
+    "stable_keep": 2,
+    "baseline_keep": 1,
+    "rc_keep": 1
+  }
+}

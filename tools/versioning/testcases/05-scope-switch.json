@@ -5,9 +5,9 @@
   "actual": "patch",
   "version_reason": "pipeline-or-tooling-changed",
   "pr_title": "chore: tighten versioning tooling",
-  "existing_labels": ["feature", "impl:quality", "area:detection", "version:minor"],
+  "existing_labels": ["feature", "impl:quality", "area:detection", "versioning:minor"],
   "expect": {
-    "version_label": "version:patch",
+    "version_label": "versioning:patch",
     "primary": "ci",
     "impl": "impl:config",
     "area_exact": ["area:tooling", "area:pipeline"]

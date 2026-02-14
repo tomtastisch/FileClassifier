@@ -34,13 +34,13 @@ jobs:
             addIf(text.includes('chore') || text.includes('cleanup'), 'chore');
 
             // SemVer labels by explicit hints
-            addIf(text.includes('version:major') || text.includes('major'), 'version:major');
-            addIf(text.includes('version:minor') || text.includes('minor'), 'version:minor');
-            addIf(text.includes('version:patch') || text.includes('patch'), 'version:patch');
-            addIf(text.includes('version:none') || text.includes('no version'), 'version:none');
+            addIf(text.includes('versioning:major') || text.includes('major'), 'versioning:major');
+            addIf(text.includes('versioning:minor') || text.includes('minor'), 'versioning:minor');
+            addIf(text.includes('versioning:patch') || text.includes('patch'), 'versioning:patch');
+            addIf(text.includes('versioning:none') || text.includes('no version'), 'versioning:none');
 
             if (labels.size === 0) {
-              labels.add('version:none');
+              labels.add('versioning:none');
             }
 
             await github.rest.issues.addLabels({

@@ -9,7 +9,7 @@
   "version_reason": "docs-test-ci-tooling",
   "pr_title": "docs: update ci docs",
   "expect": {
-    "version_label": "version:patch",
+    "version_label": "versioning:patch",
     "primary": "docs",
     "impl": "impl:docs",
     "area_contains": [

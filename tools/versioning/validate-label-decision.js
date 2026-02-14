@@ -50,9 +50,9 @@ function validate() {
     }
   }
 
-  const versionLabels = decision.labels_to_add.filter((label) => label.startsWith('version:'));
+  const versionLabels = decision.labels_to_add.filter((label) => label.startsWith('versioning:'));
   if (versionLabels.length !== 1) {
-    fail(`expected exactly 1 version:* label, got ${versionLabels.length}`);
+    fail(`expected exactly 1 versioning:* label, got ${versionLabels.length}`);
   }
 
   const primaryLabels = decision.labels_to_add.filter((label) => (schema.primary_labels || []).includes(label));

@@ -1,60 +1,46 @@
-name: version-policy
+name: versioning-policy
 
 permissions:
   contents: read
+  pull-requests: read
+  issues: read
 
 'on':
   pull_request:
   workflow_dispatch:
 
 jobs:
-  version-policy:
-    name: version-policy
+  versioning-policy:
+    name: versioning-policy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
           fetch-tags: true
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          dotnet-version: 10.0.x
-      - name: Run versioning SVT (PR-safe)
+          node-version: "20"
+      - name: Evaluate RaC versioning policy
         env:
-          CI_DEFER_ARTIFACT_LINK_RESOLUTION: "1"
-        run: bash tools/ci/bin/run.sh versioning-svt
-      - name: Run version convergence (PR-safe)
-        env:
-          REQUIRE_REMOTE: "0"
-        run: bash tools/ci/bin/run.sh version-convergence
-      - name: Upload versioning SVT artifact (ci-versioning-svt)
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${PR_NUMBER:-}" ]]; then
+            echo "versioning-policy: pull_request context required" >&2
+            exit 1
+          fi
+          mkdir -p artifacts/policy
+          files_json="$(python3 tools/ci/bin/github_api.py pr-files --repo "${REPO}" --pr "${PR_NUMBER}")"
+          labels_json="$(python3 tools/ci/bin/github_api.py issue-labels --repo "${REPO}" --issue "${PR_NUMBER}")"
+          FILES_JSON="${files_json}" EXISTING_LABELS_JSON="${labels_json}" OUT_DIR="artifacts/policy" node tools/versioning/evaluate-versioning-policy.js
+      - name: Upload versioning policy artifacts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: ci-versioning-svt
-          path: artifacts/ci/versioning-svt/
+          name: versioning-policy-artifacts
+          path: artifacts/policy/
           if-no-files-found: error
-      - name: Upload version convergence artifact (ci-version-convergence)
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: ci-version-convergence
-          path: artifacts/ci/version-convergence/
-          if-no-files-found: error
-      - name: Verify ci-versioning-svt artifact exists (post-upload)
-        if: always()
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          out="artifacts/ci/versioning-svt/version-policy_artifacts.json"
-          python3 tools/ci/bin/verify_run_artifact.py --repo "${GITHUB_REPOSITORY}" --run-id "${GITHUB_RUN_ID}" --artifact-name "ci-versioning-svt" --out "$out"
-      - name: Verify ci-version-convergence artifact exists (post-upload)
-        if: always()
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          out="artifacts/ci/version-convergence/version-policy_artifacts.json"
-          python3 tools/ci/bin/verify_run_artifact.py --repo "${GITHUB_REPOSITORY}" --run-id "${GITHUB_RUN_ID}" --artifact-name "ci-version-convergence" --out "$out"

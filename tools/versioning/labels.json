@@ -1,8 +1,12 @@
 {
-  "version:major": {"color": "B60205", "description": "Breaking change; requires MAJOR bump"},
-  "version:minor": {"color": "0E8A16", "description": "New compatible functionality; requires MINOR bump"},
-  "version:patch": {"color": "1D76DB", "description": "Fix/Refactor/Docs/CI/Tooling; requires PATCH bump"},
-  "version:none": {"color": "D4C5F9", "description": "No version bump required (meta-only change)"},
+  "versioning:major": {"color": "B60205", "description": "Breaking change; requires MAJOR bump"},
+  "versioning:minor": {"color": "0E8A16", "description": "New compatible functionality; requires MINOR bump"},
+  "versioning:patch": {"color": "1D76DB", "description": "Fix/Refactor/Docs/CI/Tooling; requires PATCH bump"},
+  "versioning:none": {"color": "D4C5F9", "description": "No version bump required (meta-only change)"},
+  "version:major": {"color": "B60205", "description": "Legacy label (migration cleanup)"},
+  "version:minor": {"color": "0E8A16", "description": "Legacy label (migration cleanup)"},
+  "version:patch": {"color": "1D76DB", "description": "Legacy label (migration cleanup)"},
+  "version:none": {"color": "D4C5F9", "description": "Legacy label (migration cleanup)"},
 
   "breaking": {"color": "B60205", "description": "Primary label: public API/behavior breaking change"},
   "feature": {"color": "0E8A16", "description": "Primary label: new compatible feature or datatype"},

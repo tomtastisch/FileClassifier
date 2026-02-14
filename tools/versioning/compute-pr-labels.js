@@ -2,6 +2,7 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
 
 const PRIMARY_PRIORITY = [
   'breaking',
@@ -32,6 +33,18 @@ const AREA_RULES = [
   { exact: 'README.md', label: 'area:docs' },
   { prefix: 'tools/', label: 'area:tooling' },
 ];
+
+function loadRacPolicy() {
+  const policyPath = process.env.RAC_POLICY_PATH || 'tools/versioning/rac-policy.json';
+  const absPath = path.resolve(policyPath);
+  const raw = fs.readFileSync(absPath, 'utf-8');
+  const policy = JSON.parse(raw);
+  const versionMap = policy?.labels?.versioning?.map;
+  if (!versionMap || !versionMap.none || !versionMap.patch || !versionMap.minor || !versionMap.major) {
+    throw new Error(`Invalid RaC policy version label map in ${policyPath}`);
+  }
+  return policy;
+}
 
 function parseJsonEnv(name, fallback) {
   const value = process.env[name];
@@ -149,10 +162,10 @@ function computeAreas(files) {
   return result;
 }
 
-function resolveVersionLabel(required) {
+function resolveVersionLabel(required, racPolicy) {
   const allowed = new Set(['major', 'minor', 'patch', 'none']);
   const normalized = allowed.has(required) ? required : 'none';
-  return `version:${normalized}`;
+  return racPolicy.labels.versioning.map[normalized];
 }
 
 function readAutoLabelScope() {
@@ -170,7 +183,8 @@ function computeDecision(input) {
   const prTitle = input.prTitle;
   const existingLabels = input.existingLabels;
 
-  const versionLabel = resolveVersionLabel(required);
+  const racPolicy = loadRacPolicy();
+  const versionLabel = resolveVersionLabel(required, racPolicy);
   const primaryLabel = computePrimary(required, files, prTitle);
   const implLabel = computeImpl(files);
   const areaLabels = computeAreas(files);
