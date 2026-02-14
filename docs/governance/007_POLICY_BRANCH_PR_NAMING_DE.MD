@@ -7,6 +7,7 @@ Diese Policy definiert ein einheitliches, professionelles und maschinenpruefbare
 
 ### 2.1 Branches
 - Muss-Format: `codex/<tag>/<kurztext-kebab>`
+- Uebergang (legacy, befristet): `codex/<tag>-<kurztext-kebab>` wird fuer bestehende Branches akzeptiert.
 - Erlaubte `<tag>`:
   - `fix`
   - `release`

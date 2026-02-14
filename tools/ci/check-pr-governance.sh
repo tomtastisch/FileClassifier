@@ -15,6 +15,7 @@ log() {
 
 fail() {
   log "FAIL: $*"
+  printf 'FAIL: %s\n' "$*" >&2
   {
     echo "# PR Governance"
     echo
@@ -72,7 +73,7 @@ if [[ -z "${PR_TITLE}" ]]; then
   fail "PR-Titel fehlt"
 fi
 
-BRANCH_REGEX='^codex/(fix|release|feat|refactor|docs|test|ci|chore|security)/[a-z0-9][a-z0-9-]{2,}$'
+BRANCH_REGEX='^codex/(fix|release|feat|refactor|docs|test|ci|chore|security)(/[a-z0-9][a-z0-9-]{2,}|-[a-z0-9][a-z0-9-]{2,})$'
 TITLE_REGEX='^(fix|release|feat|refactor|docs|test|ci|chore|security)(\([a-z0-9-]+\))?: .+'
 
 if [[ ! "${BRANCH_NAME}" =~ ${BRANCH_REGEX} ]]; then
