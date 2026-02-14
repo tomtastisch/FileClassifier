@@ -14,6 +14,15 @@
         "resolved": "6.0.4",
         "contentHash": "Qa7Hg+wrOMDKpXVn2dw4Wlun490bIWsFW0fdNJQFJLZnbU27MCP0HJ2mPgS+3EQBQUb0zKlkwiQzP+j38Hc3Iw=="
       },
+      "FsCheck": {
+        "type": "Direct",
+        "requested": "[3.2.0, )",
+        "resolved": "3.2.0",
+        "contentHash": "NrPg83xMofIEjInYxPqnZQGv6q/xUKCP67yWJ7kUKu+vjpguQvzsqhWQfLYOanVIqUqXa54ot67cOPJ3twdYLA==",
+        "dependencies": {
+          "FSharp.Core": "5.0.2"
+        }
+      },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
         "requested": "[18.0.1, )",
@@ -76,6 +85,11 @@
         "type": "Transitive",
         "resolved": "30.1.0",
         "contentHash": "HDfIzDd7JFDEwiNHpgOHBPEiyVjXQws+CEnVb+Lwiq58jHNA/xYwmTswbqknOxcAejCRFP1de/hHHw+ZuTzV6A=="
+      },
+      "FSharp.Core": {
+        "type": "Transitive",
+        "resolved": "5.0.2",
+        "contentHash": "DpcajqENgb3VXaHw1FKfVS+TWwEzck1PCajqLwBAVrtd1lfxd7T8JISVZBdV1mX9+2g48+tIgpNaVJWObdMrBw=="
       },
       "Gherkin": {
         "type": "Transitive",

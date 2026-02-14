@@ -177,6 +177,8 @@ build_validators() {
 run_preflight() {
   build_validators
   run_or_fail "CI-PREFLIGHT-001" "Label engine tests" node "${ROOT_DIR}/tools/versioning/test-compute-pr-labels.js"
+  run_or_fail "CI-PREFLIGHT-001" "PR governance checks" bash "${ROOT_DIR}/tools/ci/check-pr-governance.sh"
+  run_or_fail "CI-PREFLIGHT-001" "Code scanning tools open alerts must be zero" bash "${ROOT_DIR}/tools/ci/check-code-scanning-tools-zero.sh"
   run_or_fail "CI-PREFLIGHT-001" "Doc consistency drift guard" python3 "${ROOT_DIR}/tools/check-doc-consistency.py"
   run_or_fail "CI-PREFLIGHT-001" "Doc shell compatibility guard" python3 "${ROOT_DIR}/tools/check-doc-shell-compat.py"
   run_or_fail "CI-PREFLIGHT-001" "Docs checker unit tests" python3 -m unittest discover -s "${ROOT_DIR}/tools/tests" -p "test_*.py" -v
