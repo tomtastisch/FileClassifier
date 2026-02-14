@@ -96,3 +96,6 @@ artifacts/
 /.tmp/
 qodana-artifacts/
 qodana-results/
+
+# codex local overrides (must stay local)
+AGENTS.override.md

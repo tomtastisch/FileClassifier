@@ -18,6 +18,7 @@ Root landing page for third parties: `SECURITY_ASSURANCE_INDEX.md`.
 - `docs/audit/008_INCIDENT_RESPONSE_RUNBOOK.MD`
 - `docs/audit/009_SUPPLY_CHAIN_BASELINE.MD`
 - `docs/audit/010_REFACTOR_BACKLOG.MD`
+- `docs/audit/013_SCORECARD_GOVERNANCE_ALERT_MAPPING.MD`
 
 ## Machine Evidence
 - `artifacts/ci/security-claims-evidence/`
@@ -35,6 +36,7 @@ bash tools/audit/verify-security-claims.sh
 bash tools/audit/verify-code-analysis-evidence.sh
 bash tools/audit/generate-code-analysis-json.sh
 python3 tools/check-docs.py
+bash tools/versioning/verify-version-convergence.sh
 ```
 
 ## External Assurance

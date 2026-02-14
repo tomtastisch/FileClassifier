@@ -9,12 +9,14 @@ on:
 
 permissions:
   contents: read
-  security-events: write
 
 jobs:
   qodana:
     if: github.event_name != 'pull_request' || github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
     env:
       QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
     steps:

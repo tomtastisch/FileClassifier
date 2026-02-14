@@ -24,6 +24,10 @@ jobs:
         env:
           CI_DEFER_ARTIFACT_LINK_RESOLUTION: "1"
         run: bash tools/ci/bin/run.sh versioning-svt
+      - name: Run version convergence (PR-safe)
+        env:
+          REQUIRE_REMOTE: "0"
+        run: bash tools/ci/bin/run.sh version-convergence
       - name: Upload versioning SVT artifact (ci-versioning-svt)
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
