@@ -125,6 +125,8 @@ except Exception as ex:
 
 head_tags = sorted(set(head_tags))
 expected_version = ""
+# workflow_dispatch releases provide EXPECTED_RELEASE_TAG explicitly.
+# tag-push releases derive the expected version from the exact release tag on HEAD.
 if expected_release_tag:
     if not re.match(r"^v[0-9]+\.[0-9]+\.[0-9]+$", expected_release_tag):
         fail("svt.expected_release_tag", "vX.Y.Z", expected_release_tag, "env:EXPECTED_RELEASE_TAG", "Invalid EXPECTED_RELEASE_TAG format")
