@@ -189,19 +189,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag || github.ref_name }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          version="${RELEASE_TAG#v}"
-          prerelease_flag=""
-          if [[ "${RELEASE_TAG}" =~ -rc\.[0-9]+$ ]]; then
-            prerelease_flag="--prerelease"
-          fi
-          if gh release view "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
-            gh release edit "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" --title "${RELEASE_TAG}" ${prerelease_flag}
-          else
-            gh release create "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" --title "${RELEASE_TAG}" --notes "Automated tag-only release for ${version}" ${prerelease_flag}
-          fi
+        run: bash tools/ci/release/upsert_github_release.sh
 
       - name: Attest package provenance
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
