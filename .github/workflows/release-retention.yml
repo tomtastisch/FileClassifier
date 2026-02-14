@@ -1,0 +1,47 @@
+name: Release Retention
+
+on:
+  workflow_run:
+    workflows: ["Release Publish"]
+    types: [completed]
+  schedule:
+    - cron: '0 4 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  retention:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Setup .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.102
+      - name: Apply retention (GH Releases + NuGet unlist + GH Packages delete)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          OWNER: ${{ github.repository_owner }}
+          PACKAGE_ID: Tomtastisch.FileClassifier
+          NUGET_PACKAGE_ID: tomtastisch.fileclassifier
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          OUT_DIR: artifacts/retention
+        run: bash tools/ci/release/retention_apply.sh
+      - name: Upload retention artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-retention-artifacts
+          path: artifacts/retention/
+          if-no-files-found: error

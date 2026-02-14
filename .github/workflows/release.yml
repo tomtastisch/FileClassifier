@@ -15,8 +15,37 @@ permissions:
   contents: read
 
 jobs:
+  tag-gate:
+    runs-on: ubuntu-latest
+    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "20"
+      - name: Tag gate (fail-closed)
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag || github.ref_name }}
+          OUT_DIR: artifacts/tag-gate
+        run: node tools/versioning/tag-gate.js
+      - name: Upload tag-gate artifact
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: tag-gate-artifacts
+          path: artifacts/tag-gate/
+          if-no-files-found: error
+
   version-policy:
     runs-on: ubuntu-latest
+    needs: tag-gate
     if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
@@ -99,7 +128,7 @@ jobs:
     needs: version-policy
     if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) || github.event_name == 'workflow_dispatch'
     permissions:
-      contents: read
+      contents: write
       packages: write
       id-token: write
       attestations: write
@@ -155,6 +184,24 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: bash tools/ci/release/publish_github_packages.sh "${{ steps.nupkg.outputs.path }}" "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+
+      - name: Create or update GitHub Release (stable/rc by tag)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag || github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#v}"
+          prerelease_flag=""
+          if [[ "${RELEASE_TAG}" =~ -rc\.[0-9]+$ ]]; then
+            prerelease_flag="--prerelease"
+          fi
+          if gh release view "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh release edit "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" --title "${RELEASE_TAG}" ${prerelease_flag}
+          else
+            gh release create "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" --title "${RELEASE_TAG}" --notes "Automated tag-only release for ${version}" ${prerelease_flag}
+          fi
 
       - name: Attest package provenance
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
