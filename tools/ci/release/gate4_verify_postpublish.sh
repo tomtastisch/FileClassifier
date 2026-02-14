@@ -3,11 +3,16 @@ set -euo pipefail
 
 expected_version="${1:?expected version required}"
 nupkg_path="${2:?nupkg path required}"
-retry_schedule_seconds="${SVT_POSTPUBLISH_RETRY_SCHEDULE_SECONDS:-2,3,5,8,13,21,34,55,89,89,89}"
+default_retry_schedule_seconds="2,3,5,8,13,21,34,55,89,89,89"
+retry_schedule_seconds="${SVT_POSTPUBLISH_RETRY_SCHEDULE_SECONDS:-${default_retry_schedule_seconds}}"
 if [[ -n "${SVT_POSTPUBLISH_RETRY_COUNT:-}" ]]; then
   retry_count="${SVT_POSTPUBLISH_RETRY_COUNT}"
 else
-  retry_count="$(awk -F',' '{print NF}' <<<"${retry_schedule_seconds}")"
+  if [[ -n "${retry_schedule_seconds}" ]]; then
+    retry_count="$(awk -F',' '{print NF}' <<<"${retry_schedule_seconds}")"
+  else
+    retry_count="59"
+  fi
 fi
 retry_sleep_seconds="${SVT_POSTPUBLISH_RETRY_SLEEP_SECONDS:-10}"
 
