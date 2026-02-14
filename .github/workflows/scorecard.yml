@@ -16,7 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      security-events: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -30,14 +29,10 @@ jobs:
           repo_token: ${{ secrets.SECURITY_CLAIMS_TOKEN }}
           results_file: artifacts/ci/scorecard/results.sarif
           results_format: sarif
+          # Intentionally do not upload SARIF to Code Scanning; Scorecard findings are kept as artifacts only.
           # Keep deterministic local evidence + SARIF upload, avoid remote publish rejection
           # when workflow permissions include security-events write for SARIF upload.
           publish_results: false
-
-      - name: Upload SARIF to code scanning
-        uses: github/codeql-action/upload-sarif@f5c2471be782132e47a6e6f9c725e56730d6e9a3 # v3
-        with:
-          sarif_file: artifacts/ci/scorecard/results.sarif
 
       - name: Upload Artifact
         if: always()
