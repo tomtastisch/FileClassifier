@@ -180,4 +180,6 @@ jobs:
 
       - name: Gate 4 - SVT post-publish (git version == package version == nuget version)
         shell: bash
-        run: bash tools/ci/release/gate4_verify_postpublish.sh "${{ steps.tag.outputs.version }}" "${{ steps.nupkg.outputs.path }}"
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag || github.ref_name }}
+        run: bash tools/ci/release/gate4_verify_postpublish.sh "${RELEASE_TAG#v}" "${{ steps.nupkg.outputs.path }}"
