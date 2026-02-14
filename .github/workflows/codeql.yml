@@ -57,8 +57,8 @@ jobs:
 
       - name: Build (CodeQL traced)
         run: |
-          dotnet restore FileClassifier.sln
-          dotnet build -c Release --no-restore FileClassifier.sln
+          dotnet restore --locked-mode -v minimal FileClassifier.sln
+          dotnet build -c Release --no-restore -v minimal FileClassifier.sln
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@f5c2471be782132e47a6e6f9c725e56730d6e9a3 # v3
