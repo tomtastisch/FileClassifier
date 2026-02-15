@@ -4,7 +4,8 @@
 Wave 1 baseline findings from JSON analysis artifacts.
 
 ## Current State
-Package A (Cluster 7C) removed generic entry-point catches for the scoped files.
+Package A (Cluster 7C) removed generic entry-point catches for the scoped files (merged 2026-02-15).
+Package B (Cluster 7C) reduces duplicated archive/stream guard fragments in `Infrastructure/*` while preserving behavior.
 Evidence-backed candidates are tracked in:
 - `artifacts/audit/dead_code_candidates.json`
 - `artifacts/audit/redundancy_candidates.json`
@@ -28,6 +29,7 @@ Evidence-backed candidates are tracked in:
      - `src/FileTypeDetection/Infrastructure/ArchiveManagedInternals.vb:29`
      - `src/FileTypeDetection/Infrastructure/ArchiveInternals.vb:109`
    - Evidence: `artifacts/audit/redundancy_candidates.json`
+   - Status: Package B consolidates repeated stream guards via `StreamGuard` (SSOT), replacing the duplicated `stream.CanRead` and rewind patterns in the scoped `Infrastructure/*` files.
 
 3. Dead-code candidate scan currently returned no low-reference source declarations in `src/` under the implemented heuristic.
    - Evidence: `artifacts/audit/dead_code_candidates.json`
@@ -39,6 +41,8 @@ bash tools/audit/verify-code-analysis-evidence.sh
 jq '.candidates | length' artifacts/audit/hardening_candidates.json
 jq '.candidates | length' artifacts/audit/redundancy_candidates.json
 rg -n "Catch\\s+ex\\s+As\\s+Exception" src/FileTypeDetection/FileTypeDetector.vb src/FileTypeDetection/FileMaterializer.vb src/FileTypeDetection/EvidenceHashing.vb
+rg -n "If\\s+stream\\s+Is\\s+Nothing\\s+OrElse\\s+Not\\s+stream\\.CanRead" src/FileTypeDetection/Infrastructure/ArchiveManagedInternals.vb src/FileTypeDetection/Infrastructure/ArchiveInternals.vb
+rg -n "If\\s+stream\\.CanSeek\\s+Then\\s+stream\\.Position\\s*=\\s*0" src/FileTypeDetection/Infrastructure/ArchiveManagedInternals.vb src/FileTypeDetection/Infrastructure/ArchiveInternals.vb
 ```
 
 ## Findings Format (for next PRs)

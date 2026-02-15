@@ -1,8 +1,6 @@
 Option Strict On
 Option Explicit On
 
-Imports System.IO
-
 Namespace Global.Tomtastisch.FileClassifier
     Friend Enum ArchiveContainerType
         Unknown = 0
@@ -48,14 +46,14 @@ Namespace Global.Tomtastisch.FileClassifier
         ReadOnly Property UncompressedSize As Long?
         ReadOnly Property CompressedSize As Long?
         ReadOnly Property LinkTarget As String
-        Function OpenStream() As Stream
+        Function OpenStream() As System.IO.Stream
     End Interface
 
     Friend Interface IArchiveBackend
         ReadOnly Property ContainerType As ArchiveContainerType
 
         Function Process(
-                         stream As Stream,
+                         stream As System.IO.Stream,
                          opt As FileTypeProjectOptions,
                          depth As Integer,
                          containerTypeValue As ArchiveContainerType,
@@ -93,7 +91,7 @@ Namespace Global.Tomtastisch.FileClassifier
             If data Is Nothing OrElse data.Length = 0 Then Return False
 
             Try
-                Using ms As New MemoryStream(data, writable:=False)
+                Using ms As New System.IO.MemoryStream(data, writable:=False)
                     Return TryDescribeStream(ms, opt, descriptor)
                 End Using
             Catch ex As Exception
@@ -103,13 +101,13 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Friend Shared Function TryDescribeStream(stream As Stream, opt As FileTypeProjectOptions,
+        Friend Shared Function TryDescribeStream(stream As System.IO.Stream, opt As FileTypeProjectOptions,
                                                  ByRef descriptor As ArchiveDescriptor) As Boolean
             descriptor = ArchiveDescriptor.UnknownDescriptor()
-            If stream Is Nothing OrElse Not stream.CanRead Then Return False
+            If Not StreamGuard.IsReadable(stream) Then Return False
 
             Try
-                If stream.CanSeek Then stream.Position = 0
+                StreamGuard.RewindToStart(stream)
                 Using archive = SharpCompress.Archives.ArchiveFactory.Open(stream)
                     If archive Is Nothing Then Return False
 
@@ -124,12 +122,10 @@ Namespace Global.Tomtastisch.FileClassifier
                 descriptor = ArchiveDescriptor.UnknownDescriptor()
                 Return False
             Finally
-                If stream IsNot Nothing AndAlso stream.CanSeek Then
-                    Try
-                        stream.Position = 0
-                    Catch
-                    End Try
-                End If
+                Try
+                    StreamGuard.RewindToStart(stream)
+                Catch
+                End Try
             End Try
         End Function
 
@@ -155,19 +151,19 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
-        Friend Shared Function ValidateArchiveStream(stream As Stream, opt As FileTypeProjectOptions, depth As Integer,
+        Friend Shared Function ValidateArchiveStream(stream As System.IO.Stream, opt As FileTypeProjectOptions, depth As Integer,
                                                      descriptor As ArchiveDescriptor) As Boolean
             Return ProcessArchiveStream(stream, opt, depth, descriptor, Nothing)
         End Function
 
         Friend Shared Function ProcessArchiveStream(
-                                                    stream As Stream,
+                                                    stream As System.IO.Stream,
                                                     opt As FileTypeProjectOptions,
                                                     depth As Integer,
                                                     descriptor As ArchiveDescriptor,
                                                     extractEntry As Func(Of IArchiveEntryModel, Boolean)
                                                     ) As Boolean
-            If stream Is Nothing OrElse Not stream.CanRead Then Return False
+            If Not StreamGuard.IsReadable(stream) Then Return False
             If opt Is Nothing Then Return False
             If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then Return False
 
@@ -183,7 +179,7 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
-        Friend Shared Function TryExtractArchiveStreamToMemory(stream As Stream, opt As FileTypeProjectOptions) _
+        Friend Shared Function TryExtractArchiveStreamToMemory(stream As System.IO.Stream, opt As FileTypeProjectOptions) _
             As IReadOnlyList(Of ZipExtractedEntry)
             Dim descriptor As ArchiveDescriptor = Nothing
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
@@ -191,18 +187,18 @@ Namespace Global.Tomtastisch.FileClassifier
             Return TryExtractArchiveStreamToMemory(stream, opt, descriptor)
         End Function
 
-        Friend Shared Function TryExtractArchiveStreamToMemory(stream As Stream, opt As FileTypeProjectOptions,
+        Friend Shared Function TryExtractArchiveStreamToMemory(stream As System.IO.Stream, opt As FileTypeProjectOptions,
                                                                descriptor As ArchiveDescriptor) _
             As IReadOnlyList(Of ZipExtractedEntry)
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
-            If stream Is Nothing OrElse Not stream.CanRead Then Return emptyResult
+            If Not StreamGuard.IsReadable(stream) Then Return emptyResult
             If opt Is Nothing Then Return emptyResult
             If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then _
                 Return emptyResult
 
             Dim entries As New List(Of ZipExtractedEntry)()
             Try
-                If stream.CanSeek Then stream.Position = 0
+                StreamGuard.RewindToStart(stream)
                 Dim ok = ArchiveProcessingEngine.ProcessArchiveStream(
                     stream,
                     opt,
@@ -224,24 +220,24 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Friend Shared Function TryExtractArchiveStream(stream As Stream, destinationDirectory As String,
+        Friend Shared Function TryExtractArchiveStream(stream As System.IO.Stream, destinationDirectory As String,
                                                        opt As FileTypeProjectOptions) As Boolean
             Dim descriptor As ArchiveDescriptor = Nothing
             If Not ArchiveTypeResolver.TryDescribeStream(stream, opt, descriptor) Then Return False
             Return TryExtractArchiveStream(stream, destinationDirectory, opt, descriptor)
         End Function
 
-        Friend Shared Function TryExtractArchiveStream(stream As Stream, destinationDirectory As String,
+        Friend Shared Function TryExtractArchiveStream(stream As System.IO.Stream, destinationDirectory As String,
                                                        opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor) _
             As Boolean
-            If stream Is Nothing OrElse Not stream.CanRead Then Return False
+            If Not StreamGuard.IsReadable(stream) Then Return False
             If opt Is Nothing Then Return False
             If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then Return False
             If String.IsNullOrWhiteSpace(destinationDirectory) Then Return False
 
             Dim destinationFull As String
             Try
-                destinationFull = Path.GetFullPath(destinationDirectory)
+                destinationFull = System.IO.Path.GetFullPath(destinationDirectory)
             Catch ex As Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveExtract] Ungueltiger Zielpfad: {ex.Message}")
                 Return False
@@ -249,17 +245,17 @@ Namespace Global.Tomtastisch.FileClassifier
 
             If Not DestinationPathGuard.ValidateNewExtractionTarget(destinationFull, opt) Then Return False
 
-            Dim parent = Path.GetDirectoryName(destinationFull)
+            Dim parent = System.IO.Path.GetDirectoryName(destinationFull)
             If String.IsNullOrWhiteSpace(parent) Then Return False
 
             Dim stageDir = destinationFull & ".stage-" & Guid.NewGuid().ToString("N")
             Try
-                Directory.CreateDirectory(parent)
-                Directory.CreateDirectory(stageDir)
+                System.IO.Directory.CreateDirectory(parent)
+                System.IO.Directory.CreateDirectory(stageDir)
 
-                If stream.CanSeek Then stream.Position = 0
+                StreamGuard.RewindToStart(stream)
 
-                Dim stagePrefix = EnsureTrailingSeparator(Path.GetFullPath(stageDir))
+                Dim stagePrefix = EnsureTrailingSeparator(System.IO.Path.GetFullPath(stageDir))
                 Dim ok = ArchiveProcessingEngine.ProcessArchiveStream(
                     stream,
                     opt,
@@ -270,15 +266,15 @@ Namespace Global.Tomtastisch.FileClassifier
                                   End Function)
                 If Not ok Then Return False
 
-                Directory.Move(stageDir, destinationFull)
+                System.IO.Directory.Move(stageDir, destinationFull)
                 Return True
             Catch ex As Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveExtract] Fehler: {ex.Message}")
                 Return False
             Finally
-                If Directory.Exists(stageDir) Then
+                If System.IO.Directory.Exists(stageDir) Then
                     Try
-                        Directory.Delete(stageDir, recursive:=True)
+                        System.IO.Directory.Delete(stageDir, recursive:=True)
                     Catch
                     End Try
                 End If
@@ -296,7 +292,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Dim targetPath As String
             Try
-                targetPath = Path.GetFullPath(Path.Combine(destinationPrefix, entryName))
+                targetPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(destinationPrefix, entryName))
             Catch
                 Return False
             End Try
@@ -307,17 +303,17 @@ Namespace Global.Tomtastisch.FileClassifier
             End If
 
             If isDirectory Then
-                Directory.CreateDirectory(targetPath)
+                System.IO.Directory.CreateDirectory(targetPath)
                 Return True
             End If
 
             If Not ValidateEntrySize(entry, opt) Then Return False
 
-            Dim targetDir = Path.GetDirectoryName(targetPath)
+            Dim targetDir = System.IO.Path.GetDirectoryName(targetPath)
             If String.IsNullOrWhiteSpace(targetDir) Then Return False
-            Directory.CreateDirectory(targetDir)
+            System.IO.Directory.CreateDirectory(targetDir)
 
-            If File.Exists(targetPath) OrElse Directory.Exists(targetPath) Then
+            If System.IO.File.Exists(targetPath) OrElse System.IO.Directory.Exists(targetPath) Then
                 LogGuard.Warn(opt.Logger, "[ArchiveExtract] Kollision bei Zielpfad.")
                 Return False
             End If
@@ -327,8 +323,8 @@ Namespace Global.Tomtastisch.FileClassifier
                     If source Is Nothing OrElse Not source.CanRead Then Return False
                     Using _
                         target As _
-                            New FileStream(targetPath, FileMode.CreateNew, FileAccess.Write, FileShare.None,
-                                           InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
+                            New System.IO.FileStream(targetPath, System.IO.FileMode.CreateNew, System.IO.FileAccess.Write, System.IO.FileShare.None,
+                                           InternalIoDefaults.FileStreamBufferSize, System.IO.FileOptions.SequentialScan)
                         StreamBounds.CopyBounded(source, target, opt.MaxZipEntryUncompressedBytes)
                     End Using
                 End Using
@@ -417,12 +413,12 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function EnsureTrailingSeparator(dirPath As String) As String
-            If String.IsNullOrEmpty(dirPath) Then Return Path.DirectorySeparatorChar.ToString()
-            If dirPath.EndsWith(Path.DirectorySeparatorChar) OrElse dirPath.EndsWith(Path.AltDirectorySeparatorChar) _
+            If String.IsNullOrEmpty(dirPath) Then Return System.IO.Path.DirectorySeparatorChar.ToString()
+            If dirPath.EndsWith(System.IO.Path.DirectorySeparatorChar) OrElse dirPath.EndsWith(System.IO.Path.AltDirectorySeparatorChar) _
                 Then
                 Return dirPath
             End If
-            Return dirPath & Path.DirectorySeparatorChar
+            Return dirPath & System.IO.Path.DirectorySeparatorChar
         End Function
     End Class
 
@@ -433,19 +429,19 @@ Namespace Global.Tomtastisch.FileClassifier
         Friend Shared Function TryCollectFromFile(path As String, opt As FileTypeProjectOptions,
                                                   ByRef entries As IReadOnlyList(Of ZipExtractedEntry)) As Boolean
             entries = Array.Empty(Of ZipExtractedEntry)()
-            If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then Return False
+            If String.IsNullOrWhiteSpace(path) OrElse Not System.IO.File.Exists(path) Then Return False
             If opt Is Nothing Then Return False
 
             Try
                 Using _
                     fs As _
-                        New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read,
-                                       InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
+                        New System.IO.FileStream(path, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read,
+                                       InternalIoDefaults.FileStreamBufferSize, System.IO.FileOptions.SequentialScan)
                     Dim descriptor As ArchiveDescriptor = Nothing
                     If Not ArchiveTypeResolver.TryDescribeStream(fs, opt, descriptor) Then Return False
-                    If fs.CanSeek Then fs.Position = 0
+                    StreamGuard.RewindToStart(fs)
                     If Not ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, descriptor, depth:=0) Then Return False
-                    If fs.CanSeek Then fs.Position = 0
+                    StreamGuard.RewindToStart(fs)
                     entries = ArchiveExtractor.TryExtractArchiveStreamToMemory(fs, opt, descriptor)
                     Return entries IsNot Nothing AndAlso entries.Count > 0
                 End Using
@@ -465,7 +461,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Dim descriptor As ArchiveDescriptor = Nothing
                 If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then Return False
                 If Not ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor) Then Return False
-                Using ms As New MemoryStream(data, writable:=False)
+                Using ms As New System.IO.MemoryStream(data, writable:=False)
                     entries = ArchiveExtractor.TryExtractArchiveStreamToMemory(ms, opt, descriptor)
                     Return entries IsNot Nothing AndAlso entries.Count > 0
                 End Using
@@ -486,19 +482,19 @@ Namespace Global.Tomtastisch.FileClassifier
         End Property
 
         Public Function Process(
-                                stream As Stream,
+                                stream As System.IO.Stream,
                                 opt As FileTypeProjectOptions,
                                 depth As Integer,
                                 containerTypeValue As ArchiveContainerType,
                                 extractEntry As Func(Of IArchiveEntryModel, Boolean)
                                 ) As Boolean Implements IArchiveBackend.Process
-            If stream Is Nothing OrElse Not stream.CanRead Then Return False
+            If Not StreamGuard.IsReadable(stream) Then Return False
             If opt Is Nothing Then Return False
             If depth > opt.MaxZipNestingDepth Then Return False
             If containerTypeValue = ArchiveContainerType.Unknown Then Return False
 
             Try
-                If stream.CanSeek Then stream.Position = 0
+                StreamGuard.RewindToStart(stream)
 
                 Using archive = SharpCompress.Archives.ArchiveFactory.Open(stream)
                     If archive Is Nothing Then Return False
@@ -588,7 +584,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return True
             End If
 
-            Using nestedMs As New MemoryStream(payload, writable:=False)
+            Using nestedMs As New System.IO.MemoryStream(payload, writable:=False)
                 nestedResult = ArchiveProcessingEngine.ProcessArchiveStream(nestedMs, opt, depth + 1, nestedDescriptor,
                                                                             extractEntry)
             End Using
@@ -604,7 +600,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Try
                 Using source = entry.OpenEntryStream()
                     If source Is Nothing OrElse Not source.CanRead Then Return False
-                    Using ms As New MemoryStream()
+                    Using ms As New System.IO.MemoryStream()
                         StreamBounds.CopyBounded(source, ms, maxBytes)
                         payload = ms.ToArray()
                         Return True
@@ -710,8 +706,8 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
-        Public Function OpenStream() As Stream Implements IArchiveEntryModel.OpenStream
-            If _entry Is Nothing Then Return Stream.Null
+        Public Function OpenStream() As System.IO.Stream Implements IArchiveEntryModel.OpenStream
+            If _entry Is Nothing Then Return System.IO.Stream.Null
             Return _entry.OpenEntryStream()
         End Function
     End Class

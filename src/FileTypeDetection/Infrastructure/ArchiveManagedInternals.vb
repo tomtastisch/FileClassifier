@@ -1,9 +1,6 @@
 Option Strict On
 Option Explicit On
 
-Imports System.IO
-Imports System.IO.Compression
-
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Zentrale SSOT-Engine fuer archivbasierte Verarbeitung.
@@ -15,24 +12,24 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
-        Friend Shared Function ValidateArchiveStream(stream As Stream, opt As FileTypeProjectOptions, depth As Integer) _
+        Friend Shared Function ValidateArchiveStream(stream As System.IO.Stream, opt As FileTypeProjectOptions, depth As Integer) _
             As Boolean
             Return ProcessArchiveStream(stream, opt, depth, Nothing)
         End Function
 
         Friend Shared Function ProcessArchiveStream(
-                                                    stream As Stream,
+                                                    stream As System.IO.Stream,
                                                     opt As FileTypeProjectOptions,
                                                     depth As Integer,
-                                                    extractEntry As Func(Of ZipArchiveEntry, Boolean)
+                                                    extractEntry As Func(Of System.IO.Compression.ZipArchiveEntry, Boolean)
                                                     ) As Boolean
-            If stream Is Nothing OrElse Not stream.CanRead Then Return False
+            If Not StreamGuard.IsReadable(stream) Then Return False
             If depth > opt.MaxZipNestingDepth Then Return False
 
             Try
-                If stream.CanSeek Then stream.Position = 0
+                StreamGuard.RewindToStart(stream)
 
-                Using zip As New ZipArchive(stream, ZipArchiveMode.Read, leaveOpen:=True)
+                Using zip As New System.IO.Compression.ZipArchive(stream, System.IO.Compression.ZipArchiveMode.Read, leaveOpen:=True)
                     If zip.Entries.Count > opt.MaxZipEntries Then Return False
 
                     Dim totalUncompressed As Long = 0
@@ -86,7 +83,7 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Private Shared Function IsNestedArchiveEntry(entry As ZipArchiveEntry) As Boolean
+        Private Shared Function IsNestedArchiveEntry(entry As System.IO.Compression.ZipArchiveEntry) As Boolean
             If entry Is Nothing Then Return False
 
             Try
@@ -119,7 +116,7 @@ Namespace Global.Tomtastisch.FileClassifier
         End Property
 
         Public Function Process(
-                                stream As Stream,
+                                stream As System.IO.Stream,
                                 opt As FileTypeProjectOptions,
                                 depth As Integer,
                                 containerTypeValue As ArchiveContainerType,
@@ -144,9 +141,9 @@ Namespace Global.Tomtastisch.FileClassifier
     Friend NotInheritable Class ArchiveManagedEntryModel
         Implements IArchiveEntryModel
 
-        Private ReadOnly _entry As ZipArchiveEntry
+        Private ReadOnly _entry As System.IO.Compression.ZipArchiveEntry
 
-        Friend Sub New(entry As ZipArchiveEntry)
+        Friend Sub New(entry As System.IO.Compression.ZipArchiveEntry)
             _entry = entry
         End Sub
 
@@ -185,8 +182,8 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
-        Public Function OpenStream() As Stream Implements IArchiveEntryModel.OpenStream
-            If _entry Is Nothing Then Return Stream.Null
+        Public Function OpenStream() As System.IO.Stream Implements IArchiveEntryModel.OpenStream
+            If _entry Is Nothing Then Return System.IO.Stream.Null
             Return _entry.Open()
         End Function
     End Class
