@@ -2,12 +2,12 @@
 
 ## Scope
 This document describes the executable CI topology and artifact contract.
-Normative policy thresholds and rule parameters stay in `tools/ci/policies/rules/` and `docs/governance/001_POLICY_CI.MD`.
+Normative policy thresholds and rule parameters stay in `tools/ci/policies/rules/` and `docs/governance/101_POLICY_CI.MD`.
 
 ## Required Status Contexts
 Main branch protection requires exactly these contexts (`strict: true`): `preflight`, `version-policy`, `build`, `api-contract`, `pack`, `consumer-smoke`, `package-backed-tests`, `security-nuget`, `tests-bdd-coverage`.
 Evidence: branch protection API output (`required_status_checks.contexts`), `.github/workflows/ci.yml:59-347`, and `.github/workflows/ruleset-placeholders.yml` (`version-policy` context).
-Hinweis: Die normative Versionierungsentscheidung (RaC) wird zusaetzlich durch `.github/workflows/version-policy.yml` als Check `versioning-policy` ausgewertet (nicht Teil der Branch-Protection-Contexts).
+Note: the normative versioning decision (RaC) is additionally evaluated by `.github/workflows/version-policy.yml` as the `versioning-policy` check (not part of the branch-protection contexts).
 
 ## Workflow Topology
 - `pr-labeling` runs only on `pull_request` and is separate from the required technical gate path (`.github/workflows/ci.yml:22-58`).

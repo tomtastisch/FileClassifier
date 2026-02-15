@@ -55,4 +55,4 @@ The contract is considered approved when:
 - [ ] Content verified against current code state.
 - [ ] Links and anchors checked with `python3 tools/check-docs.py`.
 - [ ] Examples/commands verified locally.
-- [ ] Terminology aligned with `docs/010_API_CORE.MD`.
+- [ ] Terminology aligned with `docs/110_API_CORE.MD`.

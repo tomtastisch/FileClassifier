@@ -1,14 +1,14 @@
-# BDD-Ausfuehrung und Gherkin-Flow
+# BDD Execution and Gherkin Flow
 
-## 1. Zweck
-Dieses Dokument beschreibt den End-to-End-Ablauf der BDD-Tests: vom Gherkin-Satz ueber Step-Binding bis zur ausgefuehrten Fachmethode.
+## 1. Purpose
+This document describes the end-to-end flow of the BDD tests: from the Gherkin sentence through step binding to the executed domain method.
 
-## 2. Geltungsbereich
-- Feature-Saetze unter `tests/FileTypeDetectionLib.Tests/Features/`
-- Step-Bindings in `tests/FileTypeDetectionLib.Tests/Steps/FileTypeDetectionSteps.cs`
-- Ausfuehrung ueber `tools/test-bdd-readable.sh`
+## 2. Scope
+- Feature sentences under `tests/FileTypeDetectionLib.Tests/Features/`
+- Step bindings in `tests/FileTypeDetectionLib.Tests/Steps/FileTypeDetectionSteps.cs`
+- Execution via `tools/test-bdd-readable.sh`
 
-## 3. Ablaufmodell
+## 3. Flow Model
 ```mermaid
 flowchart TD
   A[".feature Satz (Given/When/Then)"] --> B["Reqnroll Matcher"]
@@ -18,7 +18,7 @@ flowchart TD
   E --> F["Then-Assertion validiert Zustand"]
 ```
 
-## 4. Gherkin zu Methode zu Funktion
+## 4. Gherkin -> Method -> Function
 ```mermaid
 sequenceDiagram
   participant F as "Feature-Datei"
@@ -37,20 +37,20 @@ sequenceDiagram
   S->>T: Assert.Equal(expected, state.LastResult.Kind)
 ```
 
-## 5. Satzarten und Verantwortungen
-| Satzart | Verantwortungsziel | Typischer Inhalt |
+## 5. Sentence Types and Responsibilities
+| Sentence type | Responsibility target | Typical content |
 |---|---|---|
-| `Given` | Startzustand herstellen | Ressource laden, Temp-Verzeichnis anlegen, Limits setzen |
-| `When` | Fachaktion ausfuehren | Detect, Validate, Extract, Persist, Hashing |
-| `Then` | Ergebnis verifizieren | Typ, Bool-Ergebnis, Dateiexistenz, Hash-Konsistenz |
+| `Given` | set up initial state | load resource, create temp directory, set limits |
+| `When` | execute domain action | detect, validate, extract, persist, hashing |
+| `Then` | verify result | kind, bool result, file existence, hash consistency |
 
-## 6. Warum der Ansatz deterministisch ist
-- Feature-Saetze sind kanonisch und eindeutig.
-- Jeder Satz mappt auf genau eine Binding-Methode.
-- Ergebniszustand wird zentral in `DetectionScenarioState` gehalten.
-- Assertions pruefen nur diesen Zustand und nicht implizite Nebeneffekte.
+## 6. Why the Approach Is Deterministic
+- Feature sentences are canonical and unambiguous.
+- Each sentence maps to exactly one binding method.
+- Result state is held centrally in `DetectionScenarioState`.
+- Assertions validate only that state, not implicit side effects.
 
-## 7. CI-Integration
+## 7. CI Integration
 ```mermaid
 flowchart LR
   A["CI Job tests-bdd-coverage"] --> B["bash tools/test-bdd-readable.sh"]
@@ -61,7 +61,7 @@ flowchart LR
   C --> G["artifacts/coverage/coverage-summary.txt"]
 ```
 
-## 8. Verifikation
+## 8. Verification
 ```bash
 bash tools/test-bdd-readable.sh
 TEST_BDD_OUTPUT_DIR=artifacts/tests bash tools/test-bdd-readable.sh -- \
@@ -74,7 +74,7 @@ TEST_BDD_OUTPUT_DIR=artifacts/tests bash tools/test-bdd-readable.sh -- \
   /p:ThresholdStat=total
 ```
 
-## 9. Verlinkte SSOT-Quellen
-- [BDD-Satzkatalog (Deutsch, kanonisch)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/003_CATALOG_BDD.MD)
-- [CI-Pipeline (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/ci/001_PIPELINE_CI.MD)
-- [Filetypedetectionsteps](https://github.com/tomtastisch/FileClassifier/blob/main/tests/FileTypeDetectionLib.Tests/Steps/FileTypeDetectionSteps.cs)
+## 9. Linked SSOT Sources
+- [BDD catalog (German, canonical)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/103_CATALOG_BDD.MD)
+- [CI pipeline (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/ci/101_PIPELINE_CI.MD)
+- [FileTypeDetectionSteps](https://github.com/tomtastisch/FileClassifier/blob/main/tests/FileTypeDetectionLib.Tests/Steps/FileTypeDetectionSteps.cs)

@@ -40,7 +40,7 @@ flowchart LR
 - Rückgabemodelle Detection: [Abstractions Detection Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Detection/README.md)
 - Rückgabemodelle Archive: [Abstractions Archive Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Archive/README.md)
 - Rückgabemodelle Hashing: [Abstractions Hashing Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Hashing/README.md)
-- Funktionskatalog mit Beispielen: [01 - Funktionen](https://github.com/tomtastisch/FileClassifier/blob/main/docs/010_API_CORE.MD)
+- Funktionskatalog mit Beispielen: [01 - Funktionen](https://github.com/tomtastisch/FileClassifier/blob/main/docs/110_API_CORE.MD)
 
 ## 3. Architekturübersicht (Systemkontext)
 ### 3.1 E2E-Systemkontext (kompakt)
@@ -377,4 +377,4 @@ flowchart TD
 - [ ] Inhalt auf aktuellen Code-Stand geprüft.
 - [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
 - [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/010_API_CORE.MD` abgeglichen.
+- [ ] Begriffe mit `docs/110_API_CORE.MD` abgeglichen.

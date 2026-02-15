@@ -1,50 +1,52 @@
 # Wave Execution DoD Matrix
 
-Stand: 2026-02-13
-Scope: Finalisierung aller offenen Security-/Governance-Punkte nach Wave-Plan.
+As of: 2026-02-13
+Scope: finalize all open security/governance items per wave plan.
 
 ## Cluster 0 - Guardrails & Contract
-- DoD-0.1: `tools/ci/schema/result.schema.json` validiert alle erzeugten `result.json` in CI ohne Sonderfall-Bypass.
-- DoD-0.2: Für jeden blockierenden Check existiert ein eindeutiger Fail-Reason im Artefakt (`rule_id`, `message`, `evidence_paths`).
+- DoD-0.1: `tools/ci/schema/result.schema.json` validates all produced `result.json` in CI without special-case bypass.
+- DoD-0.2: For each blocking check there is a unique fail reason in the artifact (`rule_id`, `message`, `evidence_paths`).
 
 ## Cluster 1 - SECURITY Truth Matrix
-- DoD-1.1: Jede Aussage aus `SECURITY.md` hat eine `SEC-CLAIM-*`-Zuordnung in `docs/audit/003_SECURITY_ASSERTION_TRACEABILITY.MD`.
-- DoD-1.2: Jede blocker-klassifizierte Aussage hat mindestens ein reproduzierbares Kommando mit `exit 0/!=0`-Kriterium.
+- DoD-1.1: Every statement in `SECURITY.md` has a `SEC-CLAIM-*` mapping in `docs/audit/103_SECURITY_ASSERTION_TRACEABILITY.MD`.
+- DoD-1.2: Every blocker-classified statement has at least one reproducible command with an `exit 0/!=0` criterion.
 
 ## Cluster 2 - Evidence Engine
-- DoD-2.1: `bash tools/audit/verify-security-claims.sh` erzeugt `raw.log`, `summary.md`, `result.json` schema-valide.
-- DoD-2.2: API-Fehler sind in Reason-Codes klassifiziert (`auth|rate-limit|network|5xx|unknown`).
+- DoD-2.1: `bash tools/audit/verify-security-claims.sh` produces schema-valid `raw.log`, `summary.md`, `result.json`.
+- DoD-2.2: API errors are classified into reason codes (`auth|rate-limit|network|5xx|unknown`).
 
 ## Cluster 3 - CI Integration
-- DoD-3.1: `security-claims-evidence` und `code-analysis-evidence` laufen auf `push` und `pull_request` gegen `main`.
-- DoD-3.2: Blocker-Claims failen deterministisch; report-only Claims blockieren Merge nicht.
+- DoD-3.1: `security-claims-evidence` and `code-analysis-evidence` run on `push` and `pull_request` against `main`.
+- DoD-3.2: Blocker claims fail deterministically; report-only claims do not block merges.
 
 ## Cluster 4 - Externe Audits/Attestations
-- DoD-4.1: OpenSSF Scorecard Workflow erzeugt SARIF und lädt Artefakte hoch.
-- DoD-4.2: Release Workflow erzeugt und verifiziert Build-Attestation (`gh attestation verify`).
+## Cluster 4 - External Audits/Attestations
+- DoD-4.1: OpenSSF Scorecard workflow produces SARIF and uploads artifacts.
+- DoD-4.2: Release workflow generates and verifies build attestations (`gh attestation verify`).
 
 ## Cluster 5 - Sichtbarkeit Repo/NuGet
-- DoD-5.1: Root-Nachweisdatei `SECURITY_ASSURANCE_INDEX.md` ist vorhanden und verlinkt alle Kern-Evidenzen.
-- DoD-5.2: README enthält sichtbare Sektion `Security Assurance & Evidence` mit Audit-/Runbook-/Threat-Links.
+## Cluster 5 - Repo/NuGet Visibility
+- DoD-5.1: Root evidence file `SECURITY_ASSURANCE_INDEX.md` exists and links all core evidence.
+- DoD-5.2: README contains a visible `Security Assurance & Evidence` section with audit/runbook/threat links.
 
 ## Cluster 6 - CodeQL / Scanning Quality
-- DoD-6.1: Für jeden Main-Commit laufen `Analyze (actions|csharp|javascript-typescript|python)` erfolgreich.
-- DoD-6.2: Kein paralleler inkompatibler CodeQL-Uploadpfad (Default-Setup konfliktfrei dokumentiert/angewendet).
+- DoD-6.1: For each main commit, `Analyze (actions|csharp|javascript-typescript|python)` completes successfully.
+- DoD-6.2: No parallel incompatible CodeQL upload path (default setup documented/applied conflict-free).
 
 ## Cluster 7 - Deep Analysis (JSON-only)
-- DoD-7.1: JSON-Artefakte `code_inventory|callgraph_inventory|dead_code_candidates|redundancy_candidates|hardening_candidates` werden erzeugt.
-- DoD-7.2: Findings mit Datei+Zeile sind in `docs/audit/006_CODE_REVIEW_FINDINGS.MD` reproduzierbar referenziert.
+- DoD-7.1: JSON artifacts `code_inventory|callgraph_inventory|dead_code_candidates|redundancy_candidates|hardening_candidates` are produced.
+- DoD-7.2: Findings with file+line are referenced reproducibly in `docs/audit/106_CODE_REVIEW_FINDINGS.MD`.
 
 ## Cluster 8 - Governance Closure
-- DoD-8.1: Threat Model, Incident Runbook, Supply-Chain Baseline sind vorhanden und gegenseitig konsistent.
-- DoD-8.2: Dokumente referenzieren reale, bestehende Workflows/Artefakte ohne Platzhalter.
+- DoD-8.1: Threat model, incident runbook, and supply-chain baseline exist and are mutually consistent.
+- DoD-8.2: Documents reference real, existing workflows/artifacts without placeholders.
 
 ## Snapshot Warning Hardening (Dependency Review)
-- DoD-SW.1: `dependency-review` verwendet `retry-on-snapshot-warnings: true`.
-- DoD-SW.2: PR-Kommentar-Output erfolgt nur bei Failure (`comment-summary-in-pr: on-failure`), damit Warnhinweise nicht als Dauerrauschen erscheinen.
-- DoD-SW.3: OpenSSF-Scorecard-Tabelle in PR-Kommentaren ist deaktiviert (`show-openssf-scorecard: false`), um nicht steuerbare Fremd-Repo-Scores nicht als Merge-Rauschen zu propagieren.
-- DoD-SW.4: Policy-Schwelle für Action-Score ist explizit gesetzt (`warn-on-openssf-scorecard-level: 9`) und im Workflow nachweisbar.
+- DoD-SW.1: `dependency-review` uses `retry-on-snapshot-warnings: true`.
+- DoD-SW.2: PR comment output happens only on failure (`comment-summary-in-pr: on-failure`) so warnings do not become persistent noise.
+- DoD-SW.3: The OpenSSF scorecard table in PR comments is disabled (`show-openssf-scorecard: false`) to avoid propagating upstream scores as merge noise.
+- DoD-SW.4: The policy threshold for action score is explicitly set (`warn-on-openssf-scorecard-level: 9`) and evidenced in the workflow.
 
 ## Release Finalisierung
-- DoD-R.1: Nach Merge ist Tag `v5.1.0` erstellt und Release-Pipeline erfolgreich abgeschlossen.
-- DoD-R.2: `git version == nupkg version == nuget version` ist im Release-Artefakt nachweisbar.
+- DoD-R.1: After merge, tag `v5.1.0` is created and the release pipeline completes successfully.
+- DoD-R.2: `git version == nupkg version == nuget version` is evidenced in the release artifact.

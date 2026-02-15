@@ -1,52 +1,52 @@
-# Dokumentationsstandard (SSOT)
+# Documentation Standard (SSOT)
 
-## 1. Zweck
-Dieser Standard definiert Aufbau, Benennung und Pflege aller Markdown-Dokumente im Repository.
-Ziel ist eine konsistente, auditierbare und schnell erfassbare Dokumentation.
+## 1. Purpose
+This standard defines structure, naming, and maintenance rules for all Markdown documents in the repository.
+The goal is consistent, auditable, and quickly scannable documentation.
 
-## 2. Geltungsbereich
+## 2. Scope
 - `README.md`
 - `docs/**/*.md`
-- modulnahe `README.md` unter `src/**` und `tests/**`
+- module-local `README.md` under `src/**` and `tests/**`
 
-## 3. Benennungsregeln
-- Root- und Kern-Dokumente unter `docs/` in `UPPER_SNAKE_CASE.md`.
-- Unterordner behalten bestehende fachliche Struktur:
+## 3. Naming Rules
+- Root and core documents under `docs/` use `UPPER_SNAKE_CASE.md`.
+- Subfolders keep the existing domain structure:
   - `docs/versioning/`
   - `docs/guides/`
   - `docs/governance/`
   - `docs/verification/`
-- Auch in Unterordnern gilt `UPPER_SNAKE_CASE.md` (Ausnahme: `README.md` als Einstieg).
+- `UPPER_SNAKE_CASE.md` applies in subfolders as well (exception: `README.md` as entry point).
 
-## 4. Pflichtstruktur pro Dokument
-Jedes fachliche Dokument folgt dieser Reihenfolge:
-1. Zweck
-2. Geltungsbereich
-3. Regeln/Architektur
-4. Verifikation/Nachweise
-5. Grenzen/Nicht-Ziele
-6. Verlinkte SSOT-Quellen
+## 4. Required Structure per Document
+Each domain document follows this order:
+1. purpose
+2. scope
+3. rules/architecture
+4. verification/evidence
+5. boundaries/non-goals
+6. linked SSOT sources
 
-## 5. Sprache und Stil
-- Primärsprache: Deutsch.
-- Technische Begriffe bleiben in üblicher Form (`CI`, `Qodana`, `SemVer`, `SSOT`).
-- Aussagen möglichst deterministisch und prüfbar formulieren.
+## 5. Language and Style
+- Primary language: German.
+- Technical terms stay in their common form (`CI`, `Qodana`, `SemVer`, `SSOT`).
+- Formulate statements as deterministically and verifiably as possible.
 
-## 6. Verlinkungsregeln
-- `README.md` verlinkt auf `docs/001_INDEX_CORE.MD` als zentralen Einstieg.
-- `docs/001_INDEX_CORE.MD` verlinkt auf alle SSOT-Dokumente.
-- Jede Spezialdoku verlinkt zurück auf `docs/001_INDEX_CORE.MD`.
+## 6. Linking Rules
+- `README.md` links to `docs/101_INDEX_CORE.MD` as the central entry point.
+- `docs/101_INDEX_CORE.MD` links to all SSOT documents.
+- Each specialized doc links back to `docs/101_INDEX_CORE.MD`.
 
-## 7. Diagrammstandard
-- Für Abläufe: `flowchart` oder `sequenceDiagram` (Mermaid).
-- Knoten mit Sonderzeichen immer quoten: `["..."]`.
-- Diagramme müssen den tatsächlichen CI-/Code-Fluss abbilden, keine generischen Platzhalter.
+## 7. Diagram Standard
+- For flows: `flowchart` or `sequenceDiagram` (Mermaid).
+- Always quote nodes with special characters: `["..."]`.
+- Diagrams must reflect the real CI/code flow, not generic placeholders.
 
-## 8. Pflegeprozess
-Bei Änderungen an CI, Labeling, Versioning oder API:
-1. Implementierung anpassen.
-2. Zugehörige SSOT-Doku im selben Commit aktualisieren.
-3. Link- und Strukturprüfung ausführen.
+## 8. Maintenance Process
+For changes to CI, labeling, versioning, or API:
+1. adjust implementation.
+2. update the related SSOT documentation in the same commit.
+3. run link and structure checks.
 
 Pflichtcheck:
 ```bash
@@ -54,20 +54,20 @@ python3 tools/check-doc-consistency.py
 python3 tools/check-docs.py
 ```
 
-## 9. Nicht-Ziele
-- Keine doppelte Pflege derselben Regel in mehreren SSOT-Dateien.
-- Keine veralteten Backup-/Deprecated-Dokumente im aktiven Pfad.
-- Keine gemischten Benennungsschemata (`kebab-case`/`snake_case`) innerhalb derselben Doku-Ebene.
+## 9. Non-Goals
+- No duplicated maintenance of the same rule across multiple SSOT files.
+- No outdated backup/deprecated documents in the active path.
+- No mixed naming schemes (`kebab-case`/`snake_case`) within the same documentation level.
 
-## 10. CI-Checkliste: Doc-Consistency (verbindlich)
-Die folgende Checkliste ist als CI-Regel verdrahtet und muss bei jedem Lauf bestehen:
-1. Veraltete Kern-Dateinamenmuster sind verboten und müssen auf kanonische Ziele zeigen.
-2. Veraltete Guides-Namen sind verboten und müssen auf kanonische Guide-Dateien zeigen.
-3. Veraltete Guide-Index-Referenzen sind verboten und müssen auf den kanonischen Guides-Index zeigen.
-4. Nicht-kanonische `docs/04_*`-Pfade sind verboten; erlaubt sind nur aktuelle 3-stellige UPPERCASE-Pfade.
-5. Jeder Treffer wird mit `Datei:Zeile`, Regel-ID und konkreter Korrekturhilfe ausgegeben.
+## 10. CI Checklist: Doc Consistency (binding)
+The following checklist is wired as a CI rule and must pass on every run:
+1. Outdated core file name patterns are forbidden and must point to canonical targets.
+2. Outdated guide names are forbidden and must point to canonical guide files.
+3. Outdated guide index references are forbidden and must point to the canonical guides index.
+4. Non-canonical `docs/04_*` paths are forbidden; only current 3-digit UPPERCASE paths are allowed.
+5. Each hit is reported with `file:line`, rule ID, and concrete remediation help.
 
-## RoC-Bezug
-- [Artifact-Contract-Regel](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/artifact_contract.yaml)
-- [Docs-Drift-Regel](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/docs_drift.yaml)
-- [Shell-Safety-Regeln](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/shell_safety.yaml)
+## RoC References
+- [Artifact contract rule](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/artifact_contract.yaml)
+- [Docs drift rule](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/docs_drift.yaml)
+- [Shell safety rules](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/shell_safety.yaml)

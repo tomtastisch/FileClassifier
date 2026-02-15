@@ -1,19 +1,23 @@
-# BDD-Satzkatalog (Deutsch, kanonisch)
+# BDD Sentence Catalog (German, canonical)
 
-## 1. Zweck
-Dieser Katalog ist die verbindliche Satzliste fuer die Reqnroll-BDD-Features im Projekt.
-Ziel ist eine einheitliche, wiederverwendbare und grammatikalisch klare Form ohne redundante Synonyme.
+## 1. Purpose
+This catalog is the binding sentence list for the project's Reqnroll BDD features.
+The goal is a unified, reusable, and grammatically clear form without redundant synonyms.
 
-## 2. Geltungsbereich
+## 2. Scope
 - `tests/FileTypeDetectionLib.Tests/Features/*.feature`
 - `tests/FileTypeDetectionLib.Tests/Steps/FileTypeDetectionSteps.cs`
 
-## 3. Verwendung
-- In `.feature`-Dateien nur die unten gelisteten Satzmuster verwenden.
-- Keine alternativen Formulierungen fuer denselben technischen Schritt einfuehren.
-- Neue Saetze nur bei neuem fachlichem Verhalten und immer mit zugehoeriger Step-Methode.
+## 3. Usage
+- In `.feature` files, use only the sentence patterns listed below.
+- Do not introduce alternative wording for the same technical step.
+- Add new sentences only for new domain behavior and always together with the corresponding step method.
 
-## 4. Uebersicht
+## 4. Overview (canonical German)
+Note:
+- The sentence patterns in the `Satzmuster (Gherkin)` column are canonical German SSOT for this repository.
+- This English mirror keeps the catalog table content as-is to preserve the exact step-binding contract.
+
 | ID | Schrittart | Satzmuster (Gherkin) | Zweck im Test | Uebergaben (Parameter) | Methodenreferenz |
 |---|---|---|---|---|---|
 | G01 | Given | `die Ressource {string} existiert` | Einzelne Testressource vorab verifizieren | `name: string` (Ressourcenname) | `tests/FileTypeDetectionLib.Tests/Steps/FileTypeDetectionSteps.cs` `GivenTheResourceExists` |
@@ -68,20 +72,20 @@ Ziel ist eine einheitliche, wiederverwendbare und grammatikalisch klare Form ohn
 | T23 | Then | `existiert keine Datei im ungueltigen Zielpfad` | Kein Artefakt am zuletzt ungueltigen Zielpfad pruefen | keine | `tests/FileTypeDetectionLib.Tests/Steps/FileTypeDetectionSteps.cs` `ThenNoFileExistsAtInvalidDestination` |
 | T24 | Then | `existiert die gespeicherte Datei {string} nicht` | Nicht-Existenz einer erwarteten Ausgabe pruefen | `fileName: string` | `tests/FileTypeDetectionLib.Tests/Steps/FileTypeDetectionSteps.cs` `ThenMaterializedFileDoesNotExist` |
 
-## 5. Verifikation/Nachweise
+## 5. Verification/Evidence
 ```bash
 bash tools/test-bdd-readable.sh
 python3 tools/check-docs.py
 ```
 
-## 6. Regeln fuer neue Saetze
-1. Grammatik: einheitlich im Muster `ich ...` mit klarer Verbposition.
-2. Scope: genau ein fachlicher Zweck pro Satz.
-3. Parameter: nur explizit benoetigte Platzhalter erlauben.
-4. Mapping: jeder Satz hat genau eine Methode im Step-Binding.
-5. Regression: nach Aenderungen immer `bash tools/test-bdd-readable.sh` ausfuehren.
+## 6. Rules for New Sentences
+1. Grammar: keep a unified pattern (e.g. `ich ...`) with a clear verb position.
+2. Scope: exactly one domain intent per sentence.
+3. Parameters: allow only explicitly required placeholders.
+4. Mapping: each sentence has exactly one method in the step binding.
+5. Regression: after changes, always run `bash tools/test-bdd-readable.sh`.
 
-## 7. Verlinkte SSOT-Quellen
-- [Testdokumentation (BDD)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/001_INDEX_TESTS.MD)
-- [BDD-Ausfuehrung und Gherkin-Flow](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/002_FLOW_BDD.MD)
-- [CI-Pipeline (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/ci/001_PIPELINE_CI.MD)
+## 7. Linked SSOT Sources
+- [Test documentation (BDD)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/101_INDEX_TESTS.MD)
+- [BDD execution and Gherkin flow](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/102_FLOW_BDD.MD)
+- [CI pipeline (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/ci/101_PIPELINE_CI.MD)

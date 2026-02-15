@@ -49,7 +49,7 @@ Out of scope:
 - T5: uncoordinated public disclosure before patch
   - Impact: exploitability window increases before mitigation is available.
   - Current controls: private vulnerability reporting path and coordinated disclosure process as declared in `SECURITY.md`.
-  - Evidence: `tools/audit/verify-security-claims.sh` claim checks and `docs/audit/008_INCIDENT_RESPONSE_RUNBOOK.MD`.
+  - Evidence: `tools/audit/verify-security-claims.sh` claim checks and `docs/audit/108_INCIDENT_RESPONSE_RUNBOOK.MD`.
 
 ## 6. Assumptions
 - Maintainer access controls and repository permissions remain correctly configured.

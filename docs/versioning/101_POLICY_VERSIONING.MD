@@ -1,95 +1,95 @@
-# Versionierungs- und Release-Policy (SSOT)
+# Versioning and Release Policy (SSOT)
 
-## 1. Zweck
-Diese Policy definiert verbindliche SemVer-Regeln (`MAJOR.MINOR.PATCH`) und die deterministische CI-Erzwingung.
+## 1. Purpose
+This policy defines binding SemVer rules (`MAJOR.MINOR.PATCH`) and deterministic CI enforcement.
 
-## 2. Geltungsbereich
-- Release-Tags `vX.Y.Z` (optional `-prerelease`) als einzige SSOT-Quelle fuer Paketversionen.
-- PR-Versioning-Guard und Auto-Labeling in CI.
+## 2. Scope
+- Release tags `vX.Y.Z` (optional `-prerelease`) are the only SSOT source for package versions.
+- PR versioning guard and auto labeling in CI.
 
-## 3. Begriffe
-- SSOT: Single Source of Truth fuer Versioninformation.
-- Breaking Change: Aenderung, die bestehende Integrationen ohne Anpassung brechen kann.
+## 3. Terms
+- SSOT: single source of truth for version information.
+- Breaking change: change that can break existing integrations without adjustments.
 
-## 4. SemVer-Regeln (verbindlich)
+## 4. SemVer Rules (binding)
 - `MAJOR`
-  - oeffentliche API entfernt/umbenannt
-  - inkompatibles Standardverhalten
+  - public API removed/renamed
+  - incompatible default behavior
 - `MINOR`
-  - neue abwaertskompatible Features oder API-Erweiterungen
+  - new backward-compatible features or API extensions
 - `PATCH`
-  - Fixes, Refactorings ohne Verhaltensbruch, Tests, Doku, CI, Tooling
+  - fixes, refactorings without behavioral break, tests, docs, CI, tooling
 - `NONE`
-  - reine Metadatenaenderungen ohne Versionsauswirkung
-- Pre-Release-Tags sind erlaubt:
-  - `vX.Y.Z-<label>` wird exakt als NuGet-Version `X.Y.Z-<label>` uebernommen.
+  - metadata-only changes without version impact
+- Pre-release tags are allowed:
+  - `vX.Y.Z-<label>` is taken over exactly as NuGet version `X.Y.Z-<label>`.
 
-## 5. Entscheidungs-Matrix
-| Aenderungstyp | Beispiel | Bump |
+## 5. Decision Matrix
+| Change type | Example | Bump |
 |---|---|---|
 | Public API rename/remove | `ZipProcessing` -> `ArchiveProcessing` | MAJOR |
-| Breaking Defaults/Policy | stricteres Verhalten ohne Opt-in | MAJOR |
-| Kompatibles Feature | neuer Datentyp/Flow | MINOR |
-| Fix/Refactor | Stabilisierung, Cleanup | PATCH |
-| Doku/Test/CI/Tooling | Workflow-, Skript-, Test-, Doku-Update | PATCH |
-| Metadaten-only | mechanische Aenderung ohne Laufzeitwirkung | NONE |
+| Breaking defaults/policy | stricter behavior without opt-in | MAJOR |
+| Compatible feature | new datatype/flow | MINOR |
+| Fix/refactor | stabilization, cleanup | PATCH |
+| Docs/tests/CI/tooling | workflow/script/test/doc update | PATCH |
+| Metadata-only | mechanical change without runtime impact | NONE |
 
-## 6. CI-Guard (Pflicht)
-- `tools/versioning/check-version-policy.sh` erzwingt fail-closed:
-  - In PR/CI: keine statischen Versionfelder in `Directory.Build.props`/`Directory.Build.targets`/`*.csproj`/`*.vbproj`.
-  - In Release (Tag): Tag-Format-Validierung und `TagVersion == nupkg-PackageVersion`.
-- Publish ist nur bei `refs/tags/v*` erlaubt.
-- Target-Feed fuer Online-Installierbarkeit: NuGet.org.
-- Release-Packaging setzt die Version ausschliesslich via:
+## 6. CI Guard (mandatory)
+- `tools/versioning/check-version-policy.sh` enforces fail-closed:
+  - In PR/CI: no static version fields in `Directory.Build.props`/`Directory.Build.targets`/`*.csproj`/`*.vbproj`.
+  - In release (tag): tag format validation and `TagVersion == nupkg-PackageVersion`.
+- Publishing is allowed only on `refs/tags/v*`.
+- Target feed for online installability: NuGet.org.
+- Release packaging sets the version exclusively via:
   - `dotnet pack ... -p:PackageVersion=$VERSION -p:Version=$VERSION`
-- Assembly-/File-Version werden deterministisch aus dem Tag-Kern abgeleitet:
+- Assembly/file version are derived deterministically from the tag core:
   - `AssemblyVersion = MAJOR.MINOR.0.0`
   - `FileVersion = MAJOR.MINOR.PATCH.0`
-- `tools/versioning/check-versioning.sh` bleibt fuer Deterministik der `required`-Klassifikation im PR-Labeling.
+- `tools/versioning/check-versioning.sh` remains for determinism of the `required` classification in PR labeling.
 
-## 7. Deterministisches Auto-Labeling (Pflicht)
-Caps pro PR-Lauf:
-- genau ein `version:*`
-- genau ein Primary-Label
-- maximal ein `impl:*`
-- maximal zwei `area:*`
+## 7. Deterministic Auto Labeling (mandatory)
+Caps per PR run:
+- exactly one `version:*`
+- exactly one primary label
+- at most one `impl:*`
+- at most two `area:*`
 
-Alle veralteten Auto-Labels werden vor dem Anwenden neuer Labels entfernt.
+All outdated auto labels are removed before applying new labels.
 
-## 8. Label-Registry
-### 8.1 Version-Labels
+## 8. Label Registry
+### 8.1 Version Labels
 - `version:major`
 - `version:minor`
 - `version:patch`
 - `version:none`
 
-### 8.2 Primary-Labels
+### 8.2 Primary Labels
 - `breaking`, `feature`, `fix`, `refactor`, `ci`, `test`, `docs`, `tooling`, `chore`
 
-### 8.3 Implementation-Labels
+### 8.3 Implementation Labels
 - `impl:quality`, `impl:security`, `impl:docs`, `impl:config`
 
-### 8.4 Area-Labels
+### 8.4 Area Labels
 - `area:pipeline`, `area:qodana`, `area:archive`, `area:hashing`, `area:detection`,
 - `area:materializer`, `area:versioning`, `area:tests`, `area:docs`, `area:tooling`
 
-Kanonische Quelle:
+Canonical source:
 - `tools/versioning/labels.json`
 
-## 9. Prioritaetsregel
-Primary-Prioritaet ist fix:
+## 9. Priority Rule
+Primary priority is fixed:
 `breaking > feature > fix > refactor > ci > test > docs > tooling > chore`
 
-## 10. Zugehoerige SSOT-Dokumente
-- `docs/versioning/004_POLICY_LABELING.MD`
-- `docs/ci/001_PIPELINE_CI.MD`
-- `docs/governance/002_POLICY_LABELING.MD`
-- `docs/governance/004_POLICY_DOCUMENTATION.MD`
+## 10. Related SSOT Documents
+- `docs/versioning/104_POLICY_LABELING.MD`
+- `docs/ci/101_PIPELINE_CI.MD`
+- `docs/governance/102_POLICY_LABELING.MD`
+- `docs/governance/104_POLICY_DOCUMENTATION.MD`
 
 ## 11. Qodana
-Qodana ist zusaetzliche Static-Analysis und ersetzt keine CI-Quality-Gates fuer Build/Test/Coverage/Versioning.
+Qodana is additional static analysis and does not replace CI quality gates for build/test/coverage/versioning.
 
-## RoC-Bezug
+## RoC References
 - [Artifact-Contract-Regel](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/artifact_contract.yaml)
 - [Docs-Drift-Regel](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/docs_drift.yaml)
 - [Shell-Safety-Regeln](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/shell_safety.yaml)

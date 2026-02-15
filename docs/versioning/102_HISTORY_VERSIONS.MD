@@ -1,16 +1,19 @@
-# Versionslinie (Commit → Version)
+# Version Line (Commit -> Version)
 
-Diese Tabelle wurde aus der Commit-Historie anhand der Policy in
-`docs/versioning/001_POLICY_VERSIONING.MD` abgeleitet.
-Heuristik fuer die Rueckwirkungs-Zuordnung:
+This table is derived from the commit history based on the policy in
+`docs/versioning/101_POLICY_VERSIONING.MD`.
+Heuristics for retroactive classification:
 - Major-Overrides: `5255724`, `fd03389`
-- `feat:` oder `Add ...` (nicht-Doku) => Minor
-- `docs|test|ci|chore|tooling|refactor|fix` => Patch
+- `feat:` or `Add ...` (non-docs) => minor
+- `docs|test|ci|chore|tooling|refactor|fix` => patch
 
-Aktueller Entwicklungsstand:
-- Aktuelle Entwicklungslinie enthaelt `5.x` (aktuell veroeffentlichtes Tag: `v5.1.4`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
+Current state:
+- Current release line contains `5.x` (latest published tag: `v5.1.4`; details in `docs/versioning/103_CHANGELOG_RELEASES.MD`).
 
-| Version | Kurzbeschreibung | Commit | Keyword |
+Note:
+- The \"short description\" column follows the original commit/PR intent text for deterministic traceability and is not normalized to a single language.
+
+| Version | Short description | Commit | Keyword |
 |---|---|---|---|
 | `5.1.4` | Refactor-Cluster 7C abgeschlossen + Qodana-Alerts auf 0 + Version-Bump fuer Release | [2adeb83](https://github.com/tomtastisch/FileClassifier/commit/2adeb83) | patch |
 | `5.1.3` | PR-Governance-Haertung (DE-Naming, PR-Template, fail-closed Gate fuer `security/code-scanning/tools = 0`) | [0b488ac](https://github.com/tomtastisch/FileClassifier/commit/0b488ac) | patch |

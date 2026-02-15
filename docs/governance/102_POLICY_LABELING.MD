@@ -6,8 +6,8 @@ This governance policy applies to deterministic PR auto-labeling and auto-versio
 ## 2. Owned Files
 - `.github/workflows/ci.yml`
 - `tools/versioning/*`
-- `docs/versioning/001_POLICY_VERSIONING.MD`
-- `docs/versioning/004_POLICY_LABELING.MD`
+- `docs/versioning/101_POLICY_VERSIONING.MD`
+- `docs/versioning/104_POLICY_LABELING.MD`
 
 ## 3. Change Requirements
 Any change to taxonomy, priority, caps, or versioning decision logic must include:

@@ -40,7 +40,7 @@ This repository uses GitHub Code Scanning Advanced Setup (workflow-based CodeQL)
 Default Setup remains disabled (state: `not-configured`).
 When Default Setup is enabled, additional advanced CodeQL workflow uploads can be rejected by GitHub.
 Operational rules for this repo:
-- Keep Default Setup disabled for CodeQL (see `docs/security/010_CODEQL_DEFAULT_SETUP_GUARDRAIL.MD`).
+- Keep Default Setup disabled for CodeQL (see `docs/security/110_CODEQL_DEFAULT_SETUP_GUARDRAIL.MD`).
 - Treat Default-Setup drift as a fail-closed blocker and remediate before merging/releasing.
 - Non-CodeQL SARIF uploads (for example OpenSSF Scorecard SARIF) are permitted.
 

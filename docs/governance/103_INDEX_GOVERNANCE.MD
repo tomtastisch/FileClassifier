@@ -15,4 +15,4 @@ This index is non-normative. Normative policy definitions are the rule files und
 | `CI-VERSION-001` | `tools/ci/policies/rules/versioning_svt.yaml` |
 
 ## Zusatzrichtlinien (dokumentativ)
-- Branch/PR Naming (DE): `docs/governance/007_POLICY_BRANCH_PR_NAMING_DE.MD`
+- Branch/PR Naming (DE): `docs/governance/107_POLICY_BRANCH_PR_NAMING_DE.MD`

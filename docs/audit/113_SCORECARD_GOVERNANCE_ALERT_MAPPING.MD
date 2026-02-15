@@ -1,18 +1,18 @@
-# Scorecard Governance Alert Mapping (Ruleset/Prozess)
+# Scorecard Governance Alert Mapping (Ruleset/Process)
 
-Stand: 2026-02-13
+As of: 2026-02-13
 
-## Verifizierter Ist-Stand (2026-02-13)
-- Branch Protection `main`:
+## Verified Current State (2026-02-13)
+- Branch protection `main`:
   - `required_pull_request_reviews.required_approving_review_count = 1`
   - `require_code_owner_reviews = true`
   - `require_last_push_approval = true`
 - Fuzzing:
-  - Workflow `.github/workflows/fuzzing-baseline.yml` aktiv.
-  - Letzter manueller Nachweis-Run: `22003901268` (`success`).
+  - Workflow `.github/workflows/fuzzing-baseline.yml` active.
+  - Last manual evidence run: `22003901268` (`success`).
 
-## Ziel
-Diese Datei mappt die repo-/governance-basierten Scorecard-Alerts ohne konkrete Datei (`no file associated`) auf verifizierbare Repository-Regeln und Prozesse.
+## Goal
+Map repo/governance-based Scorecard alerts without a concrete file (`no file associated`) to verifiable repository rules and processes.
 
 ## Scope
 - `MaintainedID`
@@ -21,32 +21,31 @@ Diese Datei mappt die repo-/governance-basierten Scorecard-Alerts ohne konkrete 
 - `FuzzingID`
 - `CIIBestPracticesID`
 
-## Nicht im Scope
-- Codezeilen-Analyzer-Hinweise (z. B. `UseCollectionExpression`, `RedundantQualifier`).
-- File-basierte Alerts (`TokenPermissionsID`, `PinnedDependenciesID`), da separat in Code/Workflow gefixt.
+## Out of Scope
+- Code-line analyzer hints (e.g. `UseCollectionExpression`, `RedundantQualifier`).
+- File-based alerts (`TokenPermissionsID`, `PinnedDependenciesID`), since those are fixed separately in code/workflows.
 
-## Mapping (Claim -> Steuerung -> Evidence)
-
-| Alert-ID | Steuerung (Soll) | Aktuelle Umsetzung | Evidence (deterministisch) | DoD A | DoD B |
+## Mapping (Claim -> Control -> Evidence)
+| Alert ID | Control (target) | Current implementation | Evidence (deterministic) | DoD A | DoD B |
 |---|---|---|---|---|---|
-| `BranchProtectionID` | `main` nur via PR + required checks | Branch Protection/Ruleset aktiv, required checks konfiguriert | `gh api repos/tomtastisch/FileClassifier/branches/main/protection` | `required_status_checks` vorhanden | direkter Push auf `main` technisch blockiert |
-| `CodeReviewID` | Mindestens 1 PR-Review vor Merge | PR-Review-Policy in Branch Protection/Ruleset | `gh api repos/tomtastisch/FileClassifier/branches/main/protection --jq '.required_pull_request_reviews'` | `required_approving_review_count >= 1` | Merge ohne Review nicht möglich |
-| `MaintainedID` | Nachweis aktiver Wartung | Kontinuierliche Commits/Releases + aktive CI | `gh api repos/tomtastisch/FileClassifier/commits?per_page=20` und `gh api repos/tomtastisch/FileClassifier/actions/runs?per_page=20` | in den letzten 90 Tagen Commits vorhanden | in den letzten 30 Tagen erfolgreiche Workflow-Runs vorhanden |
-| `FuzzingID` | Fuzzing-Baseline vorhanden (mind. report-only) | Workflow `.github/workflows/fuzzing-baseline.yml` | `gh workflow view fuzzing-baseline.yml --yaml` und `gh run list --workflow fuzzing-baseline.yml --limit 10` | Workflow existiert und ist ausführbar | mindestens ein erfolgreicher Run in den letzten 30 Tagen |
-| `CIIBestPracticesID` | Prozess-/Security-Baseline dokumentiert und nachvollziehbar | Audit-/Governance-Docs + CI-Evidence + Security Policy | `ls docs/audit` + `bash tools/audit/verify-security-claims.sh` | Audit-Index vorhanden und verlinkt | Security-Claims-Evidence liefert `pass` für Blocker-Claims |
+| `BranchProtectionID` | `main` only via PR + required checks | branch protection/ruleset active, required checks configured | `gh api repos/tomtastisch/FileClassifier/branches/main/protection` | `required_status_checks` present | direct push to `main` is technically blocked |
+| `CodeReviewID` | at least 1 PR review before merge | PR review policy in branch protection/ruleset | `gh api repos/tomtastisch/FileClassifier/branches/main/protection --jq '.required_pull_request_reviews'` | `required_approving_review_count >= 1` | merge without review not possible |
+| `MaintainedID` | evidence of active maintenance | continuous commits/releases + active CI | `gh api repos/tomtastisch/FileClassifier/commits?per_page=20` and `gh api repos/tomtastisch/FileClassifier/actions/runs?per_page=20` | commits exist in last 90 days | successful workflow runs exist in last 30 days |
+| `FuzzingID` | fuzzing baseline exists (at least report-only) | workflow `.github/workflows/fuzzing-baseline.yml` | `gh workflow view fuzzing-baseline.yml --yaml` and `gh run list --workflow fuzzing-baseline.yml --limit 10` | workflow exists and is executable | at least one successful run in last 30 days |
+| `CIIBestPracticesID` | process/security baseline documented and traceable | audit/governance docs + CI evidence + security policy | `ls docs/audit` + `bash tools/audit/verify-security-claims.sh` | audit index exists and links | security claims evidence returns `pass` for blocker claims |
 
-## Hinweis zur Scorecard-Interpretation
-- Diese Alerts bewerten Governance-Reife, nicht nur Codeinhalt.
-- Ein Alert kann trotz technischer Teilumsetzung offen bleiben, wenn Scorecard öffentliche Signale anders gewichtet.
-- Für Merge-Gates gelten nur intern deterministisch definierte Blocker-Checks.
+## Note on Scorecard Interpretation
+- These alerts evaluate governance maturity, not only code content.
+- An alert can remain open even if parts are implemented technically, if Scorecard weights public signals differently.
+- For merge gates, only internally and deterministically defined blocker checks apply.
 
-## Operativer Prozess (fail-closed)
-1. Wöchentlicher Snapshot der offenen Scorecard-Alerts.
-2. Für jeden Governance-Alert Evidence-Befehl ausführen und Artefakt in `artifacts/security/` persistieren.
-3. Bei Drift (`fail`) sofortige Korrektur in Ruleset/Workflow.
-4. Nach Korrektur Re-Run von Scorecard + Security-Claims-Evidence.
-5. Merge-Gate: `security/code-scanning/tools` muss `0` offene Alerts liefern.
-   - Standard: Gate prueft `main` (verhindert Merges, solange `main` rot ist).
-   - Ausnahme fuer Remediation-PRs: PRs mit Label `area:qodana` pruefen die Alerts gegen den PR-Ref (`refs/pull/<nr>/merge`), damit ein Qodana-Fix-PR trotz bereits rotem `main` mergebar bleibt.
-   - Implementierung: `tools/ci/check-code-scanning-tools-zero.sh` (ref-Auswahl ueber PR-Label).
-6. Nicht technisch remediierbare Heuristik-Alerts (z. B. Repo-Alter `<90 Tage`) werden nur mit begruendetem Dismissal-Kommentar geschlossen und im PR-Evidence protokolliert.
+## Operational Process (fail-closed)
+1. Weekly snapshot of open Scorecard alerts.
+2. For each governance alert, run evidence commands and persist artifacts under `artifacts/security/`.
+3. On drift (`fail`), correct ruleset/workflow immediately.
+4. After corrections, re-run Scorecard + security-claims evidence.
+5. Merge gate: `security/code-scanning/tools` must report `0` open alerts.
+   - Default: gate checks `main` (prevents merges while `main` is red).
+   - Exception for remediation PRs: PRs labeled `area:qodana` check alerts against the PR ref (`refs/pull/<nr>/merge`) to avoid deadlocks (a Qodana-fix PR can merge even if `main` is already red).
+   - Implementation: `tools/ci/check-code-scanning-tools-zero.sh` (ref selection via PR label).
+6. Heuristic alerts that cannot be remediated technically (e.g. repo age `<90 days`) are closed only with a justified dismissal comment and recorded in PR evidence.

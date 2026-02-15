@@ -1,7 +1,6 @@
 # Changelog
 
-Alle Aenderungen werden hier technisch dokumentiert. Die Release-Version selbst ist
-der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
+All changes are documented here in technical terms. The release version itself is the Git tag `vX.Y.Z` (optional `-prerelease`) as SSOT.
 
 ## [Unreleased]
 - Added:
@@ -15,100 +14,100 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 
 ## [5.1.4]
 - Changed:
-  - Cluster 7C: ReasonCodes/Exceptions konsolidiert und semantisch vereinheitlicht (DetectDetailed).
-  - Archive-Infrastructure: redundante `System.IO.*`-Qualifizierer bereinigt (Imports + unqualifiziert).
+  - Cluster 7C: consolidated and semantically unified ReasonCodes/exceptions (DetectDetailed).
+  - Archive infrastructure: removed redundant `System.IO.*` qualifiers (Imports + unqualified usage).
 - Fixed:
-  - Qodana Findings: `ConvertToConstant.Local` und `UseUtf8StringLiteral` in Tests beseitigt.
+  - Qodana findings: removed `ConvertToConstant.Local` and `UseUtf8StringLiteral` in tests.
 - Docs/CI/Tooling:
-  - Code-Scanning-Zero-Gate fuer Qodana-Fix-PRs entkoppelt (PRs mit Label `area:qodana` pruefen PR-ref statt `main`).
+  - Decoupled the code-scanning zero gate for Qodana fix PRs (PRs with label `area:qodana` check the PR ref instead of `main`).
 
 ## [5.1.3]
 - Added:
-  - Verbindliches PR-Template in deutscher Sprache mit Checklisten, Nachbesserungs-Tracking und DoD-Matrix.
-  - Governance-Policy fuer Branch-/PR-Naming (`docs/governance/007_POLICY_BRANCH_PR_NAMING_DE.MD`).
-  - FsCheck-basierter Fuzzing-Smoke-Test als nachweisbarer Fuzzing-Signaltest.
+  - Mandatory PR template in German with checklists, review-fix tracking, and a DoD matrix.
+  - Governance policy for branch/PR naming (`docs/governance/107_POLICY_BRANCH_PR_NAMING_DE.MD`).
+  - FsCheck-based fuzzing smoke test as an auditable fuzzing signal test.
 - Changed:
-  - `preflight` erzwingt jetzt fail-closed:
-    - PR-Governance-Check (Branch/Titel/PR-Body),
-    - `security/code-scanning/tools` muss 0 offene Alerts liefern.
-  - Scorecard-Workflow nutzt `SECURITY_CLAIMS_TOKEN` als PAT-basierte Tokenquelle fuer robuste Governance-Auswertung.
-  - Agent-Regelwerk (`AGENTS.md`) auf verbindliche iterative Abarbeitung und Merge-Gates erweitert.
+  - `preflight` now enforces fail-closed:
+    - PR governance check (branch/title/PR body),
+    - `security/code-scanning/tools` must report 0 open alerts.
+  - Scorecard workflow uses `SECURITY_CLAIMS_TOKEN` as a PAT-based token source for robust governance evaluation.
+  - Agent rules (`AGENTS.md`) extended with binding iterative processing and merge gates.
 - Fixed:
-  - Versionskonvergenz auf `5.1.3` nachgezogen (`RepoVersion`, `Version`, `PackageVersion`, Versionshistorie).
+  - Version convergence updated to `5.1.3` (`RepoVersion`, `Version`, `PackageVersion`, version history).
 - Docs/CI/Tooling:
-  - Governance-Index um Branch-/PR-Naming-Policy erweitert.
+  - Governance index extended with branch/PR naming policy.
 
 ## [5.1.2]
 - Changed:
-  - Gate4 Pollingdauer fuer Release-Verifikation optimiert.
+  - Optimized Gate4 polling duration for release verification.
 - Fixed:
-  - Release-/SVT-Ablauf fuer `release_tag` deterministisch stabilisiert.
+  - Stabilized release/SVT path for `release_tag` deterministically.
 
 ## [5.1.1]
 - Added:
-  - Dependabot-Schutz fuer secret-pflichtige Workflows (`qodana`, `security-claims-evidence`) bei Dependabot-PR-Kontext.
+  - Dependabot protections for secret-required workflows (`qodana`, `security-claims-evidence`) in Dependabot PR context.
 - Changed:
-  - Dependabot auf security-only fuer geplante Version-Bumps gestellt (`open-pull-requests-limit: 0` je Ecosystem).
-  - `security-claims-evidence` auf explizites fail-closed Secret-Assert (`SECURITY_CLAIMS_TOKEN`) gehaertet.
+  - Switched Dependabot to security-only for planned version bumps (`open-pull-requests-limit: 0` per ecosystem).
+  - Hardened `security-claims-evidence` with explicit fail-closed secret assert (`SECURITY_CLAIMS_TOKEN`).
 - Fixed:
-  - Secret-bedingte CI-Fehler auf Dependabot-PRs fuer `qodana` / `security-claims-evidence` beseitigt.
+  - Eliminated secret-caused CI failures on Dependabot PRs for `qodana` / `security-claims-evidence`.
 - Docs/CI/Tooling:
-  - Versionshistorie semver-absteigend sortiert und veraltete Release-Referenzen korrigiert.
+  - Sorted version history semver-desc and corrected outdated release references.
 
 ## [5.0.0]
 - Added:
-  - Optionale HMAC-SHA256-Digests fuer physische und logische Evidence-Hashes (`HmacPhysicalSha256`, `HmacLogicalSha256`) inkl. ENV-Key-Resolver (`FILECLASSIFIER_HMAC_KEY_B64`).
+  - Optional HMAC-SHA256 digests for physical and logical evidence hashes (`HmacPhysicalSha256`, `HmacLogicalSha256`) including ENV key resolver (`FILECLASSIFIER_HMAC_KEY_B64`).
 - Changed:
-  - Breaking Rename der oeffentlichen Hashing-Fassade von `DeterministicHashing` auf `EvidenceHashing`.
-  - Breaking Rename der oeffentlichen Hashing-Modelle auf `HashEvidence`, `HashDigestSet`, `HashOptions`, `HashRoundTripReport`, `HashSourceType`.
-  - Hashing-Tests konsolidiert in eine zentrale Datei `tests/FileTypeDetectionLib.Tests/Unit/HashingEvidenceTests.cs`.
+  - Breaking rename of the public hashing facade from `DeterministicHashing` to `EvidenceHashing`.
+  - Breaking rename of the public hashing models to `HashEvidence`, `HashDigestSet`, `HashOptions`, `HashRoundTripReport`, `HashSourceType`.
+  - Consolidated hashing tests into a single file `tests/FileTypeDetectionLib.Tests/Unit/HashingEvidenceTests.cs`.
 - Fixed:
-  - xxHash3-Formatierung und Optionen deterministisch vereinheitlicht (lowercase, `x16`, leere Fast-Hashes bei deaktivierter Option).
+  - Deterministically unified xxHash3 formatting and options (lowercase, `x16`, empty fast hashes when the option is disabled).
 - Docs/CI/Tooling:
-  - Migrationsdoku fuer Hashing-Renames und HMAC-Key-Setup ergänzt.
+  - Added migration docs for hashing renames and HMAC key setup.
 
 ## [4.4.0]
 - Added:
-  - Neue Governance-Policies fuer einheitliches Naming und SVT-Versioning (`CI-NAMING-001`, `CI-VERSION-001`).
+  - New governance policies for unified naming and SVT versioning (`CI-NAMING-001`, `CI-VERSION-001`).
 - Changed:
-  - Kanonischer Paket-/Assembly-/Namespace-Name auf `Tomtastisch.FileClassifier` vereinheitlicht.
-  - Release-Publish auf NuGet Trusted Publishing (OIDC via `NuGet/login@v1`) umgestellt, fail-closed abgesichert.
+  - Unified the canonical package/assembly/namespace name to `Tomtastisch.FileClassifier`.
+  - Switched release publish to NuGet trusted publishing (OIDC via `NuGet/login@v1`), hardened fail-closed.
 - Fixed:
-  - PR-Labeling robust gegen paginierte GitHub-File-Listen gemacht (deterministische JSON-Bildung).
-  - Release-Workflow YAML-Syntax fuer Fail-Closed-Assert korrigiert.
+  - Made PR labeling robust against paginated GitHub file lists (deterministic JSON generation).
+  - Fixed release workflow YAML syntax for fail-closed assert.
 - Docs/CI/Tooling:
-  - CI um dedizierte Checks `naming-snt` und `versioning-svt` inkl. Artefakt-Nachweisen erweitert.
-  - Migrationsdoku fuer Legacy-NuGet-ID (`Tomtastisch.FileTypeDetection`) ergänzt.
+  - Extended CI with dedicated checks `naming-snt` and `versioning-svt` including artifact evidence.
+  - Added migration docs for the legacy NuGet ID (`Tomtastisch.FileTypeDetection`).
 
 ## [4.2.1]
 - Added:
 - Changed:
-  - Quality-Gates auf explizites `Release`-Build/Test/Coverage gehaertet.
-  - Versioning-Guard erzwingt nun einen vorhandenen History-Eintrag fuer die aktive Version.
+  - Hardened quality gates to explicit `Release` build/test/coverage.
+  - Versioning guard now enforces a history entry for the active version.
 - Fixed:
-  - Reqnroll/xUnit Release-Regeneration gegen stale `obj/Release` Artefakte stabilisiert.
+  - Stabilized Reqnroll/xUnit release regeneration against stale `obj/Release` artifacts.
 - Docs/CI/Tooling:
-  - Versionshistorie `docs/versioning/002_HISTORY_VERSIONS.MD` fuer fehlende `4.x`-Eintraege nachgezogen.
-  - Versionierungs-Policy um den Pflicht-Nachweis im Versionsverlauf erweitert.
+  - Backfilled version history `docs/versioning/102_HISTORY_VERSIONS.MD` for missing `4.x` entries.
+  - Extended versioning policy with a required evidence entry in the version line.
 
 ## [4.1.2]
 - Added:
 - Changed:
-  - Test-Toolchain auf xUnit v3 + `Reqnroll.xunit.v3` migriert.
-  - BDD-Discovery/Runner-Ausführung für xUnit v3 stabilisiert (Scenario-Parity erhalten).
+  - Migrated test toolchain to xUnit v3 + `Reqnroll.xunit.v3`.
+  - Stabilized BDD discovery/runner execution for xUnit v3 (scenario parity preserved).
 - Fixed:
 - Docs/CI/Tooling:
-  - CI in getrennte, auditierbare Jobs refaktoriert (Preflight, Build, Security, Tests+Coverage, Summary).
-  - BDD-Readable Testlauf liefert TRX + lesbare Ausgabe + Coverage + Gate im Single-Run.
-  - Dokumentation fuer CI-Nachweise unter `docs/ci/001_PIPELINE_CI.MD` ergaenzt.
-  - Migrations-DoD und Fortschrittstracking in der PR-Beschreibung gepflegt.
+  - Refactored CI into separate, auditable jobs (preflight, build, security, tests+coverage, summary).
+  - BDD-readable test run produces TRX + readable output + coverage + gate in a single run.
+  - Added CI evidence documentation under `docs/ci/101_PIPELINE_CI.MD`.
+  - Maintained migration DoD and progress tracking in the PR description.
 
 ## [3.0.0]
-- Breaking: Rename `FileTypeDetectorOptions` -> `FileTypeProjectOptions`
-- Breaking: Rename `FileTypeSecurityBaseline` -> `FileTypeProjectBaseline`
+- Breaking: rename `FileTypeDetectorOptions` -> `FileTypeProjectOptions`
+- Breaking: rename `FileTypeSecurityBaseline` -> `FileTypeProjectBaseline`
 
 ## [2.0.0]
-- Breaking: Rename `ZipProcessing` -> `ArchiveProcessing`
+- Breaking: rename `ZipProcessing` -> `ArchiveProcessing`
 
 ## [1.0.0]
 - Initial implementation

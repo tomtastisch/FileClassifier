@@ -1,89 +1,89 @@
-# Playbook: Neue Datatypes und API-Modelle erweitern
+# Playbook: Extend New Datatypes and API Models
 
-## 1. Zweck und Zielgruppe
-Dieses Playbook beschreibt einen einheitlichen, verbindlichen Ablauf für:
-1. neue erkennbare Formate über `FileKind` + `FileTypeRegistry`
-2. neue API-Modelle unter `Abstractions/*`
+## 1. Purpose and Audience
+This playbook describes a unified, binding process for:
+1. new detectable formats via `FileKind` + `FileTypeRegistry`
+2. new API models under `Abstractions/*`
 
-Zielgruppe:
-- Entwickler, die Detection/Registry/Abstractions erweitern
-- Reviewer, die Konsistenz und fail-closed Verhalten absichern
-- Verwender, die Auswirkungen auf API-Outputs verstehen müssen
+Audience:
+- developers extending detection/registry/abstractions
+- reviewers ensuring consistency and fail-closed behavior
+- consumers who need to understand effects on API outputs
 
-## 2. Wann dieses Playbook verwenden?
-| Vorhaben | Relevanter Abschnitt |
+## 2. When to use this playbook
+| Intent | Relevant section |
 |---|---|
-| Neuer Dateityp (z. B. neue Magic-Signatur) | Abschnitt 3 und 4 |
-| Neues Rückgabemodell für Public API | Abschnitt 5 und 6 |
-| Neues Format plus neues Modell | Abschnitte 3 bis 6 |
+| New file type (e.g. new magic signature) | sections 3 and 4 |
+| New return model for public API | sections 5 and 6 |
+| New format plus new model | sections 3 through 6 |
 
-## 3. Neue `FileKind`-Formate: zentrale Stellen
-### 3.1 Pflichtdateien
-| Bereich | Datei | Aufgabe |
+## 3. New `FileKind` formats: central locations
+### 3.1 Required files
+| Area | File | Task |
 |---|---|---|
-| Öffentliche Typliste | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Detection/FileKind.vb) | Enum-Wert ergänzen |
-| SSOT Metadaten und Magic | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Detection/FileTypeRegistry.vb) | Extension/Alias/Magic und Resolve-Verhalten |
-| Detection-Details | [Detection Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Detection/README.md) | fachliche Erklärung nachziehen |
-| Registry-Tests | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/tests/FileTypeDetectionLib.Tests/Unit/FileTypeRegistryUnitTests.cs) | Resolve/Alias/Magic validieren |
+| Public kind list | [Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Detection/FileKind.vb) | add enum value |
+| SSOT metadata and magic | [Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Detection/FileTypeRegistry.vb) | extension/alias/magic and resolve behavior |
+| Detection details | [Detection module](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Detection/README.md) | update domain explanation |
+| Registry tests | [Details](https://github.com/tomtastisch/FileClassifier/blob/main/tests/FileTypeDetectionLib.Tests/Unit/FileTypeRegistryUnitTests.cs) | validate resolve/alias/magic |
 
-### 3.2 Registry-Punkte, die geprüft werden müssen
-- `ExtensionOverrides` (nur falls CanonicalExtension vom Enum-Namen abweicht)
-- `AliasOverrides` (Legacy-/Kompatibilitäts-Aliase)
-- `BuildMagicPatternCatalog()` (Magic-Pattern Aufnahme)
-- `HasStructuredContainerDetection()` (falls neuer Typ strukturierte Verfeinerung braucht)
-- indirekte Auswirkungen auf `KindsWithoutDirectContentDetection()`
+### 3.2 Registry points that must be checked
+- `ExtensionOverrides` (only if `CanonicalExtension` differs from enum name)
+- `AliasOverrides` (legacy/compatibility aliases)
+- `BuildMagicPatternCatalog()` (magic pattern ingestion)
+- `HasStructuredContainerDetection()` (if the new kind needs structured refinement)
+- indirect impact on `KindsWithoutDirectContentDetection()`
 
-### 3.3 Bei neuen Containerarten zusätzlich
-- [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md) prüfen, ob Gate/Extractor den Container bereits trägt.
-- Falls nein: Infrastrukturpfad erweitern und Security-Gates (Depth, Size, Traversal, Links) mitziehen.
+### 3.3 For new container types additionally
+- Check [Infrastructure module](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md) whether the gate/extractor already supports the container.
+- If not: extend the infrastructure path and carry security gates (depth, size, traversal, links).
 
-## 4. Schritt-für-Schritt-Checkliste für neue `FileKind`
-- [ ] Schritt 1: Enum-Wert in `FileKind.vb` anlegen.
-- [ ] Schritt 2: `FileTypeRegistry.vb` (Extension/Alias/Magic) aktualisieren.
-- [ ] Schritt 3: Bei Bedarf `HasStructuredContainerDetection()` erweitern.
-- [ ] Schritt 4: Tests für Resolve/Alias/Magic/fail-closed ergänzen.
-- [ ] Schritt 5: Doku in `docs/010_API_CORE.MD`, `docs/020_ARCH_CORE.MD`, `docs/references/001_REFERENCES_CORE.MD` aktualisieren.
-- [ ] Schritt 6: Verifikation laufen lassen (Abschnitt 9).
+## 4. Step-by-step checklist for new `FileKind`
+- [ ] Step 1: Add enum value in `FileKind.vb`.
+- [ ] Step 2: Update `FileTypeRegistry.vb` (extension/alias/magic).
+- [ ] Step 3: If needed, extend `HasStructuredContainerDetection()`.
+- [ ] Step 4: Add tests for resolve/alias/magic/fail-closed.
+- [ ] Step 5: Update docs in `docs/110_API_CORE.MD`, `docs/120_ARCH_CORE.MD`, `docs/references/101_REFERENCES_CORE.MD`.
+- [ ] Step 6: Run verification (section 9).
 
-## 5. Neue API-Modelle (`Abstractions/*`): zentrale Stellen
-### 5.1 Pflichtdateien
-| Bereich | Datei | Aufgabe |
+## 5. New API models (`Abstractions/*`): central locations
+### 5.1 Required files
+| Area | File | Task |
 |---|---|---|
-| Modell-Übersicht | [Abstractions Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md) | passenden Modellbereich bestimmen (`Detection`, `Archive`, `Hashing`) |
-| Modellklasse/enum | `src/FileTypeDetection/Abstractions/<Bereich>/<Typ>.vb` | neuen Typ definieren |
-| Teilbereich README | `src/FileTypeDetection/Abstractions/<Bereich>/README.md` | Typ in Index aufnehmen |
-| API-Katalog | [01 - Funktionen](https://github.com/tomtastisch/FileClassifier/blob/main/docs/010_API_CORE.MD) | neue/veränderte Rückgabemodelle eintragen |
-| Referenzen | [03 - Referenzen](https://github.com/tomtastisch/FileClassifier/blob/main/docs/references/001_REFERENCES_CORE.MD) | Modell- und Pfadreferenzen aktualisieren |
-| Contract-Doku (falls relevant) | `docs/contracts/*.MD` | nur bei Contract-relevanten Signatur-/Vertragsänderungen |
+| Model overview | [Abstractions module](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md) | choose model area (`Detection`, `Archive`, `Hashing`) |
+| Model class/enum | `src/FileTypeDetection/Abstractions/<Area>/<Type>.vb` | define new type |
+| Area README | `src/FileTypeDetection/Abstractions/<Area>/README.md` | add type to index |
+| API catalog | [01 - API functions](https://github.com/tomtastisch/FileClassifier/blob/main/docs/110_API_CORE.MD) | register new/changed return models |
+| References | [03 - References](https://github.com/tomtastisch/FileClassifier/blob/main/docs/references/101_REFERENCES_CORE.MD) | update model and path references |
+| Contract docs (if relevant) | `docs/contracts/*.MD` | only for contract-relevant signature/contract changes |
 
-### 5.2 Modellregeln
-- Modelle bleiben immutable orientiert und ohne I/O-Logik.
-- `Unknown`/fail-closed Semantik darf nicht aufgeweicht werden.
-- Bestehende Consumer-Verträge bleiben stabil oder werden als Breaking Change ausgewiesen.
+### 5.2 Model rules
+- Models remain immutable-oriented and contain no I/O logic.
+- `Unknown`/fail-closed semantics must not be relaxed.
+- Existing consumer contracts stay stable or are flagged as breaking changes.
 
-## 6. Schritt-für-Schritt-Checkliste für neue API-Modelle
-- [ ] Schritt 1: Modell im passenden Abstractions-Unterordner anlegen.
-- [ ] Schritt 2: Teilbereich-README und `Abstractions/README.md` aktualisieren.
-- [ ] Schritt 3: Verwendungen in Public API eintragen (`docs/010_API_CORE.MD`, `docs/references/001_REFERENCES_CORE.MD`).
-- [ ] Schritt 4: Falls API-Contract betroffen, passende Datei unter `docs/contracts/*.MD` aktualisieren.
-- [ ] Schritt 5: Unit-/Integration-Tests für neues Modellverhalten ergänzen.
-- [ ] Schritt 6: Verifikation laufen lassen (Abschnitt 9).
+## 6. Step-by-step checklist for new API models
+- [ ] Step 1: Create model in the appropriate abstractions subfolder.
+- [ ] Step 2: Update area README and `Abstractions/README.md`.
+- [ ] Step 3: Register usage in public API docs (`docs/110_API_CORE.MD`, `docs/references/101_REFERENCES_CORE.MD`).
+- [ ] Step 4: If the API contract is affected, update the relevant file under `docs/contracts/*.MD`.
+- [ ] Step 5: Add unit/integration tests for the new model behavior.
+- [ ] Step 6: Run verification (section 9).
 
-## 7. Beispiele (konkret)
-### 7.1 Beispiel A: Neuer `FileKind` `Tiff`
-1. `FileKind.vb`: Enum-Wert `Tiff` hinzufügen.
-2. `FileTypeRegistry.vb`: TIFF-Magic und Alias `tif`/`tiff` aufnehmen.
-3. `FileTypeRegistryUnitTests.cs`: neue Assertions für `ResolveByAlias("tif")` und Magic-Match.
-4. Doku in `docs/010_API_CORE.MD` und `docs/references/001_REFERENCES_CORE.MD` ergänzen.
+## 7. Examples (concrete)
+### 7.1 Example A: New `FileKind` `Tiff`
+1. `FileKind.vb`: add enum value `Tiff`.
+2. `FileTypeRegistry.vb`: add TIFF magic and alias `tif`/`tiff`.
+3. `FileTypeRegistryUnitTests.cs`: add new assertions for `ResolveByAlias("tif")` and magic match.
+4. Extend docs in `docs/110_API_CORE.MD` and `docs/references/101_REFERENCES_CORE.MD`.
 
-### 7.2 Beispiel B: Neues Modell `<NewModel>`
-1. Datei `src/FileTypeDetection/Abstractions/Hashing/<NewModel>.vb` anlegen.
-2. `src/FileTypeDetection/Abstractions/Hashing/README.md` und `src/FileTypeDetection/Abstractions/README.md` ergänzen.
-3. In `docs/010_API_CORE.MD` und `docs/references/001_REFERENCES_CORE.MD` Modell ergänzen.
-4. Wenn öffentliche Signaturen betroffen sind: passende Datei unter `docs/contracts/*.MD` aktualisieren.
+### 7.2 Example B: New model `<NewModel>`
+1. Create file `src/FileTypeDetection/Abstractions/Hashing/<NewModel>.vb`.
+2. Update `src/FileTypeDetection/Abstractions/Hashing/README.md` and `src/FileTypeDetection/Abstractions/README.md`.
+3. Add model in `docs/110_API_CORE.MD` and `docs/references/101_REFERENCES_CORE.MD`.
+4. If public signatures are affected: update the relevant file under `docs/contracts/*.MD`.
 
-## 8. Aktivierung und Einlesen
-### 8.1 Flowchart (Code -> Runtime)
+## 8. Activation and loading
+### 8.1 Flowchart (code -> runtime)
 ```mermaid
 flowchart TD
     A["Codeänderung: FileKind and/or Abstractions"] --> B["Build/Test"]
@@ -95,7 +95,7 @@ flowchart TD
     G --> H["Public Output: FileType/DetectionDetail oder neues Modell"]
 ```
 
-### 8.2 Sequence (Detect-Pipeline mit Registry)
+### 8.2 Sequence (detect pipeline with registry)
 ```mermaid
 sequenceDiagram
     participant Consumer
@@ -115,47 +115,47 @@ sequenceDiagram
     Detector-->>Consumer: FileType or DetectionDetail
 ```
 
-## 9. Verifikation (Kommandos)
+## 9. Verification (commands)
 ```bash
 python3 tools/check-docs.py
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj --filter "FullyQualifiedName~FileTypeRegistryUnitTests|FullyQualifiedName~HeaderCoveragePolicyUnitTests" -v minimal
 ```
 
-Bei Modell- oder Contract-Änderungen zusätzlich:
+For model or contract changes additionally:
 ```bash
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj --filter "FullyQualifiedName~HashingEvidenceApiContractTests|FullyQualifiedName~HashingEvidenceRoundTripTests" -v minimal
 ```
 
-## 10. Implementierungs-Checklist und Done-Kriterien
-### 10.1 Implementierungs-Checklist
-- [ ] Enum/Registry/Patterns sind konsistent erweitert.
-- [ ] Alias-Normalisierung ist eindeutig (keine Konflikte).
-- [ ] fail-closed Verhalten bleibt bei ungültigen Eingaben erhalten.
-- [ ] Tests decken Resolve, Alias, Magic und Regressionen ab.
-- [ ] Doku-Ebenen `01/02/03` und Modul-READMEs sind aktualisiert.
+## 10. Implementation checklist and done criteria
+### 10.1 Implementation checklist
+- [ ] Enum/registry/patterns are extended consistently.
+- [ ] Alias normalization is unambiguous (no conflicts).
+- [ ] Fail-closed behavior is preserved for invalid inputs.
+- [ ] Tests cover resolve, alias, magic, and regressions.
+- [ ] Documentation levels `01/02/03` and module READMEs are updated.
 
-### 10.2 Done-Kriterien
-Eine Datatype-/Modelländerung ist nur dann fertig, wenn:
-1. Enum/Registry/Patterns konsistent auflösen.
-2. Kein mehrdeutiger Alias bestehende Typen überschreibt.
-3. fail-closed Verhalten bei ungültigen Eingaben erhalten bleibt.
-4. Tests Regressionen für Detection und Mapping abdecken.
-5. Doku-Landkarte für Entwickler und Verwender aktualisiert ist.
+### 10.2 Done criteria
+A datatype/model change is done only if:
+1. enum/registry/patterns resolve consistently,
+2. no ambiguous alias overrides existing kinds,
+3. fail-closed behavior for invalid inputs is preserved,
+4. tests cover regressions for detection and mapping,
+5. the documentation map is updated for developers and consumers.
 
-## 11. Kompatibilitäts- und Breaking-Change-Hinweise
-| Änderung | Risiko | Einordnung |
+## 11. Compatibility and breaking-change hints
+| Change | Risk | Classification |
 |---|---|---|
-| Neuer `FileKind` ohne bestehende Signaturen zu ändern | meist additive Erweiterung | non-breaking, aber Test- und Doku-Pflicht |
-| Alias ändert bestehendes Mapping | bestehende Consumer können anderes Ergebnis sehen | potentiell breaking |
-| Öffentliche Modellproperties entfernen/umbenennen | Binary/Source-Consumer brechen | breaking |
-| Contract-Dokument (`docs/contracts/*.MD`) nicht aktualisiert trotz Surface-Änderung | Drift zwischen Code und Doku/Tests | release-blocking für API-Governance |
+| New `FileKind` without changing existing signatures | usually additive extension | non-breaking, but requires tests and docs |
+| Alias changes an existing mapping | existing consumers can see different results | potentially breaking |
+| Remove/rename public model properties | binary/source consumers break | breaking |
+| Contract doc (`docs/contracts/*.MD`) not updated despite surface change | drift between code and docs/tests | release-blocking for API governance |
 
-## 12. Nicht-Ziele
-- Keine stillen API-Surface-Änderungen ohne Contract-Dokumentation.
-- Keine Sicherheitslockerung im Archivpfad ohne explizite Risikoentscheidung und Testnachweis.
+## 12. Non-Goals
+- No silent API surface changes without contract documentation.
+- No security relaxation in archive paths without explicit risk decision and test evidence.
 
-## Dokumentpflege-Checkliste
-- [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
-- [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/010_API_CORE.MD` abgeglichen.
+## Documentation Maintenance Checklist
+- [ ] Content verified against current code state.
+- [ ] Links and anchors checked with `python3 tools/check-docs.py`.
+- [ ] Examples/commands verified locally.
+- [ ] Terminology aligned with `docs/110_API_CORE.MD`.

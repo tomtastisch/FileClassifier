@@ -1,25 +1,25 @@
-# Testdokumentation (BDD)
+# Test Documentation (BDD)
 
-## 1. Zweck
-Diese Seite ist der Einstieg fuer die testbezogene SSOT-Dokumentation im Bereich BDD/Reqnroll.
+## 1. Purpose
+This page is the entry point for test-related SSOT documentation in the BDD/Reqnroll area.
 
-## 2. Geltungsbereich
+## 2. Scope
 - `tests/FileTypeDetectionLib.Tests/Features/*.feature`
 - `tests/FileTypeDetectionLib.Tests/Steps/FileTypeDetectionSteps.cs`
-- Testlauf in CI via `tools/test-bdd-readable.sh`
-- Runner/Adapter: Reqnroll mit `Reqnroll.xunit.v3` (xUnit v3)
+- CI test run via `tools/test-bdd-readable.sh`
+- Runner/adapter: Reqnroll with `Reqnroll.xunit.v3` (xUnit v3)
 
-## 3. Dokumente
-1. [BDD-Satzkatalog (Deutsch, kanonisch)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/003_CATALOG_BDD.MD)
-2. [BDD-Ausfuehrung und Gherkin-Flow](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/002_FLOW_BDD.MD)
+## 3. Documents
+1. [BDD catalog (German, canonical)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/103_CATALOG_BDD.MD)
+2. [BDD execution and Gherkin flow](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/102_FLOW_BDD.MD)
 
-## 4. Verifikation
+## 4. Verification
 ```bash
 python3 tools/check-docs.py
 bash tools/test-bdd-readable.sh
 ```
 
-## 5. Verlinkte SSOT-Quellen
-- [CI-Pipeline (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/ci/001_PIPELINE_CI.MD)
-- [Dokumentationsstandard (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/governance/004_POLICY_DOCUMENTATION.MD)
-- [Readme](https://github.com/tomtastisch/FileClassifier/blob/main/tests/FileTypeDetectionLib.Tests/README.md)
+## 5. Linked SSOT Sources
+- [CI pipeline (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/ci/101_PIPELINE_CI.MD)
+- [Documentation standard (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/governance/104_POLICY_DOCUMENTATION.MD)
+- [README](https://github.com/tomtastisch/FileClassifier/blob/main/tests/FileTypeDetectionLib.Tests/README.md)

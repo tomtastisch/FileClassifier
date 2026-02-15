@@ -6,7 +6,7 @@ Normative policy definitions live in:
 - `tools/ci/policies/schema/rules.schema.json`
 - `tools/ci/policies/rules/`
 Entry index:
-- `docs/governance/006_INDEX_CI_RULES.MD`
+- `docs/governance/106_INDEX_CI_RULES.MD`
 
 ## Global Rules
 - Fail-closed: no silent bypass paths.
@@ -31,10 +31,10 @@ flowchart LR
   result --> policy["Policy validators / schema\nPolicyRunner + result schema"]
 ```
 
-The detailed job DAG and contract matrix are maintained in `docs/ci/001_PIPELINE_CI.MD` to avoid duplication.
+The detailed job DAG and contract matrix are maintained in `docs/ci/101_PIPELINE_CI.MD` to avoid duplication.
 
 ## Rule Catalog
-- Rule IDs and file ownership are indexed in `docs/governance/006_INDEX_CI_RULES.MD`.
+- Rule IDs and file ownership are indexed in `docs/governance/106_INDEX_CI_RULES.MD`.
 - Evaluation details and thresholds are defined only in `tools/ci/policies/rules/`.
 
 ## Severity Rules

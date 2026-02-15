@@ -6,7 +6,7 @@ This document describes all public API entry points with signatures, use cases, 
 ## 2. Definitions
 - Fail-closed: error paths return only safe outputs (`Unknown`, `False`, empty list).
 - Side effects: filesystem writes or global option changes.
-- Flow ID: reference to architecture flows in `docs/020_ARCH_CORE.MD`.
+- Flow ID: reference to architecture flows in `docs/120_ARCH_CORE.MD`.
 
 ## 2.1 API Semantics (prominent)
 - `TryValidateArchive(...)` is the canonical validation API.
@@ -187,7 +187,7 @@ Console.WriteLine($"Loaded={loaded}; Snapshot={snapshot}");
 
 ### 4.5 EvidenceHashing
 Details: [FileClassifier module](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md), [Abstractions module](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md).
-Formal API contract: [04 - EvidenceHashing API Contract](https://github.com/tomtastisch/FileClassifier/blob/main/docs/contracts/001_CONTRACT_HASHING.MD).
+Formal API contract: [04 - EvidenceHashing API Contract](https://github.com/tomtastisch/FileClassifier/blob/main/docs/contracts/101_CONTRACT_HASHING.MD).
 
 ```mermaid
 flowchart LR
@@ -219,8 +219,8 @@ Note:
 - Overloads without `options` use the global policy `FileTypeOptions.GetSnapshot().DeterministicHash`.
 
 ## 5. Non-Goals
-- No detailed discussion of internal low-level implementation (see `docs/references/001_REFERENCES_CORE.MD`).
-- No norm/compliance derivation (see `docs/specs/001_SPEC_DIN.MD`).
+- No detailed discussion of internal low-level implementation (see `docs/references/101_REFERENCES_CORE.MD`).
+- No norm/compliance derivation (see `docs/specs/101_SPEC_DIN.MD`).
 
 ## 6. Security Gate Mini-Contract (neutral)
 The following rules apply to `ArchiveSafetyGate` + `ArchiveExtractor`:
@@ -268,4 +268,4 @@ Portability/structure:
 - [ ] Content verified against current code state.
 - [ ] Links and anchors checked with `python3 tools/check-docs.py`.
 - [ ] Examples/commands verified locally.
-- [ ] Terminology aligned with `docs/010_API_CORE.MD`.
+- [ ] Terminology aligned with `docs/110_API_CORE.MD`.

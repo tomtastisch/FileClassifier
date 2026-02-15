@@ -4,7 +4,7 @@
 Backlog is derived from:
 - `artifacts/audit/hardening_candidates.json`
 - `artifacts/audit/redundancy_candidates.json`
-- `docs/audit/006_CODE_REVIEW_FINDINGS.MD`
+- `docs/audit/106_CODE_REVIEW_FINDINGS.MD`
 
 Baseline snapshot (2026-02-15, pre Package A):
 - hardening candidates: `21`
@@ -82,4 +82,4 @@ bash tools/audit/verify-code-analysis-evidence.sh
 - targeted code changes are limited to package scope
 - regression tests added/updated for changed behavior branches
 - full CI on PR is green
-- `docs/audit/006_CODE_REVIEW_FINDINGS.MD` updated with closed/moved findings
+- `docs/audit/106_CODE_REVIEW_FINDINGS.MD` updated with closed/moved findings

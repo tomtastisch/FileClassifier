@@ -135,7 +135,7 @@ Status (Baseline):
 - Kandidaten: `0` (heuristikbasiert).
 
 ## 6. PR-Mapping (Issue #67 Deliverables)
-Geplante/iterative PR-Pakete (aus `docs/audit/010_REFACTOR_BACKLOG.MD`):
+Geplante/iterative PR-Pakete (aus `docs/audit/110_REFACTOR_BACKLOG.MD`):
 1. Package A (P1) - Narrow broad exception catches in high-traffic entry points
 2. Package B (P2) - Archive/path guard duplication reduction
 3. Package C (P3) - Exception reason code normalization

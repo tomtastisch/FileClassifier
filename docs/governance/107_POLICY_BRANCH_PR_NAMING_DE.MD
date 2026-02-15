@@ -1,14 +1,14 @@
 # Policy Branch/PR Naming (DE)
 
-## 1. Zweck
-Diese Policy definiert ein einheitliches, professionelles und maschinenpruefbares Naming fuer Branches und Pull Requests.
+## 1. Purpose
+This policy defines a consistent, professional, and machine-checkable naming scheme for branches and pull requests.
 
-## 2. Verbindliche Konventionen
+## 2. Binding Conventions
 
 ### 2.1 Branches
-- Muss-Format: `codex/<tag>/<kurztext-kebab>`
-- Uebergang (legacy, befristet): `codex/<tag>-<kurztext-kebab>` wird fuer bestehende Branches akzeptiert.
-- Erlaubte `<tag>`:
+- Required format: `codex/<tag>/<shorttext-kebab>`
+- Transition (legacy, temporary): `codex/<tag>-<shorttext-kebab>` is accepted for existing branches.
+- Allowed `<tag>` values:
   - `fix`
   - `release`
   - `feat`
@@ -18,42 +18,42 @@ Diese Policy definiert ein einheitliches, professionelles und maschinenpruefbare
   - `ci`
   - `chore`
   - `security`
-- `<kurztext-kebab>`:
-  - nur `a-z`, `0-9`, `-`
-  - keine Leerzeichen, keine Sonderzeichen
-  - mindestens 3 Zeichen
+- `<shorttext-kebab>`:
+  - only `a-z`, `0-9`, `-`
+  - no spaces, no special characters
+  - at least 3 characters
 
 ### 2.2 PR-Titel
-- Muss-Format: `<tag>(<scope>): <deutsche kurzbeschreibung>`
-- `tag` wie oben.
+- Required format: `<tag>(<scope>): <german short description>`
+- `tag`: as above.
 - `scope`:
-  - nur `a-z0-9-`
-  - optional, aber empfohlen.
-- Kurzbeschreibung:
-  - Deutsch,
-  - praezise, kein Platzhaltertext,
-  - Ergebnis-/Aenderungsbezug.
+  - only `a-z0-9-`
+  - optional, but recommended.
+- Short description:
+  - German (mandatory),
+  - precise (no placeholder text),
+  - describes outcome/change.
 
 ### 2.3 PR-Beschreibung
-- Muss auf Deutsch sein.
-- Muss die Repository-PR-Template-Struktur einhalten.
-- Muss Checklisten und DoD-Matrix enthalten.
+- Must be written in German.
+- Must follow the repository PR template structure.
+- Must include checklists and a DoD matrix.
 
-## 3. Verbotene Muster
-- Unpraezise Titel wie `update`, `changes`, `misc`.
-- Branches ohne Tag-Segment.
-- PRs ohne Checklistenpflege nach Nachbesserungen.
+## 3. Forbidden Patterns
+- Imprecise titles like `update`, `changes`, `misc`.
+- Branches without a tag segment.
+- PRs without checklist maintenance after review fixes.
 
-## 4. Durchsetzung
-- CI-Check `pr-governance` validiert:
-  - Branch-Format,
-  - PR-Titel-Format,
-  - Pflichtsektionen und Checklisten in der PR-Beschreibung.
-- Fail-closed: Verstoss blockiert Merge.
+## 4. Enforcement
+- CI check `pr-governance` validates:
+  - branch format,
+  - PR title format,
+  - mandatory sections and checklists in the PR description.
+- Fail-closed: violations block merging.
 
 ## 5. DoD
-- DoD A: `pr-governance` laeuft erfolgreich fuer die PR.
-- DoD B: Branch- und PR-Name entsprechen exakt der Konvention.
+- DoD A: `pr-governance` completes successfully for the PR.
+- DoD B: branch and PR names match the convention exactly.
 
 ## 6. Rule Mapping
-- Normative Rule-Datei: `tools/ci/policies/rules/naming_snt.yaml`
+- Normative rule file: `tools/ci/policies/rules/naming_snt.yaml`

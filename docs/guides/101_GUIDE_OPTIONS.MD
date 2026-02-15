@@ -1,54 +1,54 @@
-# Playbook: Options anlegen und anpassen
+# Playbook: Create and Adjust Options
 
-## 1. Zweck und Zielgruppe
-Dieses Playbook beschreibt einen einheitlichen, verbindlichen Ablauf für neue oder geänderte Optionen in der FileTypeDetection-API.
+## 1. Purpose and Audience
+This playbook describes a unified, binding process for new or changed options in the FileTypeDetection API.
 
-Zielgruppe:
-- Entwickler, die `FileTypeProjectOptions` oder `FileTypeOptions` erweitern
-- Reviewer, die Vollständigkeit und fail-closed Verhalten prüfen
-- Verwender, die verstehen wollen, wann Runtime-Konfiguration aktiv wird
+Audience:
+- developers extending `FileTypeProjectOptions` or `FileTypeOptions`
+- reviewers checking completeness and fail-closed behavior
+- consumers who want to understand when runtime configuration becomes active
 
-## 2. Wann dieses Playbook verwenden?
-Verwende dieses Dokument, wenn mindestens einer der folgenden Punkte zutrifft:
-- neue Option in `FileTypeProjectOptions`
-- Änderung bestehender Default-Werte
-- Erweiterung von JSON-Load/Parse oder JSON-Export in `FileTypeOptions`
-- Baseline-Entscheidung in `FileTypeProjectBaseline`
+## 2. When to use this playbook
+Use this document if at least one of the following applies:
+- a new option in `FileTypeProjectOptions`
+- changes to existing default values
+- extension of JSON load/parse or JSON export in `FileTypeOptions`
+- a baseline decision in `FileTypeProjectBaseline`
 
-## 3. Zentral betroffene Stellen (Datei-Map)
-| Bereich | Datei | Muss angepasst werden bei |
+## 3. Central impacted locations (file map)
+| Area | File | Must be adjusted when |
 |---|---|---|
-| Option-Definition und Normalize | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/FileTypeProjectOptions.vb) | neue Property, Default, Normalisierungsregel |
-| JSON Load/Parse und Snapshot-Set | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/FileTypeOptions.vb) | JSON key mapping, parse guard, `SetSnapshot` |
-| JSON Export | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/FileTypeOptions.vb) | `GetOptions()` für Snapshot-Sicht |
-| Baseline-Werte | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/FileTypeProjectBaseline.vb) | produktive Defaults (`ApplyDeterministicDefaults`) |
-| Unit Tests (Options) | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/tests/FileTypeDetectionLib.Tests/Unit/FileTypeOptionsFacadeUnitTests.cs) | parse/export/normalize behavior |
-| Unit Tests (Baseline) | [Weiterführende Details](https://github.com/tomtastisch/FileClassifier/blob/main/tests/FileTypeDetectionLib.Tests/Unit/FileTypeProjectBaselineUnitTests.cs) | Baseline-Defaultwerte |
+| Option definition and normalize | [Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/FileTypeProjectOptions.vb) | new property, default, normalization rule |
+| JSON load/parse and snapshot set | [Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/FileTypeOptions.vb) | JSON key mapping, parse guard, `SetSnapshot` |
+| JSON export | [Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/FileTypeOptions.vb) | `GetOptions()` for snapshot visibility |
+| Baseline values | [Details](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/FileTypeProjectBaseline.vb) | production defaults (`ApplyDeterministicDefaults`) |
+| Unit tests (options) | [Details](https://github.com/tomtastisch/FileClassifier/blob/main/tests/FileTypeDetectionLib.Tests/Unit/FileTypeOptionsFacadeUnitTests.cs) | parse/export/normalize behavior |
+| Unit tests (baseline) | [Details](https://github.com/tomtastisch/FileClassifier/blob/main/tests/FileTypeDetectionLib.Tests/Unit/FileTypeProjectBaselineUnitTests.cs) | baseline default values |
 
-## 4. Schritt-für-Schritt-Checkliste (Vorgehen)
-Arbeite die Schritte in dieser Reihenfolge ab:
+## 4. Step-by-step checklist (process)
+Work through these steps in order:
 
-- [ ] Schritt 1: Option in `FileTypeProjectOptions` anlegen oder anpassen (inkl. Defaultwert).
-- [ ] Schritt 2: `NormalizeInPlace()` für fail-closed Grenzen aktualisieren.
-- [ ] Schritt 3: JSON-Parse in `FileTypeOptions.LoadOptions(json)` ergänzen.
-- [ ] Schritt 4: JSON-Export in `FileTypeOptions.GetOptions()` ergänzen.
-- [ ] Schritt 5: Baseline-Entscheidung in `FileTypeProjectBaseline` treffen.
-- [ ] Schritt 6: Unit-Tests in `FileTypeOptionsFacadeUnitTests` und ggf. `FileTypeProjectBaselineUnitTests` aktualisieren.
-- [ ] Schritt 7: Doku-Referenzen in `docs/*` und ggf. `src/*/README.md` aktualisieren.
-- [ ] Schritt 8: Verifikation laufen lassen (siehe Abschnitt 8).
+- [ ] Step 1: Create or adjust the option in `FileTypeProjectOptions` (including default value).
+- [ ] Step 2: Update `NormalizeInPlace()` for fail-closed limits.
+- [ ] Step 3: Extend JSON parsing in `FileTypeOptions.LoadOptions(json)`.
+- [ ] Step 4: Extend JSON export in `FileTypeOptions.GetOptions()`.
+- [ ] Step 5: Make a baseline decision in `FileTypeProjectBaseline`.
+- [ ] Step 6: Update unit tests in `FileTypeOptionsFacadeUnitTests` and, if needed, `FileTypeProjectBaselineUnitTests`.
+- [ ] Step 7: Update doc references in `docs/*` and, if needed, `src/*/README.md`.
+- [ ] Step 8: Run verification (see section 8).
 
-## 5. Beispiel (konkret)
-### Beispiel: Neue Scalar Option `MaxArchiveCommentBytes`
-Angenommen, eine neue Long-Option soll Archiv-Kommentargrösse begrenzen.
+## 5. Example (concrete)
+### Example: New scalar option `MaxArchiveCommentBytes`
+Assume a new long option should bound archive comment size.
 
-1. In `FileTypeProjectOptions.vb` Property + Default setzen, z. B. `Public Property MaxArchiveCommentBytes As Long = ...`.
-2. In `NormalizeInPlace()` auf Minimum normalisieren (`>= 1`).
-3. In `FileTypeOptions.LoadOptions(json)` Key `maxArchiveCommentBytes` parsen.
-4. In `FileTypeOptions.GetOptions()` den Wert ins JSON aufnehmen.
-5. In `FileTypeProjectBaseline.vb` bewusst entscheiden, ob ein strengerer Baseline-Wert gesetzt wird.
-6. In `FileTypeOptionsFacadeUnitTests.cs` Tests für validen/invaliden Wert und JSON-Roundtrip ergänzen.
+1. In `FileTypeProjectOptions.vb`, add property + default, e.g. `Public Property MaxArchiveCommentBytes As Long = ...`.
+2. In `NormalizeInPlace()`, normalize to a minimum (`>= 1`).
+3. In `FileTypeOptions.LoadOptions(json)`, parse key `maxArchiveCommentBytes`.
+4. In `FileTypeOptions.GetOptions()`, include the value in the JSON output.
+5. In `FileTypeProjectBaseline.vb`, decide deliberately whether a stricter baseline value is set.
+6. In `FileTypeOptionsFacadeUnitTests.cs`, add tests for valid/invalid values and JSON roundtrip.
 
-Beispiel-JSON für Consumer:
+Example JSON for consumers:
 
 ```json
 {
@@ -56,8 +56,8 @@ Beispiel-JSON für Consumer:
 }
 ```
 
-## 6. Aktivierung zur Laufzeit
-### 6.1 Flowchart (Aktivierung und Einlesen)
+## 6. Runtime activation
+### 6.1 Flowchart (activation and loading)
 ```mermaid
 flowchart TD
     A["Consumer/Startup"] --> B["FileTypeProjectOptions.DefaultOptions()"]
@@ -75,7 +75,7 @@ flowchart TD
     I --> J["Runtime-Entscheidung mit aktivem Snapshot"]
 ```
 
-### 6.2 Sequence (Runtime-Leseverhalten)
+### 6.2 Sequence (runtime read behavior)
 ```mermaid
 sequenceDiagram
     participant Consumer
@@ -97,45 +97,45 @@ sequenceDiagram
     end
 ```
 
-## 7. Implementierungs-Checklist und Done-Kriterien
-### 7.1 Implementierungs-Checklist
-- [ ] Option in `FileTypeProjectOptions` inkl. Default und Typ hinzugefügt.
-- [ ] `NormalizeInPlace()` für fail-closed Grenzen aktualisiert.
-- [ ] `FileTypeOptions.LoadOptions(json)` parse path für neue Option erweitert.
-- [ ] `FileTypeOptions.GetOptions()` serialisiert die Option sichtbar.
-- [ ] Baseline-Entscheidung (`FileTypeProjectBaseline`) explizit getroffen.
-- [ ] Unit-Tests für parse/export/normalize hinzugefügt oder angepasst.
-- [ ] Doku-Links in `docs/*` und ggf. `src/*/README.md` aktualisiert.
+## 7. Implementation checklist and done criteria
+### 7.1 Implementation checklist
+- [ ] Option added in `FileTypeProjectOptions` including default and type.
+- [ ] `NormalizeInPlace()` updated for fail-closed limits.
+- [ ] `FileTypeOptions.LoadOptions(json)` parse path extended for the new option.
+- [ ] `FileTypeOptions.GetOptions()` serializes the option visibly.
+- [ ] Baseline decision (`FileTypeProjectBaseline`) made explicitly.
+- [ ] Unit tests for parse/export/normalize added or adjusted.
+- [ ] Doc links updated in `docs/*` and, if needed, `src/*/README.md`.
 
-### 7.2 Done-Kriterien
-Eine Optionsänderung ist nur dann fertig, wenn:
-1. Werte deterministisch und fail-closed normalisiert werden.
-2. JSON-Load und JSON-Export konsistent sind.
-3. Baseline-Intent dokumentiert ist.
-4. Tests die Änderung abdecken (Happy Path + Invalid Input).
-5. Markdown-Links gültig sind.
+### 7.2 Done criteria
+An option change is done only if:
+1. values are normalized deterministically and fail-closed,
+2. JSON load and JSON export are consistent,
+3. baseline intent is documented,
+4. tests cover the change (happy path + invalid input),
+5. Markdown links are valid.
 
-## 8. Verifikation (Kommandos)
+## 8. Verification (commands)
 ```bash
 python3 tools/check-docs.py
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj --filter "FullyQualifiedName~FileTypeOptionsFacadeUnitTests|FullyQualifiedName~FileTypeProjectBaselineUnitTests" -v minimal
 ```
 
-## 9. Typische Fehlerbilder und fail-closed Hinweise
-| Fehlerbild | Auswirkung | Gegenmassnahme |
+## 9. Typical failure modes and fail-closed hints
+| Failure mode | Effect | Countermeasure |
 |---|---|---|
-| Property in `FileTypeProjectOptions`, aber kein Parse in `LoadOptions` | Option bleibt nie per JSON setzbar | parse case + Test ergänzen |
-| Parse vorhanden, aber kein Export in `GetOptions` | Snapshot ist intransparent für Verwender | `GetOptions` + JsonDocument-Test ergänzen |
-| Kein Normalize-Guard für numerische Grenzen | undefiniertes Runtime-Verhalten bei invalid valüs | `NormalizeInPlace` + invalid-valü Tests |
-| Baseline-Wert vergessen | Produktionsprofil inkonsistent | `FileTypeProjectBaseline` + Baseline-Test updaten |
-| Nested-Objekt nur flach kopiert | Seiteneffekte/Lecks über Snapshots | `Clone`/`Normalize` für nested options absichern |
+| Property in `FileTypeProjectOptions`, but no parse in `LoadOptions` | option is never configurable via JSON | add parse case + test |
+| Parse exists, but no export in `GetOptions` | snapshot is opaque to consumers | add `GetOptions` + JsonDocument test |
+| No normalize guard for numeric limits | undefined runtime behavior on invalid values | add `NormalizeInPlace` + invalid-value tests |
+| Baseline value forgotten | production profile is inconsistent | update `FileTypeProjectBaseline` + baseline test |
+| Nested object is only shallow-copied | side effects/leaks across snapshots | harden `Clone`/`Normalize` for nested options |
 
-## 10. Nicht-Ziele
-- Keine Änderung der API-Semantik ohne begleitende Contract-Dokumentation.
-- Keine stillen Sicherheitslockerungen ohne explizite Risikoentscheidung.
+## 10. Non-Goals
+- No change to API semantics without accompanying contract documentation.
+- No silent security relaxations without an explicit risk decision.
 
-## Dokumentpflege-Checkliste
-- [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
-- [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/010_API_CORE.MD` abgeglichen.
+## Documentation Maintenance Checklist
+- [ ] Content verified against current code state.
+- [ ] Links and anchors checked with `python3 tools/check-docs.py`.
+- [ ] Examples/commands verified locally.
+- [ ] Terminology aligned with `docs/110_API_CORE.MD`.

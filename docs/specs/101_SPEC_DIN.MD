@@ -1,52 +1,52 @@
-# DIN-orientierte Spezifikation (DE) - FileTypeDetection
+# DIN-oriented Specification (EN) - FileTypeDetection
 
-## 1. Dokumentenlenkung
-- Dokument-ID: `FTD-DIN-SPEC-DE`
+## 1. Document control
+- Document ID: `FTD-DIN-SPEC-EN`
 - Version: `1.1`
-- Sprache: Deutsch
-- Geltungsbereich: `src/FileTypeDetection`
+- Language: English
+- Scope: `src/FileTypeDetection`
 
-## 2. Zweck und Anwendungsbereich
-Diese Spezifikation beschreibt Anforderungen und Nachweise für die öffentliche API des Moduls nach einem normorientierten Aufbau (Anforderungen, Architektur, Verifikation, Rückverfolgbarkeit).
-Dieses Dokument dient als normativer Nachweis für Freigabe-, Audit- und Compliance-Prozesse.
-Die technische Detailbeschreibung der öffentlichen Schnittstellen ist in `docs/010_API_CORE.MD`, `docs/020_ARCH_CORE.MD` und `docs/references/001_REFERENCES_CORE.MD` dokumentiert.
+## 2. Purpose and application scope
+This specification describes requirements and evidence for the module's public API in a norm-oriented structure (requirements, architecture, verification, traceability).
+This document serves as normative evidence for release, audit, and compliance processes.
+The technical details of the public interfaces are documented in `docs/110_API_CORE.MD`, `docs/120_ARCH_CORE.MD`, and `docs/references/101_REFERENCES_CORE.MD`.
 
-## 3. Begriffe und Definitionen
-- `fail-closed`: Fehlerpfad liefert nur sichere Standardwerte.
-- `SSOT`: Single Source of Truth für Erkennungsregeln.
-- `Archiv-Gate`: sicherheitsorientierte Validierung vor Archiv-Verarbeitung.
+## 3. Terms and definitions
+- `fail-closed`: error path returns only safe default values.
+- `SSOT`: single source of truth for detection rules.
+- `archive gate`: security-oriented validation before archive processing.
 
-## 4. Normative Anforderungen
-| ID | Anforderung | Muss-Kriterium | Nachweis |
+## 4. Normative requirements
+| ID | Requirement | Must criterion | Evidence |
 |---|---|---|---|
-| FTD-REQ-001 | Deterministische Typdetektion | gleiche Eingabe => gleicher `FileKind` | `FileTypeRegistryUnitTests.cs` |
-| FTD-REQ-002 | Fail-closed bei Fehlern | keine Ausnahme nach aussen, stattdessen `Unknown`/`False`/leer | `ArchiveAdversarialTests.cs`, `DetectionDetailAndArchiveValidationUnitTests.cs` |
-| FTD-REQ-003 | Archiv-Sicherheit vor Extraktion | Traversal, Bomben und überschrittene Limits werden abgewiesen | `ArchiveExtractionUnitTests.cs`, `ArchiveGatePropertyTests.cs` |
-| FTD-REQ-004 | Zentrale Optionsverwaltung | Laden/Lesen globaler Optionen nur über `FileTypeOptions` | `FileTypeOptionsFacadeUnitTests.cs` |
-| FTD-REQ-005 | Einheitliche Byte-Persistenz | Byte-Persistenz mit `overwrite`/`secureExtract` in `FileMaterializer` | `FileMaterializerUnitTests.cs` |
-| FTD-REQ-006 | Archiv-Alias-Normalisierung | `tar/tgz/gz/bz2/xz/7z/rar/zz` werden alias-seitig als logischer Archivtyp `FileKind.Zip` behandelt | `FileTypeRegistryUnitTests.cs`, `ExtensionCheckUnitTests.cs` |
-| FTD-REQ-007 | Defensive Zielpfad-Sicherheit | Root-Pfade dürfen nicht materialisiert werden; Grössenlimit muss gelten | `FileMaterializerUnitTests.cs` |
-| FTD-REQ-008 | Defensive Archiv-Extraktionsziele | Root-Pfade dürfen nicht als Archiv-Extraktionsziel verwendet werden | `ArchiveExtractionUnitTests.cs` |
+| FTD-REQ-001 | Deterministic type detection | same input => same `FileKind` | `FileTypeRegistryUnitTests.cs` |
+| FTD-REQ-002 | Fail-closed on errors | no exception outward; instead `Unknown`/`False`/empty | `ArchiveAdversarialTests.cs`, `DetectionDetailAndArchiveValidationUnitTests.cs` |
+| FTD-REQ-003 | Archive safety before extraction | traversal, bombs, and exceeded limits are rejected | `ArchiveExtractionUnitTests.cs`, `ArchiveGatePropertyTests.cs` |
+| FTD-REQ-004 | Central options management | load/read global options only via `FileTypeOptions` | `FileTypeOptionsFacadeUnitTests.cs` |
+| FTD-REQ-005 | Unified byte persistence | byte persistence with `overwrite`/`secureExtract` in `FileMaterializer` | `FileMaterializerUnitTests.cs` |
+| FTD-REQ-006 | Archive alias normalization | `tar/tgz/gz/bz2/xz/7z/rar/zz` are treated as logical archive kind `FileKind.Zip` via aliases | `FileTypeRegistryUnitTests.cs`, `ExtensionCheckUnitTests.cs` |
+| FTD-REQ-007 | Defensive destination path safety | root paths must not be materialized; size limit must apply | `FileMaterializerUnitTests.cs` |
+| FTD-REQ-008 | Defensive archive extraction targets | root paths must not be used as archive extraction targets | `ArchiveExtractionUnitTests.cs` |
 
-## 5. Architektur und Verantwortlichkeiten
-| Klasse | Verantwortung | Nicht-Ziel |
+## 5. Architecture and responsibilities
+| Class | Responsibility | Non-goal |
 |---|---|---|
-| `FileTypeDetector` | Dateitypen erkennen und Sicherheitsprüfung durchführen | keine Persistenz |
-| `ArchiveProcessing` | sichere Archiv-Validierung und In-Memory-Extraktion | keine allgemeine Byte-Persistenz und kein Disk-Write |
-| `FileMaterializer` | Byte-Persistenz auf Datei/Verzeichnis mit optionalem Archiv-Extract | keine neue Archiv-Policy |
-| `FileTypeOptions` | zentrale globale Optionsschnittstelle (`LoadOptions`, `GetOptions`) | keine Typdetektion |
+| `FileTypeDetector` | detect file types and run safety checks | no persistence |
+| `ArchiveProcessing` | safe archive validation and in-memory extraction | no general byte persistence and no disk write |
+| `FileMaterializer` | byte persistence to file/directory with optional archive extract | no new archive policy |
+| `FileTypeOptions` | central global options surface (`LoadOptions`, `GetOptions`) | no type detection |
 
-## 6. Schnittstellen und Parameter
+## 6. Interfaces and parameters
 - `FileMaterializer.Persist(data, destinationPath, overwrite, secureExtract)`
   - `overwrite` default: `False`
   - `secureExtract` default: `False`
 - `FileTypeOptions.LoadOptions(json)`
-  - partielle JSON-Werte überschreiben Defaults
+  - partial JSON values override defaults
 - `FileTypeOptions.GetOptions()`
-  - Rückgabe als JSON-Snapshot
+  - returns a JSON snapshot
 
-## 7. Verifikation
-Pflichtlauf für Freigabe:
+## 7. Verification
+Mandatory run for release:
 ```bash
 python3 tools/check-docs.py
 dotnet restore FileClassifier.sln -v minimal
@@ -61,16 +61,16 @@ TEST_BDD_OUTPUT_DIR=artifacts/tests bash tools/test-bdd-readable.sh -- \
   /p:ThresholdStat=total
 ```
 
-## 8. Rückverfolgbarkeit
-Diese Spezifikation ist rückverfolgbar auf:
-- Funktionsreferenz: `docs/010_API_CORE.MD`
-- Architektur- und Ablaufreferenz: `docs/020_ARCH_CORE.MD`
-- Referenzdokument: `docs/references/001_REFERENCES_CORE.MD`
-- Modulindex: `src/FileTypeDetection/README.md`
-- Unit-/Property-Tests: `tests/FileTypeDetectionLib.Tests`
+## 8. Traceability
+This specification is traceable to:
+- function reference: `docs/110_API_CORE.MD`
+- architecture and flow reference: `docs/120_ARCH_CORE.MD`
+- reference document: `docs/references/101_REFERENCES_CORE.MD`
+- module index: `src/FileTypeDetection/README.md`
+- unit/property tests: `tests/FileTypeDetectionLib.Tests`
 
-## Dokumentpflege-Checkliste
-- [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
-- [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/010_API_CORE.MD` abgeglichen.
+## Documentation Maintenance Checklist
+- [ ] Content verified against current code state.
+- [ ] Links and anchors checked with `python3 tools/check-docs.py`.
+- [ ] Examples/commands verified locally.
+- [ ] Terminology aligned with `docs/110_API_CORE.MD`.

@@ -15,8 +15,8 @@ This document is historical evidence for the hashing facade + evidence model beh
 
 It must not be used as a description of the current API surface on `main`.
 For current SSOT:
-- API surface: `docs/010_API_CORE.MD`
-- Contract: `docs/contracts/001_CONTRACT_HASHING.MD`
+- API surface: `docs/110_API_CORE.MD`
+- Contract: `docs/contracts/101_CONTRACT_HASHING.MD`
 - Implementation: `src/FileTypeDetection/EvidenceHashing.vb`
 - Models: `src/FileTypeDetection/Abstractions/Hashing/*`
 

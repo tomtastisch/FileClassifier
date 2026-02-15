@@ -1,21 +1,21 @@
 # Portable Adoption Guide (NuGet)
 
-## 1. Ziel
-Diese Anleitung beschreibt die portable Uebernahme als NuGet-Paket ohne `ProjectReference`.
+## 1. Goal
+This guide describes portable adoption as a NuGet package without `ProjectReference`.
 
-## 2. Package-Daten
+## 2. Package Data
 - PackageId: `Tomtastisch.FileClassifier`
 - Feed: NuGet.org
-- Versioning-Quelle: Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT
+- Versioning source: Git tag `vX.Y.Z` (optional `-prerelease`) as SSOT
 
-## 3. Consumer-Setup
+## 3. Consumer Setup
 ```xml
 <ItemGroup>
   <PackageReference Include="Tomtastisch.FileClassifier" Version="x.y.z" />
 </ItemGroup>
 ```
 
-## 4. Verifikationspfad (repo-lokal)
+## 4. Verification path (repo-local)
 1. `dotnet pack src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -o artifacts/nuget -v minimal`
 2. `dotnet restore samples/PortableConsumer/PortableConsumer.csproj --configfile samples/PortableConsumer/NuGet.config -p:PortableConsumerPackageVersion=x.y.z -v minimal`
 3. `dotnet build samples/PortableConsumer/PortableConsumer.csproj -c Release --no-restore -p:PortableConsumerPackageVersion=x.y.z -v minimal`
@@ -23,13 +23,13 @@ Diese Anleitung beschreibt die portable Uebernahme als NuGet-Paket ohne `Project
 5. `dotnet restore tests/PackageBacked.Tests/PackageBacked.Tests.csproj --configfile tests/PackageBacked.Tests/NuGet.config -p:PackageBackedVersion=x.y.z -v minimal`
 6. `dotnet test tests/PackageBacked.Tests/PackageBacked.Tests.csproj -c Release --no-restore -p:PackageBackedVersion=x.y.z -v minimal`
 
-## 5. Kern-Invarianten fuer "1:1 identisch"
-- API-Identitaet: Public-API-Snapshot bleibt unveraendert (`tests/FileTypeDetectionLib.Tests/Contracts/public-api.snapshot.txt`).
-- Verhaltensidentitaet: `tests/PackageBacked.Tests` prueft Kernfaelle gegen das gepackte Paket:
+## 5. Core invariants for \"1:1 identical\"
+- API identity: public API snapshot remains unchanged (`tests/FileTypeDetectionLib.Tests/Contracts/public-api.snapshot.txt`).
+- Behavioral identity: `tests/PackageBacked.Tests` validates core cases against the packed package:
   - `Detect_And_Hash_Contracts_RemainStable`
   - `Materializer_Persists_Bytes_FailClosedContract`
-- Consumer-Smoke: `samples/PortableConsumer` baut und laeuft nur via `PackageReference`.
+- Consumer smoke: `samples/PortableConsumer` builds and runs only via `PackageReference`.
 
 ## 6. Troubleshooting
-- Fehler `NU1101`: Paketversion nicht im Feed gefunden -> Version/Feed in `NuGet.config` pruefen.
-- Fehler `NUGET_API_KEY ... placeholder`: Repo-Secret `NUGET_API_KEY` auf echten NuGet.org API-Key setzen.
+- Error `NU1101`: package version not found in feed -> check version/feed in `NuGet.config`.
+- Error `NUGET_API_KEY ... placeholder`: set repo secret `NUGET_API_KEY` to a real NuGet.org API key.
