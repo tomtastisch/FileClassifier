@@ -6,7 +6,8 @@ Normative policy thresholds and rule parameters stay in `tools/ci/policies/rules
 
 ## Required Status Contexts
 Main branch protection requires exactly these contexts (`strict: true`): `preflight`, `version-policy`, `build`, `api-contract`, `pack`, `consumer-smoke`, `package-backed-tests`, `security-nuget`, `tests-bdd-coverage`.
-Evidence: branch protection API output (`required_status_checks.contexts`) and `.github/workflows/ci.yml:59-347` plus `.github/workflows/version-policy.yml`.
+Evidence: branch protection API output (`required_status_checks.contexts`), `.github/workflows/ci.yml:59-347`, and `.github/workflows/ruleset-placeholders.yml` (`version-policy` context).
+Hinweis: Die normative Versionierungsentscheidung (RaC) wird zusaetzlich durch `.github/workflows/version-policy.yml` als Check `versioning-policy` ausgewertet (nicht Teil der Branch-Protection-Contexts).
 
 ## Workflow Topology
 - `pr-labeling` runs only on `pull_request` and is separate from the required technical gate path (`.github/workflows/ci.yml:22-58`).
@@ -18,9 +19,11 @@ flowchart TD
   pr["pr-labeling"]:::meta
   pre["preflight"] --> docs["docs-links-full"]
   pre --> svt["versioning-svt"]
+  pre --> vc["version-convergence"]
   pre --> naming["naming-snt"]
   pre --> build["build"]
   svt --> build
+  vc --> build
   naming --> build
   build --> api["api-contract"]
   build --> pack["pack"]
@@ -32,6 +35,7 @@ flowchart TD
   docs --> sum["summary"]
   naming --> sum
   svt --> sum
+  vc --> sum
   api --> sum
   smoke --> sum
   pkg --> sum
@@ -47,7 +51,8 @@ flowchart TD
   pkg -.-> req
   sec -.-> req
   bdd -.-> req
-  vp["version-policy (separate workflow)"] -.-> req
+  vp["version-policy (ruleset placeholder workflow)"]:::meta -.-> req
+  rac["versioning-policy (RaC policy workflow)"]:::meta -.-> req
 
   classDef gate fill:#e9f5ff,stroke:#2a6f97,color:#073b4c;
   classDef meta fill:#f8f9fa,stroke:#6c757d,color:#343a40;
@@ -70,7 +75,8 @@ Evidence:
 | Job | Entrypoint | Artifact path | Contract validation path | Evidence |
 |---|---|---|---|---|
 | `preflight` | `bash tools/ci/bin/run.sh preflight` | `artifacts/ci/preflight/` | Result contract + policy bridge | `.github/workflows/ci.yml:77-87`, `tools/ci/bin/run.sh:159-171` |
-| `version-policy` | `bash tools/ci/bin/run.sh versioning-svt` | `artifacts/ci/versioning-svt/` | Result contract + policy bridge | `tools/ci/bin/run.sh:242-250` |
+| `version-policy` | `.github/workflows/ruleset-placeholders.yml` | N/A | N/A (placeholder required context) | `.github/workflows/ruleset-placeholders.yml:20-24` |
+| `versioning-policy` | `bash tools/versioning/run-versioning-policy.sh` | `artifacts/policy/` | RoC policy evaluation | `.github/workflows/version-policy.yml:25-37` |
 | `build` | `bash tools/ci/bin/run.sh build` | `artifacts/ci/build/` | Result contract | `.github/workflows/ci.yml:177-187`, `tools/ci/bin/run.sh:179-183` |
 | `api-contract` | `bash tools/ci/bin/run.sh api-contract` | `artifacts/ci/api-contract/` | Result contract | `.github/workflows/ci.yml:202-212`, `tools/ci/bin/run.sh:185-189` |
 | `pack` | `bash tools/ci/bin/run.sh pack` | `artifacts/ci/pack/` | Result contract + package metadata checks | `.github/workflows/ci.yml:227-237`, `tools/ci/bin/run.sh:191-230` |
@@ -78,6 +84,7 @@ Evidence:
 | `package-backed-tests` | `bash tools/ci/bin/run.sh package-backed-tests` | `artifacts/ci/package-backed-tests/` | Result contract + package-backed tests | `.github/workflows/ci.yml:287-297`, `tools/ci/bin/run.sh:285-315` |
 | `security-nuget` | `bash tools/ci/bin/run.sh security-nuget` | `artifacts/ci/security-nuget/` | Result contract + High/Critical fail-close | `.github/workflows/ci.yml:312-322`, `tools/ci/bin/run.sh:317-329` |
 | `tests-bdd-coverage` | `bash tools/ci/bin/run.sh tests-bdd-coverage` | `artifacts/ci/tests-bdd-coverage/` | Result contract + coverage threshold execution | `.github/workflows/ci.yml:337-347`, `tools/ci/bin/run.sh:331-348` |
+| `version-convergence` | `bash tools/ci/bin/run.sh version-convergence` | `artifacts/ci/version-convergence/` | Result contract + convergence script | `.github/workflows/ci.yml:142-162`, `tools/versioning/verify-version-convergence.sh` |
 | `summary` | `bash tools/ci/bin/run.sh summary` | `artifacts/ci/summary/` | Policy contract aggregation | `.github/workflows/ci.yml:417-427`, `tools/ci/bin/run.sh:424-430` |
 | `pr-labeling` | `bash tools/ci/bin/run.sh pr-labeling` | `artifacts/ci/pr-labeling/` | Label decision schema + apply+verify | `.github/workflows/ci.yml:45-57`, `tools/ci/bin/run.sh:350-400` |
 

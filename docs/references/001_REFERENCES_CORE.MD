@@ -29,6 +29,12 @@ Quelle: `FileTypeDetector.vb`.
 | `InvalidLength` | Dateilänge ist ungültig |
 | `FileTooLarge` | `MaxBytes` wurde überschritten |
 | `Exception` | Ausnahme im Detektionspfad |
+| `ExceptionUnauthorizedAccess` | `UnauthorizedAccessException` im Detektionspfad |
+| `ExceptionSecurity` | `System.Security.SecurityException` im Detektionspfad |
+| `ExceptionIO` | `IOException` im Detektionspfad |
+| `ExceptionInvalidData` | `InvalidDataException` im Detektionspfad |
+| `ExceptionNotSupported` | `NotSupportedException` im Detektionspfad |
+| `ExceptionArgument` | `ArgumentException` im Detektionspfad |
 | `ExtensionMismatch` | Endung passt nicht zum erkannten Typ |
 | `HeaderUnknown` | Header-Magic unzureichend/unbekannt |
 | `HeaderMatch` | Header-Magic hat Typ direkt erkannt |
@@ -81,8 +87,8 @@ flowchart LR
 | Public Signaturen + Beispiele | `docs/010_API_CORE.MD` |
 | E2E-Architektur + Sequenzen | `docs/020_ARCH_CORE.MD` |
 | Normative Anforderungen | `docs/specs/001_SPEC_DIN.MD` |
-| Modul-Übersicht | `../src/FileTypeDetection/README.md` |
-| Unterordner-Details | `../src/FileTypeDetection/Detection/README.md`, `../src/FileTypeDetection/Infrastructure/README.md`, `../src/FileTypeDetection/Configuration/README.md`, `../src/FileTypeDetection/Abstractions/README.md`, `../src/FileTypeDetection/Abstractions/Detection/README.md`, `../src/FileTypeDetection/Abstractions/Archive/README.md`, `../src/FileTypeDetection/Abstractions/Hashing/README.md`, `../src/FileClassifier.App/README.md` |
+| Modul-Übersicht | [Modul-README: FileTypeDetection](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md) |
+| Unterordner-Details | [Detection README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Detection/README.md), [Infrastructure README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md), [Configuration README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/README.md), [Abstractions README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md), [Abstractions: Detection README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Detection/README.md), [Abstractions: Archive README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Archive/README.md), [Abstractions: Hashing README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Hashing/README.md), [CLI README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileClassifier.App/README.md) |
 
 ## 6.1 Change Playbooks
 | Thema | Guide |

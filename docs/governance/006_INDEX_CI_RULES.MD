@@ -1,5 +1,4 @@
 # CI Policy Rules
-<!-- NOTE: This file should be named `CI_POLICY.MD` (uppercase extension) to be picked up by governance tooling that globs for `*.MD`. -->
 
 | rule_id | file |
 | --- | --- |

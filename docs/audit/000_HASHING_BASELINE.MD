@@ -1,110 +1,89 @@
-# Hashing Baseline Evidence (Commit 0)
+# Hashing Baseline Evidence (Historical Snapshot: pre EvidenceHashing rename)
 
-Date: 2026-02-10
-Branch: feature/secure-hash-hmac-finalization (from origin/main)
+Date captured: 2026-02-10
+
+Pinned baseline commit (pre rename):
+- `373146f0d2c178533ea6ac442e6cc2a117cb4331`
+
+Rename commit (Deterministic* -> Evidence/Hash*):
+- `7c6e94dad37b440c32386719e796d0bb6100c741`
 
 ## Scope
-Baseline evidence for the current hashing facade + evidence models before any renames or behavior changes.
+This document is historical evidence for the hashing facade + evidence model behavior **before** the public rename:
+- `DeterministicHashing` -> `EvidenceHashing`
+- `DeterministicHash*` -> `Hash*`
 
-## Public facade and behavior
-### Facade class name + API surface
-File: src/FileTypeDetection/DeterministicHashing.vb
-- `Public NotInheritable Class DeterministicHashing` (line 14)
-- Public entrypoints (selected):
-  - `HashFile(path)` / `HashFile(path, options)` (lines 21-62)
-  - `HashBytes(data)` / `HashBytes(data, label, options)` (lines 64-109)
-  - `HashEntries(entries, label, options)` (lines 111-132)
-  - `VerifyRoundTrip(path, options)` (lines 134-224)
+It must not be used as a description of the current API surface on `main`.
+For current SSOT:
+- API surface: `docs/010_API_CORE.MD`
+- Contract: `docs/contracts/001_CONTRACT_HASHING.MD`
+- Implementation: `src/FileTypeDetection/EvidenceHashing.vb`
+- Models: `src/FileTypeDetection/Abstractions/Hashing/*`
 
-### Canonical bytes used for SHA256 and xxHash3
-File: src/FileTypeDetection/DeterministicHashing.vb
+## How To Verify (repo-local, deterministic)
+All references below are pinned to the baseline commit via `git show`:
+
+```bash
+BASE=373146f0d2c178533ea6ac442e6cc2a117cb4331
+
+git show \"$BASE\":src/FileTypeDetection/DeterministicHashing.vb | nl -ba | sed -n '1,260p'
+git show \"$BASE\":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashEvidence.vb | nl -ba | sed -n '1,220p'
+git show \"$BASE\":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashDigestSet.vb | nl -ba | sed -n '1,240p'
+git show \"$BASE\":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashOptions.vb | nl -ba | sed -n '1,240p'
+git show \"$BASE\":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashRoundTripReport.vb | nl -ba | sed -n '1,260p'
+git show \"$BASE\":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashSourceType.vb | nl -ba | sed -n '1,120p'
+```
+
+## Baseline Facade (pre rename)
+Pinned file (baseline commit):
+- `src/FileTypeDetection/DeterministicHashing.vb` @ `373146f0`
+
+Selected public entrypoints (baseline):
+- `HashFile(path)` / `HashFile(path, options)`
+- `HashBytes(data)` / `HashBytes(data, label, options)`
+- `HashEntries(entries, label, options)`
+- `VerifyRoundTrip(path, options)`
+
+## Canonical Bytes Semantics (baseline)
+Pinned file: `src/FileTypeDetection/DeterministicHashing.vb` @ `373146f0`
 
 Raw payload mode (`BuildEvidenceFromRawPayload`):
-- Physical SHA256 and Logical SHA256 are both computed from the same `safePayload` bytes.
+- Physical SHA-256 and Logical SHA-256 are both computed from the same `safePayload` bytes.
 - Fast hashes are both computed from the same `safePayload` bytes.
-
-Evidence snippet:
-- `physicalSha = ComputeSha256Hex(safePayload)`
-- `logicalSha = physicalSha`
-- `fastPhysical = ComputeFastHash(safePayload, hashOptions)`
-- `fastLogical = fastPhysical`
-(lines 295-309)
 
 Archive/entries mode (`BuildEvidenceFromEntries`):
 - Logical bytes are a canonical manifest (`BuildLogicalManifestBytes`) derived from normalized entries.
 - Physical bytes are the original archive bytes only when `compressedBytes` is present/non-empty.
 
-Evidence snippet:
-- `logicalBytes = BuildLogicalManifestBytes(normalizedEntries)`
-- `logicalSha = ComputeSha256Hex(logicalBytes)`
-- `fastLogical = ComputeFastHash(logicalBytes, hashOptions)`
-- `If compressedBytes ...` then:
-  - `physicalSha = ComputeSha256Hex(compressedBytes)`
-  - `fastPhysical = ComputeFastHash(compressedBytes, hashOptions)`
-(lines 241-252)
-
 Canonical manifest structure:
 - Includes `LogicalManifestVersion` header and entry count.
-- For each entry: writes path bytes + content length + SHA256(content) bytes.
+- For each entry: writes path bytes + content length + SHA-256(content) bytes.
 
-Evidence snippet:
-- `Dim contentHash = SHA256.HashData(entry.Content)`
-- `writer.Write(contentHash.Length)`
-- `writer.Write(contentHash)`
-(lines 370-386)
+Formatting:
+- SHA-256 hex: lowercase (`ToLowerInvariant()` after `Convert.ToHexString(...)`).
+- xxHash3: lowercase fixed-width `x16` via `ToString(\"x16\", CultureInfo.InvariantCulture)`.
+- If `IncludeFastHash` is false (or options is null), fast digests are empty.
 
-### SHA256 hex formatting
-File: src/FileTypeDetection/DeterministicHashing.vb
-- `Convert.ToHexString(SHA256.HashData(data)).ToLowerInvariant()`
-(lines 392-395)
+## Evidence Model Types (baseline names)
+Pinned files @ `373146f0`:
+- `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashDigestSet.vb`
+- `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashEvidence.vb`
+- `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashOptions.vb`
+- `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashRoundTripReport.vb`
+- `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashSourceType.vb`
 
-### xxHash3 implementation + formatting
-File: src/FileTypeDetection/DeterministicHashing.vb
-- Uses `System.IO.Hashing.XxHash3.HashToUInt64(data)`
-- Formats as lowercase fixed-width 16 hex digits: `ToString("x16", CultureInfo.InvariantCulture)`
-- When `IncludeFastHash` is false (or options is null), returns `String.Empty`.
+## Current Implementation Pointers (post rename)
+Current facade + models on `main`:
+- `src/FileTypeDetection/EvidenceHashing.vb`
+- `src/FileTypeDetection/Abstractions/Hashing/HashDigestSet.vb`
+- `src/FileTypeDetection/Abstractions/Hashing/HashEvidence.vb`
+- `src/FileTypeDetection/Abstractions/Hashing/HashOptions.vb`
+- `src/FileTypeDetection/Abstractions/Hashing/HashRoundTripReport.vb`
+- `src/FileTypeDetection/Abstractions/Hashing/HashSourceType.vb`
 
-Evidence snippet:
-- `If options Is Nothing OrElse Not options.IncludeFastHash Then Return String.Empty`
-- `Dim value = System.IO.Hashing.XxHash3.HashToUInt64(data)`
-- `Return value.ToString("x16", CultureInfo.InvariantCulture)`
-(lines 397-402)
-
-## Evidence model types
-### Digest set
-File: src/FileTypeDetection/Abstractions/Hashing/DeterministicHashDigestSet.vb
-- Public properties:
-  - `PhysicalSha256`, `LogicalSha256`
-  - `FastPhysicalXxHash3`, `FastLogicalXxHash3`
-  - `HasPhysicalHash`, `HasLogicalHash`
-- Normalization:
-  - `Trim().ToLowerInvariant()` (Normalize)
-
-### Evidence wrapper
-File: src/FileTypeDetection/Abstractions/Hashing/DeterministicHashEvidence.vb
-- Has `Notes As String` and stores bytes as `ImmutableArray(Of Byte)`.
-- Failures created via `CreateFailure(...)` with empty bytes and `DeterministicHashDigestSet.Empty`.
-
-### Options
-File: src/FileTypeDetection/Abstractions/Hashing/DeterministicHashOptions.vb
-- Defaults:
-  - `IncludePayloadCopies = False`
-  - `IncludeFastHash = True`
-  - `MaterializedFileName = "deterministic-roundtrip.bin"`
-
-### RoundTrip report
-File: src/FileTypeDetection/Abstractions/Hashing/DeterministicHashRoundTripReport.vb
-- Reports h1..h4 and computes logical/physical equality based on `LogicalSha256` / `PhysicalSha256`.
-
-### Source type
-File: src/FileTypeDetection/Abstractions/Hashing/DeterministicHashSourceType.vb
-- Values: Unknown, FilePath, RawBytes, ArchiveEntries, MaterializedFile.
-
-## Baseline tests
-Command:
+## Baseline Tests
+Historical command (baseline):
 - `dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -v minimal`
 
-Result (captured from console output):
-- Exit code: 0
-- Passed: 394
-- Failed: 0
+Note:
+- The current test suite size and exact counts can differ from the baseline snapshot; the authoritative check is the CI job `tests-bdd-coverage` and local `dotnet test` on `main`.

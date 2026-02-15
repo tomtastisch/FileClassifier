@@ -1,7 +1,7 @@
 # NuGet Trusted Publishing (OIDC)
 
 ## 1. Zweck
-Release-Publish auf nuget.org erfolgt per OIDC Trusted Publishing in `/.github/workflows/release.yml` via `NuGet/login@v1`.
+Release-Publish auf nuget.org erfolgt per OIDC Trusted Publishing in `.github/workflows/release.yml` via `NuGet/login@v1`.
 
 ## 2. Binding
 Die aktive Trusted-Publishing-Policy ist an folgende Identität gebunden:
@@ -27,7 +27,7 @@ Die aktive Trusted-Publishing-Policy ist an folgende Identität gebunden:
 - Bei Incident-Diagnose kann das Fenster über die beiden Variablen erhöht werden, ohne Workflow-Jobnamen oder Required Contexts zu ändern.
 
 ## 5. Entkoppelte Online-Konvergenz (Async)
-- Workflow: `/.github/workflows/nuget-online-convergence.yml`
+- Workflow: `.github/workflows/nuget-online-convergence.yml`
 - Trigger: `workflow_run` nach erfolgreichem `Release Publish`.
 - Der Async-Workflow prüft weiterhin **alle** Endpunkte als harte Konvergenzbedingungen:
   - `REQUIRE_SEARCH=1`
