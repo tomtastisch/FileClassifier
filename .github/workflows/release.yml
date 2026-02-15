@@ -201,7 +201,7 @@ jobs:
         run: |
           set -euo pipefail
           latest_tag="$(gh api "repos/${REPO}/releases/latest" --jq .tag_name)"
-          test "${latest_tag}" = "${RELEASE_TAG}"
+          [[ "${latest_tag}" == "${RELEASE_TAG}" ]] || { echo "ERROR: Latest release tag '${latest_tag}' does not match expected '${RELEASE_TAG}'" >&2; exit 1; }
 
       - name: Attest package provenance
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
