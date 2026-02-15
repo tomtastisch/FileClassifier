@@ -1,68 +1,68 @@
 # Threat Model
 
-## 1. Scope
+## 1. Zweck und Scope
 In scope:
-- library behavior in `src/FileTypeDetection/*`
-- CI/CD and release controls in `.github/workflows/*`
-- security reporting and evidence lifecycle in `SECURITY.md` and `docs/audit/*`
+- Library-Verhalten in `src/FileTypeDetection/*`
+- CI/CD und Release-Kontrollen in `.github/workflows/*`
+- Security Reporting und Evidence-Lifecycle in `SECURITY.md` und `docs/audit/*`
 
 Out of scope:
-- downstream deployment hardening of consuming systems
-- host-level controls outside this repository
+- Downstream Deployment-Hardening von konsumierenden Systemen
+- Host-Level-Kontrollen ausserhalb dieses Repositories
 
 ## 2. Assets
-- A1: untrusted file payloads entering detection/extraction paths
-- A2: extracted archive entries in memory
-- A3: hash/evidence artifacts used for integrity assertions
-- A4: produced NuGet package (`.nupkg`) and its provenance
-- A5: vulnerability reports and coordinated disclosure state
+- A1: Untrusted File-Payloads, die in Detection-/Extraction-Pfade gelangen
+- A2: Extrahierte Archive-Entries im Memory
+- A3: Hash-/Evidence-Artefakte fuer Integritaets-Assertions
+- A4: Erzeugtes NuGet-Paket (`.nupkg`) und dessen Provenance
+- A5: Vulnerability-Reports und Status der koordinierten Offenlegung
 
 ## 3. Trust Boundaries
-- B1: caller input -> detector/archive internals (`src/FileTypeDetection/FileTypeDetector.vb`)
-- B2: repository source -> CI execution (`.github/workflows/ci.yml`)
-- B3: CI-produced package -> NuGet publication (`.github/workflows/release.yml`)
-- B4: external reporter -> maintainer triage (GitHub private vulnerability reporting)
+- B1: Caller-Input -> Detector/Archive-Internals (`src/FileTypeDetection/FileTypeDetector.vb`)
+- B2: Repository-Source -> CI-Execution (`.github/workflows/ci.yml`)
+- B3: CI-erzeugtes Paket -> NuGet Publication (`.github/workflows/release.yml`)
+- B4: Externer Reporter -> Maintainer-Triage (GitHub Private Vulnerability Reporting)
 
 ## 4. Attacker Capabilities
-- C1: submit crafted files/archives to trigger unsafe parsing or extraction logic
-- C2: attempt path traversal or resource exhaustion through archive payloads
-- C3: attempt supply-chain tampering between build and publication
-- C4: attempt disclosure abuse via public channels before fix readiness
+- C1: Crafted Files/Archives einspeisen, um unsafe Parsing/Extraction-Logik zu triggern
+- C2: Path Traversal oder Resource Exhaustion ueber Archive-Payloads versuchen
+- C3: Supply-Chain-Tampering zwischen Build und Publication versuchen
+- C4: Disclosure-Abuse ueber oeffentliche Kanaele vor Fix-Readiness versuchen
 
-## 5. Threat Scenarios And Controls
-- T1: archive traversal (zip-slip style path escape)
-  - Impact: write/read outside intended scope during extraction.
-  - Current controls: fail-closed archive safety gates in archive internals and detector paths; extraction APIs constrained to safe flows.
-  - Evidence: `tests/FileTypeDetectionLib.Tests/*` plus CI job `tests-bdd-coverage` in `.github/workflows/ci.yml`.
-- T2: decompression/resource exhaustion
-  - Impact: memory/CPU pressure, possible denial-of-service.
-  - Current controls: guarded archive processing paths and bounded validation/extraction flows.
-  - Evidence: source paths under `src/FileTypeDetection/Infrastructure/*` and CI execution traces.
-- T3: release artifact provenance tampering
-  - Impact: consumers install untrusted package build output.
-  - Current controls: OIDC trusted publishing and provenance attestation in `.github/workflows/release.yml`.
-  - Evidence: release workflow step `actions/attest-build-provenance@v2` and `gh attestation verify` output artifact.
-- T4: vulnerable dependency ingress
-  - Impact: known vulnerable transitive components in shipped package.
-  - Current controls: `security-nuget` gate in CI (`dotnet list ... --vulnerable --include-transitive`) with High/Critical fail behavior.
-  - Evidence: `tools/ci/bin/run.sh` (`run_security_nuget`) and CI artifacts `artifacts/ci/security-nuget/*`.
-- T5: uncoordinated public disclosure before patch
-  - Impact: exploitability window increases before mitigation is available.
-  - Current controls: private vulnerability reporting path and coordinated disclosure process as declared in `SECURITY.md`.
-  - Evidence: `tools/audit/verify-security-claims.sh` claim checks and `docs/audit/008_INCIDENT_RESPONSE_RUNBOOK.MD`.
+## 5. Threat Scenarios und Kontrollen
+- T1: Archive Traversal (zip-slip style path escape)
+  - Impact: Write/Read ausserhalb des intended Scope waehrend der Extraktion.
+  - Current controls: fail-closed Archive-Safety-Gates in Archive-Internals und Detector-Pfaden; Extraction-APIs sind auf sichere Flows eingeschraenkt.
+  - Evidence: `tests/FileTypeDetectionLib.Tests/*` plus CI-Job `tests-bdd-coverage` in `.github/workflows/ci.yml`.
+- T2: Decompression/Resource Exhaustion
+  - Impact: Memory/CPU Pressure, moeglicher Denial-of-Service.
+  - Current controls: guarded Archive-Processing-Pfade und bounded Validation/Extraction-Flows.
+  - Evidence: Source-Pfade unter `src/FileTypeDetection/Infrastructure/*` und CI Execution Traces.
+- T3: Release-Artifact Provenance Tampering
+  - Impact: Consumer installieren untrusted Package-Build-Output.
+  - Current controls: OIDC Trusted Publishing und Provenance Attestation in `.github/workflows/release.yml`.
+  - Evidence: Release-Workflow Step `actions/attest-build-provenance@v2` und `gh attestation verify` Output-Artefakt.
+- T4: Vulnerable Dependency Ingress
+  - Impact: bekannte vulnerable transitive Komponenten im shipped Package.
+  - Current controls: CI-Gate `security-nuget` (`dotnet list ... --vulnerable --include-transitive`) mit High/Critical fail behavior.
+  - Evidence: `tools/ci/bin/run.sh` (`run_security_nuget`) und CI-Artefakte `artifacts/ci/security-nuget/*`.
+- T5: Unkoordinierte Public Disclosure vor Patch
+  - Impact: Exploitability-Window erhoeht sich, bevor Mitigation verfuegbar ist.
+  - Current controls: Private Vulnerability Reporting Path und Coordinated Disclosure Prozess (wie in `SECURITY.md` deklariert).
+  - Evidence: `tools/audit/verify-security-claims.sh` Claim-Checks und `docs/audit/008_INCIDENT_RESPONSE_RUNBOOK.MD`.
 
-## 6. Assumptions
-- Maintainer access controls and repository permissions remain correctly configured.
-- GitHub-hosted security features remain available for the repository.
-- Consumers execute their own runtime hardening controls; this repository cannot enforce them.
+## 6. Annahmen
+- Maintainer-Access-Controls und Repo-Permissions bleiben korrekt konfiguriert.
+- GitHub-hosted Security-Features bleiben fuer das Repository verfuegbar.
+- Consumer setzen ihre eigenen Runtime-Hardening-Kontrollen um; dieses Repository kann sie nicht erzwingen.
 
 ## 7. Residual Risks
-- R1: runtime denial-of-service risk can only be reduced, not eliminated, for hostile inputs.
-- R2: organizational response speed depends on maintainer availability.
-- R3: third-party platform outages can delay triage/release actions.
+- R1: Runtime Denial-of-Service Risk kann fuer hostile Inputs nur reduziert, nicht eliminiert werden.
+- R2: Organisatorische Response-Speed haengt von Maintainer-Verfuegbarkeit ab.
+- R3: Third-Party-Platform-Outages koennen Triage/Release-Aktionen verzoegern.
 
-## 8. Reproducible Verification
-All commands are intended to run from the repository root.
+## 8. Reproduzierbare Verifikation
+Alle Kommandos sind fuer Ausfuehrung im Repository-Root gedacht.
 ```bash
 bash tools/audit/verify-security-claims.sh
 bash tools/ci/bin/run.sh security-nuget

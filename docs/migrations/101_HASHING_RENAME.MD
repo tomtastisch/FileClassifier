@@ -1,11 +1,11 @@
-# Migration: Hashing-Rename (Deterministic* -> Evidence/Hash*)
+# Migration: Hashing Rename (Deterministic* -> Evidence/Hash*)
 
-## Zweck und Scope
-Dieses Dokument mappt das Breaking-Rename der oeffentlichen API im Hashing/Evidence-Subsystem.
-Das Verhalten bleibt deterministisch und fail-closed; nur Identifier und Dateinamen wurden umbenannt.
+## Scope
+This document maps the breaking public API rename of the hashing/evidence subsystem.
+Behavior remains deterministic and fail-closed; identifiers and file names changed.
 
-## Type-Renames
-| Alt | Neu |
+## Type Renames
+| Old | New |
 |---|---|
 | `DeterministicHashing` | `EvidenceHashing` |
 | `DeterministicHashEvidence` | `HashEvidence` |
@@ -14,8 +14,8 @@ Das Verhalten bleibt deterministisch und fail-closed; nur Identifier und Dateina
 | `DeterministicHashRoundTripReport` | `HashRoundTripReport` |
 | `DeterministicHashSourceType` | `HashSourceType` |
 
-## File-Renames (Repository)
-| Alter Pfad | Neuer Pfad |
+## File Renames (Repository)
+| Old Path | New Path |
 |---|---|
 | `src/FileTypeDetection/DeterministicHashing.vb` | `src/FileTypeDetection/EvidenceHashing.vb` |
 | `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashEvidence.vb` | `src/FileTypeDetection/Abstractions/Hashing/HashEvidence.vb` |
@@ -24,28 +24,28 @@ Das Verhalten bleibt deterministisch und fail-closed; nur Identifier und Dateina
 | `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashRoundTripReport.vb` | `src/FileTypeDetection/Abstractions/Hashing/HashRoundTripReport.vb` |
 | `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashSourceType.vb` | `src/FileTypeDetection/Abstractions/Hashing/HashSourceType.vb` |
 
-Hinweis:
-- Die Eintraege unter `Alter Pfad` sind historisch und existieren auf `main` nach dem Rename-Commit nicht mehr.
-- Repo-lokale Verifikation:
+Note:
+- The `Old Path` entries are historical and do not exist on `main` after the rename commit.
+- Repo-local verification:
   - `git log --follow --oneline -- src/FileTypeDetection/DeterministicHashing.vb`
   - `git show <baseline_sha>:src/FileTypeDetection/DeterministicHashing.vb`
 
-## Optionale Secure Digests (HMAC-SHA256)
-Neue optionale Digests wurden hinzugefuegt:
+## Optional Secure Digests (HMAC-SHA256)
+New optional digests were added:
 - `HashDigestSet.HmacPhysicalSha256`
 - `HashDigestSet.HmacLogicalSha256`
 
-Aktivierung:
+Opt-in:
 - Set `HashOptions.IncludeSecureHash = true`.
 - Provide a Base64 key via `FILECLASSIFIER_HMAC_KEY_B64`.
 
-Wenn Secure Hashing angefordert wird, aber der Key fehlt oder ungueltig ist:
-- Das bestehende SHA-256 und xxHash3 Verhalten bleibt erhalten.
-- HMAC-Digests sind leer.
-- `HashEvidence.Notes` enthaelt eine klare Nachricht, dass HMAC angefordert wurde, aber nicht gesetzt war.
+If secure hashing is requested but the key is missing or invalid:
+- Existing SHA-256 and xxHash3 behavior is preserved.
+- HMAC digests are empty.
+- `HashEvidence.Notes` includes a clear message that HMAC was requested but omitted.
 
-## JSON-Optionen (FileTypeOptions)
-Die JSON-Keys fuer die globalen Hashing-Optionen bleiben unter dem bestehenden Namespace `deterministicHash`.
-Neuer Key:
+## JSON Options (FileTypeOptions)
+The JSON keys for the global hashing options remain under the existing `deterministicHash` namespace.
+New key:
 - `deterministicHash.includeSecureHash` (object form)
 - `deterministicHashIncludeSecureHash` (flat form)

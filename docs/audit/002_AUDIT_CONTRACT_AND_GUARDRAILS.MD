@@ -1,37 +1,37 @@
-# Audit Contract And Guardrails
+# Audit-Vertrag und Guardrails
 
-## 1. Purpose
-Define deterministic evidence rules for `SECURITY.md` claim verification.
+## 1. Zweck
+Deterministische Evidence-Regeln fuer die Verifikation von Claims in `SECURITY.md`.
 
-## 2. Status Model
-Result contract status values:
-- `pass`: no blocking violations.
-- `fail`: at least one blocking violation.
-- `warn`: report-only findings.
+## 2. Statusmodell
+Statuswerte im Result-Contract:
+- `pass`: keine blockierenden Verstoesse.
+- `fail`: mindestens ein blockierender Verstoss.
+- `warn`: report-only Findings.
 
-Operational tri-state mapping used by claim engine:
+Operationales Tri-State-Mapping (Claim-Engine):
 - `pass` -> schema `pass`
 - `fail` -> schema `fail`
 - `unknown` -> schema `warn` with explicit reason code in `rule_violations[].message`
 
-## 3. Blocking Policy
-Blocking checks are allowed only if deterministic.
-Live GitHub API checks are blocker-eligible with strict anti-flake controls:
+## 3. Blocking-Policy
+Blockierende Checks sind nur zulaessig, wenn sie deterministisch sind.
+Live GitHub API Checks sind blocker-eligible mit strikten Anti-Flake-Kontrollen:
 - 3 retries
 - exponential backoff (2s, 4s, 8s)
 - current implementation emits generic API failure messages after retries
 
-If retries are exhausted:
-- blocker claims fail with reason code
-- report-only claims emit warn
+Wenn alle Retries erschoepft sind:
+- Blocker-Claims failen mit Reason-Code
+- Report-only Claims emittieren `warn`
 
-## 4. Evidence Contract
-Required artifacts per check:
+## 4. Evidence-Contract
+Erforderliche Artefakte pro Check:
 - `raw.log`
 - `summary.md`
-- `result.json` (must match `tools/ci/schema/result.schema.json`)
+- `result.json` (muss `tools/ci/schema/result.schema.json` matchen)
 
-## 5. Drift Handling
-- Policy drift is fail-closed for blocker claims.
-- Unknown states are never silently ignored.
-- Every failure must include an evidence path and a reproducible command.
+## 5. Drift-Handling
+- Policy-Drift ist fail-closed fuer Blocker-Claims.
+- Unknown-States werden nie stillschweigend ignoriert.
+- Jeder Failure muss einen Evidence-Pfad und ein reproduzierbares Kommando enthalten.

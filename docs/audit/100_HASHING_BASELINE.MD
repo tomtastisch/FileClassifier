@@ -1,27 +1,27 @@
-# Hashing-Baseline Evidence (Historischer Snapshot: vor EvidenceHashing-Rename)
+# Hashing Baseline Evidence (Historical Snapshot: pre EvidenceHashing rename)
 
-Erfasst am: 2026-02-10
+Date captured: 2026-02-10
 
-Pinned Baseline-Commit (vor Rename):
+Pinned baseline commit (pre rename):
 - `373146f0d2c178533ea6ac442e6cc2a117cb4331`
 
-Rename-Commit (Deterministic* -> Evidence/Hash*):
+Rename commit (Deterministic* -> Evidence/Hash*):
 - `7c6e94dad37b440c32386719e796d0bb6100c741`
 
-## Zweck und Scope
-Dieses Dokument ist historische Evidence fuer das Verhalten der Hashing-Fassade und des Evidence-Modells **vor** dem public Rename:
+## Scope
+This document is historical evidence for the hashing facade + evidence model behavior **before** the public rename:
 - `DeterministicHashing` -> `EvidenceHashing`
 - `DeterministicHash*` -> `Hash*`
 
-Es darf nicht als Beschreibung der aktuellen API-Oberflaeche auf `main` verwendet werden.
-SSOT fuer den aktuellen Stand:
-- API-Surface: `docs/010_API_CORE.MD`
+It must not be used as a description of the current API surface on `main`.
+For current SSOT:
+- API surface: `docs/010_API_CORE.MD`
 - Contract: `docs/contracts/001_CONTRACT_HASHING.MD`
 - Implementation: `src/FileTypeDetection/EvidenceHashing.vb`
 - Models: `src/FileTypeDetection/Abstractions/Hashing/*`
 
-## Verifikation (repo-lokal, deterministisch)
-Alle Referenzen unten sind auf den Baseline-Commit gepinnt (via `git show`):
+## How To Verify (repo-local, deterministic)
+All references below are pinned to the baseline commit via `git show`:
 
 ```bash
 BASE=373146f0d2c178533ea6ac442e6cc2a117cb4331
@@ -34,46 +34,46 @@ git show "$BASE":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashRou
 git show "$BASE":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashSourceType.vb | nl -ba | sed -n '1,120p'
 ```
 
-## Baseline-Fassade (vor Rename)
-Pinned File (Baseline-Commit):
+## Baseline Facade (pre rename)
+Pinned file (baseline commit):
 - `src/FileTypeDetection/DeterministicHashing.vb` @ `373146f0`
 
-Ausgewaehlte public Entrypoints (Baseline):
+Selected public entrypoints (baseline):
 - `HashFile(path)` / `HashFile(path, options)`
 - `HashBytes(data)` / `HashBytes(data, label, options)`
 - `HashEntries(entries, label, options)`
 - `VerifyRoundTrip(path, options)`
 
-## Semantik der kanonischen Bytes (Baseline)
-Pinned File: `src/FileTypeDetection/DeterministicHashing.vb` @ `373146f0`
+## Canonical Bytes Semantics (baseline)
+Pinned file: `src/FileTypeDetection/DeterministicHashing.vb` @ `373146f0`
 
-Raw-Payload-Mode (`BuildEvidenceFromRawPayload`):
-- Physical SHA-256 und Logical SHA-256 werden beide aus denselben `safePayload` Bytes berechnet.
-- Fast-Hashes werden beide aus denselben `safePayload` Bytes berechnet.
+Raw payload mode (`BuildEvidenceFromRawPayload`):
+- Physical SHA-256 and Logical SHA-256 are both computed from the same `safePayload` bytes.
+- Fast hashes are both computed from the same `safePayload` bytes.
 
-Archive/Entries-Mode (`BuildEvidenceFromEntries`):
-- Logical Bytes sind ein kanonisches Manifest (`BuildLogicalManifestBytes`) aus normalisierten Entries.
-- Physical Bytes sind die Original-Archive-Bytes nur dann, wenn `compressedBytes` vorhanden und nicht leer ist.
+Archive/entries mode (`BuildEvidenceFromEntries`):
+- Logical bytes are a canonical manifest (`BuildLogicalManifestBytes`) derived from normalized entries.
+- Physical bytes are the original archive bytes only when `compressedBytes` is present/non-empty.
 
-Kanonische Manifest-Struktur:
-- Enthaelt `LogicalManifestVersion` Header und Entry-Count.
-- Pro Entry: schreibt Path-Bytes + Content-Length + SHA-256(content) Bytes.
+Canonical manifest structure:
+- Includes `LogicalManifestVersion` header and entry count.
+- For each entry: writes path bytes + content length + SHA-256(content) bytes.
 
-Formatierung:
-- SHA-256 Hex: lowercase (`ToLowerInvariant()` nach `Convert.ToHexString(...)`).
+Formatting:
+- SHA-256 hex: lowercase (`ToLowerInvariant()` after `Convert.ToHexString(...)`).
 - xxHash3: lowercase fixed-width `x16` via `ToString("x16", CultureInfo.InvariantCulture)`.
-- Wenn `IncludeFastHash` false ist (oder options null), sind Fast-Digests leer.
+- If `IncludeFastHash` is false (or options is null), fast digests are empty.
 
-## Evidence-Model Types (Baseline-Namen)
-Pinned Files @ `373146f0`:
+## Evidence Model Types (baseline names)
+Pinned files @ `373146f0`:
 - `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashDigestSet.vb`
 - `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashEvidence.vb`
 - `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashOptions.vb`
 - `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashRoundTripReport.vb`
 - `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashSourceType.vb`
 
-## Current Implementation Pointers (nach Rename)
-Aktuelle Fassade + Models auf `main`:
+## Current Implementation Pointers (post rename)
+Current facade + models on `main`:
 - `src/FileTypeDetection/EvidenceHashing.vb`
 - `src/FileTypeDetection/Abstractions/Hashing/HashDigestSet.vb`
 - `src/FileTypeDetection/Abstractions/Hashing/HashEvidence.vb`
@@ -81,9 +81,9 @@ Aktuelle Fassade + Models auf `main`:
 - `src/FileTypeDetection/Abstractions/Hashing/HashRoundTripReport.vb`
 - `src/FileTypeDetection/Abstractions/Hashing/HashSourceType.vb`
 
-## Baseline-Tests
-Historisches Kommando (Baseline):
+## Baseline Tests
+Historical command (baseline):
 - `dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -v minimal`
 
-Hinweis:
-- Die aktuelle Test-Suite-Groesse und exakte Counts koennen von der Baseline abweichen; der autoritative Check ist der CI-Job `tests-bdd-coverage` und lokal `dotnet test` auf `main`.
+Note:
+- The current test suite size and exact counts can differ from the baseline snapshot; the authoritative check is the CI job `tests-bdd-coverage` and local `dotnet test` on `main`.

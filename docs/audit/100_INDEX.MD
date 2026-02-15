@@ -1,10 +1,10 @@
-# Audit-Index
+# Audit Index
 
-## Zweck und Scope
-Zentraler Index fuer Evidence-/Hardening-Dokumente, die Claims aus `SECURITY.md` nachweisbar machen, ohne `SECURITY.md` selbst zu aendern.
-Root-Landing-Page fuer Dritte: `SECURITY_ASSURANCE_INDEX.md`.
+## Scope
+Central index for evidence-hardening artifacts that support claims in `SECURITY.md` without modifying `SECURITY.md` itself.
+Root landing page for third parties: `SECURITY_ASSURANCE_INDEX.md`.
 
-## Dokumente
+## Documents
 - `docs/audit/000_HASHING_BASELINE.MD`
 - `docs/audit/000_INDEX.MD`
 - `docs/audit/002_AUDIT_CONTRACT_AND_GUARDRAILS.MD`
@@ -21,7 +21,7 @@ Root-Landing-Page fuer Dritte: `SECURITY_ASSURANCE_INDEX.md`.
 - `docs/audit/013_SCORECARD_GOVERNANCE_ALERT_MAPPING.MD`
 - `docs/audit/014_EVIDENCE_REPORT_ISSUE_67.MD`
 
-## Maschinelle Evidence
+## Machine Evidence
 - `artifacts/ci/security-claims-evidence/`
 - `artifacts/ci/code-analysis-evidence/`
 - `artifacts/audit/code_inventory.json`
@@ -30,8 +30,8 @@ Root-Landing-Page fuer Dritte: `SECURITY_ASSURANCE_INDEX.md`.
 - `artifacts/audit/redundancy_candidates.json`
 - `artifacts/audit/hardening_candidates.json`
 
-## Repro-Kommandos
-Alle Kommandos sind fuer Ausfuehrung im Repository-Root gedacht.
+## Repro Commands
+All commands are intended to run from the repository root.
 ```bash
 bash tools/audit/verify-security-claims.sh
 bash tools/audit/verify-code-analysis-evidence.sh
@@ -40,8 +40,8 @@ python3 tools/check-docs.py
 bash tools/versioning/verify-version-convergence.sh
 ```
 
-## Externe Assurance
-- OpenSSF Scorecard Workflow: `.github/workflows/scorecard.yml`
-- Artifact Attestations im Release-Workflow: `.github/workflows/release.yml`
-- Deep Analysis Evidence Workflow: `.github/workflows/code-analysis-evidence.yml`
-- GitHub Code Scanning Default Setup (state muss `not-configured` sein): `gh api "repos/<owner>/<repo>/code-scanning/default-setup"`
+## External Assurance
+- OpenSSF Scorecard workflow: `.github/workflows/scorecard.yml`
+- Artifact attestations in release workflow: `.github/workflows/release.yml`
+- Deep analysis evidence workflow: `.github/workflows/code-analysis-evidence.yml`
+- GitHub Code Scanning Default Setup (state must be not-configured): `gh api "repos/<owner>/<repo>/code-scanning/default-setup"`
