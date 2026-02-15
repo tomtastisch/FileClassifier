@@ -121,7 +121,9 @@ for version in "${NUGET_VERSIONS[@]}"; do
       continue
     fi
     rc=$?
-    if grep -Eqi '(forbidden|unauthorized| 403 | 401 |status code.*403|status code.*401|does not have permission|api key is invalid|has expired)' "${delete_log}"; then
+    # NuGet.org returns 403/401 on missing "unlist" privilege or invalid/expired keys.
+    # Treat this as best-effort retention (skip), but still fail-closed on unknown errors.
+    if grep -Eqi '(forbidden|unauthorized|(^|[^0-9])(401|403)([^0-9]|$)|status code.*(401|403)|does not have permission|api key is invalid|has expired)' "${delete_log}"; then
       echo "SKIP dotnet nuget delete ${PACKAGE_ID} ${version} (reason=403/401)" >> "${ACTIONS_LOG}"
       echo -e "skip\tnuget\tunlist\t${version} (reason=forbidden)" >> "${SUMMARY_TSV}"
       continue
