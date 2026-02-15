@@ -191,6 +191,18 @@ jobs:
           RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag || github.ref_name }}
         run: bash tools/ci/release/upsert_github_release.sh
 
+      - name: "Post-check: stable release must be Latest"
+        if: (github.event_name != 'workflow_dispatch' && !contains(github.ref_name, '-rc.')) || (github.event_name == 'workflow_dispatch' && !contains(github.event.inputs.release_tag, '-rc.'))
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag || github.ref_name }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          latest_tag="$(gh api "repos/${REPO}/releases/latest" --jq .tag_name)"
+          [[ "${latest_tag}" == "${RELEASE_TAG}" ]] || { echo "ERROR: Latest release tag '${latest_tag}' does not match expected '${RELEASE_TAG}'" >&2; exit 1; }
+
       - name: Attest package provenance
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
         with:
