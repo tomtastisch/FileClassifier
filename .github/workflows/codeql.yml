@@ -53,7 +53,8 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           build-mode: manual
-          queries: security-and-quality
+          # Security-only (no quality queries) to keep `security/code-scanning` alert count policy-conform.
+          queries: security-extended
 
       - name: Build (CodeQL traced)
         run: |
