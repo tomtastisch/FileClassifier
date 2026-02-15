@@ -1,10 +1,6 @@
 Option Strict On
 Option Explicit On
 
-Imports System.IO
-Imports System.IO.Compression
-Imports Microsoft.Extensions.Logging
-
 Namespace Global.Tomtastisch.FileClassifier
     Friend NotInheritable Class InternalIoDefaults
         Friend Const CopyBufferSize As Integer = 8192
@@ -23,7 +19,7 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
-        Friend Shared Sub CopyBounded(input As Stream, output As Stream, maxBytes As Long)
+        Friend Shared Sub CopyBounded(input As System.IO.Stream, output As System.IO.Stream, maxBytes As Long)
             Dim buf(InternalIoDefaults.CopyBufferSize - 1) As Byte
             Dim total As Long = 0
 
@@ -46,11 +42,11 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
-        Friend Shared Function IsReadable(stream As Stream) As Boolean
+        Friend Shared Function IsReadable(stream As System.IO.Stream) As Boolean
             Return stream IsNot Nothing AndAlso stream.CanRead
         End Function
 
-        Friend Shared Sub RewindToStart(stream As Stream)
+        Friend Shared Sub RewindToStart(stream As System.IO.Stream)
             If stream Is Nothing Then Return
             If stream.CanSeek Then stream.Position = 0
         End Sub
@@ -70,7 +66,7 @@ Namespace Global.Tomtastisch.FileClassifier
             If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then Return False
 
             Try
-                Using ms As New MemoryStream(data, writable:=False)
+                Using ms As New System.IO.MemoryStream(data, writable:=False)
                     Return IsArchiveSafeStream(ms, opt, descriptor, depth:=0)
                 End Using
             Catch ex As Exception
@@ -79,7 +75,7 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Friend Shared Function IsArchiveSafeStream(stream As Stream, opt As FileTypeProjectOptions,
+        Friend Shared Function IsArchiveSafeStream(stream As System.IO.Stream, opt As FileTypeProjectOptions,
                                                    descriptor As ArchiveDescriptor, depth As Integer) As Boolean
             If Not StreamGuard.IsReadable(stream) Then Return False
             If opt Is Nothing Then Return False
@@ -132,12 +128,12 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return False
             End If
 
-            If File.Exists(destinationFull) Then
+            If System.IO.File.Exists(destinationFull) Then
                 If Not overwrite Then Return False
-                File.Delete(destinationFull)
-            ElseIf Directory.Exists(destinationFull) Then
+                System.IO.File.Delete(destinationFull)
+            ElseIf System.IO.Directory.Exists(destinationFull) Then
                 If Not overwrite Then Return False
-                Directory.Delete(destinationFull, recursive:=True)
+                System.IO.Directory.Delete(destinationFull, recursive:=True)
             End If
 
             Return True
@@ -150,12 +146,12 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return False
             End If
 
-            If File.Exists(destinationFull) OrElse Directory.Exists(destinationFull) Then
+            If System.IO.File.Exists(destinationFull) OrElse System.IO.Directory.Exists(destinationFull) Then
                 LogGuard.Warn(opt.Logger, "[PathGuard] Ziel existiert bereits.")
                 Return False
             End If
 
-            Dim parent = Path.GetDirectoryName(destinationFull)
+            Dim parent = System.IO.Path.GetDirectoryName(destinationFull)
             If String.IsNullOrWhiteSpace(parent) Then
                 LogGuard.Warn(opt.Logger, "[PathGuard] Ziel ohne gueltigen Parent.")
                 Return False
@@ -169,7 +165,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Dim rootPath As String
             Try
-                rootPath = Path.GetPathRoot(destinationFull)
+                rootPath = System.IO.Path.GetPathRoot(destinationFull)
             Catch
                 Return False
             End Try
@@ -177,8 +173,8 @@ Namespace Global.Tomtastisch.FileClassifier
             If String.IsNullOrWhiteSpace(rootPath) Then Return False
 
             Return String.Equals(
-                destinationFull.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
-                rootPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                destinationFull.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar),
+                rootPath.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar),
                 StringComparison.OrdinalIgnoreCase)
         End Function
     End Class
@@ -204,7 +200,7 @@ Namespace Global.Tomtastisch.FileClassifier
             If safe.Contains(ChrW(0)) Then Return False
 
             safe = safe.Replace("\"c, "/"c)
-            If Path.IsPathRooted(safe) Then Return False
+            If System.IO.Path.IsPathRooted(safe) Then Return False
             safe = safe.TrimStart("/"c)
             If safe.Length = 0 Then Return False
 
@@ -242,7 +238,7 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
-        Friend Shared Function TryRefine(streamFactory As Func(Of Stream)) As FileType
+        Friend Shared Function TryRefine(streamFactory As Func(Of System.IO.Stream)) As FileType
             If streamFactory Is Nothing Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
 
             Try
@@ -254,7 +250,7 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Friend Shared Function TryRefineStream(stream As Stream) As FileType
+        Friend Shared Function TryRefineStream(stream As System.IO.Stream) As FileType
             If Not StreamGuard.IsReadable(stream) Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
 
             Try
@@ -265,9 +261,9 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Private Shared Function DetectKindFromArchivePackage(stream As Stream) As FileType
+        Private Shared Function DetectKindFromArchivePackage(stream As System.IO.Stream) As FileType
             Try
-                Using zip As New ZipArchive(stream, ZipArchiveMode.Read, leaveOpen:=True)
+                Using zip As New System.IO.Compression.ZipArchive(stream, System.IO.Compression.ZipArchiveMode.Read, leaveOpen:=True)
                     Dim hasContentTypes = False
                     Dim hasDocxMarker = False
                     Dim hasXlsxMarker = False
@@ -312,29 +308,29 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
-        Friend Shared Sub Debug(logger As ILogger, message As String)
+        Friend Shared Sub Debug(logger As Microsoft.Extensions.Logging.ILogger, message As String)
             If logger Is Nothing Then Return
-            If Not logger.IsEnabled(LogLevel.Debug) Then Return
+            If Not logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug) Then Return
             Try
-                logger.LogDebug("{Message}", message)
+                Microsoft.Extensions.Logging.LoggerExtensions.LogDebug(logger, "{Message}", message)
             Catch
             End Try
         End Sub
 
-        Friend Shared Sub Warn(logger As ILogger, message As String)
+        Friend Shared Sub Warn(logger As Microsoft.Extensions.Logging.ILogger, message As String)
             If logger Is Nothing Then Return
-            If Not logger.IsEnabled(LogLevel.Warning) Then Return
+            If Not logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Warning) Then Return
             Try
-                logger.LogWarning("{Message}", message)
+                Microsoft.Extensions.Logging.LoggerExtensions.LogWarning(logger, "{Message}", message)
             Catch
             End Try
         End Sub
 
-        Friend Shared Sub [Error](logger As ILogger, message As String, ex As Exception)
+        Friend Shared Sub [Error](logger As Microsoft.Extensions.Logging.ILogger, message As String, ex As Exception)
             If logger Is Nothing Then Return
-            If Not logger.IsEnabled(LogLevel.Error) Then Return
+            If Not logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Error) Then Return
             Try
-                logger.LogError(ex, "{Message}", message)
+                Microsoft.Extensions.Logging.LoggerExtensions.LogError(logger, ex, "{Message}", message)
             Catch
             End Try
         End Sub
