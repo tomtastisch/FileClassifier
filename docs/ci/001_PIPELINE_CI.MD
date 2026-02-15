@@ -76,7 +76,7 @@ Evidence:
 |---|---|---|---|---|
 | `preflight` | `bash tools/ci/bin/run.sh preflight` | `artifacts/ci/preflight/` | Result contract + policy bridge | `.github/workflows/ci.yml:77-87`, `tools/ci/bin/run.sh:159-171` |
 | `version-policy` | `.github/workflows/ruleset-placeholders.yml` | N/A | N/A (placeholder required context) | `.github/workflows/ruleset-placeholders.yml:20-24` |
-| `versioning-policy` | `bash tools/versioning/run-versioning-policy.sh` | `artifacts/policy/` | RoC policy evaluation | `.github/workflows/version-policy.yml:25-37` |
+| `versioning-policy` | `bash tools/versioning/run-versioning-policy.sh` | `artifacts/policy/` | RaC policy evaluation | `.github/workflows/version-policy.yml:25-37` |
 | `build` | `bash tools/ci/bin/run.sh build` | `artifacts/ci/build/` | Result contract | `.github/workflows/ci.yml:177-187`, `tools/ci/bin/run.sh:179-183` |
 | `api-contract` | `bash tools/ci/bin/run.sh api-contract` | `artifacts/ci/api-contract/` | Result contract | `.github/workflows/ci.yml:202-212`, `tools/ci/bin/run.sh:185-189` |
 | `pack` | `bash tools/ci/bin/run.sh pack` | `artifacts/ci/pack/` | Result contract + package metadata checks | `.github/workflows/ci.yml:227-237`, `tools/ci/bin/run.sh:191-230` |

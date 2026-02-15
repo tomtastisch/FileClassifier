@@ -26,12 +26,12 @@ All references below are pinned to the baseline commit via `git show`:
 ```bash
 BASE=373146f0d2c178533ea6ac442e6cc2a117cb4331
 
-git show \"$BASE\":src/FileTypeDetection/DeterministicHashing.vb | nl -ba | sed -n '1,260p'
-git show \"$BASE\":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashEvidence.vb | nl -ba | sed -n '1,220p'
-git show \"$BASE\":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashDigestSet.vb | nl -ba | sed -n '1,240p'
-git show \"$BASE\":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashOptions.vb | nl -ba | sed -n '1,240p'
-git show \"$BASE\":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashRoundTripReport.vb | nl -ba | sed -n '1,260p'
-git show \"$BASE\":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashSourceType.vb | nl -ba | sed -n '1,120p'
+git show "$BASE":src/FileTypeDetection/DeterministicHashing.vb | nl -ba | sed -n '1,260p'
+git show "$BASE":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashEvidence.vb | nl -ba | sed -n '1,220p'
+git show "$BASE":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashDigestSet.vb | nl -ba | sed -n '1,240p'
+git show "$BASE":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashOptions.vb | nl -ba | sed -n '1,240p'
+git show "$BASE":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashRoundTripReport.vb | nl -ba | sed -n '1,260p'
+git show "$BASE":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashSourceType.vb | nl -ba | sed -n '1,120p'
 ```
 
 ## Baseline Facade (pre rename)
@@ -61,7 +61,7 @@ Canonical manifest structure:
 
 Formatting:
 - SHA-256 hex: lowercase (`ToLowerInvariant()` after `Convert.ToHexString(...)`).
-- xxHash3: lowercase fixed-width `x16` via `ToString(\"x16\", CultureInfo.InvariantCulture)`.
+- xxHash3: lowercase fixed-width `x16` via `ToString("x16", CultureInfo.InvariantCulture)`.
 - If `IncludeFastHash` is false (or options is null), fast digests are empty.
 
 ## Evidence Model Types (baseline names)
