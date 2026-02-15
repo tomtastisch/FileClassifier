@@ -26,7 +26,8 @@ Sie darf `AGENTS.md` nicht widersprechen. Im Konfliktfall gilt immer `AGENTS.md`
 - Branch-Namen: `codex/<tag>/<kurztext-kebab>`
   - erlaubte `<tag>`: `fix|release|feat|refactor|docs|test|ci|chore|security`
 - PR-Titel: `<tag>(<scope>): <deutsche kurzbeschreibung>`
-- PR-Beschreibung: Deutsch und nach `AGENTS.md` Pflichtstruktur + Checklisten + Evidence + DoD-Matrix.
+- PR-Beschreibung: Deutsch und gemaess dem in `AGENTS.md` beschriebenen Abschnitt zu PR-Beschreibungen
+  (Pflichtinhalte inkl. Ziel/Scope, Checklisten, Evidence, DoD-Matrix, ...).
 
 ## 4) Arbeitsablauf (push&green)
 1. Branch erstellen (siehe Konventionen).
@@ -59,8 +60,10 @@ Sie darf `AGENTS.md` nicht widersprechen. Im Konfliktfall gilt immer `AGENTS.md`
 - CodeQL muss Advanced-Setup bleiben; Default-Setup darf nicht aktiviert werden.
   - Guardrail lokal: `bash tools/ci/check-codeql-default-setup.sh`
 - CodeQL Query-Set ist security-only (keine Quality-Alerts als Code-Scanning Alerts).
-- Vor Merge verifizieren (open alerts = 0):
-  - `gh api 'repos/{owner}/{repo}/code-scanning/alerts?state=open' --paginate | jq -s 'map(length)|add'`
+- Vor Merge verifizieren (open alerts = 0) mit Repo-Guardrail:
+  - `bash tools/ci/check-code-scanning-tools-zero.sh`
+  - Optional (nur zur manuellen Diagnose):
+    - `gh api 'repos/{owner}/{repo}/code-scanning/alerts?state=open' --paginate | jq -s 'map(length)|add'`
 
 ## 7) Evidence-Policy (Pflicht)
 - Jede materielle Aussage muss Evidence haben (Kommando + Artefakt/Output + Pfad).
