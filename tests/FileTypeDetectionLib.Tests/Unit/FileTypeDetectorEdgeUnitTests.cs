@@ -79,7 +79,7 @@ public sealed class FileTypeDetectorEdgeUnitTests
     {
         using var scope = TestTempPaths.CreateScope("ftd-ex-io");
         var path = Path.Combine(scope.RootPath, "locked.bin");
-        File.WriteAllBytes(path, new byte[] { 0x25, 0x50, 0x44, 0x46, 0x2D }); // "%PDF-" header prefix
+        File.WriteAllBytes(path, "%PDF-"u8.ToArray()); // "%PDF-" header prefix
 
         using var locked = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
 
