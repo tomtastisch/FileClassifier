@@ -8,10 +8,11 @@ Heuristik fuer die Rueckwirkungs-Zuordnung:
 - `docs|test|ci|chore|tooling|refactor|fix` => Patch
 
 Aktueller Entwicklungsstand:
-- Aktuelle Entwicklungslinie enthaelt `5.x` (aktuell veroeffentlichtes Tag: `v5.1.3`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
+- Aktuelle Entwicklungslinie enthaelt `5.x` (aktuell veroeffentlichtes Tag: `v5.1.3`; naechstes vorgesehenes Tag: `v5.1.4`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
 
 | Version | Kurzbeschreibung | Commit | Keyword |
 |---|---|---|---|
+| `5.1.4` | Refactor-Cluster 7C abgeschlossen + Qodana-Alerts auf 0 (Archive-Infrastructure Qualifier-Cleanup, Tests) | [0a85c82](https://github.com/tomtastisch/FileClassifier/commit/0a85c82) | patch |
 | `5.1.3` | PR-Governance-Haertung (DE-Naming, PR-Template, fail-closed Gate fuer `security/code-scanning/tools = 0`) | [0b488ac](https://github.com/tomtastisch/FileClassifier/commit/0b488ac) | patch |
 | `5.1.2` | Gate4 Polling-Optimierung und Release-Haertung | [f12711d](https://github.com/tomtastisch/FileClassifier/commit/f12711d) | patch |
 | `5.1.1` | Dependabot security-only mode und fail-closed Guards fuer secret-pflichtige Workflows | [d0ad8ec](https://github.com/tomtastisch/FileClassifier/commit/d0ad8ec) | patch |
