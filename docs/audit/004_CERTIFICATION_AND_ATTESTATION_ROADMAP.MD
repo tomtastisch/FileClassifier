@@ -36,11 +36,12 @@ gh attestation verify "$NUPKG" --repo tomtastisch/FileClassifier
 - Verification commands are documented and reproducible.
 
 ## 6. Code Scanning Mode Constraint
-This repository currently uses GitHub Code Scanning Default Setup (state: `configured`).
+This repository uses GitHub Code Scanning Advanced Setup (workflow-based CodeQL) and requires that GitHub Code Scanning
+Default Setup remains disabled (state: `not-configured`).
 When Default Setup is enabled, additional advanced CodeQL workflow uploads can be rejected by GitHub.
-Operational rule for this repo:
-- Keep Default Setup active for CodeQL until an explicit migration decision is made.
-- Do not run parallel advanced CodeQL workflow uploads in the same repository state.
+Operational rules for this repo:
+- Keep Default Setup disabled for CodeQL (see `docs/security/010_CODEQL_DEFAULT_SETUP_GUARDRAIL.MD`).
+- Treat Default-Setup drift as a fail-closed blocker and remediate before merging/releasing.
 - Non-CodeQL SARIF uploads (for example OpenSSF Scorecard SARIF) are permitted.
 
 ## 7. OpenSSF Scorecard Constraint for Third-Party GitHub Actions
