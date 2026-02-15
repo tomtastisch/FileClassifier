@@ -192,7 +192,7 @@ jobs:
         run: bash tools/ci/release/upsert_github_release.sh
 
       - name: "Post-check: stable release must be Latest"
-        if: !contains(github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag || github.ref_name, '-rc.')
+        if: (github.event_name != 'workflow_dispatch' && !contains(github.ref_name, '-rc.')) || (github.event_name == 'workflow_dispatch' && !contains(github.event.inputs.release_tag, '-rc.'))
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag || github.ref_name }}
