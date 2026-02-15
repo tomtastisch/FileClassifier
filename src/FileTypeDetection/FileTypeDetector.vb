@@ -76,6 +76,8 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
             Catch ex As UnauthorizedAccessException
                 Return LogReadFileSafeFailure(opt, ex)
+            Catch ex As System.Security.SecurityException
+                Return LogReadFileSafeFailure(opt, ex)
             Catch ex As IOException
                 Return LogReadFileSafeFailure(opt, ex)
             Catch ex As InvalidDataException
@@ -83,8 +85,6 @@ Namespace Global.Tomtastisch.FileClassifier
             Catch ex As NotSupportedException
                 Return LogReadFileSafeFailure(opt, ex)
             Catch ex As ArgumentException
-                Return LogReadFileSafeFailure(opt, ex)
-            Catch ex As Exception
                 Return LogReadFileSafeFailure(opt, ex)
             End Try
         End Function
@@ -214,6 +214,8 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
             Catch ex As UnauthorizedAccessException
                 Return LogDetectFailure(opt, trace, ex)
+            Catch ex As System.Security.SecurityException
+                Return LogDetectFailure(opt, trace, ex)
             Catch ex As IOException
                 Return LogDetectFailure(opt, trace, ex)
             Catch ex As InvalidDataException
@@ -221,8 +223,6 @@ Namespace Global.Tomtastisch.FileClassifier
             Catch ex As NotSupportedException
                 Return LogDetectFailure(opt, trace, ex)
             Catch ex As ArgumentException
-                Return LogDetectFailure(opt, trace, ex)
-            Catch ex As Exception
                 Return LogDetectFailure(opt, trace, ex)
             End Try
         End Function
@@ -269,6 +269,8 @@ Namespace Global.Tomtastisch.FileClassifier
                     FileMaterializer.Persist(payload, destinationDirectory, overwrite:=False, secureExtract:=True)
             Catch ex As UnauthorizedAccessException
                 Return LogArchiveExtractFailure(opt, ex)
+            Catch ex As System.Security.SecurityException
+                Return LogArchiveExtractFailure(opt, ex)
             Catch ex As IOException
                 Return LogArchiveExtractFailure(opt, ex)
             Catch ex As InvalidDataException
@@ -276,8 +278,6 @@ Namespace Global.Tomtastisch.FileClassifier
             Catch ex As NotSupportedException
                 Return LogArchiveExtractFailure(opt, ex)
             Catch ex As ArgumentException
-                Return LogArchiveExtractFailure(opt, ex)
-            Catch ex As Exception
                 Return LogArchiveExtractFailure(opt, ex)
             End Try
         End Function
@@ -305,6 +305,8 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
             Catch ex As UnauthorizedAccessException
                 Return LogArchiveExtractFailure(opt, ex, emptyResult)
+            Catch ex As System.Security.SecurityException
+                Return LogArchiveExtractFailure(opt, ex, emptyResult)
             Catch ex As IOException
                 Return LogArchiveExtractFailure(opt, ex, emptyResult)
             Catch ex As InvalidDataException
@@ -312,8 +314,6 @@ Namespace Global.Tomtastisch.FileClassifier
             Catch ex As NotSupportedException
                 Return LogArchiveExtractFailure(opt, ex, emptyResult)
             Catch ex As ArgumentException
-                Return LogArchiveExtractFailure(opt, ex, emptyResult)
-            Catch ex As Exception
                 Return LogArchiveExtractFailure(opt, ex, emptyResult)
             End Try
         End Function
@@ -330,6 +330,8 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return ResolveByHeaderForBytes(data, opt, trace, data)
             Catch ex As UnauthorizedAccessException
                 Return LogDetectFailure(opt, ex)
+            Catch ex As System.Security.SecurityException
+                Return LogDetectFailure(opt, ex)
             Catch ex As IOException
                 Return LogDetectFailure(opt, ex)
             Catch ex As InvalidDataException
@@ -337,8 +339,6 @@ Namespace Global.Tomtastisch.FileClassifier
             Catch ex As NotSupportedException
                 Return LogDetectFailure(opt, ex)
             Catch ex As ArgumentException
-                Return LogDetectFailure(opt, ex)
-            Catch ex As Exception
                 Return LogDetectFailure(opt, ex)
             End Try
         End Function

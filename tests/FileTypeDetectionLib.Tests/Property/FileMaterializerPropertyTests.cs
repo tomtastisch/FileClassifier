@@ -126,4 +126,15 @@ public sealed class FileMaterializerPropertyTests
             Assert.False(ok);
         }
     }
+
+    [Fact]
+    public void Persist_ReturnsFalse_ForDestinationWithNullChar()
+    {
+        var payload = new byte[] { 0x10, 0x20 };
+        var destination = "out\0bad.bin";
+
+        var ok = FileMaterializer.Persist(payload, destination, overwrite: false, secureExtract: false);
+
+        Assert.False(ok);
+    }
 }
