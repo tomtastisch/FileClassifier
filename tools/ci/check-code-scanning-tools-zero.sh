@@ -60,11 +60,39 @@ if [[ -z "${REPO}" ]]; then
   fail "Repository-Slug konnte nicht bestimmt werden"
 fi
 
+# Gate strategy:
+# - Default: enforce 0 open alerts on main (prevents unrelated merges while main is red).
+# - Exception: PRs labeled "area:qodana" are allowed to validate against the PR ref, so the cleanup PR itself can merge.
+EVENT_NAME="${GITHUB_EVENT_NAME:-}"
+QUERY_REF=""
+if [[ "${EVENT_NAME}" == "pull_request" && -n "${GITHUB_EVENT_PATH:-}" && -f "${GITHUB_EVENT_PATH:-}" ]]; then
+  if jq -r '.pull_request.labels[].name // empty' "${GITHUB_EVENT_PATH}" | grep -Fxq -- "area:qodana"; then
+    QUERY_REF="${GITHUB_REF:-}"
+    if [[ -z "${QUERY_REF}" ]]; then
+      pr_number="$(jq -r '.pull_request.number // empty' "${GITHUB_EVENT_PATH}")"
+      if [[ -n "${pr_number}" ]]; then
+        QUERY_REF="refs/pull/${pr_number}/merge"
+      fi
+    fi
+    log "INFO: PR hat Label area:qodana -> pruefe Code-Scanning Alerts fuer ref=${QUERY_REF:-<unset>}"
+  else
+    QUERY_REF="refs/heads/main"
+    log "INFO: PR ohne Label area:qodana -> pruefe Code-Scanning Alerts fuer ref=${QUERY_REF}"
+  fi
+else
+  QUERY_REF="${GITHUB_REF:-refs/heads/main}"
+  log "INFO: Event=${EVENT_NAME:-<unset>} -> pruefe Code-Scanning Alerts fuer ref=${QUERY_REF}"
+fi
+
 attempt=1
 delay=2
 max_attempts=3
 while true; do
-  if gh api "repos/${REPO}/code-scanning/alerts?state=open&per_page=100" --paginate > "${ALERTS_JSON}" 2>> "${RAW_LOG}"; then
+  api_path="repos/${REPO}/code-scanning/alerts?state=open&per_page=100"
+  if [[ -n "${QUERY_REF}" ]]; then
+    api_path="${api_path}&ref=${QUERY_REF}"
+  fi
+  if gh api "${api_path}" --paginate > "${ALERTS_JSON}" 2>> "${RAW_LOG}"; then
     break
   fi
   if (( attempt >= max_attempts )); then
@@ -89,6 +117,7 @@ fi
   echo
   echo "- status: pass"
   echo "- open_alerts: 0"
+  echo "- ref: ${QUERY_REF}"
   echo "- repo: ${REPO}"
 } > "${SUMMARY_MD}"
 
