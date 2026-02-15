@@ -26,11 +26,11 @@ Namespace Global.Tomtastisch.FileClassifier
                                                     depth As Integer,
                                                     extractEntry As Func(Of ZipArchiveEntry, Boolean)
                                                     ) As Boolean
-            If stream Is Nothing OrElse Not stream.CanRead Then Return False
+            If Not StreamGuard.IsReadable(stream) Then Return False
             If depth > opt.MaxZipNestingDepth Then Return False
 
             Try
-                If stream.CanSeek Then stream.Position = 0
+                StreamGuard.RewindToStart(stream)
 
                 Using zip As New ZipArchive(stream, ZipArchiveMode.Read, leaveOpen:=True)
                     If zip.Entries.Count > opt.MaxZipEntries Then Return False

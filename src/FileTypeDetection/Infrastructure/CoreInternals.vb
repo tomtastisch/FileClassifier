@@ -39,6 +39,24 @@ Namespace Global.Tomtastisch.FileClassifier
     End Class
 
     ''' <summary>
+    '''     Kleine, zentrale Stream-Guards, um duplizierte Pattern-Checks in Archivroutinen zu reduzieren.
+    '''     Keine Semantik: reine Abfrage/Positionierung.
+    ''' </summary>
+    Friend NotInheritable Class StreamGuard
+        Private Sub New()
+        End Sub
+
+        Friend Shared Function IsReadable(stream As Stream) As Boolean
+            Return stream IsNot Nothing AndAlso stream.CanRead
+        End Function
+
+        Friend Shared Sub RewindToStart(stream As Stream)
+            If stream Is Nothing Then Return
+            If stream.CanSeek Then stream.Position = 0
+        End Sub
+    End Class
+
+    ''' <summary>
     '''     Sicherheits-Gate fuer Archive-Container.
     ''' </summary>
     Friend NotInheritable Class ArchiveSafetyGate
@@ -63,7 +81,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Friend Shared Function IsArchiveSafeStream(stream As Stream, opt As FileTypeProjectOptions,
                                                    descriptor As ArchiveDescriptor, depth As Integer) As Boolean
-            If stream Is Nothing OrElse Not stream.CanRead Then Return False
+            If Not StreamGuard.IsReadable(stream) Then Return False
             If opt Is Nothing Then Return False
             Return ArchiveProcessingEngine.ValidateArchiveStream(stream, opt, depth, descriptor)
         End Function
@@ -237,12 +255,10 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Friend Shared Function TryRefineStream(stream As Stream) As FileType
-            If stream Is Nothing OrElse Not stream.CanRead Then
-                Return FileTypeRegistry.Resolve(FileKind.Unknown)
-            End If
+            If Not StreamGuard.IsReadable(stream) Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
 
             Try
-                If stream.CanSeek Then stream.Position = 0
+                StreamGuard.RewindToStart(stream)
                 Return DetectKindFromArchivePackage(stream)
             Catch
                 Return FileTypeRegistry.Resolve(FileKind.Unknown)
