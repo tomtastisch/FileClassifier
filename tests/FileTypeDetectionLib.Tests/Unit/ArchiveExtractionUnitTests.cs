@@ -71,6 +71,17 @@ public sealed class ArchiveExtractionUnitTests
     }
 
     [Fact]
+    public void ExtractArchiveSafe_Fails_ForDestinationWithNullChar()
+    {
+        var source = TestResources.Resolve("sample.zip");
+        var invalidDestination = "out\0bad";
+
+        var ok = new FileTypeDetector().ExtractArchiveSafe(source, invalidDestination, false);
+
+        Assert.False(ok);
+    }
+
+    [Fact]
     public void ExtractArchiveSafeToMemory_Succeeds_ForValidArchive_WithVerification()
     {
         var source = TestResources.Resolve("sample.zip");

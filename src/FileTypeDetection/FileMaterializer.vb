@@ -38,6 +38,9 @@ Namespace Global.Tomtastisch.FileClassifier
             Catch ex As UnauthorizedAccessException
                 LogGuard.Warn(opt.Logger, $"[Materialize] Ungueltiger Zielpfad: {ex.Message}")
                 Return False
+            Catch ex As System.Security.SecurityException
+                LogGuard.Warn(opt.Logger, $"[Materialize] Ungueltiger Zielpfad: {ex.Message}")
+                Return False
             Catch ex As NotSupportedException
                 LogGuard.Warn(opt.Logger, $"[Materialize] Ungueltiger Zielpfad: {ex.Message}")
                 Return False
@@ -45,9 +48,6 @@ Namespace Global.Tomtastisch.FileClassifier
                 LogGuard.Warn(opt.Logger, $"[Materialize] Ungueltiger Zielpfad: {ex.Message}")
                 Return False
             Catch ex As IOException
-                LogGuard.Warn(opt.Logger, $"[Materialize] Ungueltiger Zielpfad: {ex.Message}")
-                Return False
-            Catch ex As Exception
                 LogGuard.Warn(opt.Logger, $"[Materialize] Ungueltiger Zielpfad: {ex.Message}")
                 Return False
             End Try
@@ -93,6 +93,9 @@ Namespace Global.Tomtastisch.FileClassifier
             Catch ex As UnauthorizedAccessException
                 LogGuard.Error(opt.Logger, "[Materialize] Byte-Persistenz fehlgeschlagen.", ex)
                 Return False
+            Catch ex As System.Security.SecurityException
+                LogGuard.Error(opt.Logger, "[Materialize] Byte-Persistenz fehlgeschlagen.", ex)
+                Return False
             Catch ex As IOException
                 LogGuard.Error(opt.Logger, "[Materialize] Byte-Persistenz fehlgeschlagen.", ex)
                 Return False
@@ -103,9 +106,6 @@ Namespace Global.Tomtastisch.FileClassifier
                 LogGuard.Error(opt.Logger, "[Materialize] Byte-Persistenz fehlgeschlagen.", ex)
                 Return False
             Catch ex As ArgumentException
-                LogGuard.Error(opt.Logger, "[Materialize] Byte-Persistenz fehlgeschlagen.", ex)
-                Return False
-            Catch ex As Exception
                 LogGuard.Error(opt.Logger, "[Materialize] Byte-Persistenz fehlgeschlagen.", ex)
                 Return False
             End Try
@@ -124,6 +124,9 @@ Namespace Global.Tomtastisch.FileClassifier
             Catch ex As UnauthorizedAccessException
                 LogGuard.Error(opt.Logger, "[Materialize] Archiv-Extraktion fehlgeschlagen.", ex)
                 Return False
+            Catch ex As System.Security.SecurityException
+                LogGuard.Error(opt.Logger, "[Materialize] Archiv-Extraktion fehlgeschlagen.", ex)
+                Return False
             Catch ex As IOException
                 LogGuard.Error(opt.Logger, "[Materialize] Archiv-Extraktion fehlgeschlagen.", ex)
                 Return False
@@ -134,9 +137,6 @@ Namespace Global.Tomtastisch.FileClassifier
                 LogGuard.Error(opt.Logger, "[Materialize] Archiv-Extraktion fehlgeschlagen.", ex)
                 Return False
             Catch ex As ArgumentException
-                LogGuard.Error(opt.Logger, "[Materialize] Archiv-Extraktion fehlgeschlagen.", ex)
-                Return False
-            Catch ex As Exception
                 LogGuard.Error(opt.Logger, "[Materialize] Archiv-Extraktion fehlgeschlagen.", ex)
                 Return False
             End Try
