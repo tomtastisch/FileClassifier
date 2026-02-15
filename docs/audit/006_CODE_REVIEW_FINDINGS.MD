@@ -34,6 +34,10 @@ Evidence-backed candidates are tracked in:
 3. Dead-code candidate scan currently returned no low-reference source declarations in `src/` under the implemented heuristic.
    - Evidence: `artifacts/audit/dead_code_candidates.json`
 
+4. `DetectDetailed(...).ReasonCode` used a generic `"Exception"` bucket for distinct exception classes (IO, Security, Argument, etc.).
+   - Impact: reduced auditability of fail-closed paths (different root causes were indistinguishable in results).
+   - Status: Package C maps file-access exceptions to deterministic, typed reason codes.
+
 ## Repro Evidence Commands
 All commands are intended to run from the repository root.
 ```bash

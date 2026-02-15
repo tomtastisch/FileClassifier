@@ -75,6 +75,21 @@ public sealed class FileTypeDetectorEdgeUnitTests
     }
 
     [Fact]
+    public void DetectDetailed_ReturnsExceptionIO_ForShareViolation()
+    {
+        using var scope = TestTempPaths.CreateScope("ftd-ex-io");
+        var path = Path.Combine(scope.RootPath, "locked.bin");
+        File.WriteAllBytes(path, new byte[] { 0x25, 0x50, 0x44, 0x46, 0x2D }); // "%PDF-" header prefix
+
+        using var locked = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+
+        var detail = new FileTypeDetector().DetectDetailed(path);
+
+        Assert.Equal(FileKind.Unknown, detail.DetectedType.Kind);
+        Assert.Equal("ExceptionIO", detail.ReasonCode);
+    }
+
+    [Fact]
     public void Detect_ReturnsUnknown_WhenPayloadExceedsMaxBytes()
     {
         using var optionsScope = new DetectorOptionsScope();

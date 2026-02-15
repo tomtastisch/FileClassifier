@@ -22,6 +22,12 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Const ReasonInvalidLength As String = "InvalidLength"
         Private Const ReasonFileTooLarge As String = "FileTooLarge"
         Private Const ReasonException As String = "Exception"
+        Private Const ReasonExceptionUnauthorizedAccess As String = "ExceptionUnauthorizedAccess"
+        Private Const ReasonExceptionSecurity As String = "ExceptionSecurity"
+        Private Const ReasonExceptionIO As String = "ExceptionIO"
+        Private Const ReasonExceptionInvalidData As String = "ExceptionInvalidData"
+        Private Const ReasonExceptionNotSupported As String = "ExceptionNotSupported"
+        Private Const ReasonExceptionArgument As String = "ExceptionArgument"
         Private Const ReasonExtensionMismatch As String = "ExtensionMismatch"
         Private Const ReasonHeaderUnknown As String = "HeaderUnknown"
         Private Const ReasonHeaderMatch As String = "HeaderMatch"
@@ -602,8 +608,21 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Shared Function LogDetectFailure(opt As FileTypeProjectOptions, ByRef trace As DetectionTrace,
                                                  ex As Exception) As FileType
             LogGuard.Error(opt.Logger, "[Detect] Ausnahme, fail-closed.", ex)
-            trace.ReasonCode = ReasonException
+            trace.ReasonCode = ExceptionToReasonCode(ex)
             Return UnknownType()
+        End Function
+
+        Private Shared Function ExceptionToReasonCode(ex As Exception) As String
+            If ex Is Nothing Then Return ReasonException
+
+            If TypeOf ex Is UnauthorizedAccessException Then Return ReasonExceptionUnauthorizedAccess
+            If TypeOf ex Is System.Security.SecurityException Then Return ReasonExceptionSecurity
+            If TypeOf ex Is IOException Then Return ReasonExceptionIO
+            If TypeOf ex Is InvalidDataException Then Return ReasonExceptionInvalidData
+            If TypeOf ex Is NotSupportedException Then Return ReasonExceptionNotSupported
+            If TypeOf ex Is ArgumentException Then Return ReasonExceptionArgument
+
+            Return ReasonException
         End Function
 
         Private Shared Function LogArchiveExtractFailure(opt As FileTypeProjectOptions, ex As Exception) As Boolean
