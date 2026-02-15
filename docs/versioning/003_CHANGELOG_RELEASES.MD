@@ -13,6 +13,15 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 - Docs/CI/Tooling:
   - TBD
 
+## [5.1.4]
+- Changed:
+  - Cluster 7C: ReasonCodes/Exceptions konsolidiert und semantisch vereinheitlicht (DetectDetailed).
+  - Archive-Infrastructure: redundante `System.IO.*`-Qualifizierer bereinigt (Imports + unqualifiziert).
+- Fixed:
+  - Qodana Findings: `ConvertToConstant.Local` und `UseUtf8StringLiteral` in Tests beseitigt.
+- Docs/CI/Tooling:
+  - Code-Scanning-Zero-Gate fuer Qodana-Fix-PRs entkoppelt (PRs mit Label `area:qodana` pruefen PR-ref statt `main`).
+
 ## [5.1.3]
 - Added:
   - Verbindliches PR-Template in deutscher Sprache mit Checklisten, Nachbesserungs-Tracking und DoD-Matrix.
