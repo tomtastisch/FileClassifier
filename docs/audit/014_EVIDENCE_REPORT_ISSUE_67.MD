@@ -33,6 +33,9 @@ ASSUMPTION:
 ## 3. Baseline Checks (Phase 0)
 Alle Kommandos sind vom Repo-Root aus ausfuehrbar. Artefakte werden unter `artifacts/ci/<check_id>/` erzeugt.
 
+Hinweis (CI-Governance):
+- PR-Beschreibungen werden fail-closed validiert (Pflichtsektionen/Checklisten) via `tools/ci/check-pr-governance.sh`.
+
 Ausgefuehrte Checks (lokal) + Evidence-Pfade:
 ```bash
 bash tools/ci/bin/run.sh preflight
@@ -142,4 +145,3 @@ Dieses Dokument ist PR-uebergreifend; pro Package wird die Findings-/Status-Sekt
 ## 7. Decision Log
 - 2026-02-15: Baseline Evidence wird ausschliesslich ueber reproduzierbare Kommandos + `artifacts/` erzeugt (nicht committen).
 - 2026-02-15: Findings-Quelle ist initial JSON-Heuristik (`tools/audit/generate-code-analysis-json.sh`), nachfolgend durch zielgerichtete Tests/Evidence zu erharten.
-
