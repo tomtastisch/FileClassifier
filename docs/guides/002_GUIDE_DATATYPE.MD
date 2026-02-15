@@ -76,8 +76,8 @@ Zielgruppe:
 3. `FileTypeRegistryUnitTests.cs`: neue Assertions für `ResolveByAlias("tif")` und Magic-Match.
 4. Doku in `docs/010_API_CORE.MD` und `docs/references/001_REFERENCES_CORE.MD` ergänzen.
 
-### 7.2 Beispiel B: Neues Modell `ArchiveScanEvidence`
-1. Datei `src/FileTypeDetection/Abstractions/Hashing/ArchiveScanEvidence.vb` anlegen.
+### 7.2 Beispiel B: Neues Modell `<NewModel>`
+1. Datei `src/FileTypeDetection/Abstractions/Hashing/<NewModel>.vb` anlegen.
 2. `src/FileTypeDetection/Abstractions/Hashing/README.md` und `src/FileTypeDetection/Abstractions/README.md` ergänzen.
 3. In `docs/010_API_CORE.MD` und `docs/references/001_REFERENCES_CORE.MD` Modell ergänzen.
 4. Wenn öffentliche Signaturen betroffen sind: passende Datei unter `docs/contracts/*.MD` aktualisieren.

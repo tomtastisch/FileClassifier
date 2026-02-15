@@ -2,7 +2,7 @@
 
 ## 1. Zweck
 
-Kompakter CLI-Einstiegspunkt für die Bibliothek `FileTypeDetectionLib`.
+Kompakter CLI-Einstiegspunkt für die Bibliothek `Tomtastisch.FileClassifier`.
 
 ## 2. Dateien
 

@@ -65,7 +65,7 @@ Release-Gate-4 (post-publish) nutzt eigene Defaults über den Wrapper:
   - `REQUIRE_FLATCONTAINER=1`
 
 Asynchrone Full-Convergence:
-- Workflow `/.github/workflows/nuget-online-convergence.yml` prüft nach erfolgreichem Release weiterhin alle drei Endpunkte mit längerem Retry-Fenster.
+- Workflow `.github/workflows/nuget-online-convergence.yml` prüft nach erfolgreichem Release weiterhin alle drei Endpunkte mit längerem Retry-Fenster.
 
 ## E) Maintainer: Token Storage and Local Publish (Secure)
 Keychain (prompt-basiert):

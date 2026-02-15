@@ -19,7 +19,7 @@ Verglichene Repositories:
 
 ## 2. Methodik (nur faktenbasiert)
 Erhoben via GitHub API und lokale Dateiinspektion:
-- Vorhandensein `SECURITY.md` (`SECURITY.md` oder `.github/SECURITY.md`)
+- Vorhandensein `SECURITY.md` (FileClassifier: repo-root `SECURITY.md`; andere Repos ggf. alternativ `.github/SECURITY.md`)
 - Status `private-vulnerability-reporting`
 - Sichtbare `security_and_analysis`-Felder (`dependabot_security_updates`, `secret_scanning`)
 - Vorhandensein `.github/dependabot.yml`

@@ -24,6 +24,12 @@ Behavior remains deterministic and fail-closed; identifiers and file names chang
 | `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashRoundTripReport.vb` | `src/FileTypeDetection/Abstractions/Hashing/HashRoundTripReport.vb` |
 | `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashSourceType.vb` | `src/FileTypeDetection/Abstractions/Hashing/HashSourceType.vb` |
 
+Note:
+- The `Old Path` entries are historical and do not exist on `main` after the rename commit.
+- Repo-local verification:
+  - `git log --follow --oneline -- src/FileTypeDetection/DeterministicHashing.vb`
+  - `git show <baseline_sha>:src/FileTypeDetection/DeterministicHashing.vb`
+
 ## Optional Secure Digests (HMAC-SHA256)
 New optional digests were added:
 - `HashDigestSet.HmacPhysicalSha256`
