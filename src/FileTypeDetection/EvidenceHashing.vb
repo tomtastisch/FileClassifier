@@ -526,7 +526,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return True
             Catch ex As UnauthorizedAccessException
                 Return SetReadFileError(ex, errorMessage)
-            Catch ex As Global.System.Security.SecurityException
+            Catch ex As System.Security.SecurityException
                 Return SetReadFileError(ex, errorMessage)
             Catch ex As Global.System.IO.IOException
                 Return SetReadFileError(ex, errorMessage)
