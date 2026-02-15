@@ -115,15 +115,12 @@ for version in "${NUGET_VERSIONS[@]}"; do
     echo -e "plan\tnuget\tunlist\t${version}" >> "${SUMMARY_TSV}"
   else
     delete_log="${OUT_DIR}/nuget-delete-${version}.log"
-    set +e
-    dotnet nuget delete "${PACKAGE_ID}" "${version}" --api-key "${NUGET_API_KEY}" --source "https://api.nuget.org/v3/index.json" --non-interactive >"${delete_log}" 2>&1
-    rc=$?
-    set -e
-    if [[ "${rc}" -eq 0 ]]; then
+    if dotnet nuget delete "${PACKAGE_ID}" "${version}" --api-key "${NUGET_API_KEY}" --source "https://api.nuget.org/v3/index.json" --non-interactive >"${delete_log}" 2>&1; then
       echo "EXEC dotnet nuget delete ${PACKAGE_ID} ${version}" >> "${ACTIONS_LOG}"
       echo -e "done\tnuget\tunlist\t${version}" >> "${SUMMARY_TSV}"
       continue
     fi
+    rc=$?
     if grep -Eqi '(forbidden|unauthorized| 403 | 401 |status code.*403|status code.*401|does not have permission|api key is invalid|has expired)' "${delete_log}"; then
       echo "SKIP dotnet nuget delete ${PACKAGE_ID} ${version} (reason=403/401)" >> "${ACTIONS_LOG}"
       echo -e "skip\tnuget\tunlist\t${version} (reason=forbidden)" >> "${SUMMARY_TSV}"
