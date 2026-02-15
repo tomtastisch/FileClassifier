@@ -9,7 +9,6 @@ RAW_LOG="${OUT_DIR}/raw.log"
 SUMMARY_MD="${OUT_DIR}/summary.md"
 RESULT_JSON="${OUT_DIR}/result.json"
 ALERTS_JSON="${OUT_DIR}/open-alerts.json"
-SECURITY_ALERTS_JSON="${OUT_DIR}/open-security-alerts.json"
 
 mkdir -p "${OUT_DIR}"
 : > "${RAW_LOG}"
@@ -77,15 +76,12 @@ while true; do
   delay=$((delay * 2))
 done
 
-# Block only on security-relevant alerts; informational/style-only findings
-# from external analyzers are tracked separately and must not deadlock PR gates.
-jq '[.[] | select(((.rule.security_severity_level // .severity // "") | tostring) != "")]' "${ALERTS_JSON}" > "${SECURITY_ALERTS_JSON}"
-count="$(jq 'length' "${SECURITY_ALERTS_JSON}")"
+count="$(jq 'length' "${ALERTS_JSON}")"
 if [[ "${count}" -gt 0 ]]; then
-  jq '[.[] | {number,rule:(.rule.id // .rule.name),tool:.tool.name,severity:(.rule.security_severity_level // .severity),html_url}]' "${SECURITY_ALERTS_JSON}" > "${OUT_DIR}/open-alerts-summary.json"
-  log "Open security-relevant alerts detected: ${count}"
-  jq -r '.[] | "- #\(.number) [\(.tool)] \(.rule) [sev=\(.severity)] -> \(.html_url)"' "${OUT_DIR}/open-alerts-summary.json" | tee -a "${RAW_LOG}" >/dev/null
-  fail "Offene security-relevante Code-Scanning-Alerts vorhanden (${count})"
+  jq '[.[0:50][] | {number,tool:.tool.name,rule:(.rule.id // .rule.name),security_severity:(.rule.security_severity_level // null),rule_severity:(.rule.severity // null),html_url}]' "${ALERTS_JSON}" > "${OUT_DIR}/open-alerts-summary.json"
+  log "Open code-scanning alerts detected: ${count} (showing first 50)"
+  jq -r '.[] | "- #\(.number) [\(.tool)] \(.rule) [security_sev=\(.security_severity) rule_sev=\(.rule_severity)] -> \(.html_url)"' "${OUT_DIR}/open-alerts-summary.json" | tee -a "${RAW_LOG}" >/dev/null
+  fail "Offene Code-Scanning-Alerts vorhanden (${count})"
 fi
 
 {
