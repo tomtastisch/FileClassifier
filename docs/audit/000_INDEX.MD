@@ -8,6 +8,7 @@ Root landing page for third parties: `SECURITY_ASSURANCE_INDEX.md`.
 - `docs/audit/000_HASHING_BASELINE.MD`
 - `docs/audit/000_INDEX.MD`
 - `docs/audit/002_AUDIT_CONTRACT_AND_GUARDRAILS.MD`
+- `docs/audit/014_EVIDENCE_REPORT_ISSUE_67.MD`
 - `docs/audit/011_SECURITY_BENCHMARK.MD`
 - `docs/audit/012_WAVE_EXECUTION_DOD.MD`
 - `docs/audit/003_SECURITY_ASSERTION_TRACEABILITY.MD`
