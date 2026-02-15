@@ -36,9 +36,27 @@ bash tools/audit/generate-code-analysis-json.sh
 bash tools/audit/verify-code-analysis-evidence.sh
 ```
 
-## 6. Baseline Snapshot (2026-02-13)
+## 6. Baseline Snapshot
+Snapshots are point-in-time outputs of the current heuristic and will drift as code changes.
+
+Repro (repo root):
+```bash
+bash tools/audit/verify-code-analysis-evidence.sh
+jq '.candidates | length' artifacts/audit/hardening_candidates.json
+jq '.candidates | length' artifacts/audit/redundancy_candidates.json
+jq '.candidates | length' artifacts/audit/dead_code_candidates.json
+```
+
+### 6.1 Snapshot (2026-02-13)
 - inventory files (`src/*.vb|*.cs`): `22`
 - method declarations (heuristic): `698`
 - dead code candidates (heuristic): `0`
 - redundancy candidates (heuristic): `18`
 - hardening candidates (broad catches): `12`
+
+### 6.2 Snapshot (2026-02-15)
+- inventory files (`src/*.vb|*.cs`): `22`
+- method declarations (heuristic): `683`
+- dead code candidates (heuristic): `0`
+- redundancy candidates (heuristic): `18`
+- hardening candidates (broad catches): `21`

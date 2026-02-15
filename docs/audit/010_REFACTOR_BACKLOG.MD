@@ -6,10 +6,16 @@ Backlog is derived from:
 - `artifacts/audit/redundancy_candidates.json`
 - `docs/audit/006_CODE_REVIEW_FINDINGS.MD`
 
-Current baseline snapshot:
-- hardening candidates: `12`
+Current baseline snapshot (2026-02-15):
+- hardening candidates: `21`
 - redundancy candidates: `18`
 - dead-code candidates: `0`
+
+Repro (repo root):
+```bash
+bash tools/audit/verify-code-analysis-evidence.sh
+jq '.candidates | length' artifacts/audit/hardening_candidates.json
+```
 
 ## 2. Prioritized PR Packages
 
