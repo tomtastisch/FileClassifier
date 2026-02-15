@@ -19,7 +19,7 @@ Mapping of claims in `SECURITY.md` to evidence sources and verification commands
 | SEC-CLAIM-012 | 4. Erforderliche Angaben | minimum report fields are explicitly listed | `SECURITY.md` section 4 | `rg -n "Erforderliche Angaben|Reproduktionsschritte|Impact" SECURITY.md` | section and required bullets exist | report-only |
 | SEC-CLAIM-013 | 9. Nachweisbarkeit | local minimum evidence commands are executable | build/test + claim script | `dotnet build FileClassifier.sln -v minimal && dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release -v minimal && bash tools/audit/verify-security-claims.sh` | all commands exit 0 | yes |
 | SEC-CLAIM-014 | 9. Nachweisbarkeit | optional extended check IDs are available | CI runner implementation | `rg -n "tests-bdd-coverage|api-contract|pack|consumer-smoke|package-backed-tests" tools/ci/bin/run.sh` | all IDs resolvable | yes |
-| SEC-CLAIM-015 | 1. Zweck/Geltungsbereich | ISO/IEC 29147 and 30111 orientation is documented | policy + roadmap docs | `rg -n "29147|30111" SECURITY.md docs/audit/104_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD` | references present with non-certification language | report-only |
+| SEC-CLAIM-015 | 1. Zweck und Geltungsbereich | ISO/IEC 29147 and 30111 orientation is documented | policy + roadmap docs | `rg -n "29147|30111" SECURITY.md docs/audit/104_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD` | references present with non-certification language | report-only |
 | SEC-CLAIM-016 | 9. Zertifizierungsgrenze | no formal product certification claim is made | `SECURITY.md` section 9 | `rg -n "keine.*Zertifizierung|kein.*Rechtsgutachten" SECURITY.md` | explicit non-claim present | yes |
 
 ## Full Coverage Note

@@ -1,16 +1,16 @@
-# 02 - Gesamtarchitektur und Ablaufflüsse
+# 02 - Overall Architecture and Execution Flows
 
-## 1. Zweck und Scope
-Dieses Dokument beschreibt die öffentliche API (Use-Cases), die interne Kernpipeline sowie die wesentlichen Laufzeitflüsse (Detektion, Archiv-Validierung, Extraktion, Persistenz).
-Es dient als Architektur- und Ablaufreferenz auf Dokumentationsebene und ersetzt keine Code-Reviews der Guards.
+## 1. Purpose and Scope
+This document describes the public API (use cases), the internal core pipeline, and the main runtime flows (detection, archive validation, extraction, persistence).
+It serves as an architecture and flow reference at documentation level and is not a replacement for code reviews of internal guards.
 
-## 2. Begriffe und Notation
-### 2.1 Konventionen
-- Knoten = Verantwortungsbereich, Komponente oder Artefakt.
-- Pfeil = Datenfluss oder Aufrufpfad (je nach Diagrammtyp).
-- fail-closed = bei Unsicherheit oder Verstoss: `Unknown`, `false` oder leere Liste.
+## 2. Terms and Notation
+### 2.1 Conventions
+- node = responsibility, component, or artifact.
+- arrow = dataflow or call path (depending on diagram type).
+- fail-closed = on uncertainty or violation: `Unknown`, `false`, or an empty list.
 
-### 2.2 Flow-IDs (Legende)
+### 2.2 Flow IDs (legend)
 - `F0`: ReadFileSafe Utility
 - `F1`: Detect (Path)
 - `F2`: Detect (Bytes)
@@ -22,9 +22,9 @@ Es dient als Architektur- und Ablaufreferenz auf Dokumentationsebene und ersetzt
 - `F8`: Extension Policy Check
 - `F9`: Deterministic Hashing / h1-h4 RoundTrip
 
-### 2.3 Mermaid-Layout (global)
-Hinweis: Diese `init`-Konfiguration reduziert Kreuzungen und erhöht Lesbarkeit.
-Sie kann pro Diagramm überschrieben werden, sollte aber konsistent bleiben.
+### 2.3 Mermaid layout (global)
+Note: This `init` configuration reduces crossings and improves readability.
+It can be overridden per diagram, but should remain consistent.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 80, "rankSpacing": 90}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -32,21 +32,21 @@ flowchart LR
   A["Mermaid Init: aktiviert (Referenz)"]
 ```
 
-### 2.4 Detailquellen für tieferes Drill-Down
-- Detection-Details: [Detection Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Detection/README.md)
-- Infrastructure-Details (Guards/Archive internals): [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md)
-- Konfigurationsdetails: [Configuration Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/README.md)
-- Rückgabemodelle: [Abstractions Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md)
-- Rückgabemodelle Detection: [Abstractions Detection Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Detection/README.md)
-- Rückgabemodelle Archive: [Abstractions Archive Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Archive/README.md)
-- Rückgabemodelle Hashing: [Abstractions Hashing Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Hashing/README.md)
-- Funktionskatalog mit Beispielen: [01 - Funktionen](https://github.com/tomtastisch/FileClassifier/blob/main/docs/110_API_CORE.MD)
+### 2.4 Detail sources for deeper drill-down
+- Detection details: [Detection module](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Detection/README.md)
+- Infrastructure details (guards/archive internals): [Infrastructure module](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md)
+- Configuration details: [Configuration module](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/README.md)
+- Return models: [Abstractions module](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md)
+- Return models (detection): [Abstractions Detection module](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Detection/README.md)
+- Return models (archive): [Abstractions Archive module](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Archive/README.md)
+- Return models (hashing): [Abstractions Hashing module](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Hashing/README.md)
+- Function catalog with examples: [01 - Functions](https://github.com/tomtastisch/FileClassifier/blob/main/docs/110_API_CORE.MD)
 
-## 3. Architekturübersicht (Systemkontext)
-### 3.1 E2E-Systemkontext (kompakt)
-Dieses Diagramm zeigt die Schichten des Laufzeitflusses:
-Inputs -> Public API -> Kernkomponenten -> Outputs.
-Detailentscheidungen (Archivfall, Refinement, Persistenzzweig) folgen in 3.2 und Abschnitt 4.
+## 3. Architecture Overview (System Context)
+### 3.1 E2E system context (compact)
+This diagram shows the layers of the runtime flow:
+inputs -> public API -> core components -> outputs.
+Branching decisions (archive case, refinement, persistence branch) follow in 3.2 and section 4.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 80, "rankSpacing": 90}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -104,12 +104,12 @@ flowchart LR
     DH --> H
 ```
 
-Kurzlesehilfe:
-- Nur Schichtsicht, keine Branch-Details.
-- Branch- und Sicherheitsentscheidungen stehen in Abschnitt 4.
+Quick reading guide:
+- layer view only, no branch details.
+- branching and security decisions are covered in section 4.
 
-### 3.2 Entscheidungsübersicht (kompakt)
-Dieses Diagramm zeigt die zentrale Entscheidungslogik in einer vertikalen Lesespur.
+### 3.2 Decision overview (compact)
+This diagram shows the core decision logic in a single vertical reading path.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 80, "rankSpacing": 90}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -127,11 +127,11 @@ flowchart TD
   Z --> T
 ```
 
-## 4. Flussdiagramme (entscheidungsrelevante Abläufe)
-### 4.1 Ablauf A: Detektion und Archiv-Validierung
-Dieses Diagramm zeigt die Kernentscheidung: `Magic == Archiv?` sowie die fail-closed-Kaskade über `ArchiveSafetyGate`.
-Oben: Typdetektion (`FileType`/`DetectionDetail`).
-Unten: reine Archiv-Validierung (`bool`) über denselben Gate-Knoten.
+## 4. Flowcharts (decision-relevant flows)
+### 4.1 Flow A: Detection and archive validation
+This diagram shows the key decision: `magic == archive?` and the fail-closed cascade via `ArchiveSafetyGate`.
+Top: type detection (`FileType`/`DetectionDetail`).
+Bottom: pure archive validation (`bool`) via the same gate node.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 70, "rankSpacing": 80}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -152,14 +152,14 @@ flowchart TD
   Q2 --> V2["Validate Output: Bool"]
 ```
 
-Kurzlesehilfe:
-- `ArchiveSafetyGate` ist SSOT für Archiv-Sicherheit in den gezeigten Pfaden.
-- `OpenXmlRefiner` läuft nur im Archiv-OK-Fall.
+Quick reading guide:
+- `ArchiveSafetyGate` is the SSOT for archive safety on the shown paths.
+- `OpenXmlRefiner` runs only when the archive passes the gate.
 
-### 4.2 Ablauf B: Extraktion (Memory) vs. Persistenz (Disk)
-Dieses Diagramm zeigt zwei Archiv-Use-Cases:
-(1) sichere In-Memory-Extraktion (Entries-Liste)
-(2) Persistenz auf Disk (Raw Write oder Archiv-Extract), jeweils mit fail-closed Ergebnissen.
+### 4.2 Flow B: Extraction (memory) vs. persistence (disk)
+This diagram shows two archive use cases:
+(1) safe in-memory extraction (entries list)
+(2) persistence to disk (raw write or archive extract), each with fail-closed results.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 80, "rankSpacing": 90}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -216,15 +216,15 @@ flowchart LR
     X --> O4
 ```
 
-Kurzlesehilfe:
-- Memory-Extraktion und Persistenz teilen sich Gate/Extractor.
-- Persistenz liefert immer `Bool` als Rückgabekontrakt.
+Quick reading guide:
+- memory extraction and persistence share the gate/extractor.
+- persistence always returns `Bool` as the contract.
 
-## 5. Sequenzflüsse (Runtime-Interaktionen)
-### 5.1 Detect(path) mit Archivfall
-Dieser Sequenzfluss zeigt den Archivfall im Detektor:
-Detektion -> Gate -> optionales Refinement -> Rückgabe.
-Der fail-closed-Pfad liefert `Unknown`.
+## 5. Sequence flows (runtime interactions)
+### 5.1 Detect(path) with archive case
+This sequence flow shows the archive case in the detector:
+detection -> gate -> optional refinement -> return value.
+The fail-closed path returns `Unknown`.
 
 ```mermaid
 sequenceDiagram
@@ -255,9 +255,9 @@ sequenceDiagram
   end
 ```
 
-### 5.2 Validate + Extract (Memory)
-Fokus: Byte-Pfad über `ArchiveProcessing`.
-Fail-closed endet mit leerer Liste.
+### 5.2 Validate + extract (memory)
+Focus: byte path via `ArchiveProcessing`.
+Fail-closed ends with an empty list.
 
 ```mermaid
 sequenceDiagram
@@ -276,9 +276,9 @@ sequenceDiagram
   end
 ```
 
-### 5.3 Materializer: Branching (Persist)
-Fokus: Zielpfadprüfung, danach entweder sicherer Archiv-Zweig oder Raw-Write.
-Rückgabe ist immer boolesch.
+### 5.3 Materializer: branching (persist)
+Focus: destination-path validation, then either the secure archive branch or raw write.
+The return type is always boolean.
 
 ```mermaid
 sequenceDiagram
@@ -315,10 +315,10 @@ sequenceDiagram
   end
 ```
 
-## 6. NSD-Sichten (strukturierter Kontrollfluss)
+## 6. NSD views (structured control flow)
 ### 6.1 NSD: FileMaterializer.Persist(...)
-Diese Sicht reduziert verschachtelte Bedingungen auf strukturierten Kontrollfluss.
-Jeder negative Prüfpfad endet sofort fail-closed mit `false`.
+This view reduces nested conditions to structured control flow.
+Every negative check path ends immediately fail-closed with `false`.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 65, "rankSpacing": 70}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -338,8 +338,8 @@ flowchart TD
 ```
 
 ### 6.2 NSD: FileTypeDetector.Detect(path, verifyExtension)
-Die Endungsprüfung ist ein nachgelagerter Policy-Filter.
-Bei Mismatch wird fail-closed `UnknownType` zurückgegeben.
+The extension check is a downstream policy filter.
+On mismatch, `UnknownType` is returned fail-closed.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 65, "rankSpacing": 70}, "themeVariables": {"fontSize": "16px"}}}%%
@@ -354,8 +354,8 @@ flowchart TD
   D4 -->|"No"| D6["Return UnknownType"]
 ```
 
-## 7. Zuordnung Public API -> Flows
-| Methode | Flow-ID |
+## 7. Public API to flow mapping
+| Method | Flow ID |
 |---|---|
 | `ReadFileSafe(path)` | `F0` |
 | `Detect(path)` / `DetectDetailed(path)` | `F1` |
@@ -368,13 +368,13 @@ flowchart TD
 | `DetectAndVerifyExtension(path)` / `Detect(..., verifyExtension)` | `F8` |
 | `EvidenceHashing.HashFile/HashBytes/HashEntries/VerifyRoundTrip` | `F9` |
 
-## 8. Grenzen und Nicht-Ziele
-- Kein Ersatz für Quellcode-Reviews interner Guards (z. B. Payload-/Path-Guards).
-- Keine Policy-Festlegung für konkrete Grenzwerte; diese kommen aus `FileTypeProjectOptions` und der Baseline.
-- Keine Aussage über konkrete Threat-Model-Abdeckung ausserhalb der beschriebenen fail-closed-Semantik.
+## 8. Boundaries and non-goals
+- not a replacement for source-code reviews of internal guards (e.g., payload/path guards).
+- no policy decision for specific thresholds; these come from `FileTypeProjectOptions` and the baseline.
+- no claim about threat-model coverage beyond the described fail-closed semantics.
 
-## Dokumentpflege-Checkliste
-- [ ] Inhalt auf aktuellen Code-Stand geprüft.
-- [ ] Links und Anker mit `python3 tools/check-docs.py` geprüft.
-- [ ] Beispiele/Kommandos lokal verifiziert.
-- [ ] Begriffe mit `docs/110_API_CORE.MD` abgeglichen.
+## Documentation maintenance checklist
+- [ ] Content reviewed against current code state.
+- [ ] Links and anchors checked via `python3 tools/check-docs.py`.
+- [ ] Examples/commands verified locally.
+- [ ] Terminology aligned with `docs/110_API_CORE.MD`.

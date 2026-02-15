@@ -1,10 +1,10 @@
-# Security-Policy Benchmark (Stand: 2026-02-13)
+# Security Policy Benchmark (as of 2026-02-13)
 
-## 1. Ziel und Scope
-Vergleich der Security-Policy-Reife von `tomtastisch/FileClassifier` (PR-Branch `tomtastisch-patch-1`) mit verbreiteten .NET-Open-Source-Repositories anhand nachweisbarer GitHub- und Repository-Fakten.
-Dieser Benchmark ist ein Snapshot vor Merge in `main` (Stand 2026-02-13).
+## 1. Goal and Scope
+Comparison of the security-policy maturity of `tomtastisch/FileClassifier` (PR branch `tomtastisch-patch-1`) with common .NET open-source repositories based on verifiable GitHub and repository facts.
+This benchmark is a snapshot before merge into `main` (as of 2026-02-13).
 
-Verglichene Repositories:
+Compared repositories:
 - `tomtastisch/FileClassifier`
 - `dotnet/runtime`
 - `dotnet/aspnetcore`
@@ -17,63 +17,63 @@ Verglichene Repositories:
 - `xunit/xunit`
 - `NLog/NLog`
 
-## 2. Methodik (nur faktenbasiert)
-Erhoben via GitHub API und lokale Dateiinspektion:
-- Vorhandensein `SECURITY.md` (FileClassifier: repo-root `SECURITY.md`; andere Repos ggf. alternativ `.github/SECURITY.md`)
-- Status `private-vulnerability-reporting`
-- Sichtbare `security_and_analysis`-Felder (`dependabot_security_updates`, `secret_scanning`)
-- Vorhandensein `.github/dependabot.yml`
-- Vorhandensein von Workflow-Dateien mit `codeql` im Dateinamen
-- Inhaltsmerkmale der `SECURITY.md`: Support-Tabelle, Reporting, SLA-Zeitangaben, Safe Harbor, ISO/IEC 29147/30111, koordinierte Offenlegung
+## 2. Method (facts only)
+Collected via GitHub API and local file inspection:
+- presence of `SECURITY.md` (FileClassifier: repo-root `SECURITY.md`; other repos may alternatively use `.github/SECURITY.md`)
+- status `private-vulnerability-reporting`
+- visible `security_and_analysis` fields (`dependabot_security_updates`, `secret_scanning`)
+- presence of `.github/dependabot.yml`
+- presence of workflow files with `codeql` in the file name
+- content markers in `SECURITY.md`: support table, reporting, SLA time targets, safe harbor, ISO/IEC 29147/30111, coordinated disclosure
 
-## 3. Ergebnis A - Plattform-/Repo-Merkmale
-| Repository | SECURITY.md | Private Vulnerability Reporting | Dependabot Security Updates | Secret Scanning | CodeQL Workflow-Datei | dependabot.yml |
+## 3. Result A - Platform/repo signals
+| Repository | SECURITY.md | Private Vulnerability Reporting | Dependabot Security Updates | Secret Scanning | CodeQL workflow file | dependabot.yml |
 |---|---|---|---|---|---|---|
-| tomtastisch/FileClassifier | nein (Snapshot vor Merge in `main`) | true | enabled | enabled | nein | nein |
-| dotnet/runtime | ja | false_or_unavailable | unknown | unknown | nein | ja |
-| dotnet/aspnetcore | ja | false_or_unavailable | unknown | unknown | nein | ja |
-| JamesNK/Newtonsoft.Json | nein | false_or_unavailable | unknown | unknown | ja | nein |
-| DapperLib/Dapper | nein | false_or_unavailable | unknown | unknown | nein | nein |
-| serilog/serilog | ja | true | unknown | unknown | nein | nein |
-| AutoMapper/AutoMapper | nein | true | unknown | unknown | nein | nein |
-| App-vNext/Polly | ja | true | unknown | unknown | nein | ja |
-| FluentValidation/FluentValidation | nein | false_or_unavailable | unknown | unknown | nein | nein |
-| xunit/xunit | nein | false_or_unavailable | unknown | unknown | nein | nein |
-| NLog/NLog | ja | true | unknown | unknown | nein | ja |
+| tomtastisch/FileClassifier | no (snapshot before merge into `main`) | true | enabled | enabled | no | no |
+| dotnet/runtime | yes | false_or_unavailable | unknown | unknown | no | yes |
+| dotnet/aspnetcore | yes | false_or_unavailable | unknown | unknown | no | yes |
+| JamesNK/Newtonsoft.Json | no | false_or_unavailable | unknown | unknown | yes | no |
+| DapperLib/Dapper | no | false_or_unavailable | unknown | unknown | no | no |
+| serilog/serilog | yes | true | unknown | unknown | no | no |
+| AutoMapper/AutoMapper | no | true | unknown | unknown | no | no |
+| App-vNext/Polly | yes | true | unknown | unknown | no | yes |
+| FluentValidation/FluentValidation | no | false_or_unavailable | unknown | unknown | no | no |
+| xunit/xunit | no | false_or_unavailable | unknown | unknown | no | no |
+| NLog/NLog | yes | true | unknown | unknown | no | yes |
 
-Hinweis:
-- `unknown` bedeutet: Feld wird ueber GitHub API fuer das betrachtete Fremdrepo nicht veroeffentlicht bzw. nicht sichtbar geliefert.
-- `false_or_unavailable` bedeutet: API liefert fuer den Endpunkt keine aktive Konfiguration.
+Notes:
+- `unknown` means: the field is not published or not visible via the GitHub API for the external repo.
+- `false_or_unavailable` means: the API endpoint does not show an active configuration.
 
-## 4. Ergebnis B - SECURITY.md Inhaltsvergleich
-| Repository | Support-Versionen | Reporting-Abschnitt | SLA-Zeitwerte | Safe Harbor | ISO/IEC 29147/30111 | Koordinierte Offenlegung |
+## 4. Result B - SECURITY.md content comparison
+| Repository | Supported versions | Reporting section | SLA time targets | Safe harbor | ISO/IEC 29147/30111 | Coordinated disclosure |
 |---|---|---|---|---|---|---|
-| dotnet/runtime | ja | ja | ja | nein | nein | nein |
-| dotnet/aspnetcore | ja | ja | ja | nein | nein | nein |
-| serilog/serilog | ja | ja | nein | nein | nein | nein |
-| App-vNext/Polly | nein | ja | ja | nein | nein | nein |
-| NLog/NLog | ja | ja | nein | nein | nein | nein |
-| tomtastisch/FileClassifier (lokal, PR) | ja | ja | ja | ja | ja | ja |
+| dotnet/runtime | yes | yes | yes | no | no | no |
+| dotnet/aspnetcore | yes | yes | yes | no | no | no |
+| serilog/serilog | yes | yes | no | no | no | no |
+| App-vNext/Polly | no | yes | yes | no | no | no |
+| NLog/NLog | yes | yes | no | no | no | no |
+| tomtastisch/FileClassifier (local, PR) | yes | yes | yes | yes | yes | yes |
 
-## 5. Interpretation (faktennah)
-- Die neue `SECURITY.md` von FileClassifier ist inhaltlich umfangreicher als die untersuchten Vergleichsdateien (insbesondere Safe Harbor, ISO/IEC-Orientierung, koordinierte Offenlegung).
-- Snapshot-Hinweis: Zum Erhebungszeitpunkt lag die Datei im PR-Branch `tomtastisch-patch-1` und noch nicht in `main`.
-- Repo-seitige Sicherheitsmechanismen sind fuer FileClassifier nachweisbar aktiv:
-  - Private Vulnerability Reporting (`enabled=true`)
-  - Dependabot Security Updates (`enabled`)
-  - Secret Scanning (`enabled`)
-  - CI-Sicherheitsgate `security-nuget` (lokal mit `pass` verifiziert)
+## 5. Interpretation (fact-oriented)
+- The new `SECURITY.md` for FileClassifier is more comprehensive in content than the comparison files (notably safe harbor, ISO/IEC orientation, coordinated disclosure).
+- Snapshot note: at the time of collection, the file was on PR branch `tomtastisch-patch-1` and not yet in `main`.
+- Repository-side security mechanisms for FileClassifier are verifiably active:
+  - private vulnerability reporting (`enabled=true`)
+  - Dependabot security updates (`enabled`)
+  - secret scanning (`enabled`)
+  - CI security gate `security-nuget` (verified locally with `pass`)
 
-## 6. Rest-Gaps fuer "zertifizierungsnahe" Einsatzfaehigkeit
-Diese Punkte sind ausserhalb einer einzelnen `SECURITY.md`, aber notwendig fuer belastbare Audit-/Zertifizierungsfaehigkeit:
-- formaler SDLC-Nachweis (dokumentierte Rollen, Freigaben, Change-Management)
-- Threat-Modeling-Artefakte mit regelmaessiger Aktualisierung
-- Incident-Response-Runbooks mit Uebungen und Nachweisen
-- SBOM/Provenance-Strategie fuer Releases (inkl. Aufbewahrung)
-- formaler Nachweis fuer Produktionsbetriebskontrollen beim Betreiber
+## 6. Remaining gaps for \"certification-adjacent\" readiness
+These points are outside a single `SECURITY.md`, but are needed for robust audit/certification readiness:
+- formal SDLC evidence (documented roles, approvals, change management)
+- threat modeling artifacts with regular updates
+- incident response runbooks with exercises and evidence
+- SBOM/provenance strategy for releases (including retention)
+- formal evidence for production operational controls by the operator
 
-## 7. Reproduzierbarkeit
-Verwendete Kommandos (Auszug):
+## 7. Reproducibility
+Used commands (excerpt):
 All commands are intended to run from the repository root.
 ```bash
 REPO="<owner>/<repo>"
@@ -85,7 +85,7 @@ gh api "repos/$REPO/contents/.github/workflows"
 gh api "repos/$REPO/contents/.github/dependabot.yml"
 ```
 
-Lokale Verifikation fuer FileClassifier:
+Local verification for FileClassifier:
 ```bash
 python3 tools/check-docs.py
 dotnet build FileClassifier.sln -v minimal
