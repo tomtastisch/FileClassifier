@@ -253,6 +253,20 @@ public sealed class HashingEvidenceSha256Tests
     }
 
     [Fact]
+    public void HashFile_ReturnsFailure_WhenFileCannotBeRead_DueToShareViolation()
+    {
+        using var scope = TestTempPaths.CreateScope("ftd-hashfile-share");
+        var path = Path.Combine(scope.RootPath, "locked.bin");
+        File.WriteAllBytes(path, new byte[] { 0x01, 0x02, 0x03 });
+
+        using var locked = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+        var evidence = EvidenceHashing.HashFile(path);
+
+        Assert.False(evidence.Digests.HasLogicalHash);
+        Assert.Contains("nicht", evidence.Notes, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void HashEntries_ReturnsFailure_ForDuplicateNormalizedPath_AfterTrim()
     {
         var a = new ZipExtractedEntry("a.txt", new byte[] { 0x01 });

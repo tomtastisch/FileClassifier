@@ -4,7 +4,7 @@
 Wave 1 baseline findings from JSON analysis artifacts.
 
 ## Current State
-Package A (Cluster 7C) has been started and reduced generic entry-point catches.
+Package A (Cluster 7C) removed generic entry-point catches for the scoped files.
 Evidence-backed candidates are tracked in:
 - `artifacts/audit/dead_code_candidates.json`
 - `artifacts/audit/redundancy_candidates.json`
@@ -12,8 +12,8 @@ Evidence-backed candidates are tracked in:
 - `artifacts/ci/code-analysis-evidence/result.json`
 
 ## Baseline Findings (Wave 1)
-1. Generic `Catch ex As Exception` usage was reduced in Package A for entry-point files (`FileTypeDetector`, `FileMaterializer`, `EvidenceHashing`).
-   Remaining broad catches still require follow-up in infrastructure internals.
+1. Generic `Catch ex As Exception` usage was removed from Package A entry-point files (`FileTypeDetector`, `FileMaterializer`, `EvidenceHashing`).
+   Remaining broad catches still require follow-up in infrastructure internals (Package B/C scope).
    - Examples:
      - `src/FileTypeDetection/Infrastructure/CoreInternals.vb:58`
      - `src/FileTypeDetection/Infrastructure/ArchiveManagedInternals.vb:70`
@@ -38,6 +38,7 @@ All commands are intended to run from the repository root.
 bash tools/audit/verify-code-analysis-evidence.sh
 jq '.candidates | length' artifacts/audit/hardening_candidates.json
 jq '.candidates | length' artifacts/audit/redundancy_candidates.json
+rg -n "Catch\\s+ex\\s+As\\s+Exception" src/FileTypeDetection/FileTypeDetector.vb src/FileTypeDetection/FileMaterializer.vb src/FileTypeDetection/EvidenceHashing.vb
 ```
 
 ## Findings Format (for next PRs)
