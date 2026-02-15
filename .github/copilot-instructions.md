@@ -38,6 +38,8 @@ Sie darf `AGENTS.md` nicht widersprechen. Im Konfliktfall gilt immer `AGENTS.md`
    - `git push -u origin HEAD`
 6. PR erstellen (CLI bevorzugt):
    - `gh pr create --fill`
+   - PR-Governance ist enforced: Pflichtsektionen/Checklisten/Statements muessen im PR-Body enthalten sein
+     (siehe `tools/ci/check-pr-governance.sh`).
 7. CI abwarten und evidenzbasiert reagieren:
    - `gh pr checks <NR> --watch`
 8. Review-Fixes iterativ einarbeiten; Threads auf `resolved` setzen.
