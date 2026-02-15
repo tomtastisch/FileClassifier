@@ -29,9 +29,15 @@ fail() {
     echo "- status: fail"
     echo "- reason: ${reason}"
   } > "${SUMMARY_MD}"
-  jq -n --arg reason "${reason}" \
-    '{schema_version:1,check_id:"codeql-default-setup-guardrail",status:"fail",reason:$reason,evidence_paths:["artifacts/ci/preflight/codeql-default-setup-guardrail/raw.log","artifacts/ci/preflight/codeql-default-setup-guardrail/summary.md"]}' \
-    > "${RESULT_JSON}"
+  if [[ -f "${DEFAULT_SETUP_JSON}" ]]; then
+    jq -n --arg reason "${reason}" \
+      '{schema_version:1,check_id:"codeql-default-setup-guardrail",status:"fail",reason:$reason,evidence_paths:["artifacts/ci/preflight/codeql-default-setup-guardrail/raw.log","artifacts/ci/preflight/codeql-default-setup-guardrail/default-setup.json","artifacts/ci/preflight/codeql-default-setup-guardrail/summary.md"]}' \
+      > "${RESULT_JSON}"
+  else
+    jq -n --arg reason "${reason}" \
+      '{schema_version:1,check_id:"codeql-default-setup-guardrail",status:"fail",reason:$reason,evidence_paths:["artifacts/ci/preflight/codeql-default-setup-guardrail/raw.log","artifacts/ci/preflight/codeql-default-setup-guardrail/summary.md"]}' \
+      > "${RESULT_JSON}"
+  fi
   exit 1
 }
 
@@ -52,19 +58,26 @@ fi
 if [[ -z "${REPO}" ]]; then
   fail "Repository-Slug konnte nicht bestimmt werden"
 fi
+if [[ ! "${REPO}" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+  fail "Ungueltiger Repository-Slug: '${REPO}' (erwartet owner/name)"
+fi
+
+gh_api() {
+  local -r endpoint="$1"; shift
+  if [[ -n "${CODEQL_TOKEN}" ]]; then
+    GH_TOKEN="${CODEQL_TOKEN}" GH_REPO="${REPO}" gh api "${endpoint}" "$@"
+  else
+    GH_REPO="${REPO}" gh api "${endpoint}" "$@"
+  fi
+}
 
 attempt=1
 delay=2
 max_attempts=3
 while true; do
-  if [[ -n "${CODEQL_TOKEN}" ]]; then
-    export GH_TOKEN="${CODEQL_TOKEN}"
-  fi
-  if gh api "repos/${REPO}/code-scanning/default-setup" > "${DEFAULT_SETUP_JSON}" 2>> "${RAW_LOG}"; then
-    export GH_TOKEN="${BASE_GH_TOKEN}"
+  if gh_api "repos/{owner}/{repo}/code-scanning/default-setup" > "${DEFAULT_SETUP_JSON}" 2>> "${RAW_LOG}"; then
     break
   fi
-  export GH_TOKEN="${BASE_GH_TOKEN}"
   if (( attempt >= max_attempts )); then
     if grep -qF "Resource not accessible by integration (HTTP 403)" "${RAW_LOG}"; then
       fail "GitHub API 403 fuer CodeQL Default Setup. GITHUB_TOKEN reicht hier nicht aus; setze Secret CODEQL_DEFAULT_SETUP_GUARDRAIL_TOKEN (Fine-Grained PAT, Repo: Administration Read, Security Events Read)."

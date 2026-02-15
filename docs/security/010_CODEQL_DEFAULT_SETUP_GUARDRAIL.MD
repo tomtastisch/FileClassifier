@@ -6,7 +6,7 @@ GitHub **CodeQL Default Setup** muss deshalb **deaktiviert** sein (`state=not-co
 
 ## Verifikation
 ```bash
-gh api /repos/tomtastisch/FileClassifier/code-scanning/default-setup --jq '{state,updated_at,schedule}'
+gh api repos/{owner}/{repo}/code-scanning/default-setup --jq '{state,updated_at,schedule}'
 ```
 
 Erwartung:

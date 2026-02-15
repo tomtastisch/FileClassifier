@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
+IFS=$'\n\t'
+export LC_ALL=C
 
 repo="${GITHUB_REPOSITORY:-${REPO:-}}"
 if [[ -z "${repo}" ]]; then
   echo "ERROR: missing GITHUB_REPOSITORY/REPO env (expected owner/name)." >&2
   exit 2
 fi
+if [[ ! "${repo}" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+  echo "ERROR: invalid repo slug: '${repo}' (expected owner/name)." >&2
+  exit 2
+fi
 
-BASE_GH_TOKEN="${GH_TOKEN:-}"
 CODEQL_TOKEN="${CODEQL_DEFAULT_SETUP_GUARDRAIL_TOKEN:-}"
 
 retry() {
@@ -29,16 +34,25 @@ retry() {
   done
 }
 
+gh_api() {
+  local -r endpoint="$1"; shift
+  if [[ -n "${CODEQL_TOKEN}" ]]; then
+    GH_TOKEN="${CODEQL_TOKEN}" GH_REPO="${repo}" gh api "${endpoint}" "$@"
+  else
+    GH_REPO="${repo}" gh api "${endpoint}" "$@"
+  fi
+}
+
 state=""
-if [[ -n "${CODEQL_TOKEN}" ]]; then
-  export GH_TOKEN="${CODEQL_TOKEN}"
-fi
-if ! state="$(retry 4 1 gh api "repos/${repo}/code-scanning/default-setup" --jq .state)"; then
-  export GH_TOKEN="${BASE_GH_TOKEN}"
+# Backoff schedule for max=4, base=1s: 1s, 2s, 4s.
+if ! state="$(retry 4 1 gh_api "repos/{owner}/{repo}/code-scanning/default-setup" --jq .state)"; then
   echo "ERROR: failed to query CodeQL default-setup state via GitHub API." >&2
   exit 3
 fi
-export GH_TOKEN="${BASE_GH_TOKEN}"
+if [[ -z "${state}" ]]; then
+  echo "ERROR: invalid API response (missing state)." >&2
+  exit 3
+fi
 
 drift="false"
 if [[ "${state}" != "not-configured" ]]; then
