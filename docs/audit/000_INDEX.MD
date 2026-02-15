@@ -43,4 +43,4 @@ bash tools/versioning/verify-version-convergence.sh
 - OpenSSF Scorecard workflow: `.github/workflows/scorecard.yml`
 - Artifact attestations in release workflow: `.github/workflows/release.yml`
 - Deep analysis evidence workflow: `.github/workflows/code-analysis-evidence.yml`
-- GitHub Code Scanning Default Setup (configured): `gh api "repos/<owner>/<repo>/code-scanning/default-setup"`
+- GitHub Code Scanning Default Setup (state must be not-configured): `gh api "repos/<owner>/<repo>/code-scanning/default-setup"`
