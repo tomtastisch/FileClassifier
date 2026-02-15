@@ -131,7 +131,7 @@ public sealed class FileMaterializerPropertyTests
     public void Persist_ReturnsFalse_ForDestinationWithNullChar()
     {
         var payload = new byte[] { 0x10, 0x20 };
-        var destination = "out\0bad.bin";
+        const string destination = "out\0bad.bin";
 
         var ok = FileMaterializer.Persist(payload, destination, overwrite: false, secureExtract: false);
 
