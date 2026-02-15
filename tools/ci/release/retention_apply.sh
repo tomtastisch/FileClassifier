@@ -20,15 +20,18 @@ if [[ -z "${GH_TOKEN}" ]]; then
   echo "GH_TOKEN/GITHUB_TOKEN missing" >&2
   exit 1
 fi
+NUGET_ENABLED="1"
 if [[ -z "${NUGET_API_KEY}" ]]; then
-  echo "NUGET_API_KEY missing" >&2
-  exit 1
+  # Best-effort for scheduled retention: still keep GH Releases + GH Packages retention working,
+  # but skip NuGet unlist when no API key is available.
+  echo "WARN: NUGET_API_KEY missing; skipping NuGet retention actions" >&2
+  NUGET_ENABLED="0"
 fi
 
 mapfile -t TAGS < <(gh api "/repos/${REPO}/tags" --paginate --jq '.[].name' | sort -u)
 
-mapfile -t STABLE_TAGS < <(printf '%s\n' "${TAGS[@]}" | rg '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V -r || true)
-mapfile -t RC_TAGS < <(printf '%s\n' "${TAGS[@]}" | rg '^v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$' | sort -V -r || true)
+mapfile -t STABLE_TAGS < <(printf '%s\n' "${TAGS[@]}" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V -r || true)
+mapfile -t RC_TAGS < <(printf '%s\n' "${TAGS[@]}" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$' | sort -V -r || true)
 
 LATEST_STABLE="${STABLE_TAGS[0]:-}"
 PREV_STABLE="${STABLE_TAGS[1]:-}"
@@ -37,7 +40,7 @@ if [[ -n "${LATEST_STABLE}" ]]; then
   base_no_v="${LATEST_STABLE#v}"
   IFS='.' read -r major minor patch <<<"${base_no_v}"
   candidate="v${major}.${minor}.0"
-  if printf '%s\n' "${STABLE_TAGS[@]}" | rg -x "${candidate}" >/dev/null 2>&1; then
+  if printf '%s\n' "${STABLE_TAGS[@]}" | grep -xF "${candidate}" >/dev/null 2>&1; then
     BASELINE="${candidate}"
   fi
 fi
@@ -102,13 +105,32 @@ for version in "${NUGET_VERSIONS[@]}"; do
     echo -e "keep\tnuget\tkeep\t${version}" >> "${SUMMARY_TSV}"
     continue
   fi
+  if [[ "${NUGET_ENABLED}" != "1" ]]; then
+    echo "SKIP NuGet unlist ${PACKAGE_ID} ${version} (reason=NUGET_API_KEY missing)" >> "${ACTIONS_LOG}"
+    echo -e "skip\tnuget\tunlist\t${version} (reason=missing_api_key)" >> "${SUMMARY_TSV}"
+    continue
+  fi
   if [[ "${DRY_RUN}" == "1" ]]; then
     echo "DRY_RUN dotnet nuget delete ${PACKAGE_ID} ${version}" >> "${ACTIONS_LOG}"
     echo -e "plan\tnuget\tunlist\t${version}" >> "${SUMMARY_TSV}"
   else
-    dotnet nuget delete "${PACKAGE_ID}" "${version}" --api-key "${NUGET_API_KEY}" --source "https://api.nuget.org/v3/index.json" --non-interactive
-    echo "EXEC dotnet nuget delete ${PACKAGE_ID} ${version}" >> "${ACTIONS_LOG}"
-    echo -e "done\tnuget\tunlist\t${version}" >> "${SUMMARY_TSV}"
+    delete_log="${OUT_DIR}/nuget-delete-${version}.log"
+    if dotnet nuget delete "${PACKAGE_ID}" "${version}" --api-key "${NUGET_API_KEY}" --source "https://api.nuget.org/v3/index.json" --non-interactive >"${delete_log}" 2>&1; then
+      echo "EXEC dotnet nuget delete ${PACKAGE_ID} ${version}" >> "${ACTIONS_LOG}"
+      echo -e "done\tnuget\tunlist\t${version}" >> "${SUMMARY_TSV}"
+      continue
+    fi
+    rc=$?
+    # NuGet.org returns 403/401 on missing "unlist" privilege or invalid/expired keys.
+    # Treat this as best-effort retention (skip), but still fail-closed on unknown errors.
+    if grep -Eqi '(forbidden|unauthorized|(^|[^0-9])(401|403)([^0-9]|$)|status code.*(401|403)|does not have permission|api key is invalid|has expired)' "${delete_log}"; then
+      echo "SKIP dotnet nuget delete ${PACKAGE_ID} ${version} (reason=403/401)" >> "${ACTIONS_LOG}"
+      echo -e "skip\tnuget\tunlist\t${version} (reason=forbidden)" >> "${SUMMARY_TSV}"
+      continue
+    fi
+    echo "FAIL dotnet nuget delete ${PACKAGE_ID} ${version} (rc=${rc})" >> "${ACTIONS_LOG}"
+    echo -e "fail\tnuget\tunlist\t${version} (rc=${rc})" >> "${SUMMARY_TSV}"
+    exit "${rc}"
   fi
 done
 
