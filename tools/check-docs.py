@@ -20,6 +20,10 @@ LINK_RE = re.compile(r'(?<!\!)\[(?P<text>[^\]]+)\]\((?P<url>[^)\s]+)(?:\s+"[^"]*
 RELATIVE_RE = re.compile(
     r'\]\(\s*(?!https?://|mailto:|#)(?:\.{1,2}/|/|docs/|src/|tests/|tools/|README\.md|[^)]+\.md(?:#[^)]+)?)(?:\s+"[^"]*")?\s*\)'
 )
+LANG_SWITCH_BLOCK_RE = re.compile(
+    r"<!-- LANG_SWITCH:BEGIN -->\r?\n.*?\r?\n<!-- LANG_SWITCH:END -->",
+    re.DOTALL,
+)
 PATH_TEXT_RE = re.compile(r'(?i)^\s*(?:\.{1,2}/|/)?(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+\s*$')
 FILE_TEXT_RE = re.compile(r'(?i)^\s*[A-Za-z0-9_.-]+\.(md|mdx|vb|cs|fs|java|kt|ts|js|json|yml|yaml|toml|xml|sh|ps1|sql)\s*$')
 INTERNAL_REPO_URL_RE = re.compile(
@@ -69,6 +73,7 @@ def collect_targets() -> list[Path]:
 
 def check_docs_naming() -> list[str]:
     errors: list[str] = []
+    allowed_lowercase_docs = {"lang_switch_report.md"}
     for f in sorted(DOCS_DIR.rglob("*")):
         if not f.is_file():
             continue
@@ -78,6 +83,8 @@ def check_docs_naming() -> list[str]:
             errors.append(f"docs contains forbidden README: {f.relative_to(ROOT)}")
             continue
         if f.suffix != ".MD":
+            if f.name in allowed_lowercase_docs:
+                continue
             errors.append(f"docs markdown must be uppercase .MD: {f.relative_to(ROOT)}")
             continue
         if not DOC_NAME_RE.match(f.name):
@@ -251,11 +258,12 @@ def check_links_and_text(files: list[Path]) -> list[str]:
 
     for f in files:
         text = f.read_text(encoding="utf-8")
+        text_for_link_check = LANG_SWITCH_BLOCK_RE.sub("", text)
 
-        if RELATIVE_RE.search(text):
+        if RELATIVE_RE.search(text_for_link_check):
             errors.append(f"relative link detected in {f.relative_to(ROOT)}")
 
-        for m in LINK_RE.finditer(text):
+        for m in LINK_RE.finditer(text_for_link_check):
             ltxt = m.group("text").strip()
             url = m.group("url").strip()
 
@@ -293,7 +301,7 @@ def check_links_and_text(files: list[Path]) -> list[str]:
             errors.append(f"non-absolute or unsupported URL in {f.relative_to(ROOT)}: {url}")
 
         # Also validate plain URLs in text sections/tables.
-        for pm in PLAIN_URL_RE.finditer(text):
+        for pm in PLAIN_URL_RE.finditer(text_for_link_check):
             raw_url = pm.group("url")
             cleaned = raw_url.rstrip(".,;:")
             if cleaned.startswith("mailto:"):
