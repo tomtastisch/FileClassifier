@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](004_MATRIX_HASHING.MD) | [EN](104_MATRIX_HASHING.MD)
+<!-- LANG_SWITCH:END -->
+
 # Test Matrix - Deterministic Hashing
 
 ## 1. Purpose & Scope

@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](001_PIPELINE_CI.MD) | [EN](101_PIPELINE_CI.MD)
+<!-- LANG_SWITCH:END -->
+
 # CI Pipeline (SSOT)
 
 ## Scope

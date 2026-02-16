@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](012_WAVE_EXECUTION_DOD.MD) | [EN](112_WAVE_EXECUTION_DOD.MD)
+<!-- LANG_SWITCH:END -->
+
 # Wave Execution DoD Matrix
 
 As of: 2026-02-13

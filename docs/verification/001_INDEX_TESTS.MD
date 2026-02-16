@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](001_INDEX_TESTS.MD) | [EN](101_INDEX_TESTS.MD)
+<!-- LANG_SWITCH:END -->
+
 # Testdokumentation (BDD)
 
 ## 1. Zweck

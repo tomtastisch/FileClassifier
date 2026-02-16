@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](003_CATALOG_BDD.MD) | [EN](103_CATALOG_BDD.MD)
+<!-- LANG_SWITCH:END -->
+
 # BDD-Satzkatalog (Deutsch, kanonisch)
 
 ## 1. Zweck

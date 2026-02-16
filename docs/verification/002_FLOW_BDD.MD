@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](002_FLOW_BDD.MD) | [EN](102_FLOW_BDD.MD)
+<!-- LANG_SWITCH:END -->
+
 # BDD-Ausfuehrung und Gherkin-Flow
 
 ## 1. Zweck

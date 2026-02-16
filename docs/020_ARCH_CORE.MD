@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](020_ARCH_CORE.MD) | [EN](120_ARCH_CORE.MD)
+<!-- LANG_SWITCH:END -->
+
 # 02 - Gesamtarchitektur und Ablaufflüsse
 
 ## 1. Zweck und Scope

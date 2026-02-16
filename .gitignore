@@ -56,6 +56,9 @@ tools/*
 !tools/ci/**
 tools/ci/checks/**/bin/
 tools/ci/checks/**/obj/
+!tools/lang_switch/
+!tools/lang_switch/update_lang_headers.py
+tools/lang_switch/__pycache__/
 !tools/versioning/
 !tools/versioning/check-versioning.sh
 !tools/versioning/labels.json

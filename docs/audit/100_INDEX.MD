@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](000_INDEX.MD) | [EN](100_INDEX.MD)
+<!-- LANG_SWITCH:END -->
+
 # Audit Index
 
 ## Scope

@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](002_NUGET_TRUSTED_PUBLISHING.MD) | [EN](102_NUGET_TRUSTED_PUBLISHING.MD)
+<!-- LANG_SWITCH:END -->
+
 # NuGet Trusted Publishing (OIDC)
 
 ## 1. Zweck

@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](011_SECURITY_BENCHMARK.MD) | [EN](111_SECURITY_BENCHMARK.MD)
+<!-- LANG_SWITCH:END -->
+
 # Security-Policy Benchmark (Stand: 2026-02-13)
 
 ## 1. Ziel und Scope

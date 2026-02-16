@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](003_GUIDE_PORTABLE.MD) | [EN](103_GUIDE_PORTABLE.MD)
+<!-- LANG_SWITCH:END -->
+
 # Portable Adoption Guide (NuGet)
 
 ## 1. Goal

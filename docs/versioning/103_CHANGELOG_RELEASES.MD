@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](003_CHANGELOG_RELEASES.MD) | [EN](103_CHANGELOG_RELEASES.MD)
+<!-- LANG_SWITCH:END -->
+
 # Changelog
 
 All changes are documented here in technical terms. The release version itself is the Git tag `vX.Y.Z` (optional `-prerelease`) as SSOT.

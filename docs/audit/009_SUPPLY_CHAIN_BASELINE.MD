@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](009_SUPPLY_CHAIN_BASELINE.MD) | [EN](109_SUPPLY_CHAIN_BASELINE.MD)
+<!-- LANG_SWITCH:END -->
+
 # Supply-Chain-Baseline
 
 ## 1. Ziel

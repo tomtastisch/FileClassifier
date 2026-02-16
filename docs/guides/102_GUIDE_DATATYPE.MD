@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](002_GUIDE_DATATYPE.MD) | [EN](102_GUIDE_DATATYPE.MD)
+<!-- LANG_SWITCH:END -->
+
 # Playbook: Extend New Datatypes and API Models
 
 ## 1. Purpose and Audience

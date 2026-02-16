@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](002_POLICY_LABELING.MD) | [EN](102_POLICY_LABELING.MD)
+<!-- LANG_SWITCH:END -->
+
 # Labeling Ownership
 
 ## 1. Scope

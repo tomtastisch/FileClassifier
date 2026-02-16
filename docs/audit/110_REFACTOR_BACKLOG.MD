@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](010_REFACTOR_BACKLOG.MD) | [EN](110_REFACTOR_BACKLOG.MD)
+<!-- LANG_SWITCH:END -->
+
 # Refactor Backlog (Cluster 7C)
 
 ## 1. Source

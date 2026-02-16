@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](003_POLICY_VERSIONING_SVT.MD) | [EN](103_POLICY_VERSIONING_SVT.MD)
+<!-- LANG_SWITCH:END -->
+
 # Versioning Policy (SVT)
 
 ## 1. Purpose

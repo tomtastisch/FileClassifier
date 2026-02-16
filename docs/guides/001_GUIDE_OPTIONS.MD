@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](001_GUIDE_OPTIONS.MD) | [EN](101_GUIDE_OPTIONS.MD)
+<!-- LANG_SWITCH:END -->
+
 # Playbook: Options anlegen und anpassen
 
 ## 1. Zweck und Zielgruppe

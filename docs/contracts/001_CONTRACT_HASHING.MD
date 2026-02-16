@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](001_CONTRACT_HASHING.MD) | [EN](101_CONTRACT_HASHING.MD)
+<!-- LANG_SWITCH:END -->
+
 # 04 - EvidenceHashing API Contract
 
 ## 1. Zweck und Scope

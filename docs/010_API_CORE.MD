@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](010_API_CORE.MD) | [EN](110_API_CORE.MD)
+<!-- LANG_SWITCH:END -->
+
 # 01 - Funktionen
 
 ## 1. Zweck & Scope

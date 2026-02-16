@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](001_REFERENCES_CORE.MD) | [EN](101_REFERENCES_CORE.MD)
+<!-- LANG_SWITCH:END -->
+
 # 03 - References
 
 ## 1. Purpose & Scope

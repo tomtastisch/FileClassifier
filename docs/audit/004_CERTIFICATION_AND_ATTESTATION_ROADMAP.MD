@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](004_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD) | [EN](104_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD)
+<!-- LANG_SWITCH:END -->
+
 # Roadmap: Zertifizierung und Attestationen
 
 ## 1. Positionierung

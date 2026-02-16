@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](001_INDEX_CORE.MD) | [EN](101_INDEX_CORE.MD)
+<!-- LANG_SWITCH:END -->
+
 # Dokumentationsindex
 
 ## 1. Zweck

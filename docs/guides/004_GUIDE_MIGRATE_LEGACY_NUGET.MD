@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](004_GUIDE_MIGRATE_LEGACY_NUGET.MD) | [EN](104_GUIDE_MIGRATE_LEGACY_NUGET.MD)
+<!-- LANG_SWITCH:END -->
+
 # Migration Guide: Legacy NuGet ID to Canonical Package
 
 ## Scope

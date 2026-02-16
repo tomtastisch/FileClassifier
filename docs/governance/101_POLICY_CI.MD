@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](001_POLICY_CI.MD) | [EN](101_POLICY_CI.MD)
+<!-- LANG_SWITCH:END -->
+
 # CI Policy (SSOT)
 
 ## Scope

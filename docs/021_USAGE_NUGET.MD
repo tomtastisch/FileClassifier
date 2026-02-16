@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](021_USAGE_NUGET.MD) | [EN](121_USAGE_NUGET.MD)
+<!-- LANG_SWITCH:END -->
+
 # NuGet Nutzung
 
 ## A) Zweck

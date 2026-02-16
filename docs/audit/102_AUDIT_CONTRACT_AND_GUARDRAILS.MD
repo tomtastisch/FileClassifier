@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](002_AUDIT_CONTRACT_AND_GUARDRAILS.MD) | [EN](102_AUDIT_CONTRACT_AND_GUARDRAILS.MD)
+<!-- LANG_SWITCH:END -->
+
 # Audit Contract And Guardrails
 
 ## 1. Purpose

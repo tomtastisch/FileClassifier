@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](005_CODE_ANALYSIS_METHOD.MD) | [EN](105_CODE_ANALYSIS_METHOD.MD)
+<!-- LANG_SWITCH:END -->
+
 # Code Analysis Method
 
 ## 1. Goal
