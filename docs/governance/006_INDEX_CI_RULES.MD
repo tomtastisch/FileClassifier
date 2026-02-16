@@ -4,7 +4,7 @@
 
 # CI-Richtlinienregeln
 
-| rule_id | datei |
+| rule_id | Datei |
 | --- | --- |
 | `CI-ARTIFACT-000` | `tools/ci/policies/rules/artifact_contract.yaml` |
 | `CI-DOCS-000` | `tools/ci/policies/rules/docs_drift.yaml` |

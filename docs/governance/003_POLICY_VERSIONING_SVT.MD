@@ -19,7 +19,7 @@ Fuer das kanonische Paket `Tomtastisch.FileClassifier` MUESSEN die folgenden Wer
 - veroeffentlichte NuGet-Version `X.Y.Z` (Release-Job)
 
 ## 4. SHALL-Statements
-- Release-Tags SHALL Prefix `v` und semantischen Versionskern verwenden (`vMAJOR.MINOR.PATCH`).
+- Release-Tags SHALL den Prefix `v` sowie einen semantischen Versionskern verwenden (`vMAJOR.MINOR.PATCH`).
 - Der Release-Pack-Schritt SHALL `VERSION=${GITHUB_REF_NAME#v}` ableiten.
 - `dotnet pack` SHALL `-p:Version=$VERSION -p:PackageVersion=$VERSION` setzen.
 - CI SHALL bei Mehrdeutigkeit fail-closed abbrechen (z. B. mehrere passende Tags auf HEAD).

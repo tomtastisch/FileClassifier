@@ -4,7 +4,7 @@
 
 # Security-Policy-Benchmark (Stand: 2026-02-13)
 
-## 1. Ziel und Scope
+## 1. Ziel und Geltungsbereich
 Vergleich der Security-Policy-Reife von `tomtastisch/FileClassifier` (PR-Branch `tomtastisch-patch-1`) mit verbreiteten .NET-Open-Source-Repositories anhand nachweisbarer GitHub- und Repository-Fakten.
 Dieser Benchmark ist ein Snapshot vor dem Merge in `main` (Stand 2026-02-13).
 

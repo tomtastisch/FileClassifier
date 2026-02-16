@@ -9,7 +9,7 @@ Dieser Leitfaden beschreibt die Migration vom veralteten Paket `Tomtastisch.File
 
 ## Warum
 - Das Legacy-Paket ist veraltet und auf NuGet.org unlisted.
-- Das kanonische Paket erhaelt laufende Updates und policy-gestuetzte CI-Validierung.
+- Das kanonische Paket erhaelt laufende Updates und Policy-gestuetzte CI-Validierung.
 - Der oeffentliche Root-Namespace ist auf `Tomtastisch.FileClassifier` vereinheitlicht (Level-3 Public-Surface-Rename).
 
 ## PackageReference-Migration
