@@ -3,31 +3,38 @@ Option Explicit On
 
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
-    '''     Konfiguration fuer Dateityp-Erkennung und ZIP-Sicherheitsgrenzen.
-    '''     Sicherheitsannahmen:
-    '''     - Grenzen sind konservativ, um Memory-/CPU-DoS (z. B. Zip-Bomb) zu reduzieren.
-    '''     - Logger darf Beobachtbarkeit liefern, aber niemals das Ergebnis beeinflussen.
+    '''     Konfigurationsobjekt für Dateityp-Erkennung, Archivgrenzen und deterministische Hash-Optionen.
     ''' </summary>
+    ''' <remarks>
+    '''     <para>
+    '''         Sicherheitsannahmen:
+    '''         1) Grenzwerte sind konservativ gesetzt, um Ressourcenangriffe (z. B. Zip-Bombs) zu reduzieren.
+    '''         2) Der Logger darf ausschließlich Beobachtbarkeit liefern und keine Entscheidungslogik beeinflussen.
+    '''     </para>
+    '''     <para>
+    '''         Die Instanz wird vor Verwendung normiert; nicht zulässige Minimalwerte werden auf sichere Untergrenzen angehoben.
+    '''     </para>
+    ''' </remarks>
     Public NotInheritable Class FileTypeProjectOptions
         Private Const MinPositiveLong As Long = 1
         Private Const MinPositiveInt As Integer = 1
         Private Const MinNonNegativeInt As Integer = 0
 
         ''' <summary>
-        '''     Erzwingt Header-only-Erkennung fuer Nicht-ZIP-Typen.
+        '''     Erzwingt Header-only-Erkennung für Nicht-ZIP-Typen.
         '''     Sonderregel: ZIP-Container werden weiterhin sicher inhaltlich verfeinert (OOXML/ZIP).
         '''     Default ist True und read-only.
         ''' </summary>
         Public ReadOnly Property HeaderOnlyNonZip As Boolean
 
         ''' <summary>
-        '''     Harte Obergrenze fuer Datei-/Byte-Payloads.
-        '''     Alles darueber wird fail-closed verworfen.
+        '''     Harte Obergrenze für Datei-/Byte-Payloads.
+        '''     Alles darüber wird fail-closed verworfen.
         ''' </summary>
         Public Property MaxBytes As Long = 200L * 1024L * 1024L
 
         ''' <summary>
-        '''     Maximale Header-Laenge fuer Sniffing/Magic.
+        '''     Maximale Header-Länge für Sniffing/Magic.
         ''' </summary>
         Public Property SniffBytes As Integer = 64 * 1024
 
@@ -41,18 +48,18 @@ Namespace Global.Tomtastisch.FileClassifier
         Public Property MaxZipEntryUncompressedBytes As Long = 200L * 1024L * 1024L
 
         ''' <summary>
-        '''     Maximal erlaubtes Kompressionsverhaeltnis (u/c).
+        '''     Maximal erlaubtes Kompressionsverhältnis (u/c).
         '''     Dient als einfacher Schutz gegen stark komprimierte Bomben.
         ''' </summary>
         Public Property MaxZipCompressionRatio As Integer = 50
 
         ''' <summary>
-        '''     Maximale Rekursionstiefe fuer verschachtelte ZIP-Dateien (0 = aus).
+        '''     Maximale Rekursionstiefe für verschachtelte ZIP-Dateien (0 = aus).
         ''' </summary>
         Public Property MaxZipNestingDepth As Integer = 2
 
         ''' <summary>
-        '''     Harte In-Memory-Grenze fuer verschachtelte ZIP-Entries.
+        '''     Harte In-Memory-Grenze für verschachtelte ZIP-Entries.
         ''' </summary>
         Public Property MaxZipNestedBytes As Long = 50L * 1024L * 1024L
 
@@ -62,19 +69,25 @@ Namespace Global.Tomtastisch.FileClassifier
         Public Property RejectArchiveLinks As Boolean = True
 
         ''' <summary>
-        '''     Erlaubt Archive-Entries mit unbekannter Groesse nur bei explizitem Opt-In.
+        '''     Erlaubt Archive-Entries mit unbekannter Größe nur bei explizitem Opt-In.
         '''     Default ist fail-closed (False).
         ''' </summary>
         Public Property AllowUnknownArchiveEntrySize As Boolean = False
 
-        ''' <summary>Optionaler Logger fuer Diagnosezwecke.</summary>
+        ''' <summary>Optionaler Logger für Diagnosezwecke.</summary>
         Public Property Logger As Global.Microsoft.Extensions.Logging.ILogger = Nothing
 
         ''' <summary>
-        '''     Optionen fuer deterministische Hash-/Evidence-Funktionen.
+        '''     Optionen für deterministische Hash-/Evidence-Funktionen.
         ''' </summary>
         Public Property DeterministicHash As HashOptions = New HashOptions()
 
+        ''' <summary>
+        '''     Initialisiert eine neue Instanz mit sicheren Standardwerten.
+        ''' </summary>
+        ''' <remarks>
+        '''     Diese öffentliche Initialisierung erzwingt <c>HeaderOnlyNonZip=True</c>.
+        ''' </remarks>
         Public Sub New()
             Me.New(True)
         End Sub

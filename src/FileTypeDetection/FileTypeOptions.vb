@@ -3,20 +3,50 @@ Option Explicit On
 
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
-    '''     Zentrale, globale Optionsverwaltung als JSON-Schnittstelle.
+    '''     Verwaltet die globalen Bibliotheksoptionen als thread-sicheren Snapshot mit JSON-Ein- und Ausgabe.
     ''' </summary>
+    ''' <remarks>
+    '''     <para>
+    '''         Verantwortung: Die Klasse bildet die öffentliche Konfigurationsschnittstelle für Konsumenten und kapselt
+    '''         Validierung, Normalisierung und Snapshot-Aktualisierung.
+    '''     </para>
+    '''     <para>
+    '''         Nebenwirkungen: Änderungen wirken global auf nachfolgende Operationen der Bibliothek.
+    '''         Fehlerhafte Konfigurationen werden fail-closed verworfen.
+    '''     </para>
+    '''     <para>
+    '''         Threading: Lese- und Schreibzugriffe auf den aktuellen Snapshot sind über ein zentrales Lock synchronisiert.
+    '''     </para>
+    ''' </remarks>
     Public NotInheritable Class FileTypeOptions
-        Private Shared ReadOnly _optionsLock As New Object()
+        Private Shared ReadOnly OptionsLock As New Object()
         Private Shared _currentOptions As FileTypeProjectOptions = FileTypeProjectOptions.DefaultOptions()
 
         Private Sub New()
         End Sub
 
         ''' <summary>
-        '''     Laedt globale Optionen aus JSON.
-        '''     Nicht gesetzte Felder bleiben auf Default-Werten.
+        '''     Lädt globale Optionen aus einem JSON-Dokument und ersetzt den aktuellen Snapshot atomar bei Erfolg.
         ''' </summary>
-        Public Shared Function LoadOptions(json As String) As Boolean
+        ''' <remarks>
+        '''     <para>
+        '''         Nicht gesetzte Felder bleiben auf normierten Default-Werten. Unbekannte Schlüssel werden ignoriert
+        '''         und protokolliert.
+        '''     </para>
+        '''     <para>
+        '''         Fail-Closed: Bei Parse- oder Validierungsfehlern bleibt der bisherige Snapshot unverändert und die
+        '''         Methode liefert <c>False</c>.
+        '''     </para>
+        ''' </remarks>
+        ''' <param name="json">JSON-Konfiguration mit unterstützten Optionsfeldern.</param>
+        ''' <returns><c>True</c>, wenn ein gültiger Snapshot gesetzt wurde; andernfalls <c>False</c>.</returns>
+        ''' <exception cref="System.Text.Json.JsonException">Kann bei ungültiger JSON-Struktur intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützter JSON-Konstellation intern auftreten und wird fail-closed behandelt.</exception>
+        Public Shared Function LoadOptions _
+            (
+                json As String
+            ) As Boolean
             If String.IsNullOrWhiteSpace(json) Then Return False
 
             Dim defaults = FileTypeProjectOptions.DefaultOptions()
@@ -38,11 +68,11 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim logger = defaults.Logger
 
             Try
-                Using doc = Global.System.Text.Json.JsonDocument.Parse(
+                Using doc = Text.Json.JsonDocument.Parse(
                     json,
-                    New Global.System.Text.Json.JsonDocumentOptions With {.AllowTrailingCommas = True}
+                    New Text.Json.JsonDocumentOptions With {.AllowTrailingCommas = True}
                 )
-                    If doc.RootElement.ValueKind <> Global.System.Text.Json.JsonValueKind.Object Then
+                    If doc.RootElement.ValueKind <> Text.Json.JsonValueKind.Object Then
                         LogGuard.Warn(logger, "[Config] Root muss ein JSON-Objekt sein.")
                         Return False
                     End If
@@ -121,15 +151,24 @@ Namespace Global.Tomtastisch.FileClassifier
                 nextOptions.NormalizeInPlace()
                 SetSnapshot(nextOptions)
                 Return True
-            Catch ex As Exception
+            Catch ex As Exception When _
+                TypeOf ex Is ArgumentException OrElse
+                TypeOf ex Is Text.Json.JsonException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is InvalidOperationException OrElse
+                TypeOf ex Is FormatException
                 LogGuard.Warn(GetSnapshot().Logger, $"[Config] Parse-Fehler: {ex.Message}")
                 Return False
             End Try
         End Function
 
         ''' <summary>
-        '''     Liefert die aktuell gesetzten globalen Optionen als JSON.
+        '''     Liefert den aktuell gesetzten globalen Options-Snapshot als JSON-Dokument.
         ''' </summary>
+        ''' <remarks>
+        '''     Ausgabe dient der auditierbaren Repräsentation der effektiven Laufzeitkonfiguration.
+        ''' </remarks>
+        ''' <returns>JSON-Serialisierung der normierten Optionen.</returns>
         Public Shared Function GetOptions() As String
             Dim opt = GetSnapshot()
             Dim dto As New Dictionary(Of String, Object) From {
@@ -151,65 +190,72 @@ Namespace Global.Tomtastisch.FileClassifier
                     {"materializedFileName", opt.DeterministicHash.MaterializedFileName}
                     }}
                     }
-            Return Global.System.Text.Json.JsonSerializer.Serialize(dto)
+            Return Text.Json.JsonSerializer.Serialize(dto)
         End Function
 
         Friend Shared Function LoadOptionsFromPath(path As String) As Boolean
-            If String.IsNullOrWhiteSpace(path) OrElse Not Global.System.IO.File.Exists(path) Then Return False
+            If String.IsNullOrWhiteSpace(path) OrElse Not IO.File.Exists(path) Then Return False
             If Not path.EndsWith(".json", StringComparison.OrdinalIgnoreCase) Then Return False
 
             Try
-                Return LoadOptions(Global.System.IO.File.ReadAllText(path))
-            Catch
+                Return LoadOptions(IO.File.ReadAllText(path))
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is Security.SecurityException OrElse
+                TypeOf ex Is IO.IOException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException
+                Return False
+            Catch ex As Exception
                 Return False
             End Try
         End Function
 
         Friend Shared Function GetSnapshot() As FileTypeProjectOptions
-            SyncLock _optionsLock
+            SyncLock OptionsLock
                 Return Snapshot(_currentOptions)
             End SyncLock
         End Function
 
         Friend Shared Sub SetSnapshot(opt As FileTypeProjectOptions)
-            SyncLock _optionsLock
+            SyncLock OptionsLock
                 _currentOptions = Snapshot(opt)
             End SyncLock
         End Sub
 
-        Private Shared Function SafeInt(el As Global.System.Text.Json.JsonElement, fallback As Integer) As Integer
+        Private Shared Function SafeInt(el As Text.Json.JsonElement, fallback As Integer) As Integer
             Dim v As Integer
-            If el.ValueKind = Global.System.Text.Json.JsonValueKind.Number AndAlso el.TryGetInt32(v) Then Return v
+            If el.ValueKind = Text.Json.JsonValueKind.Number AndAlso el.TryGetInt32(v) Then Return v
             Return fallback
         End Function
 
-        Private Shared Function SafeLong(el As Global.System.Text.Json.JsonElement, fallback As Long) As Long
+        Private Shared Function SafeLong(el As Text.Json.JsonElement, fallback As Long) As Long
             Dim v As Long
-            If el.ValueKind = Global.System.Text.Json.JsonValueKind.Number AndAlso el.TryGetInt64(v) Then Return v
+            If el.ValueKind = Text.Json.JsonValueKind.Number AndAlso el.TryGetInt64(v) Then Return v
             Return fallback
         End Function
 
-        Private Shared Function ParsePositiveInt(el As Global.System.Text.Json.JsonElement, fallback As Integer,
+        Private Shared Function ParsePositiveInt(el As Text.Json.JsonElement, fallback As Integer,
                                                  name As String,
-                                                 logger As Global.Microsoft.Extensions.Logging.ILogger) As Integer
+                                                 logger As Microsoft.Extensions.Logging.ILogger) As Integer
             Dim v = SafeInt(el, fallback)
             If v > 0 Then Return v
             LogGuard.Warn(logger, $"[Config] Ungueltiger Wert fuer '{name}', fallback={fallback}.")
             Return fallback
         End Function
 
-        Private Shared Function ParseNonNegativeInt(el As Global.System.Text.Json.JsonElement, fallback As Integer,
+        Private Shared Function ParseNonNegativeInt(el As Text.Json.JsonElement, fallback As Integer,
                                                     name As String,
-                                                    logger As Global.Microsoft.Extensions.Logging.ILogger) As Integer
+                                                    logger As Microsoft.Extensions.Logging.ILogger) As Integer
             Dim v = SafeInt(el, fallback)
             If v >= 0 Then Return v
             LogGuard.Warn(logger, $"[Config] Ungueltiger Wert fuer '{name}', fallback={fallback}.")
             Return fallback
         End Function
 
-        Private Shared Function ParsePositiveLong(el As Global.System.Text.Json.JsonElement, fallback As Long,
+        Private Shared Function ParsePositiveLong(el As Text.Json.JsonElement, fallback As Long,
                                                   name As String,
-                                                  logger As Global.Microsoft.Extensions.Logging.ILogger) _
+                                                  logger As Microsoft.Extensions.Logging.ILogger) _
             As Long
             Dim v = SafeLong(el, fallback)
             If v > 0 Then Return v
@@ -217,21 +263,21 @@ Namespace Global.Tomtastisch.FileClassifier
             Return fallback
         End Function
 
-        Private Shared Function ParseBoolean(el As Global.System.Text.Json.JsonElement, fallback As Boolean,
+        Private Shared Function ParseBoolean(el As Text.Json.JsonElement, fallback As Boolean,
                                              name As String,
-                                             logger As Global.Microsoft.Extensions.Logging.ILogger) _
+                                             logger As Microsoft.Extensions.Logging.ILogger) _
             As Boolean
-            If el.ValueKind = Global.System.Text.Json.JsonValueKind.True Then Return True
-            If el.ValueKind = Global.System.Text.Json.JsonValueKind.False Then Return False
+            If el.ValueKind = Text.Json.JsonValueKind.True Then Return True
+            If el.ValueKind = Text.Json.JsonValueKind.False Then Return False
             LogGuard.Warn(logger, $"[Config] Ungueltiger Wert fuer '{name}', fallback={fallback}.")
             Return fallback
         End Function
 
-        Private Shared Function ParseString(el As Global.System.Text.Json.JsonElement, fallback As String,
+        Private Shared Function ParseString(el As Text.Json.JsonElement, fallback As String,
                                             name As String,
-                                            logger As Global.Microsoft.Extensions.Logging.ILogger) _
+                                            logger As Microsoft.Extensions.Logging.ILogger) _
             As String
-            If el.ValueKind = Global.System.Text.Json.JsonValueKind.String Then
+            If el.ValueKind = Text.Json.JsonValueKind.String Then
                 Dim value = el.GetString()
                 If value IsNot Nothing Then Return value
             End If
@@ -240,14 +286,14 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Sub TryParseHashOptions(
-                                                            el As Global.System.Text.Json.JsonElement,
+                                                            el As Text.Json.JsonElement,
                                                             ByRef includePayloadCopies As Boolean,
                                                             ByRef includeFastHash As Boolean,
                                                             ByRef includeSecureHash As Boolean,
                                                             ByRef materializedFileName As String,
-                                                            logger As Global.Microsoft.Extensions.Logging.ILogger)
+                                                            logger As Microsoft.Extensions.Logging.ILogger)
 
-            If el.ValueKind <> Global.System.Text.Json.JsonValueKind.Object Then
+            If el.ValueKind <> Text.Json.JsonValueKind.Object Then
                 LogGuard.Warn(logger, "[Config] 'deterministicHash' muss ein JSON-Objekt sein.")
                 Return
             End If

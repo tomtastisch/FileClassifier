@@ -3,22 +3,81 @@ Option Explicit On
 
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
-    '''     Ergebnisbericht fuer deterministische h1-h4 RoundTrip-Pruefungen.
+    '''     Ergebnisbericht für deterministische h1-h4-RoundTrip-Prüfungen.
     ''' </summary>
+    ''' <remarks>
+    '''     Der Bericht stellt Einzel-Evidence und daraus abgeleitete Konsistenzkennzahlen für logische und physische
+    '''     Digest-Vergleiche bereit.
+    ''' </remarks>
     Public NotInheritable Class HashRoundTripReport
+        ''' <summary>
+        '''     Eingabepfad des geprüften Objekts.
+        ''' </summary>
         Public ReadOnly Property InputPath As String
+
+        ''' <summary>
+        '''     Kennzeichnet, ob die Eingabe als Archiv verarbeitet wurde.
+        ''' </summary>
         Public ReadOnly Property IsArchiveInput As Boolean
+
+        ''' <summary>
+        '''     Erster Nachweis (Ausgangszustand).
+        ''' </summary>
         Public ReadOnly Property H1 As HashEvidence
+
+        ''' <summary>
+        '''     Zweiter Nachweis (kanonische Sicht).
+        ''' </summary>
         Public ReadOnly Property H2 As HashEvidence
+
+        ''' <summary>
+        '''     Dritter Nachweis (logische Bytes).
+        ''' </summary>
         Public ReadOnly Property H3 As HashEvidence
+
+        ''' <summary>
+        '''     Vierter Nachweis (materialisierte Zielrepräsentation).
+        ''' </summary>
         Public ReadOnly Property H4 As HashEvidence
+
+        ''' <summary>
+        '''     Kennzeichnet Gleichheit der logischen Digests zwischen h1 und h2.
+        ''' </summary>
         Public ReadOnly Property LogicalH1EqualsH2 As Boolean
+
+        ''' <summary>
+        '''     Kennzeichnet Gleichheit der logischen Digests zwischen h1 und h3.
+        ''' </summary>
         Public ReadOnly Property LogicalH1EqualsH3 As Boolean
+
+        ''' <summary>
+        '''     Kennzeichnet Gleichheit der logischen Digests zwischen h1 und h4.
+        ''' </summary>
         Public ReadOnly Property LogicalH1EqualsH4 As Boolean
+
+        ''' <summary>
+        '''     Kennzeichnet Gleichheit der physischen Digests zwischen h1 und h2.
+        ''' </summary>
         Public ReadOnly Property PhysicalH1EqualsH2 As Boolean
+
+        ''' <summary>
+        '''     Kennzeichnet Gleichheit der physischen Digests zwischen h1 und h3.
+        ''' </summary>
         Public ReadOnly Property PhysicalH1EqualsH3 As Boolean
+
+        ''' <summary>
+        '''     Kennzeichnet Gleichheit der physischen Digests zwischen h1 und h4.
+        ''' </summary>
         Public ReadOnly Property PhysicalH1EqualsH4 As Boolean
+
+        ''' <summary>
+        '''     Gesamtindikator für logische Konsistenz über h1 bis h4.
+        ''' </summary>
         Public ReadOnly Property LogicalConsistent As Boolean
+
+        ''' <summary>
+        '''     Ergänzende Hinweise zum RoundTrip-Lauf.
+        ''' </summary>
         Public ReadOnly Property Notes As String
 
         Friend Sub New(inputPath As String, isArchiveInput As Boolean, h1 As HashEvidence, h2 As HashEvidence,

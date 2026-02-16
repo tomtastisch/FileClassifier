@@ -3,8 +3,21 @@ Option Explicit On
 
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
-    '''     Öffentliche Fassade für deterministische Hash- und RoundTrip-Nachweise.
+    '''     Öffentliche Fassade für deterministische Hash-Nachweise und RoundTrip-Konsistenzberichte.
     ''' </summary>
+    ''' <remarks>
+    '''     <para>
+    '''         Verantwortung: Die Klasse erzeugt reproduzierbare Digest-Evidence für Dateien, Rohbytes und Archiv-Entries.
+    '''     </para>
+    '''     <para>
+    '''         Security/Compliance: Optionale HMAC-Digests verwenden den Schlüssel aus
+    '''         <c>FILECLASSIFIER_HMAC_KEY_B64</c>; fehlt der Schlüssel, wird fail-closed ohne HMAC fortgeführt.
+    '''     </para>
+    '''     <para>
+    '''         Nebenwirkungen: <c>VerifyRoundTrip</c> verwendet temporäre Dateisystempfade für die Materialisierung und
+    '''         bereinigt diese anschließend best-effort.
+    '''     </para>
+    ''' </remarks>
     Public NotInheritable Class EvidenceHashing
         Private Const LogicalManifestVersion As String = "FTD-LOGICAL-HASH-V1"
         Private Const DefaultPayloadLabel As String = "payload.bin"
@@ -13,16 +26,40 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
-        Public Shared Function HashFile(path As String) As HashEvidence
+        ''' <summary>
+        '''     Erstellt einen deterministischen Hash-Nachweis für eine Datei mit Standard-Hashoptionen.
+        ''' </summary>
+        ''' <remarks>
+        '''     Delegiert auf die Überladung mit expliziten Hashoptionen.
+        ''' </remarks>
+        ''' <param name="path">Pfad zur Eingabedatei.</param>
+        ''' <returns>Hash-Evidence; bei Fehlern ein fail-closed Nachweisobjekt mit Fehlerhinweis.</returns>
+        Public Shared Function HashFile _
+            (
+                path As String
+            ) As HashEvidence
             Return HashFile(path, options:=Nothing)
         End Function
 
-        Public Shared Function HashFile(path As String, options As HashOptions) _
+        ''' <summary>
+        '''     Erstellt einen deterministischen Hash-Nachweis für eine Datei.
+        ''' </summary>
+        ''' <remarks>
+        '''     Archive werden über kanonisches Manifest gehasht; Nicht-Archive über direkte Payload-Digests.
+        ''' </remarks>
+        ''' <param name="path">Pfad zur Eingabedatei.</param>
+        ''' <param name="options">Optionale Hashparameter; bei <c>Nothing</c> werden globale Defaults verwendet.</param>
+        ''' <returns>Hash-Evidence; bei Fehlern ein fail-closed Nachweisobjekt mit Fehlerhinweis.</returns>
+        Public Shared Function HashFile _
+            (
+                path As String,
+                options As HashOptions
+            ) _
             As HashEvidence
             Dim detectorOptions = FileTypeOptions.GetSnapshot()
             Dim normalizedOptions = ResolveHashOptions(detectorOptions, options)
 
-            If String.IsNullOrWhiteSpace(path) OrElse Not Global.System.IO.File.Exists(path) Then
+            If String.IsNullOrWhiteSpace(path) OrElse Not IO.File.Exists(path) Then
                 Return _
                     HashEvidence.CreateFailure(HashSourceType.FilePath, path, "Datei nicht gefunden.")
             End If
@@ -38,7 +75,7 @@ Namespace Global.Tomtastisch.FileClassifier
             If ArchiveEntryCollector.TryCollectFromFile(path, detectorOptions, entries) Then
                 Return BuildEvidenceFromEntries(
                     sourceType:=HashSourceType.FilePath,
-                    label:=Global.System.IO.Path.GetFileName(path),
+                    label:=IO.Path.GetFileName(path),
                     detectedType:=detectedType,
                     compressedBytes:=fileBytes,
                     entries:=entries,
@@ -48,22 +85,61 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Return BuildEvidenceFromRawPayload(
                 sourceType:=HashSourceType.FilePath,
-                label:=Global.System.IO.Path.GetFileName(path),
+                label:=IO.Path.GetFileName(path),
                 detectedType:=detectedType,
                 payload:=fileBytes,
                 hashOptions:=normalizedOptions,
                 notes:="Raw payload hashed directly.")
         End Function
 
-        Public Shared Function HashBytes(data As Byte()) As HashEvidence
+        ''' <summary>
+        '''     Erstellt einen deterministischen Hash-Nachweis für Rohbytes mit Standardlabel.
+        ''' </summary>
+        ''' <remarks>
+        '''     Delegiert auf die Überladung mit Label und expliziten Hashoptionen.
+        ''' </remarks>
+        ''' <param name="data">Zu hashende Rohbytes.</param>
+        ''' <returns>Hash-Evidence; bei Fehlern ein fail-closed Nachweisobjekt mit Fehlerhinweis.</returns>
+        Public Shared Function HashBytes _
+            (
+                data As Byte()
+            ) As HashEvidence
             Return HashBytes(data, DefaultPayloadLabel, options:=Nothing)
         End Function
 
-        Public Shared Function HashBytes(data As Byte(), label As String) As HashEvidence
+        ''' <summary>
+        '''     Erstellt einen deterministischen Hash-Nachweis für Rohbytes mit benutzerdefiniertem Label.
+        ''' </summary>
+        ''' <remarks>
+        '''     Delegiert auf die Überladung mit expliziten Hashoptionen.
+        ''' </remarks>
+        ''' <param name="data">Zu hashende Rohbytes.</param>
+        ''' <param name="label">Fachliches Label für den Nachweis.</param>
+        ''' <returns>Hash-Evidence; bei Fehlern ein fail-closed Nachweisobjekt mit Fehlerhinweis.</returns>
+        Public Shared Function HashBytes _
+            (
+                data As Byte(),
+                label As String
+            ) As HashEvidence
             Return HashBytes(data, label, options:=Nothing)
         End Function
 
-        Public Shared Function HashBytes(data As Byte(), label As String, options As HashOptions) _
+        ''' <summary>
+        '''     Erstellt einen deterministischen Hash-Nachweis für Rohbytes.
+        ''' </summary>
+        ''' <remarks>
+        '''     Die Eingabe wird gegen globale Größenlimits geprüft und anschließend als Archiv- oder Rohpayload verarbeitet.
+        ''' </remarks>
+        ''' <param name="data">Zu hashende Rohbytes.</param>
+        ''' <param name="label">Fachliches Label für den Nachweis.</param>
+        ''' <param name="options">Optionale Hashparameter; bei <c>Nothing</c> werden globale Defaults verwendet.</param>
+        ''' <returns>Hash-Evidence; bei Fehlern ein fail-closed Nachweisobjekt mit Fehlerhinweis.</returns>
+        Public Shared Function HashBytes _
+            (
+                data As Byte(),
+                label As String,
+                options As HashOptions
+            ) _
             As HashEvidence
             Dim detectorOptions = FileTypeOptions.GetSnapshot()
             Dim normalizedOptions = ResolveHashOptions(detectorOptions, options)
@@ -100,17 +176,55 @@ Namespace Global.Tomtastisch.FileClassifier
                 notes:="Raw payload hashed directly.")
         End Function
 
-        Public Shared Function HashEntries(entries As IReadOnlyList(Of ZipExtractedEntry)) As HashEvidence
+        ''' <summary>
+        '''     Erstellt einen deterministischen Hash-Nachweis aus extrahierten Archiveinträgen mit Standardlabel.
+        ''' </summary>
+        ''' <remarks>
+        '''     Delegiert auf die Überladung mit Label und expliziten Hashoptionen.
+        ''' </remarks>
+        ''' <param name="entries">Read-only Liste normalisierbarer Archiveinträge.</param>
+        ''' <returns>Hash-Evidence; bei Fehlern ein fail-closed Nachweisobjekt mit Fehlerhinweis.</returns>
+        Public Shared Function HashEntries _
+            (
+                entries As IReadOnlyList(Of ZipExtractedEntry)
+            ) As HashEvidence
             Return HashEntries(entries, "archive-entries", options:=Nothing)
         End Function
 
-        Public Shared Function HashEntries(entries As IReadOnlyList(Of ZipExtractedEntry), label As String) _
+        ''' <summary>
+        '''     Erstellt einen deterministischen Hash-Nachweis aus extrahierten Archiveinträgen mit benutzerdefiniertem Label.
+        ''' </summary>
+        ''' <remarks>
+        '''     Delegiert auf die Überladung mit expliziten Hashoptionen.
+        ''' </remarks>
+        ''' <param name="entries">Read-only Liste normalisierbarer Archiveinträge.</param>
+        ''' <param name="label">Fachliches Label für den Nachweis.</param>
+        ''' <returns>Hash-Evidence; bei Fehlern ein fail-closed Nachweisobjekt mit Fehlerhinweis.</returns>
+        Public Shared Function HashEntries _
+            (
+                entries As IReadOnlyList(Of ZipExtractedEntry),
+                label As String
+            ) _
             As HashEvidence
             Return HashEntries(entries, label, options:=Nothing)
         End Function
 
-        Public Shared Function HashEntries(entries As IReadOnlyList(Of ZipExtractedEntry), label As String,
-                                           options As HashOptions) As HashEvidence
+        ''' <summary>
+        '''     Erstellt einen deterministischen Hash-Nachweis aus extrahierten Archiveinträgen.
+        ''' </summary>
+        ''' <remarks>
+        '''     Entry-Pfade und -Inhalte werden vor der Manifestbildung normalisiert, dedupliziert und deterministisch sortiert.
+        ''' </remarks>
+        ''' <param name="entries">Read-only Liste normalisierbarer Archiveinträge.</param>
+        ''' <param name="label">Fachliches Label für den Nachweis.</param>
+        ''' <param name="options">Optionale Hashparameter; bei <c>Nothing</c> werden globale Defaults verwendet.</param>
+        ''' <returns>Hash-Evidence; bei Fehlern ein fail-closed Nachweisobjekt mit Fehlerhinweis.</returns>
+        Public Shared Function HashEntries _
+            (
+                entries As IReadOnlyList(Of ZipExtractedEntry),
+                label As String,
+                options As HashOptions
+            ) As HashEvidence
             Dim projectOptions = FileTypeOptions.GetSnapshot()
             Dim normalizedOptions = ResolveHashOptions(projectOptions, options)
             Return BuildEvidenceFromEntries(
@@ -123,16 +237,49 @@ Namespace Global.Tomtastisch.FileClassifier
                 notes:="Entries hashed via canonical manifest.")
         End Function
 
-        Public Shared Function VerifyRoundTrip(path As String) As HashRoundTripReport
+        ''' <summary>
+        '''     Führt den deterministischen h1-h4-RoundTrip mit Standard-Hashoptionen aus.
+        ''' </summary>
+        ''' <remarks>
+        '''     Delegiert auf die Überladung mit expliziten Hashoptionen.
+        ''' </remarks>
+        ''' <param name="path">Pfad zur Eingabedatei.</param>
+        ''' <returns>RoundTrip-Bericht mit Konsistenzkennzahlen und Notes.</returns>
+        Public Shared Function VerifyRoundTrip _
+            (
+                path As String
+            ) As HashRoundTripReport
             Return VerifyRoundTrip(path, options:=Nothing)
         End Function
 
-        Public Shared Function VerifyRoundTrip(path As String, options As HashOptions) _
+        ''' <summary>
+        '''     Führt den deterministischen h1-h4-RoundTrip aus und bewertet logische sowie physische Konsistenz.
+        ''' </summary>
+        ''' <remarks>
+        '''     <para>
+        '''         Ablauf:
+        '''         1) h1: Hash des Eingabeobjekts,
+        '''         2) h2: Hash der kanonischen Archivsicht bzw. der Originalbytes,
+        '''         3) h3: Hash der logisch kanonisierten Bytes,
+        '''         4) h4: Hash nach Materialisierung der kanonischen Bytes.
+        '''     </para>
+        '''     <para>
+        '''         Fehler werden fail-closed als Bericht mit Fehler-Evidence zurückgegeben.
+        '''     </para>
+        ''' </remarks>
+        ''' <param name="path">Pfad zur Eingabedatei.</param>
+        ''' <param name="options">Optionale Hashparameter; bei <c>Nothing</c> werden globale Defaults verwendet.</param>
+        ''' <returns>RoundTrip-Bericht mit Konsistenzkennzahlen und Notes.</returns>
+        Public Shared Function VerifyRoundTrip _
+            (
+                path As String,
+                options As HashOptions
+            ) _
             As HashRoundTripReport
             Dim detectorOptions = FileTypeOptions.GetSnapshot()
             Dim normalizedOptions = ResolveHashOptions(detectorOptions, options)
 
-            If String.IsNullOrWhiteSpace(path) OrElse Not Global.System.IO.File.Exists(path) Then
+            If String.IsNullOrWhiteSpace(path) OrElse Not IO.File.Exists(path) Then
                 Dim failed = HashEvidence.CreateFailure(HashSourceType.FilePath, path, "Datei nicht gefunden.")
                 Return _
                     New HashRoundTripReport(path, isArchiveInput:=False, h1:=failed, h2:=failed, h3:=failed, h4:=failed,
@@ -184,44 +331,67 @@ Namespace Global.Tomtastisch.FileClassifier
                 hashOptions:=normalizedOptions,
                 notes:="Canonical logical bytes hashed directly.")
 
-            Dim h4 As HashEvidence =
-                    HashEvidence.CreateFailure(HashSourceType.MaterializedFile, "roundtrip-h4-file",
-                                               "Materialization failed.")
-            Dim roundTripTempRoot = Global.System.IO.Path.Combine(Global.System.IO.Path.GetTempPath(),
-                                                    "ftd-roundtrip-" &
-                                                    Guid.NewGuid().ToString("N", Global.System.Globalization.CultureInfo.InvariantCulture))
+            Dim h4 As HashEvidence = HashEvidence.CreateFailure(
+                    HashSourceType.MaterializedFile,
+                    "roundtrip-h4-file",
+                    "Materialization failed."
+                )
+
+            Dim roundTripTempRoot = IO.Path.Combine(
+                    IO.Path.GetTempPath(),
+                    "ftd-roundtrip-" &
+                    Guid.NewGuid().ToString("N", Globalization.CultureInfo.InvariantCulture)
+                )
+
             Try
-                Global.System.IO.Directory.CreateDirectory(roundTripTempRoot)
-                Dim targetFile = Global.System.IO.Path.Combine(roundTripTempRoot,
-                                                 NormalizeLabel(normalizedOptions.MaterializedFileName))
+                IO.Directory.CreateDirectory(roundTripTempRoot)
+                Dim targetFile = IO.Path.Combine(
+                        roundTripTempRoot,
+                        NormalizeLabel(normalizedOptions.MaterializedFileName)
+                    )
+
                 If FileMaterializer.Persist(canonicalBytes, targetFile, overwrite:=False, secureExtract:=False) Then
                     h4 = HashFile(targetFile, normalizedOptions)
                 End If
+
             Finally
                 Try
-                    If Global.System.IO.Directory.Exists(roundTripTempRoot) Then
-                        Global.System.IO.Directory.Delete(roundTripTempRoot, recursive:=True)
+                    If IO.Directory.Exists(roundTripTempRoot) Then
+                        IO.Directory.Delete(roundTripTempRoot, recursive:=True)
                     End If
-                Catch
+
+                Catch ex As Exception When _
+                    TypeOf ex Is UnauthorizedAccessException OrElse
+                    TypeOf ex Is System.Security.SecurityException OrElse
+                    TypeOf ex Is IO.IOException OrElse
+                    TypeOf ex Is NotSupportedException OrElse
+                    TypeOf ex Is ArgumentException
+                Catch ex As Exception
                 End Try
             End Try
 
-            Dim notes =
-                    If(isArchiveInput, "Archive roundtrip (h1-h4) executed.", "Raw file roundtrip (h1-h4) executed.")
+            Dim notes = If(
+                    isArchiveInput,
+                    "Archive roundtrip (h1-h4) executed.",
+                    "Raw file roundtrip (h1-h4) executed."
+                )
+
             Return New HashRoundTripReport(path, isArchiveInput, h1, h2, h3, h4, notes)
         End Function
 
         Private Shared Function BuildEvidenceFromEntries(
-                                                         sourceType As HashSourceType,
-                                                         label As String,
-                                                         detectedType As FileType,
-                                                         compressedBytes As Byte(),
-                                                         entries As IReadOnlyList(Of ZipExtractedEntry),
-                                                         hashOptions As HashOptions,
-                                                         notes As String
-                                                         ) As HashEvidence
+                                                     sourceType As HashSourceType,
+                                                     label As String,
+                                                     detectedType As FileType,
+                                                     compressedBytes As Byte(),
+                                                     entries As IReadOnlyList(Of ZipExtractedEntry),
+                                                     hashOptions As HashOptions,
+                                                     notes As String
+                                                 ) As HashEvidence
+
             Dim normalizedEntries As List(Of NormalizedEntry) = Nothing
             Dim normalizeError As String = String.Empty
+
             If Not TryNormalizeEntries(entries, normalizedEntries, normalizeError) Then
                 Return HashEvidence.CreateFailure(sourceType, label, normalizeError)
             End If
@@ -237,6 +407,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim secureNote = String.Empty
             Dim hmacKey As Byte() = Array.Empty(Of Byte)()
             Dim hasHmacKey = False
+
             If hashOptions IsNot Nothing AndAlso hashOptions.IncludeSecureHash Then
                 hasHmacKey = TryResolveHmacKey(hmacKey, secureNote)
                 If hasHmacKey Then
@@ -294,13 +465,14 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function BuildEvidenceFromRawPayload(
-                                                            sourceType As HashSourceType,
-                                                            label As String,
-                                                            detectedType As FileType,
-                                                            payload As Byte(),
-                                                            hashOptions As HashOptions,
-                                                            notes As String
+                                                                sourceType As HashSourceType,
+                                                                label As String,
+                                                                detectedType As FileType,
+                                                                payload As Byte(),
+                                                                hashOptions As HashOptions,
+                                                                notes As String
                                                             ) As HashEvidence
+
             Dim safePayload = If(payload, Array.Empty(Of Byte)())
             Dim physicalSha = ComputeSha256Hex(safePayload)
             Dim logicalSha = physicalSha
@@ -393,16 +565,16 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function BuildLogicalManifestBytes(entries As IReadOnlyList(Of NormalizedEntry)) As Byte()
-            Using ms As New Global.System.IO.MemoryStream()
-                Using writer As New Global.System.IO.BinaryWriter(ms, Global.System.Text.Encoding.UTF8, leaveOpen:=True)
-                    Dim versionBytes = Global.System.Text.Encoding.UTF8.GetBytes(LogicalManifestVersion)
+            Using ms As New IO.MemoryStream()
+                Using writer As New IO.BinaryWriter(ms, Text.Encoding.UTF8, leaveOpen:=True)
+                    Dim versionBytes = Text.Encoding.UTF8.GetBytes(LogicalManifestVersion)
                     writer.Write(versionBytes.Length)
                     writer.Write(versionBytes)
                     writer.Write(entries.Count)
 
                     For Each entry In entries
-                        Dim pathBytes = Global.System.Text.Encoding.UTF8.GetBytes(entry.RelativePath)
-                        Dim contentHash = Global.System.Security.Cryptography.SHA256.HashData(entry.Content)
+                        Dim pathBytes = Text.Encoding.UTF8.GetBytes(entry.RelativePath)
+                        Dim contentHash = Security.Cryptography.SHA256.HashData(entry.Content)
                         writer.Write(pathBytes.Length)
                         writer.Write(pathBytes)
                         writer.Write(CLng(entry.Content.LongLength))
@@ -416,7 +588,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function ComputeSha256Hex(payload As Byte()) As String
             Dim data = If(payload, Array.Empty(Of Byte)())
-            Return Convert.ToHexString(Global.System.Security.Cryptography.SHA256.HashData(data)).ToLowerInvariant()
+            Return Convert.ToHexString(Security.Cryptography.SHA256.HashData(data)).ToLowerInvariant()
         End Function
 
         Private Shared Function TryResolveHmacKey(ByRef key As Byte(), ByRef note As String) As Boolean
@@ -437,7 +609,13 @@ Namespace Global.Tomtastisch.FileClassifier
                     Return False
                 End If
                 Return True
-            Catch
+            Catch ex As Exception When _
+                TypeOf ex Is FormatException OrElse
+                TypeOf ex Is ArgumentException
+                key = Array.Empty(Of Byte)()
+                note = $"Secure hashing requested but env var '{HmacKeyEnvVarB64}' is invalid Base64; HMAC digests omitted."
+                Return False
+            Catch ex As Exception
                 key = Array.Empty(Of Byte)()
                 note = $"Secure hashing requested but env var '{HmacKeyEnvVarB64}' is invalid Base64; HMAC digests omitted."
                 Return False
@@ -447,7 +625,7 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Shared Function ComputeHmacSha256Hex(key As Byte(), payload As Byte()) As String
             Dim safeKey = If(key, Array.Empty(Of Byte)())
             Dim data = If(payload, Array.Empty(Of Byte)())
-            Using hmac As New Global.System.Security.Cryptography.HMACSHA256(safeKey)
+            Using hmac As New Security.Cryptography.HMACSHA256(safeKey)
                 Return Convert.ToHexString(hmac.ComputeHash(data)).ToLowerInvariant()
             End Using
         End Function
@@ -455,8 +633,8 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Shared Function ComputeFastHash(payload As Byte(), options As HashOptions) As String
             If options Is Nothing OrElse Not options.IncludeFastHash Then Return String.Empty
             Dim data = If(payload, Array.Empty(Of Byte)())
-            Dim value = Global.System.IO.Hashing.XxHash3.HashToUInt64(data)
-            Return value.ToString("x16", Global.System.Globalization.CultureInfo.InvariantCulture)
+            Dim value = IO.Hashing.XxHash3.HashToUInt64(data)
+            Return value.ToString("x16", Globalization.CultureInfo.InvariantCulture)
         End Function
 
         Private Shared Function AppendNoteIfAny(baseNotes As String, toAppend As String) As String
@@ -503,7 +681,7 @@ Namespace Global.Tomtastisch.FileClassifier
             End If
 
             Try
-                Dim fi As New Global.System.IO.FileInfo(path)
+                Dim fi As New IO.FileInfo(path)
                 If Not fi.Exists Then
                     errorMessage = "Datei existiert nicht."
                     Return False
@@ -516,25 +694,21 @@ Namespace Global.Tomtastisch.FileClassifier
 
                 Using _
                     fs As _
-                        New Global.System.IO.FileStream(path, Global.System.IO.FileMode.Open, Global.System.IO.FileAccess.Read, Global.System.IO.FileShare.Read,
-                                       InternalIoDefaults.FileStreamBufferSize, Global.System.IO.FileOptions.SequentialScan)
-                    Using ms As New Global.System.IO.MemoryStream(CInt(Math.Min(Math.Max(fi.Length, 0), Integer.MaxValue)))
+                        New IO.FileStream(path, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read,
+                                       InternalIoDefaults.FileStreamBufferSize, IO.FileOptions.SequentialScan)
+                    Using ms As New IO.MemoryStream(CInt(Math.Min(Math.Max(fi.Length, 0), Integer.MaxValue)))
                         StreamBounds.CopyBounded(fs, ms, detectorOptions.MaxBytes)
                         bytes = ms.ToArray()
                     End Using
                 End Using
                 Return True
-            Catch ex As UnauthorizedAccessException
-                Return SetReadFileError(ex, errorMessage)
-            Catch ex As System.Security.SecurityException
-                Return SetReadFileError(ex, errorMessage)
-            Catch ex As Global.System.IO.IOException
-                Return SetReadFileError(ex, errorMessage)
-            Catch ex As Global.System.IO.InvalidDataException
-                Return SetReadFileError(ex, errorMessage)
-            Catch ex As NotSupportedException
-                Return SetReadFileError(ex, errorMessage)
-            Catch ex As ArgumentException
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is IO.IOException OrElse
+                TypeOf ex Is IO.InvalidDataException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException
                 Return SetReadFileError(ex, errorMessage)
             End Try
         End Function

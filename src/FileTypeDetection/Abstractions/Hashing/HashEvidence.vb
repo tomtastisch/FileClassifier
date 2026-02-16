@@ -3,18 +3,61 @@ Option Explicit On
 
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
-    '''     Nachweisobjekt fuer einen deterministischen Hash-Schritt.
+    '''     Nachweisobjekt für einen deterministischen Hash-Schritt.
     ''' </summary>
+    ''' <remarks>
+    '''     Das Objekt kapselt Herkunft, Typkontext, optionale Payloadkopien, Digest-Satz sowie ergänzende Notes in
+    '''     unveränderlicher Form für externe Auswertung.
+    ''' </remarks>
     Public NotInheritable Class HashEvidence
+        ''' <summary>
+        '''     Herkunftskanal des Nachweises.
+        ''' </summary>
         Public ReadOnly Property SourceType As HashSourceType
+
+        ''' <summary>
+        '''     Fachliches Label der Eingabequelle.
+        ''' </summary>
         Public ReadOnly Property Label As String
+
+        ''' <summary>
+        '''     Ermittelter Dateitypkontext für den Nachweis.
+        ''' </summary>
         Public ReadOnly Property DetectedType As FileType
+
+        ''' <summary>
+        '''     Optionaler Beispiel-Entry bei archivbasierten Nachweisen.
+        ''' </summary>
         Public ReadOnly Property Entry As ZipExtractedEntry
+
+        ''' <summary>
+        '''     Optional mitgeführte komprimierte Bytes.
+        ''' </summary>
         Public ReadOnly Property CompressedBytes As Global.System.Collections.Immutable.ImmutableArray(Of Byte)
+
+        ''' <summary>
+        '''     Optional mitgeführte unkomprimierte bzw. logische Bytes.
+        ''' </summary>
         Public ReadOnly Property UncompressedBytes As Global.System.Collections.Immutable.ImmutableArray(Of Byte)
+
+        ''' <summary>
+        '''     Anzahl berücksichtigter Entries im Nachweis.
+        ''' </summary>
         Public ReadOnly Property EntryCount As Integer
+
+        ''' <summary>
+        '''     Gesamtgröße unkomprimierter Nutzdaten in Bytes.
+        ''' </summary>
         Public ReadOnly Property TotalUncompressedBytes As Long
+
+        ''' <summary>
+        '''     Deterministischer Digest-Satz des Nachweises.
+        ''' </summary>
         Public ReadOnly Property Digests As HashDigestSet
+
+        ''' <summary>
+        '''     Ergänzende Hinweise, z. B. zu Fehlern oder Sicherheitsaspekten.
+        ''' </summary>
         Public ReadOnly Property Notes As String
 
         Friend Sub New(

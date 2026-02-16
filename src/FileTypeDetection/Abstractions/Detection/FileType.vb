@@ -5,13 +5,18 @@ Imports System.Collections.Immutable
 
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
-    '''     Unveränderliches Wertobjekt für einen Dateityp.
-    '''     SSOT-Regel:
-    '''     - Instanzen werden zentral in FileTypeRegistry aufgebaut.
-    '''     - Aufrufer sollen keine ad-hoc FileType-Objekte erstellen.
+    '''     Unveränderliches Wertobjekt, das einen aufgelösten Dateityp einschließlich Metadaten beschreibt.
     ''' </summary>
+    ''' <remarks>
+    '''     <para>
+    '''         SSOT-Regel: Instanzen werden zentral über <c>FileTypeRegistry</c> aufgebaut.
+    '''     </para>
+    '''     <para>
+    '''         Konsumenten erhalten ein stabiles, read-only API-Modell mit kanonischer Endung, MIME und Aliasmenge.
+    '''     </para>
+    ''' </remarks>
     Public NotInheritable Class FileType
-        ''' <summary>Enum-Schluessel des Typs.</summary>
+        ''' <summary>Enum-Schlüssel des Typs.</summary>
         Public ReadOnly Property Kind As FileKind
 
         ''' <summary>Kanonische Endung inklusive Punkt, bei Unknown leer.</summary>
@@ -26,7 +31,7 @@ Namespace Global.Tomtastisch.FileClassifier
         Public ReadOnly Property Allowed As Boolean
 
         ''' <summary>
-        '''     Normalisierte Alias-Liste (ohne fuehrenden Punkt, dedupliziert).
+        '''     Normalisierte Alias-Liste (ohne führenden Punkt, dedupliziert).
         ''' </summary>
         Public ReadOnly Property Aliases As ImmutableArray(Of String)
 
@@ -54,6 +59,10 @@ Namespace Global.Tomtastisch.FileClassifier
             End If
         End Sub
 
+        ''' <summary>
+        '''     Liefert die textuelle Repräsentation des Dateityps auf Basis des Enum-Schlüssels.
+        ''' </summary>
+        ''' <returns>String-Repräsentation des Feldes <see cref="Kind"/>.</returns>
         Public Overrides Function ToString() As String
             Return Kind.ToString()
         End Function

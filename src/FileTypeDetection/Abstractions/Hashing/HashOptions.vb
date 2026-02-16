@@ -3,28 +3,32 @@ Option Explicit On
 
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
-    '''     Steuerung fuer deterministic hashing APIs.
+    '''     Konfiguriert das Verhalten der öffentlichen deterministischen Hashing-APIs.
     ''' </summary>
+    ''' <remarks>
+    '''     Die Optionen steuern, welche Digest-Arten berechnet und welche Payloadkopien in Evidence-Objekten mitgeführt werden.
+    '''     Ungültige Dateinamen für Materialisierung werden intern auf einen sicheren Standardwert normalisiert.
+    ''' </remarks>
     Public NotInheritable Class HashOptions
         ''' <summary>
-        '''     Wenn True, werden komprimierte und unkomprimierte Bytes in Evidence als Kopie mitgefuehrt.
+        '''     Wenn True, werden komprimierte und unkomprimierte Bytes in Evidence als Kopie mitgeführt.
         ''' </summary>
         Public Property IncludePayloadCopies As Boolean = False
 
         ''' <summary>
-        '''     Wenn True, wird zusaetzlich ein schneller XxHash3-Digest berechnet.
+        '''     Wenn True, wird zusätzlich ein schneller XxHash3-Digest berechnet.
         ''' </summary>
         Public Property IncludeFastHash As Boolean = True
 
         ''' <summary>
-        '''     Wenn True, wird zusaetzlich ein optionaler HMAC-SHA256 Digest berechnet (keyed).
+        '''     Wenn True, wird zusätzlich ein optionaler HMAC-SHA256 Digest berechnet (keyed).
         '''     Der Key wird aus der Environment Variable 'FILECLASSIFIER_HMAC_KEY_B64' gelesen.
-        '''     Wenn der Key fehlt oder ungueltig ist, werden HMAC-Digests leer gelassen und Notes ergaenzt.
+        '''     Wenn der Key fehlt oder ungültig ist, werden HMAC-Digests leer gelassen und Notes ergänzt.
         ''' </summary>
         Public Property IncludeSecureHash As Boolean = False
 
         ''' <summary>
-        '''     Dateiname fuer den Materialisierungs-Schritt im RoundTrip-Report.
+        '''     Dateiname für den Materialisierungs-Schritt im RoundTrip-Report.
         ''' </summary>
         Public Property MaterializedFileName As String = "deterministic-roundtrip.bin"
 
