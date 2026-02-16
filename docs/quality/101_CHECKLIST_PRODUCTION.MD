@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](001_CHECKLIST_PRODUCTION.MD) | [EN](101_CHECKLIST_PRODUCTION.MD)
+<!-- LANG_SWITCH:END -->
+
 # Production Readiness Checklist - FileTypeDetection
 
 ## 1. Build and Test Gate

@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](008_INCIDENT_RESPONSE_RUNBOOK.MD) | [EN](108_INCIDENT_RESPONSE_RUNBOOK.MD)
+<!-- LANG_SWITCH:END -->
+
 # Incident-Response-Runbook
 
 ## 1. Trigger Events

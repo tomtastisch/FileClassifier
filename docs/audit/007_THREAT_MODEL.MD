@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](007_THREAT_MODEL.MD) | [EN](107_THREAT_MODEL.MD)
+<!-- LANG_SWITCH:END -->
+
 # Threat Model
 
 ## 1. Zweck und Scope

@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](002_HISTORY_VERSIONS.MD) | [EN](102_HISTORY_VERSIONS.MD)
+<!-- LANG_SWITCH:END -->
+
 # Version Line (Commit -> Version)
 
 This table is derived from the commit history based on the policy in

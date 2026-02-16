@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](001_POLICY_VERSIONING.MD) | [EN](101_POLICY_VERSIONING.MD)
+<!-- LANG_SWITCH:END -->
+
 # Versioning and Release Policy (SSOT)
 
 ## 1. Purpose

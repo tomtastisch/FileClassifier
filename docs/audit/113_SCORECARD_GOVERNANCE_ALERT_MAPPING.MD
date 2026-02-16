@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](013_SCORECARD_GOVERNANCE_ALERT_MAPPING.MD) | [EN](113_SCORECARD_GOVERNANCE_ALERT_MAPPING.MD)
+<!-- LANG_SWITCH:END -->
+
 # Scorecard Governance Alert Mapping (Ruleset/Process)
 
 As of: 2026-02-13

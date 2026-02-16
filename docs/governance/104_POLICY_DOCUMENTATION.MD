@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](004_POLICY_DOCUMENTATION.MD) | [EN](104_POLICY_DOCUMENTATION.MD)
+<!-- LANG_SWITCH:END -->
+
 # Documentation Standard (SSOT)
 
 ## 1. Purpose

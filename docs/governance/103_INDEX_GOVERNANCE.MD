@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](003_INDEX_GOVERNANCE.MD) | [EN](103_INDEX_GOVERNANCE.MD)
+<!-- LANG_SWITCH:END -->
+
 # Policy Index (SSOT Navigation)
 
 This index is non-normative. Normative policy definitions are the rule files under `tools/ci/policies/rules/`.

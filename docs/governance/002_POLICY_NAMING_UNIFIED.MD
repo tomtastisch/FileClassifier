@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](002_POLICY_NAMING_UNIFIED.MD) | [EN](102_POLICY_NAMING_UNIFIED.MD)
+<!-- LANG_SWITCH:END -->
+
 # Unified Naming Policy (SSOT)
 
 ## 1. Purpose

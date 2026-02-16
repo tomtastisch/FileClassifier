@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](005_POLICY_NAMING.MD) | [EN](105_POLICY_NAMING.MD)
+<!-- LANG_SWITCH:END -->
+
 # Naming Policy (SNT Level 3)
 
 ## 1. Ziel und Geltungsbereich

@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](015_DOC_BILINGUAL_MAPPING.MD) | [EN](115_DOC_BILINGUAL_MAPPING.MD)
+<!-- LANG_SWITCH:END -->
+
 # Bilingual Documentation: DE<->EN Mapping (0NN_ -> 1NN_)
 
 ## 1. Goal & Scope

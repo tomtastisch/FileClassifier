@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](003_CHANGELOG_RELEASES.MD) | [EN](103_CHANGELOG_RELEASES.MD)
+<!-- LANG_SWITCH:END -->
+
 # Changelog
 
 Alle Aenderungen werden hier technisch dokumentiert. Die Release-Version selbst ist

@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](020_ARCH_CORE.MD) | [EN](120_ARCH_CORE.MD)
+<!-- LANG_SWITCH:END -->
+
 # 02 - Overall Architecture and Execution Flows
 
 ## 1. Purpose and Scope

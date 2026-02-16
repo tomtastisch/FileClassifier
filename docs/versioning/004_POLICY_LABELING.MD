@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](004_POLICY_LABELING.MD) | [EN](104_POLICY_LABELING.MD)
+<!-- LANG_SWITCH:END -->
+
 # Auto-Labeling und Auto-Versionierung (SSOT)
 
 ## 1. Zweck

@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](014_EVIDENCE_REPORT_ISSUE_67.MD) | [EN](114_EVIDENCE_REPORT_ISSUE_67.MD)
+<!-- LANG_SWITCH:END -->
+
 # Evidence Report — Issue #67 (Full Refactor & Production-Readiness Hardening)
 
 ## 1. Goal / Scope

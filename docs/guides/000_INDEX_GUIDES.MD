@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](000_INDEX_GUIDES.MD) | [EN](100_INDEX_GUIDES.MD)
+<!-- LANG_SWITCH:END -->
+
 # Guides - Change Playbooks
 
 ## 1. Zweck

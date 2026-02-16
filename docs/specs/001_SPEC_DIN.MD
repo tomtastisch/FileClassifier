@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](001_SPEC_DIN.MD) | [EN](101_SPEC_DIN.MD)
+<!-- LANG_SWITCH:END -->
+
 # DIN-orientierte Spezifikation (DE) - FileTypeDetection
 
 ## 1. Dokumentenlenkung

@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](000_HASHING_BASELINE.MD) | [EN](100_HASHING_BASELINE.MD)
+<!-- LANG_SWITCH:END -->
+
 # Hashing Baseline Evidence (Historical Snapshot: pre EvidenceHashing rename)
 
 Date captured: 2026-02-10

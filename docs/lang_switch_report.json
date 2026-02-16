@@ -1,0 +1,935 @@
+{
+  "summary": {
+    "total_files": 102,
+    "changed_files": 102,
+    "ok": 102,
+    "missing_counterpart": 0,
+    "needs_map": 0
+  },
+  "changed_files": [
+    "docs/001_INDEX_CORE.MD",
+    "docs/010_API_CORE.MD",
+    "docs/020_ARCH_CORE.MD",
+    "docs/021_USAGE_NUGET.MD",
+    "docs/101_INDEX_CORE.MD",
+    "docs/110_API_CORE.MD",
+    "docs/120_ARCH_CORE.MD",
+    "docs/121_USAGE_NUGET.MD",
+    "docs/audit/000_HASHING_BASELINE.MD",
+    "docs/audit/000_INDEX.MD",
+    "docs/audit/002_AUDIT_CONTRACT_AND_GUARDRAILS.MD",
+    "docs/audit/003_SECURITY_ASSERTION_TRACEABILITY.MD",
+    "docs/audit/004_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD",
+    "docs/audit/005_CODE_ANALYSIS_METHOD.MD",
+    "docs/audit/006_CODE_REVIEW_FINDINGS.MD",
+    "docs/audit/007_THREAT_MODEL.MD",
+    "docs/audit/008_INCIDENT_RESPONSE_RUNBOOK.MD",
+    "docs/audit/009_SUPPLY_CHAIN_BASELINE.MD",
+    "docs/audit/010_REFACTOR_BACKLOG.MD",
+    "docs/audit/011_SECURITY_BENCHMARK.MD",
+    "docs/audit/012_WAVE_EXECUTION_DOD.MD",
+    "docs/audit/013_SCORECARD_GOVERNANCE_ALERT_MAPPING.MD",
+    "docs/audit/014_EVIDENCE_REPORT_ISSUE_67.MD",
+    "docs/audit/015_DOC_BILINGUAL_MAPPING.MD",
+    "docs/audit/100_HASHING_BASELINE.MD",
+    "docs/audit/100_INDEX.MD",
+    "docs/audit/102_AUDIT_CONTRACT_AND_GUARDRAILS.MD",
+    "docs/audit/103_SECURITY_ASSERTION_TRACEABILITY.MD",
+    "docs/audit/104_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD",
+    "docs/audit/105_CODE_ANALYSIS_METHOD.MD",
+    "docs/audit/106_CODE_REVIEW_FINDINGS.MD",
+    "docs/audit/107_THREAT_MODEL.MD",
+    "docs/audit/108_INCIDENT_RESPONSE_RUNBOOK.MD",
+    "docs/audit/109_SUPPLY_CHAIN_BASELINE.MD",
+    "docs/audit/110_REFACTOR_BACKLOG.MD",
+    "docs/audit/111_SECURITY_BENCHMARK.MD",
+    "docs/audit/112_WAVE_EXECUTION_DOD.MD",
+    "docs/audit/113_SCORECARD_GOVERNANCE_ALERT_MAPPING.MD",
+    "docs/audit/114_EVIDENCE_REPORT_ISSUE_67.MD",
+    "docs/audit/115_DOC_BILINGUAL_MAPPING.MD",
+    "docs/ci/001_PIPELINE_CI.MD",
+    "docs/ci/002_NUGET_TRUSTED_PUBLISHING.MD",
+    "docs/ci/101_PIPELINE_CI.MD",
+    "docs/ci/102_NUGET_TRUSTED_PUBLISHING.MD",
+    "docs/contracts/001_CONTRACT_HASHING.MD",
+    "docs/contracts/101_CONTRACT_HASHING.MD",
+    "docs/governance/001_POLICY_CI.MD",
+    "docs/governance/002_POLICY_LABELING.MD",
+    "docs/governance/002_POLICY_NAMING_UNIFIED.MD",
+    "docs/governance/003_INDEX_GOVERNANCE.MD",
+    "docs/governance/003_POLICY_VERSIONING_SVT.MD",
+    "docs/governance/004_POLICY_DOCUMENTATION.MD",
+    "docs/governance/005_POLICY_NAMING.MD",
+    "docs/governance/006_INDEX_CI_RULES.MD",
+    "docs/governance/007_POLICY_BRANCH_PR_NAMING_DE.MD",
+    "docs/governance/101_POLICY_CI.MD",
+    "docs/governance/102_POLICY_LABELING.MD",
+    "docs/governance/102_POLICY_NAMING_UNIFIED.MD",
+    "docs/governance/103_INDEX_GOVERNANCE.MD",
+    "docs/governance/103_POLICY_VERSIONING_SVT.MD",
+    "docs/governance/104_POLICY_DOCUMENTATION.MD",
+    "docs/governance/105_POLICY_NAMING.MD",
+    "docs/governance/106_INDEX_CI_RULES.MD",
+    "docs/governance/107_POLICY_BRANCH_PR_NAMING_DE.MD",
+    "docs/guides/000_INDEX_GUIDES.MD",
+    "docs/guides/001_GUIDE_OPTIONS.MD",
+    "docs/guides/002_GUIDE_DATATYPE.MD",
+    "docs/guides/003_GUIDE_PORTABLE.MD",
+    "docs/guides/004_GUIDE_MIGRATE_LEGACY_NUGET.MD",
+    "docs/guides/100_INDEX_GUIDES.MD",
+    "docs/guides/101_GUIDE_OPTIONS.MD",
+    "docs/guides/102_GUIDE_DATATYPE.MD",
+    "docs/guides/103_GUIDE_PORTABLE.MD",
+    "docs/guides/104_GUIDE_MIGRATE_LEGACY_NUGET.MD",
+    "docs/migrations/001_HASHING_RENAME.MD",
+    "docs/migrations/101_HASHING_RENAME.MD",
+    "docs/quality/001_CHECKLIST_PRODUCTION.MD",
+    "docs/quality/101_CHECKLIST_PRODUCTION.MD",
+    "docs/references/001_REFERENCES_CORE.MD",
+    "docs/references/101_REFERENCES_CORE.MD",
+    "docs/secure/001_HMAC_KEY_SETUP.MD",
+    "docs/secure/101_HMAC_KEY_SETUP.MD",
+    "docs/security/010_CODEQL_DEFAULT_SETUP_GUARDRAIL.MD",
+    "docs/security/110_CODEQL_DEFAULT_SETUP_GUARDRAIL.MD",
+    "docs/specs/001_SPEC_DIN.MD",
+    "docs/specs/101_SPEC_DIN.MD",
+    "docs/verification/001_INDEX_TESTS.MD",
+    "docs/verification/002_FLOW_BDD.MD",
+    "docs/verification/003_CATALOG_BDD.MD",
+    "docs/verification/004_MATRIX_HASHING.MD",
+    "docs/verification/101_INDEX_TESTS.MD",
+    "docs/verification/102_FLOW_BDD.MD",
+    "docs/verification/103_CATALOG_BDD.MD",
+    "docs/verification/104_MATRIX_HASHING.MD",
+    "docs/versioning/001_POLICY_VERSIONING.MD",
+    "docs/versioning/002_HISTORY_VERSIONS.MD",
+    "docs/versioning/003_CHANGELOG_RELEASES.MD",
+    "docs/versioning/004_POLICY_LABELING.MD",
+    "docs/versioning/101_POLICY_VERSIONING.MD",
+    "docs/versioning/102_HISTORY_VERSIONS.MD",
+    "docs/versioning/103_CHANGELOG_RELEASES.MD",
+    "docs/versioning/104_POLICY_LABELING.MD"
+  ],
+  "ok": [
+    "docs/001_INDEX_CORE.MD",
+    "docs/010_API_CORE.MD",
+    "docs/020_ARCH_CORE.MD",
+    "docs/021_USAGE_NUGET.MD",
+    "docs/101_INDEX_CORE.MD",
+    "docs/110_API_CORE.MD",
+    "docs/120_ARCH_CORE.MD",
+    "docs/121_USAGE_NUGET.MD",
+    "docs/audit/000_HASHING_BASELINE.MD",
+    "docs/audit/000_INDEX.MD",
+    "docs/audit/002_AUDIT_CONTRACT_AND_GUARDRAILS.MD",
+    "docs/audit/003_SECURITY_ASSERTION_TRACEABILITY.MD",
+    "docs/audit/004_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD",
+    "docs/audit/005_CODE_ANALYSIS_METHOD.MD",
+    "docs/audit/006_CODE_REVIEW_FINDINGS.MD",
+    "docs/audit/007_THREAT_MODEL.MD",
+    "docs/audit/008_INCIDENT_RESPONSE_RUNBOOK.MD",
+    "docs/audit/009_SUPPLY_CHAIN_BASELINE.MD",
+    "docs/audit/010_REFACTOR_BACKLOG.MD",
+    "docs/audit/011_SECURITY_BENCHMARK.MD",
+    "docs/audit/012_WAVE_EXECUTION_DOD.MD",
+    "docs/audit/013_SCORECARD_GOVERNANCE_ALERT_MAPPING.MD",
+    "docs/audit/014_EVIDENCE_REPORT_ISSUE_67.MD",
+    "docs/audit/015_DOC_BILINGUAL_MAPPING.MD",
+    "docs/audit/100_HASHING_BASELINE.MD",
+    "docs/audit/100_INDEX.MD",
+    "docs/audit/102_AUDIT_CONTRACT_AND_GUARDRAILS.MD",
+    "docs/audit/103_SECURITY_ASSERTION_TRACEABILITY.MD",
+    "docs/audit/104_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD",
+    "docs/audit/105_CODE_ANALYSIS_METHOD.MD",
+    "docs/audit/106_CODE_REVIEW_FINDINGS.MD",
+    "docs/audit/107_THREAT_MODEL.MD",
+    "docs/audit/108_INCIDENT_RESPONSE_RUNBOOK.MD",
+    "docs/audit/109_SUPPLY_CHAIN_BASELINE.MD",
+    "docs/audit/110_REFACTOR_BACKLOG.MD",
+    "docs/audit/111_SECURITY_BENCHMARK.MD",
+    "docs/audit/112_WAVE_EXECUTION_DOD.MD",
+    "docs/audit/113_SCORECARD_GOVERNANCE_ALERT_MAPPING.MD",
+    "docs/audit/114_EVIDENCE_REPORT_ISSUE_67.MD",
+    "docs/audit/115_DOC_BILINGUAL_MAPPING.MD",
+    "docs/ci/001_PIPELINE_CI.MD",
+    "docs/ci/002_NUGET_TRUSTED_PUBLISHING.MD",
+    "docs/ci/101_PIPELINE_CI.MD",
+    "docs/ci/102_NUGET_TRUSTED_PUBLISHING.MD",
+    "docs/contracts/001_CONTRACT_HASHING.MD",
+    "docs/contracts/101_CONTRACT_HASHING.MD",
+    "docs/governance/001_POLICY_CI.MD",
+    "docs/governance/002_POLICY_LABELING.MD",
+    "docs/governance/002_POLICY_NAMING_UNIFIED.MD",
+    "docs/governance/003_INDEX_GOVERNANCE.MD",
+    "docs/governance/003_POLICY_VERSIONING_SVT.MD",
+    "docs/governance/004_POLICY_DOCUMENTATION.MD",
+    "docs/governance/005_POLICY_NAMING.MD",
+    "docs/governance/006_INDEX_CI_RULES.MD",
+    "docs/governance/007_POLICY_BRANCH_PR_NAMING_DE.MD",
+    "docs/governance/101_POLICY_CI.MD",
+    "docs/governance/102_POLICY_LABELING.MD",
+    "docs/governance/102_POLICY_NAMING_UNIFIED.MD",
+    "docs/governance/103_INDEX_GOVERNANCE.MD",
+    "docs/governance/103_POLICY_VERSIONING_SVT.MD",
+    "docs/governance/104_POLICY_DOCUMENTATION.MD",
+    "docs/governance/105_POLICY_NAMING.MD",
+    "docs/governance/106_INDEX_CI_RULES.MD",
+    "docs/governance/107_POLICY_BRANCH_PR_NAMING_DE.MD",
+    "docs/guides/000_INDEX_GUIDES.MD",
+    "docs/guides/001_GUIDE_OPTIONS.MD",
+    "docs/guides/002_GUIDE_DATATYPE.MD",
+    "docs/guides/003_GUIDE_PORTABLE.MD",
+    "docs/guides/004_GUIDE_MIGRATE_LEGACY_NUGET.MD",
+    "docs/guides/100_INDEX_GUIDES.MD",
+    "docs/guides/101_GUIDE_OPTIONS.MD",
+    "docs/guides/102_GUIDE_DATATYPE.MD",
+    "docs/guides/103_GUIDE_PORTABLE.MD",
+    "docs/guides/104_GUIDE_MIGRATE_LEGACY_NUGET.MD",
+    "docs/migrations/001_HASHING_RENAME.MD",
+    "docs/migrations/101_HASHING_RENAME.MD",
+    "docs/quality/001_CHECKLIST_PRODUCTION.MD",
+    "docs/quality/101_CHECKLIST_PRODUCTION.MD",
+    "docs/references/001_REFERENCES_CORE.MD",
+    "docs/references/101_REFERENCES_CORE.MD",
+    "docs/secure/001_HMAC_KEY_SETUP.MD",
+    "docs/secure/101_HMAC_KEY_SETUP.MD",
+    "docs/security/010_CODEQL_DEFAULT_SETUP_GUARDRAIL.MD",
+    "docs/security/110_CODEQL_DEFAULT_SETUP_GUARDRAIL.MD",
+    "docs/specs/001_SPEC_DIN.MD",
+    "docs/specs/101_SPEC_DIN.MD",
+    "docs/verification/001_INDEX_TESTS.MD",
+    "docs/verification/002_FLOW_BDD.MD",
+    "docs/verification/003_CATALOG_BDD.MD",
+    "docs/verification/004_MATRIX_HASHING.MD",
+    "docs/verification/101_INDEX_TESTS.MD",
+    "docs/verification/102_FLOW_BDD.MD",
+    "docs/verification/103_CATALOG_BDD.MD",
+    "docs/verification/104_MATRIX_HASHING.MD",
+    "docs/versioning/001_POLICY_VERSIONING.MD",
+    "docs/versioning/002_HISTORY_VERSIONS.MD",
+    "docs/versioning/003_CHANGELOG_RELEASES.MD",
+    "docs/versioning/004_POLICY_LABELING.MD",
+    "docs/versioning/101_POLICY_VERSIONING.MD",
+    "docs/versioning/102_HISTORY_VERSIONS.MD",
+    "docs/versioning/103_CHANGELOG_RELEASES.MD",
+    "docs/versioning/104_POLICY_LABELING.MD"
+  ],
+  "missing_counterpart": [],
+  "needs_map": [],
+  "records": [
+    {
+      "file": "docs/001_INDEX_CORE.MD",
+      "counterpart": "docs/101_INDEX_CORE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/010_API_CORE.MD",
+      "counterpart": "docs/110_API_CORE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/020_ARCH_CORE.MD",
+      "counterpart": "docs/120_ARCH_CORE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/021_USAGE_NUGET.MD",
+      "counterpart": "docs/121_USAGE_NUGET.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/101_INDEX_CORE.MD",
+      "counterpart": "docs/001_INDEX_CORE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/110_API_CORE.MD",
+      "counterpart": "docs/010_API_CORE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/120_ARCH_CORE.MD",
+      "counterpart": "docs/020_ARCH_CORE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/121_USAGE_NUGET.MD",
+      "counterpart": "docs/021_USAGE_NUGET.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/000_HASHING_BASELINE.MD",
+      "counterpart": "docs/audit/100_HASHING_BASELINE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/000_INDEX.MD",
+      "counterpart": "docs/audit/100_INDEX.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/002_AUDIT_CONTRACT_AND_GUARDRAILS.MD",
+      "counterpart": "docs/audit/102_AUDIT_CONTRACT_AND_GUARDRAILS.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/003_SECURITY_ASSERTION_TRACEABILITY.MD",
+      "counterpart": "docs/audit/103_SECURITY_ASSERTION_TRACEABILITY.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/004_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD",
+      "counterpart": "docs/audit/104_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/005_CODE_ANALYSIS_METHOD.MD",
+      "counterpart": "docs/audit/105_CODE_ANALYSIS_METHOD.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/006_CODE_REVIEW_FINDINGS.MD",
+      "counterpart": "docs/audit/106_CODE_REVIEW_FINDINGS.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/007_THREAT_MODEL.MD",
+      "counterpart": "docs/audit/107_THREAT_MODEL.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/008_INCIDENT_RESPONSE_RUNBOOK.MD",
+      "counterpart": "docs/audit/108_INCIDENT_RESPONSE_RUNBOOK.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/009_SUPPLY_CHAIN_BASELINE.MD",
+      "counterpart": "docs/audit/109_SUPPLY_CHAIN_BASELINE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/010_REFACTOR_BACKLOG.MD",
+      "counterpart": "docs/audit/110_REFACTOR_BACKLOG.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/011_SECURITY_BENCHMARK.MD",
+      "counterpart": "docs/audit/111_SECURITY_BENCHMARK.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/012_WAVE_EXECUTION_DOD.MD",
+      "counterpart": "docs/audit/112_WAVE_EXECUTION_DOD.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/013_SCORECARD_GOVERNANCE_ALERT_MAPPING.MD",
+      "counterpart": "docs/audit/113_SCORECARD_GOVERNANCE_ALERT_MAPPING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/014_EVIDENCE_REPORT_ISSUE_67.MD",
+      "counterpart": "docs/audit/114_EVIDENCE_REPORT_ISSUE_67.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/015_DOC_BILINGUAL_MAPPING.MD",
+      "counterpart": "docs/audit/115_DOC_BILINGUAL_MAPPING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/100_HASHING_BASELINE.MD",
+      "counterpart": "docs/audit/000_HASHING_BASELINE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/100_INDEX.MD",
+      "counterpart": "docs/audit/000_INDEX.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/102_AUDIT_CONTRACT_AND_GUARDRAILS.MD",
+      "counterpart": "docs/audit/002_AUDIT_CONTRACT_AND_GUARDRAILS.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/103_SECURITY_ASSERTION_TRACEABILITY.MD",
+      "counterpart": "docs/audit/003_SECURITY_ASSERTION_TRACEABILITY.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/104_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD",
+      "counterpart": "docs/audit/004_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/105_CODE_ANALYSIS_METHOD.MD",
+      "counterpart": "docs/audit/005_CODE_ANALYSIS_METHOD.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/106_CODE_REVIEW_FINDINGS.MD",
+      "counterpart": "docs/audit/006_CODE_REVIEW_FINDINGS.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/107_THREAT_MODEL.MD",
+      "counterpart": "docs/audit/007_THREAT_MODEL.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/108_INCIDENT_RESPONSE_RUNBOOK.MD",
+      "counterpart": "docs/audit/008_INCIDENT_RESPONSE_RUNBOOK.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/109_SUPPLY_CHAIN_BASELINE.MD",
+      "counterpart": "docs/audit/009_SUPPLY_CHAIN_BASELINE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/110_REFACTOR_BACKLOG.MD",
+      "counterpart": "docs/audit/010_REFACTOR_BACKLOG.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/111_SECURITY_BENCHMARK.MD",
+      "counterpart": "docs/audit/011_SECURITY_BENCHMARK.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/112_WAVE_EXECUTION_DOD.MD",
+      "counterpart": "docs/audit/012_WAVE_EXECUTION_DOD.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/113_SCORECARD_GOVERNANCE_ALERT_MAPPING.MD",
+      "counterpart": "docs/audit/013_SCORECARD_GOVERNANCE_ALERT_MAPPING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/114_EVIDENCE_REPORT_ISSUE_67.MD",
+      "counterpart": "docs/audit/014_EVIDENCE_REPORT_ISSUE_67.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/audit/115_DOC_BILINGUAL_MAPPING.MD",
+      "counterpart": "docs/audit/015_DOC_BILINGUAL_MAPPING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/ci/001_PIPELINE_CI.MD",
+      "counterpart": "docs/ci/101_PIPELINE_CI.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/ci/002_NUGET_TRUSTED_PUBLISHING.MD",
+      "counterpart": "docs/ci/102_NUGET_TRUSTED_PUBLISHING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/ci/101_PIPELINE_CI.MD",
+      "counterpart": "docs/ci/001_PIPELINE_CI.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/ci/102_NUGET_TRUSTED_PUBLISHING.MD",
+      "counterpart": "docs/ci/002_NUGET_TRUSTED_PUBLISHING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/contracts/001_CONTRACT_HASHING.MD",
+      "counterpart": "docs/contracts/101_CONTRACT_HASHING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/contracts/101_CONTRACT_HASHING.MD",
+      "counterpart": "docs/contracts/001_CONTRACT_HASHING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/001_POLICY_CI.MD",
+      "counterpart": "docs/governance/101_POLICY_CI.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/002_POLICY_LABELING.MD",
+      "counterpart": "docs/governance/102_POLICY_LABELING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/002_POLICY_NAMING_UNIFIED.MD",
+      "counterpart": "docs/governance/102_POLICY_NAMING_UNIFIED.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/003_INDEX_GOVERNANCE.MD",
+      "counterpart": "docs/governance/103_INDEX_GOVERNANCE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/003_POLICY_VERSIONING_SVT.MD",
+      "counterpart": "docs/governance/103_POLICY_VERSIONING_SVT.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/004_POLICY_DOCUMENTATION.MD",
+      "counterpart": "docs/governance/104_POLICY_DOCUMENTATION.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/005_POLICY_NAMING.MD",
+      "counterpart": "docs/governance/105_POLICY_NAMING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/006_INDEX_CI_RULES.MD",
+      "counterpart": "docs/governance/106_INDEX_CI_RULES.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/007_POLICY_BRANCH_PR_NAMING_DE.MD",
+      "counterpart": "docs/governance/107_POLICY_BRANCH_PR_NAMING_DE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/101_POLICY_CI.MD",
+      "counterpart": "docs/governance/001_POLICY_CI.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/102_POLICY_LABELING.MD",
+      "counterpart": "docs/governance/002_POLICY_LABELING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/102_POLICY_NAMING_UNIFIED.MD",
+      "counterpart": "docs/governance/002_POLICY_NAMING_UNIFIED.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/103_INDEX_GOVERNANCE.MD",
+      "counterpart": "docs/governance/003_INDEX_GOVERNANCE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/103_POLICY_VERSIONING_SVT.MD",
+      "counterpart": "docs/governance/003_POLICY_VERSIONING_SVT.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/104_POLICY_DOCUMENTATION.MD",
+      "counterpart": "docs/governance/004_POLICY_DOCUMENTATION.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/105_POLICY_NAMING.MD",
+      "counterpart": "docs/governance/005_POLICY_NAMING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/106_INDEX_CI_RULES.MD",
+      "counterpart": "docs/governance/006_INDEX_CI_RULES.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/governance/107_POLICY_BRANCH_PR_NAMING_DE.MD",
+      "counterpart": "docs/governance/007_POLICY_BRANCH_PR_NAMING_DE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/guides/000_INDEX_GUIDES.MD",
+      "counterpart": "docs/guides/100_INDEX_GUIDES.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/guides/001_GUIDE_OPTIONS.MD",
+      "counterpart": "docs/guides/101_GUIDE_OPTIONS.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/guides/002_GUIDE_DATATYPE.MD",
+      "counterpart": "docs/guides/102_GUIDE_DATATYPE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/guides/003_GUIDE_PORTABLE.MD",
+      "counterpart": "docs/guides/103_GUIDE_PORTABLE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/guides/004_GUIDE_MIGRATE_LEGACY_NUGET.MD",
+      "counterpart": "docs/guides/104_GUIDE_MIGRATE_LEGACY_NUGET.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/guides/100_INDEX_GUIDES.MD",
+      "counterpart": "docs/guides/000_INDEX_GUIDES.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/guides/101_GUIDE_OPTIONS.MD",
+      "counterpart": "docs/guides/001_GUIDE_OPTIONS.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/guides/102_GUIDE_DATATYPE.MD",
+      "counterpart": "docs/guides/002_GUIDE_DATATYPE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/guides/103_GUIDE_PORTABLE.MD",
+      "counterpart": "docs/guides/003_GUIDE_PORTABLE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/guides/104_GUIDE_MIGRATE_LEGACY_NUGET.MD",
+      "counterpart": "docs/guides/004_GUIDE_MIGRATE_LEGACY_NUGET.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/migrations/001_HASHING_RENAME.MD",
+      "counterpart": "docs/migrations/101_HASHING_RENAME.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/migrations/101_HASHING_RENAME.MD",
+      "counterpart": "docs/migrations/001_HASHING_RENAME.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/quality/001_CHECKLIST_PRODUCTION.MD",
+      "counterpart": "docs/quality/101_CHECKLIST_PRODUCTION.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/quality/101_CHECKLIST_PRODUCTION.MD",
+      "counterpart": "docs/quality/001_CHECKLIST_PRODUCTION.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/references/001_REFERENCES_CORE.MD",
+      "counterpart": "docs/references/101_REFERENCES_CORE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/references/101_REFERENCES_CORE.MD",
+      "counterpart": "docs/references/001_REFERENCES_CORE.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/secure/001_HMAC_KEY_SETUP.MD",
+      "counterpart": "docs/secure/101_HMAC_KEY_SETUP.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/secure/101_HMAC_KEY_SETUP.MD",
+      "counterpart": "docs/secure/001_HMAC_KEY_SETUP.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/security/010_CODEQL_DEFAULT_SETUP_GUARDRAIL.MD",
+      "counterpart": "docs/security/110_CODEQL_DEFAULT_SETUP_GUARDRAIL.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/security/110_CODEQL_DEFAULT_SETUP_GUARDRAIL.MD",
+      "counterpart": "docs/security/010_CODEQL_DEFAULT_SETUP_GUARDRAIL.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/specs/001_SPEC_DIN.MD",
+      "counterpart": "docs/specs/101_SPEC_DIN.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/specs/101_SPEC_DIN.MD",
+      "counterpart": "docs/specs/001_SPEC_DIN.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/verification/001_INDEX_TESTS.MD",
+      "counterpart": "docs/verification/101_INDEX_TESTS.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/verification/002_FLOW_BDD.MD",
+      "counterpart": "docs/verification/102_FLOW_BDD.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/verification/003_CATALOG_BDD.MD",
+      "counterpart": "docs/verification/103_CATALOG_BDD.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/verification/004_MATRIX_HASHING.MD",
+      "counterpart": "docs/verification/104_MATRIX_HASHING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/verification/101_INDEX_TESTS.MD",
+      "counterpart": "docs/verification/001_INDEX_TESTS.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/verification/102_FLOW_BDD.MD",
+      "counterpart": "docs/verification/002_FLOW_BDD.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/verification/103_CATALOG_BDD.MD",
+      "counterpart": "docs/verification/003_CATALOG_BDD.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/verification/104_MATRIX_HASHING.MD",
+      "counterpart": "docs/verification/004_MATRIX_HASHING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/versioning/001_POLICY_VERSIONING.MD",
+      "counterpart": "docs/versioning/101_POLICY_VERSIONING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/versioning/002_HISTORY_VERSIONS.MD",
+      "counterpart": "docs/versioning/102_HISTORY_VERSIONS.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/versioning/003_CHANGELOG_RELEASES.MD",
+      "counterpart": "docs/versioning/103_CHANGELOG_RELEASES.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/versioning/004_POLICY_LABELING.MD",
+      "counterpart": "docs/versioning/104_POLICY_LABELING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/versioning/101_POLICY_VERSIONING.MD",
+      "counterpart": "docs/versioning/001_POLICY_VERSIONING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/versioning/102_HISTORY_VERSIONS.MD",
+      "counterpart": "docs/versioning/002_HISTORY_VERSIONS.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/versioning/103_CHANGELOG_RELEASES.MD",
+      "counterpart": "docs/versioning/003_CHANGELOG_RELEASES.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    },
+    {
+      "file": "docs/versioning/104_POLICY_LABELING.MD",
+      "counterpart": "docs/versioning/004_POLICY_LABELING.MD",
+      "source": "schema",
+      "status": "ok",
+      "counterpart_exists": true
+    }
+  ]
+}

@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](006_INDEX_CI_RULES.MD) | [EN](106_INDEX_CI_RULES.MD)
+<!-- LANG_SWITCH:END -->
+
 # CI Policy Rules
 
 | rule_id | file |

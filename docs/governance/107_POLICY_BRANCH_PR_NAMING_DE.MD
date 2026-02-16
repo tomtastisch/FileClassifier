@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](007_POLICY_BRANCH_PR_NAMING_DE.MD) | [EN](107_POLICY_BRANCH_PR_NAMING_DE.MD)
+<!-- LANG_SWITCH:END -->
+
 # Policy Branch/PR Naming (DE)
 
 ## 1. Purpose

@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](006_CODE_REVIEW_FINDINGS.MD) | [EN](106_CODE_REVIEW_FINDINGS.MD)
+<!-- LANG_SWITCH:END -->
+
 # Code Review Findings
 
 ## Scope

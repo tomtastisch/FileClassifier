@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](001_HASHING_RENAME.MD) | [EN](101_HASHING_RENAME.MD)
+<!-- LANG_SWITCH:END -->
+
 # Migration: Hashing-Rename (Deterministic* -> Evidence/Hash*)
 
 ## Zweck und Scope
