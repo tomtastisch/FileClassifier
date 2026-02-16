@@ -1,17 +1,17 @@
-# Refactor-Backlog (Cluster 7C)
+# Refactor Backlog (Cluster 7C)
 
-## 1. Quelle
-Der Backlog wird abgeleitet aus:
+## 1. Source
+Backlog is derived from:
 - `artifacts/audit/hardening_candidates.json`
 - `artifacts/audit/redundancy_candidates.json`
-- `docs/audit/006_CODE_REVIEW_FINDINGS.MD`
+- `docs/audit/106_CODE_REVIEW_FINDINGS.MD`
 
-Baseline Snapshot (2026-02-15, vor Package A):
+Baseline snapshot (2026-02-15, pre Package A):
 - hardening candidates: `21`
 - redundancy candidates: `18`
 - dead-code candidates: `0`
 
-Current Snapshot (2026-02-15, nach Package A):
+Current snapshot (2026-02-15, post Package A):
 - hardening candidates: `12`
 
 Repro (repo root):
@@ -20,21 +20,21 @@ bash tools/audit/verify-code-analysis-evidence.sh
 jq '.candidates | length' artifacts/audit/hardening_candidates.json
 ```
 
-## 2. Priorisierte PR-Packages
+## 2. Prioritized PR Packages
 
-### Package A (P1) - Broad exception catches in high-traffic entry points einengen
+### Package A (P1) - Narrow broad exception catches in high-traffic entry points
 Scope candidates:
 - `src/FileTypeDetection/FileTypeDetector.vb`
 - `src/FileTypeDetection/FileMaterializer.vb`
 - `src/FileTypeDetection/EvidenceHashing.vb`
 
 Rules:
-- generisches `Catch ex As Exception` durch engere Exception-Behandlung ersetzen, wo deterministisch moeglich
-- fail-closed Verhalten beibehalten
-- aktuelle public API und Return-Contracts erhalten
+- replace generic `Catch ex As Exception` with narrower exception handling where deterministically possible
+- keep fail-closed behavior intact
+- preserve current public API and return contracts
 
 Required checks:
-Alle Kommandos sind fuer Ausfuehrung im Repository-Root gedacht.
+All commands are intended to run from the repository root.
 ```bash
 dotnet build FileClassifier.sln -v minimal
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release -v minimal
@@ -48,8 +48,8 @@ Scope candidates:
 - `src/FileTypeDetection/Infrastructure/ArchiveManagedInternals.vb`
 
 Rules:
-- duplizierte Guard-Fragmente nur konsolidieren, wenn das Verhalten auf Outputs byte-for-byte aequivalent bleibt
-- fokussierte Regression-Tests fuer Guard-Edge-Cases ergaenzen
+- consolidate duplicated guard fragments only when behavior remains byte-for-byte equivalent on outputs
+- add focused regression tests for guard edge cases
 
 Required checks:
 ```bash
@@ -60,11 +60,11 @@ bash tools/ci/bin/run.sh consumer-smoke
 
 ### Package C (P3) - Exception reason code normalization
 Scope candidates:
-- broad catch sites, die nach Package A bewusst generisch bleiben
+- broad catch sites that remain intentionally generic after Package A
 
 Rules:
-- Exception-to-Result-Mapping mit deterministischen Reason-Codes anreichern
-- keine versteckten Behavior-Changes im Success-Pfad
+- enrich exception-to-result mapping with deterministic reason codes
+- no hidden behavior changes in success path
 
 Required checks:
 ```bash
@@ -73,13 +73,13 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 bash tools/audit/verify-code-analysis-evidence.sh
 ```
 
-## 3. Ausfuehrungsreihenfolge
+## 3. Execution Order
 1. Package A
 2. Package B
 3. Package C
 
-## 4. Definition of Done pro Package
-- Targeted Code-Changes sind auf den Package-Scope begrenzt
-- Regression-Tests sind fuer geaenderte Behavior-Branches hinzugefuegt/aktualisiert
-- Full CI auf der PR ist gruen
-- `docs/audit/006_CODE_REVIEW_FINDINGS.MD` wurde mit geschlossenen/verschobenen Findings aktualisiert
+## 4. Definition Of Done Per Package
+- targeted code changes are limited to package scope
+- regression tests added/updated for changed behavior branches
+- full CI on PR is green
+- `docs/audit/106_CODE_REVIEW_FINDINGS.MD` updated with closed/moved findings

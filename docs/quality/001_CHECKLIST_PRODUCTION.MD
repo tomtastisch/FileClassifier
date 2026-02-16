@@ -1,6 +1,6 @@
-# Production Readiness Checklist - FileTypeDetection
+# Production-Readiness-Checkliste - FileTypeDetection
 
-## 1. Build and Test Gate
+## 1. Build- und Test-Gate
 - [ ] `dotnet restore FileClassifier.sln -v minimal`
 - [ ] `python3 tools/check-docs.py` (prüft lokale Markdown-Dateilinks und Heading-Anker fail-closed)
 - [ ] `dotnet format FileClassifier.sln --verify-no-changes`
@@ -10,24 +10,24 @@
 - [ ] Coverage-Roadmap stufenweise erhöhen (z. B. `85/69 -> 88/72 -> 90/75`) statt sprunghaft.
 - [ ] BDD-Tag-Filter prüfen (z. B. `Category=e2e`, `Category=materializer`)
 
-## 2. Security and Limits
+## 2. Security und Limits
 - [ ] `FileTypeProjectBaseline.ApplyDeterministicDefaults()` beim Start setzen
 - [ ] Falls nötig: `FileTypeOptions.LoadOptions(json)` für Umgebungslimits
 - [ ] Archiv-Grenzen (`MaxZipEntries`, `MaxZipCompressionRatio`, `MaxZipNestingDepth`) mit Ops abstimmen
 - [ ] Root-/Traversal-Schutz im Zielsystem validieren (Dateisystemrechte, Container-Mounts)
 
-## 3. Runtime Configuration
+## 3. Runtime-Konfiguration
 - [ ] Konfigurationsquelle je Umgebung festlegen (embedded, file, secret/config service)
 - [ ] Snapshot der aktiven Optionen per `FileTypeOptions.GetOptions()` protokollieren
 - [ ] Änderungsprozess für Grenzwerte (Review + Freigabe) dokumentieren
 
-## 4. Operational Readiness
+## 4. Betriebsbereitschaft (Operational Readiness)
 - [ ] Logging-Level und Ziel (stdout/file/collector) festlegen
 - [ ] Alarmierung auf fail-closed-Häufung einrichten (Unknown/False/empty spikes)
 - [ ] Durchsatz-/Latenz-Baseline erfassen (z. B. Benchmark-Smoke in CI)
 - [ ] Incident-Runbook für Archiv-Angriffsfälle (Bomb/Traversal) verfügbar machen
 
-## 5. Integration Contract
+## 5. Integrationsvertrag
 - [ ] Aufrufervertrag klarstellen: keine Ausnahme als Kontrollfluss erwarten
 - [ ] Rückgabe-Semantik dokumentieren:
   - `Unknown` bei unsicherer/ungültiger Erkennung
@@ -35,7 +35,7 @@
   - leere Liste bei fehlgeschlagener Memory-Extraktion
 - [ ] Consumer-Reaktion auf fail-closed im Service-Workflow definiert
 
-## 6. Release and Rollback
+## 6. Release und Rollback
 - [ ] Release-Version/Changelog erstellt
 - [ ] Canary/gestaffeltes Rollout geplant
 - [ ] Rollback-Strategie definiert (Artefakt + Konfiguration + Datenpfade)

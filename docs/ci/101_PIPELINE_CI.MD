@@ -1,18 +1,18 @@
-# CI-Pipeline (SSOT)
+# CI Pipeline (SSOT)
 
-## Zweck und Scope
-Dieses Dokument beschreibt die ausfuehrbare CI-Topologie und den Artefaktvertrag.
-Normative Policy-Schwellenwerte und Regelparameter liegen in `tools/ci/policies/rules/` und `docs/governance/001_POLICY_CI.MD`.
+## Scope
+This document describes the executable CI topology and artifact contract.
+Normative policy thresholds and rule parameters stay in `tools/ci/policies/rules/` and `docs/governance/101_POLICY_CI.MD`.
 
-## Erforderliche Status-Contexts
-Die Branch-Protection auf `main` verlangt exakt diese Contexts (`strict: true`): `preflight`, `version-policy`, `build`, `api-contract`, `pack`, `consumer-smoke`, `package-backed-tests`, `security-nuget`, `tests-bdd-coverage`.
-Evidence: Branch-Protection API Output (`required_status_checks.contexts`), `.github/workflows/ci.yml:59-347` und `.github/workflows/ruleset-placeholders.yml` (Context `version-policy`).
-Hinweis: Die normative Versionierungsentscheidung (RaC) wird zusaetzlich durch `.github/workflows/version-policy.yml` als Check `versioning-policy` ausgewertet (nicht Teil der Branch-Protection-Contexts).
+## Required Status Contexts
+Main branch protection requires exactly these contexts (`strict: true`): `preflight`, `version-policy`, `build`, `api-contract`, `pack`, `consumer-smoke`, `package-backed-tests`, `security-nuget`, `tests-bdd-coverage`.
+Evidence: branch protection API output (`required_status_checks.contexts`), `.github/workflows/ci.yml:59-347`, and `.github/workflows/ruleset-placeholders.yml` (`version-policy` context).
+Note: the normative versioning decision (RaC) is additionally evaluated by `.github/workflows/version-policy.yml` as the `versioning-policy` check (not part of the branch-protection contexts).
 
-## Workflow-Topologie
-- `pr-labeling` laeuft nur auf `pull_request` und ist getrennt vom erforderlichen technischen Gate-Pfad (`.github/workflows/ci.yml:22-58`).
-- Der technische Gate-Pfad startet bei `preflight` und faechert in Downstream-Jobs ueber `needs` auf (`.github/workflows/ci.yml:89-427`).
-- `summary` aggregiert Downstream-Artefakte und fuehrt Contract-Checks aus (`.github/workflows/ci.yml:349-427`, `tools/ci/bin/run.sh:446`).
+## Workflow Topology
+- `pr-labeling` runs only on `pull_request` and is separate from the required technical gate path (`.github/workflows/ci.yml:22-58`).
+- The technical gate path starts at `preflight` and fans into downstream jobs via `needs` (`.github/workflows/ci.yml:89-427`).
+- `summary` aggregates downstream artifacts and runs contract checks (`.github/workflows/ci.yml:349-427`, `tools/ci/bin/run.sh:446`).
 
 ```mermaid
 flowchart TD
@@ -58,21 +58,21 @@ flowchart TD
   classDef meta fill:#f8f9fa,stroke:#6c757d,color:#343a40;
 ```
 
-## Artefaktvertrag
-Jeder Aufruf `tools/ci/bin/run.sh <check_id>` initialisiert und finalisiert ein fixes Artefakt-Set:
+## Artifact Contract
+Each `tools/ci/bin/run.sh <check_id>` invocation initializes and finalizes a fixed artifact set:
 - `raw.log`
 - `summary.md`
 - `result.json`
 - `diag.json`
 
 Evidence:
-- Artefaktpfad-Initialisierung: `tools/ci/lib/result.sh:12-20`.
-- File-Materialisierung: `tools/ci/lib/result.sh:28-34`.
-- Finale `result.json` Komposition: `tools/ci/lib/result.sh:78-112`.
-- Universal Runner Wiring: `tools/ci/bin/run.sh:16-28`.
+- Artifact path initialization in `tools/ci/lib/result.sh:12-20`.
+- File materialization in `tools/ci/lib/result.sh:28-34`.
+- Final `result.json` composition in `tools/ci/lib/result.sh:78-112`.
+- Universal runner wiring in `tools/ci/bin/run.sh:16-28`.
 
-## Vertragsmatrix
-| Job | Entrypoint | Artefaktpfad | Vertragsvalidierung | Evidence |
+## Contract Matrix
+| Job | Entrypoint | Artifact path | Contract validation path | Evidence |
 |---|---|---|---|---|
 | `preflight` | `bash tools/ci/bin/run.sh preflight` | `artifacts/ci/preflight/` | Result contract + policy bridge | `.github/workflows/ci.yml:77-87`, `tools/ci/bin/run.sh:159-171` |
 | `version-policy` | `.github/workflows/ruleset-placeholders.yml` | N/A | N/A (placeholder required context) | `.github/workflows/ruleset-placeholders.yml:20-24` |
@@ -88,14 +88,14 @@ Evidence:
 | `summary` | `bash tools/ci/bin/run.sh summary` | `artifacts/ci/summary/` | Policy contract aggregation | `.github/workflows/ci.yml:417-427`, `tools/ci/bin/run.sh:424-430` |
 | `pr-labeling` | `bash tools/ci/bin/run.sh pr-labeling` | `artifacts/ci/pr-labeling/` | Label decision schema + apply+verify | `.github/workflows/ci.yml:45-57`, `tools/ci/bin/run.sh:350-400` |
 
-## Labeling- und Versionierungs-Entscheidungspfad
-- Decision-Generierung: `compute-pr-labels.js` schreibt `decision.json` (`tools/ci/bin/run.sh:371-372`).
-- Schema-Validierung: `validate-label-decision.js` (`tools/ci/bin/run.sh:374`).
-- Label-Anwendung und Post-Apply-Verifikation: deterministischer GitHub API PUT (curl-backed) und anschliessender Re-Read (`tools/ci/bin/run.sh:375-399`, `tools/ci/bin/github_api.py`).
-- Workflow-Token-Quelle: `GH_TOKEN: ${{ github.token }}` (`.github/workflows/ci.yml:46-50`).
+## Labeling and Versioning Decision Path
+- Decision generation: `compute-pr-labels.js` writes `decision.json` (`tools/ci/bin/run.sh:371-372`).
+- Schema validation: `validate-label-decision.js` (`tools/ci/bin/run.sh:374`).
+- Label application and post-apply verification: deterministic GitHub API PUT (curl-backed) and post-apply re-read (`tools/ci/bin/run.sh:375-399`, `tools/ci/bin/github_api.py`).
+- Workflow token source: `GH_TOKEN: ${{ github.token }}` (`.github/workflows/ci.yml:46-50`).
 
-## Qodana: Vertragsposition
-Qodana laeuft in einem separaten Workflow und wird durch `run.sh qodana` validiert:
+## Qodana Contract Position
+Qodana runs in a separate workflow and is validated by `run.sh qodana`:
 - Qodana action execution and SARIF output path (`.github/workflows/qodana.yml:34-40`, `.github/workflows/qodana.yml:59`).
 - Contract check invocation (`.github/workflows/qodana.yml:47-48`, `tools/ci/bin/run.sh:402-422`).
 - Qodana artifact upload (`.github/workflows/qodana.yml:54-60`).

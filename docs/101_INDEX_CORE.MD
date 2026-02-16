@@ -1,0 +1,62 @@
+# Documentation Index
+
+## 1. Purpose
+Central entry point for all project documentation, grouped by responsibility areas.
+
+## 2. Standards and Guardrails
+- Documentation standard (mandatory): [Documentation Standard (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/governance/104_POLICY_DOCUMENTATION.MD)
+- CI and quality evidence: [CI Pipeline (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/ci/101_PIPELINE_CI.MD)
+- Auto labeling and auto versioning: [Auto Labeling and Auto Versioning (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/versioning/104_POLICY_LABELING.MD)
+- Test documentation (BDD): [Test Documentation (BDD)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/101_INDEX_TESTS.MD)
+
+## 3. Core Architecture (SSOT)
+1. [01 - API Functions](https://github.com/tomtastisch/FileClassifier/blob/main/docs/110_API_CORE.MD)
+2. [02 - Overall Architecture and Flows](https://github.com/tomtastisch/FileClassifier/blob/main/docs/120_ARCH_CORE.MD)
+3. [03 - References](https://github.com/tomtastisch/FileClassifier/blob/main/docs/references/101_REFERENCES_CORE.MD)
+4. [04 - EvidenceHashing API Contract](https://github.com/tomtastisch/FileClassifier/blob/main/docs/contracts/101_CONTRACT_HASHING.MD)
+5. [DIN-oriented Specification (DE) - FileTypeDetection](https://github.com/tomtastisch/FileClassifier/blob/main/docs/specs/101_SPEC_DIN.MD)
+6. [Production Readiness Checklist - FileTypeDetection](https://github.com/tomtastisch/FileClassifier/blob/main/docs/quality/101_CHECKLIST_PRODUCTION.MD)
+7. [Secure Hash Key Setup (HMAC)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/secure/101_HMAC_KEY_SETUP.MD)
+
+## 4. Versioning and Governance
+1. [Versioning and Release Policy (SSOT)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/versioning/101_POLICY_VERSIONING.MD)
+2. [Version Line (Commit -> Version)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/versioning/102_HISTORY_VERSIONS.MD)
+3. [Changelog](https://github.com/tomtastisch/FileClassifier/blob/main/docs/versioning/103_CHANGELOG_RELEASES.MD)
+4. [Labeling Ownership](https://github.com/tomtastisch/FileClassifier/blob/main/docs/governance/102_POLICY_LABELING.MD)
+
+## 5. Guides and Implementation Playbooks
+1. [Guides - Change Playbooks](https://github.com/tomtastisch/FileClassifier/blob/main/docs/guides/100_INDEX_GUIDES.MD)
+2. [Playbook: Create and Adjust Options](https://github.com/tomtastisch/FileClassifier/blob/main/docs/guides/101_GUIDE_OPTIONS.MD)
+3. [Playbook: Extend New Datatypes and API Models](https://github.com/tomtastisch/FileClassifier/blob/main/docs/guides/102_GUIDE_DATATYPE.MD)
+
+## 5.1 Migration Notes
+1. [Migration: Hashing Rename](https://github.com/tomtastisch/FileClassifier/blob/main/docs/migrations/101_HASHING_RENAME.MD)
+
+## 6. Tests and Evidence Documents
+1. [Test Matrix - Deterministic Hashing](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/104_MATRIX_HASHING.MD)
+2. [BDD Catalog (German, canonical)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/103_CATALOG_BDD.MD)
+3. [BDD Execution and Gherkin Flow](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/102_FLOW_BDD.MD)
+
+## 7. Module-Local Documentation
+- [FileTypeDetection Module](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md)
+- [Index - Detection](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Detection/README.md)
+- [Index - Infrastructure](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md)
+- [Index - Configuration](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/README.md)
+- [Index - Abstractions](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md)
+- [Abstractions Detection Module](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Detection/README.md)
+- [Abstractions Archive Module](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Archive/README.md)
+- [Abstractions Hashing Module](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Hashing/README.md)
+- [README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileClassifier.App/README.md)
+- [README](https://github.com/tomtastisch/FileClassifier/blob/main/tests/FileTypeDetectionLib.Tests/README.md)
+
+## 8. Maintenance Process
+Mandatory check for documentation changes:
+```bash
+python3 tools/check-docs.py
+```
+
+## Documentation Maintenance Checklist
+- [ ] Content verified against current code state.
+- [ ] Links and anchors checked with `python3 tools/check-docs.py`.
+- [ ] Examples/commands verified locally.
+- [ ] References to SSOT documents kept consistent.

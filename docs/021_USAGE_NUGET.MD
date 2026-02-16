@@ -1,9 +1,9 @@
-# NuGet Usage
+# NuGet Nutzung
 
-## A) Purpose
+## A) Zweck
 `Tomtastisch.FileClassifier` stellt die öffentliche Bibliotheksoberfläche für Dateityperkennung, sichere Archivverarbeitung, Byte-Materialisierung und deterministische Hashing-Nachweise bereit.
 
-## B) Install (Consumer)
+## B) Installation (Consumer)
 ```bash
 dotnet add package Tomtastisch.FileClassifier --version X.Y.Z
 ```
@@ -18,7 +18,7 @@ Version-Pinning:
 - Für Releases gilt SVT: Git-Tag `vX.Y.Z` entspricht Paketversion `X.Y.Z`.
 - Consumer sollten exakt auf die freigegebene Version pinnen.
 
-## C) Minimal Usage (Consumer)
+## C) Minimalbeispiel (Consumer)
 ```csharp
 using Tomtastisch.FileClassifier;
 
@@ -33,7 +33,7 @@ if (detected.Kind == FileKind.Pdf)
 }
 ```
 
-## D) Verification (Consumer)
+## D) Verifikation (Consumer)
 Lokale Paketprüfung (nur Paketmetadata gegen Erwartung):
 ```bash
 EXPECTED_VERSION=X.Y.Z VERIFY_ONLINE=0 bash tools/ci/verify_nuget_release.sh
