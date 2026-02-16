@@ -85,7 +85,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Using ms As New MemoryStream(data, writable:=False)
                     Return IsArchiveSafeStream(ms, opt, descriptor, depth:=0)
                 End Using
-            Catch ex As Exception When TypeOf ex Is Exception
+            Catch ex As Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveGate] Bytes-Fehler: {ex.Message}")
                 Return False
             End Try
