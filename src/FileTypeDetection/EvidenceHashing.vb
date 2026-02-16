@@ -1,3 +1,12 @@
+' ============================================================================
+' FILE: EvidenceHashing.vb
+'
+' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
+' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.md
+' - Try/Catch konsistent im Catch-Filter-Schema
+' - Variablen im Deklarationsblock, spaltenartig ausgerichtet
+' ============================================================================
+
 Option Strict On
 Option Explicit On
 
@@ -295,7 +304,7 @@ Namespace Global.Tomtastisch.FileClassifier
             End If
 
             Dim originalBytes As Byte() = Array.Empty(Of Byte)()
-            Dim readError As String = String.Empty
+            Dim readError     As String = String.Empty
             If Not TryReadFileBounded(path, detectorOptions, originalBytes, readError) Then
                 Dim failed = HashEvidence.CreateFailure(HashSourceType.Unknown, path, readError)
                 Return _
@@ -306,13 +315,13 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim archiveEntries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             Dim isArchiveInput = ArchiveEntryCollector.TryCollectFromFile(path, detectorOptions, archiveEntries)
 
-            Dim h2 As HashEvidence
+            Dim h2             As HashEvidence
             Dim canonicalBytes As Byte()
 
             If isArchiveInput Then
                 h2 = HashEntries(archiveEntries, "roundtrip-h2-entries", normalizedOptions)
                 Dim normalizedEntries As List(Of NormalizedEntry) = Nothing
-                Dim normalizeError As String = String.Empty
+                Dim normalizeError    As String                   = String.Empty
                 If TryNormalizeEntries(archiveEntries, normalizedEntries, normalizeError) Then
                     canonicalBytes = BuildLogicalManifestBytes(normalizedEntries)
                 Else
@@ -366,7 +375,7 @@ Namespace Global.Tomtastisch.FileClassifier
                     TypeOf ex Is IO.IOException OrElse
                     TypeOf ex Is NotSupportedException OrElse
                     TypeOf ex Is ArgumentException
-                Catch ex As Exception
+                Catch ex As Exception When TypeOf ex Is Exception
                 End Try
             End Try
 
@@ -390,7 +399,7 @@ Namespace Global.Tomtastisch.FileClassifier
                                                  ) As HashEvidence
 
             Dim normalizedEntries As List(Of NormalizedEntry) = Nothing
-            Dim normalizeError As String = String.Empty
+            Dim normalizeError    As String                   = String.Empty
 
             If Not TryNormalizeEntries(entries, normalizedEntries, normalizeError) Then
                 Return HashEvidence.CreateFailure(sourceType, label, normalizeError)
@@ -615,7 +624,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 key = Array.Empty(Of Byte)()
                 note = $"Secure hashing requested but env var '{HmacKeyEnvVarB64}' is invalid Base64; HMAC digests omitted."
                 Return False
-            Catch ex As Exception
+            Catch ex As Exception When TypeOf ex Is Exception
                 key = Array.Empty(Of Byte)()
                 note = $"Secure hashing requested but env var '{HmacKeyEnvVarB64}' is invalid Base64; HMAC digests omitted."
                 Return False
@@ -718,6 +727,9 @@ Namespace Global.Tomtastisch.FileClassifier
             Return False
         End Function
 
+        ''' <summary>
+        '''     Interne Hilfsklasse <c>NormalizedEntry</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+        ''' </summary>
         Private NotInheritable Class NormalizedEntry
             Friend ReadOnly Property RelativePath As String
             Friend ReadOnly Property Content As Byte()

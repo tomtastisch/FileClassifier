@@ -1,3 +1,12 @@
+' ============================================================================
+' FILE: ArchiveManagedInternals.vb
+'
+' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
+' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.md
+' - Try/Catch konsistent im Catch-Filter-Schema
+' - Variablen im Deklarationsblock, spaltenartig ausgerichtet
+' ============================================================================
+
 Option Strict On
 Option Explicit On
 
@@ -6,8 +15,8 @@ Imports System.IO.Compression
 
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
-    '''     Zentrale SSOT-Engine fuer archivbasierte Verarbeitung.
-    '''     Eine Iterationslogik fuer Validierung und sichere Extraktion.
+    '''     Zentrale SSOT-Engine für archivbasierte Verarbeitung.
+    '''     Eine Iterationslogik für Validierung und sichere Extraktion.
     ''' </summary>
     Friend NotInheritable Class ArchiveStreamEngine
         Private Shared ReadOnly _recyclableStreams As New Microsoft.IO.RecyclableMemoryStreamManager()
@@ -67,7 +76,7 @@ Namespace Global.Tomtastisch.FileClassifier
                                         End If
                                     End Using
                                 End Using
-                            Catch ex As Exception
+                            Catch ex As Exception When TypeOf ex Is Exception
                                 LogGuard.Debug(opt.Logger, $"[ArchiveGate] Nested-Fehler: {ex.Message}")
                                 Return False
                             End Try
@@ -80,7 +89,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
 
                 Return True
-            Catch ex As Exception
+            Catch ex As Exception When TypeOf ex Is Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveGate] Stream-Fehler: {ex.Message}")
                 Return False
             End Try
@@ -109,15 +118,24 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
     End Class
 
+    ''' <summary>
+    '''     Interne Hilfsklasse <c>ArchiveManagedBackend</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    ''' </summary>
     Friend NotInheritable Class ArchiveManagedBackend
         Implements IArchiveBackend
 
+        ''' <summary>
+        '''     Liefert den vom Managed-Backend unterstützten Containertyp.
+        ''' </summary>
         Public ReadOnly Property ContainerType As ArchiveContainerType Implements IArchiveBackend.ContainerType
             Get
                 Return ArchiveContainerType.Zip
             End Get
         End Property
 
+        ''' <summary>
+        '''     Verarbeitet ZIP-Archive fail-closed über die Managed-Archive-Engine.
+        ''' </summary>
         Public Function Process(
                                 stream As Stream,
                                 opt As FileTypeProjectOptions,
@@ -141,6 +159,9 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
     End Class
 
+    ''' <summary>
+    '''     Interne Hilfsklasse <c>ArchiveManagedEntryModel</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    ''' </summary>
     Friend NotInheritable Class ArchiveManagedEntryModel
         Implements IArchiveEntryModel
 
@@ -150,6 +171,9 @@ Namespace Global.Tomtastisch.FileClassifier
             _entry = entry
         End Sub
 
+        ''' <summary>
+        '''     Liefert den relativen Archivpfad des Managed-Eintrags.
+        ''' </summary>
         Public ReadOnly Property RelativePath As String Implements IArchiveEntryModel.RelativePath
             Get
                 If _entry Is Nothing Then Return String.Empty
@@ -157,6 +181,9 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
+        ''' <summary>
+        '''     Kennzeichnet, ob der Managed-Eintrag ein Verzeichnis repräsentiert.
+        ''' </summary>
         Public ReadOnly Property IsDirectory As Boolean Implements IArchiveEntryModel.IsDirectory
             Get
                 If _entry Is Nothing Then Return False
@@ -165,6 +192,9 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
+        ''' <summary>
+        '''     Liefert die unkomprimierte Größe des Eintrags, sofern verfügbar.
+        ''' </summary>
         Public ReadOnly Property UncompressedSize As Long? Implements IArchiveEntryModel.UncompressedSize
             Get
                 If _entry Is Nothing Then Return Nothing
@@ -172,6 +202,9 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
+        ''' <summary>
+        '''     Liefert die komprimierte Größe des Eintrags, sofern verfügbar.
+        ''' </summary>
         Public ReadOnly Property CompressedSize As Long? Implements IArchiveEntryModel.CompressedSize
             Get
                 If _entry Is Nothing Then Return Nothing
@@ -179,12 +212,18 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
+        ''' <summary>
+        '''     Liefert für Managed-ZIP immer eine leere Zeichenfolge (keine Link-Metadaten).
+        ''' </summary>
         Public ReadOnly Property LinkTarget As String Implements IArchiveEntryModel.LinkTarget
             Get
                 Return String.Empty
             End Get
         End Property
 
+        ''' <summary>
+        '''     Öffnet einen lesbaren Stream auf den Eintragsinhalt.
+        ''' </summary>
         Public Function OpenStream() As Stream Implements IArchiveEntryModel.OpenStream
             If _entry Is Nothing Then Return Stream.Null
             Return _entry.Open()

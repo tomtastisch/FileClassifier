@@ -1,3 +1,12 @@
+' ============================================================================
+' FILE: FileTypeDetector.vb
+'
+' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
+' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.md
+' - Try/Catch konsistent im Catch-Filter-Schema
+' - Variablen im Deklarationsblock, spaltenartig ausgerichtet
+' ============================================================================
+
 Option Strict On
 Option Explicit On
 
@@ -347,7 +356,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf ex Is NotSupportedException OrElse
                 TypeOf ex Is ArgumentException
                 Return False
-            Catch ex As Exception
+            Catch ex As Exception When TypeOf ex Is Exception
                 ' Kompatibilitäts-Catch: unbekannte Ausnahme bleibt fail-closed.
                 Return False
             End Try
@@ -833,7 +842,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf ex Is NotSupportedException OrElse
                 TypeOf ex Is ArgumentException
                 Return Array.Empty(Of Byte)()
-            Catch ex As Exception
+            Catch ex As Exception When TypeOf ex Is Exception
                 Return Array.Empty(Of Byte)()
             End Try
         End Function
@@ -896,6 +905,9 @@ Namespace Global.Tomtastisch.FileClassifier
             Return New MemoryStream(data, 0, data.Length, writable:=False, publiclyVisible:=False)
         End Function
 
+        ''' <summary>
+        '''     Interner, unveränderlicher Datenträger <c>DetectionTrace</c> für strukturierte Verarbeitungsschritte.
+        ''' </summary>
         Private Structure DetectionTrace
             Friend ReasonCode As String
             Friend UsedZipContentCheck As Boolean

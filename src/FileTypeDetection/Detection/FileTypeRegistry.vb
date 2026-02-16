@@ -1,3 +1,12 @@
+' ============================================================================
+' FILE: FileTypeRegistry.vb
+'
+' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
+' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.md
+' - Try/Catch konsistent im Catch-Filter-Schema
+' - Variablen im Deklarationsblock, spaltenartig ausgerichtet
+' ============================================================================
+
 Option Strict On
 Option Explicit On
 
@@ -6,9 +15,9 @@ Imports System.Linq
 
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
-    '''     Zentrale Registry als SSOT fuer Typmetadaten, Alias-Aufloesung und Magic-Patterns.
+    '''     Zentrale Registry als SSOT für Typmetadaten, Alias-Auflösung und Magic-Patterns.
     '''     Regeln:
-    '''     - Neue Typen werden primaer ueber FileKind erweitert.
+    '''     - Neue Typen werden primär über FileKind erweitert.
     '''     - Metadaten werden deterministisch aus FileKind + zentralen Overrides aufgebaut.
     '''     - Unknown ist immer als fail-closed Fallback vorhanden.
     ''' </summary>
@@ -264,7 +273,7 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         ''' <summary>
-        '''     Liefert den zugeordneten FileType fuer einen Enumwert.
+        '''     Liefert den zugeordneten FileType für einen Enumwert.
         ''' </summary>
         ''' <param name="kind">Enumwert des Typs.</param>
         ''' <returns>Registrierter Typ oder Unknown.</returns>
@@ -275,9 +284,9 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         ''' <summary>
-        '''     Liefert den zugeordneten FileType fuer einen Aliaswert.
+        '''     Liefert den zugeordneten FileType für einen Aliaswert.
         ''' </summary>
-        ''' <param name="aliasKey">Alias mit oder ohne fuehrenden Punkt.</param>
+        ''' <param name="aliasKey">Alias mit oder ohne führenden Punkt.</param>
         ''' <returns>Registrierter Typ oder Unknown.</returns>
         Friend Shared Function ResolveByAlias(aliasKey As String) As FileType
             Dim k = FileKind.Unknown
@@ -287,6 +296,9 @@ Namespace Global.Tomtastisch.FileClassifier
             Return Resolve(FileKind.Unknown)
         End Function
 
+        ''' <summary>
+        '''     Interner, unveränderlicher Datenträger <c>FileTypeDefinition</c> für strukturierte Verarbeitungsschritte.
+        ''' </summary>
         Private Structure FileTypeDefinition
             Friend ReadOnly Kind As FileKind
             Friend ReadOnly CanonicalExtension As String
@@ -302,6 +314,9 @@ Namespace Global.Tomtastisch.FileClassifier
             End Sub
         End Structure
 
+        ''' <summary>
+        '''     Interner, unveränderlicher Datenträger <c>MagicRule</c> für strukturierte Verarbeitungsschritte.
+        ''' </summary>
         Private Structure MagicRule
             Friend ReadOnly Kind As FileKind
             Friend ReadOnly Patterns As ImmutableArray(Of MagicPattern)
@@ -312,6 +327,9 @@ Namespace Global.Tomtastisch.FileClassifier
             End Sub
         End Structure
 
+        ''' <summary>
+        '''     Interner, unveränderlicher Datenträger <c>MagicPattern</c> für strukturierte Verarbeitungsschritte.
+        ''' </summary>
         Private Structure MagicPattern
             Friend ReadOnly Segments As ImmutableArray(Of MagicSegment)
 
@@ -320,6 +338,9 @@ Namespace Global.Tomtastisch.FileClassifier
             End Sub
         End Structure
 
+        ''' <summary>
+        '''     Interner, unveränderlicher Datenträger <c>MagicSegment</c> für strukturierte Verarbeitungsschritte.
+        ''' </summary>
         Private Structure MagicSegment
             Friend ReadOnly Offset As Integer
             Friend ReadOnly Bytes As ImmutableArray(Of Byte)

@@ -1,3 +1,12 @@
+' ============================================================================
+' FILE: FileTypeOptions.vb
+'
+' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
+' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.md
+' - Try/Catch konsistent im Catch-Filter-Schema
+' - Variablen im Deklarationsblock, spaltenartig ausgerichtet
+' ============================================================================
+
 Option Strict On
 Option Explicit On
 
@@ -206,7 +215,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf ex Is NotSupportedException OrElse
                 TypeOf ex Is ArgumentException
                 Return False
-            Catch ex As Exception
+            Catch ex As Exception When TypeOf ex Is Exception
                 Return False
             End Try
         End Function

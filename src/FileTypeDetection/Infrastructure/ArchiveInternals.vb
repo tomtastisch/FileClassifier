@@ -1,9 +1,21 @@
+' ============================================================================
+' FILE: ArchiveInternals.vb
+'
+' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
+' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.md
+' - Try/Catch konsistent im Catch-Filter-Schema
+' - Variablen im Deklarationsblock, spaltenartig ausgerichtet
+' ============================================================================
+
 Option Strict On
 Option Explicit On
 
 Imports System.IO
 
 Namespace Global.Tomtastisch.FileClassifier
+    ''' <summary>
+    '''     Interne Aufzählung <c>ArchiveContainerType</c> für deterministische Zustands- und Typkennzeichnung.
+    ''' </summary>
     Friend Enum ArchiveContainerType
         Unknown = 0
         Zip
@@ -13,9 +25,23 @@ Namespace Global.Tomtastisch.FileClassifier
         Rar
     End Enum
 
+    ''' <summary>
+    '''     Interne Hilfsklasse <c>ArchiveDescriptor</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    ''' </summary>
     Friend NotInheritable Class ArchiveDescriptor
+        ''' <summary>
+        '''     Logischer Dateityp des erkannten Archivcontainers.
+        ''' </summary>
         Public ReadOnly Property LogicalKind As FileKind
+
+        ''' <summary>
+        '''     Primärer physischer Containertyp der Erkennung.
+        ''' </summary>
         Public ReadOnly Property ContainerType As ArchiveContainerType
+
+        ''' <summary>
+        '''     Deterministische Containerkette für verschachtelte Formate.
+        ''' </summary>
         Public ReadOnly Property ContainerChain As IReadOnlyList(Of ArchiveContainerType)
 
         Private Sub New(logicalKind As FileKind, containerType As ArchiveContainerType,
@@ -42,6 +68,9 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
     End Class
 
+    ''' <summary>
+    '''     Interner Vertrag <c>IArchiveEntryModel</c> für austauschbare Infrastrukturkomponenten.
+    ''' </summary>
     Friend Interface IArchiveEntryModel
         ReadOnly Property RelativePath As String
         ReadOnly Property IsDirectory As Boolean
@@ -51,6 +80,9 @@ Namespace Global.Tomtastisch.FileClassifier
         Function OpenStream() As Stream
     End Interface
 
+    ''' <summary>
+    '''     Interner Vertrag <c>IArchiveBackend</c> für austauschbare Infrastrukturkomponenten.
+    ''' </summary>
     Friend Interface IArchiveBackend
         ReadOnly Property ContainerType As ArchiveContainerType
 
@@ -63,6 +95,9 @@ Namespace Global.Tomtastisch.FileClassifier
                          ) As Boolean
     End Interface
 
+    ''' <summary>
+    '''     Interne Hilfsklasse <c>ArchiveBackendRegistry</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    ''' </summary>
     Friend NotInheritable Class ArchiveBackendRegistry
         Private Shared ReadOnly _managedArchiveBackend As New ArchiveManagedBackend()
         Private Shared ReadOnly _sharpCompressBackend As New SharpCompressArchiveBackend()
@@ -83,6 +118,9 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
     End Class
 
+    ''' <summary>
+    '''     Interne Hilfsklasse <c>ArchiveTypeResolver</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    ''' </summary>
     Friend NotInheritable Class ArchiveTypeResolver
         Private Sub New()
         End Sub
@@ -96,7 +134,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Using ms As New MemoryStream(data, writable:=False)
                     Return TryDescribeStream(ms, opt, descriptor)
                 End Using
-            Catch ex As Exception
+            Catch ex As Exception When TypeOf ex Is Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveDetect] Byte-Erkennung fehlgeschlagen: {ex.Message}")
                 descriptor = ArchiveDescriptor.UnknownDescriptor()
                 Return False
@@ -119,7 +157,7 @@ Namespace Global.Tomtastisch.FileClassifier
                     descriptor = ArchiveDescriptor.ForContainerType(mapped)
                     Return True
                 End Using
-            Catch ex As Exception
+            Catch ex As Exception When TypeOf ex Is Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveDetect] Stream-Erkennung fehlgeschlagen: {ex.Message}")
                 descriptor = ArchiveDescriptor.UnknownDescriptor()
                 Return False
@@ -149,6 +187,9 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
     End Class
 
+    ''' <summary>
+    '''     Interne Hilfsklasse <c>ArchiveProcessingEngine</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    ''' </summary>
     Friend NotInheritable Class ArchiveProcessingEngine
         Private Sub New()
         End Sub
@@ -175,6 +216,9 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
     End Class
 
+    ''' <summary>
+    '''     Interne Hilfsklasse <c>ArchiveExtractor</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    ''' </summary>
     Friend NotInheritable Class ArchiveExtractor
         Private Shared ReadOnly _recyclableStreams As New Microsoft.IO.RecyclableMemoryStreamManager()
 
@@ -183,7 +227,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Friend Shared Function TryExtractArchiveStreamToMemory(stream As Stream, opt As FileTypeProjectOptions) _
             As IReadOnlyList(Of ZipExtractedEntry)
-            Dim descriptor As ArchiveDescriptor = Nothing
+            Dim descriptor  As ArchiveDescriptor                   = Nothing
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             If Not ArchiveTypeResolver.TryDescribeStream(stream, opt, descriptor) Then Return emptyResult
             Return TryExtractArchiveStreamToMemory(stream, opt, descriptor)
@@ -215,7 +259,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End If
 
                 Return entries.AsReadOnly()
-            Catch ex As Exception
+            Catch ex As Exception When TypeOf ex Is Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveExtract] InMemory-Fehler: {ex.Message}")
                 entries.Clear()
                 Return emptyResult
@@ -240,7 +284,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim destinationFull As String
             Try
                 destinationFull = Path.GetFullPath(destinationDirectory)
-            Catch ex As Exception
+            Catch ex As Exception When TypeOf ex Is Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveExtract] Ungueltiger Zielpfad: {ex.Message}")
                 Return False
             End Try
@@ -270,7 +314,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
                 Directory.Move(stageDir, destinationFull)
                 Return True
-            Catch ex As Exception
+            Catch ex As Exception When TypeOf ex Is Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveExtract] Fehler: {ex.Message}")
                 Return False
             Finally
@@ -331,7 +375,7 @@ Namespace Global.Tomtastisch.FileClassifier
                     End Using
                 End Using
                 Return True
-            Catch ex As Exception
+            Catch ex As Exception When TypeOf ex Is Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveExtract] Entry-Fehler: {ex.Message}")
                 Return False
             End Try
@@ -363,7 +407,7 @@ Namespace Global.Tomtastisch.FileClassifier
                     End Using
                 End Using
                 Return True
-            Catch ex As Exception
+            Catch ex As Exception When TypeOf ex Is Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveExtract] InMemory-Entry-Fehler: {ex.Message}")
                 Return False
             End Try
@@ -424,6 +468,9 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
     End Class
 
+    ''' <summary>
+    '''     Interne Hilfsklasse <c>ArchiveEntryCollector</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    ''' </summary>
     Friend NotInheritable Class ArchiveEntryCollector
         Private Sub New()
         End Sub
@@ -474,15 +521,24 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
     End Class
 
+    ''' <summary>
+    '''     Interne Hilfsklasse <c>SharpCompressArchiveBackend</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    ''' </summary>
     Friend NotInheritable Class SharpCompressArchiveBackend
         Implements IArchiveBackend
 
+        ''' <summary>
+        '''     Liefert den vom Backend gemeldeten Containertyp.
+        ''' </summary>
         Public ReadOnly Property ContainerType As ArchiveContainerType Implements IArchiveBackend.ContainerType
             Get
                 Return ArchiveContainerType.Unknown
             End Get
         End Property
 
+        ''' <summary>
+        '''     Verarbeitet ein Archiv über SharpCompress fail-closed und optionalen Entry-Callback.
+        ''' </summary>
         Public Function Process(
                                 stream As Stream,
                                 opt As FileTypeProjectOptions,
@@ -541,7 +597,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
 
                 Return True
-            Catch ex As Exception
+            Catch ex As Exception When TypeOf ex Is Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveGate] SharpCompress-Fehler: {ex.Message}")
                 Return False
             End Try
@@ -661,6 +717,9 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
     End Class
 
+    ''' <summary>
+    '''     Interne Hilfsklasse <c>SharpCompressEntryModel</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    ''' </summary>
     Friend NotInheritable Class SharpCompressEntryModel
         Implements IArchiveEntryModel
 
@@ -670,6 +729,9 @@ Namespace Global.Tomtastisch.FileClassifier
             _entry = entry
         End Sub
 
+        ''' <summary>
+        '''     Liefert den relativen Archivpfad des Eintrags.
+        ''' </summary>
         Public ReadOnly Property RelativePath As String Implements IArchiveEntryModel.RelativePath
             Get
                 If _entry Is Nothing Then Return String.Empty
@@ -677,12 +739,18 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
+        ''' <summary>
+        '''     Kennzeichnet, ob der Eintrag ein Verzeichnis repräsentiert.
+        ''' </summary>
         Public ReadOnly Property IsDirectory As Boolean Implements IArchiveEntryModel.IsDirectory
             Get
                 Return _entry IsNot Nothing AndAlso _entry.IsDirectory
             End Get
         End Property
 
+        ''' <summary>
+        '''     Liefert die unkomprimierte Größe, sofern verfügbar.
+        ''' </summary>
         Public ReadOnly Property UncompressedSize As Long? Implements IArchiveEntryModel.UncompressedSize
             Get
                 If _entry Is Nothing Then Return Nothing
@@ -692,6 +760,9 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
+        ''' <summary>
+        '''     Liefert die komprimierte Größe, sofern verfügbar.
+        ''' </summary>
         Public ReadOnly Property CompressedSize As Long? Implements IArchiveEntryModel.CompressedSize
             Get
                 If _entry Is Nothing Then Return Nothing
@@ -701,6 +772,9 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
+        ''' <summary>
+        '''     Liefert ein Linkziel bei Link-Einträgen, sonst eine leere Zeichenfolge.
+        ''' </summary>
         Public ReadOnly Property LinkTarget As String Implements IArchiveEntryModel.LinkTarget
             Get
                 If _entry Is Nothing Then Return String.Empty
@@ -708,6 +782,9 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
+        ''' <summary>
+        '''     Öffnet einen lesbaren Stream für den Eintragsinhalt.
+        ''' </summary>
         Public Function OpenStream() As Stream Implements IArchiveEntryModel.OpenStream
             If _entry Is Nothing Then Return Stream.Null
             Return _entry.OpenEntryStream()
