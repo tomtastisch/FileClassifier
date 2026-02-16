@@ -89,7 +89,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
 
                 Return True
-            Catch ex As Exception When TypeOf ex Is Exception
+            Catch ex As Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveGate] Stream-Fehler: {ex.Message}")
                 Return False
             End Try
