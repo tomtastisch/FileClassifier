@@ -304,7 +304,7 @@ Namespace Global.Tomtastisch.FileClassifier
             End If
 
             Dim originalBytes As Byte() = Array.Empty(Of Byte)()
-            Dim readError     As String = String.Empty
+            Dim readError As String = String.Empty
             If Not TryReadFileBounded(path, detectorOptions, originalBytes, readError) Then
                 Dim failed = HashEvidence.CreateFailure(HashSourceType.Unknown, path, readError)
                 Return _
@@ -315,13 +315,13 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim archiveEntries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             Dim isArchiveInput = ArchiveEntryCollector.TryCollectFromFile(path, detectorOptions, archiveEntries)
 
-            Dim h2             As HashEvidence
+            Dim h2 As HashEvidence
             Dim canonicalBytes As Byte()
 
             If isArchiveInput Then
                 h2 = HashEntries(archiveEntries, "roundtrip-h2-entries", normalizedOptions)
                 Dim normalizedEntries As List(Of NormalizedEntry) = Nothing
-                Dim normalizeError    As String                   = String.Empty
+                Dim normalizeError As String = String.Empty
                 If TryNormalizeEntries(archiveEntries, normalizedEntries, normalizeError) Then
                     canonicalBytes = BuildLogicalManifestBytes(normalizedEntries)
                 Else
@@ -399,7 +399,7 @@ Namespace Global.Tomtastisch.FileClassifier
                                                  ) As HashEvidence
 
             Dim normalizedEntries As List(Of NormalizedEntry) = Nothing
-            Dim normalizeError    As String                   = String.Empty
+            Dim normalizeError As String = String.Empty
 
             If Not TryNormalizeEntries(entries, normalizedEntries, normalizeError) Then
                 Return HashEvidence.CreateFailure(sourceType, label, normalizeError)
