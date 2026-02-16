@@ -181,12 +181,12 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function MaterializeRawBytes _
             (
-                data As Byte(), 
-                destinationFull As String, 
+                data As Byte(),
+                destinationFull As String,
                 overwrite As Boolean,
                 opt As FileTypeProjectOptions
             ) As Boolean
-            
+
             Try
                 If Not DestinationPathGuard.PrepareMaterializationTarget(destinationFull, overwrite, opt) Then _
                     Return False
@@ -203,7 +203,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
 
                 Return True
-                
+
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse _
                 TypeOf ex Is Security.SecurityException OrElse _
@@ -219,13 +219,13 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function MaterializeArchiveBytes _
             (
-                data As Byte(), 
-                destinationFull As String, 
+                data As Byte(),
+                destinationFull As String,
                 overwrite As Boolean,
-                opt As FileTypeProjectOptions, 
+                opt As FileTypeProjectOptions,
                 descriptor As ArchiveDescriptor
             ) As Boolean
-            
+
             Try
                 If Not DestinationPathGuard.PrepareMaterializationTarget(destinationFull, overwrite, opt) Then _
                     Return False
@@ -233,7 +233,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Using ms As New MemoryStream(data, writable:=False)
                     Return ArchiveExtractor.TryExtractArchiveStream(ms, destinationFull, opt, descriptor)
                 End Using
-                
+
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse _
                 TypeOf ex Is System.Security.SecurityException OrElse _
