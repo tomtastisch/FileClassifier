@@ -4,9 +4,9 @@
 
 # Audit-Index
 
-## Zweck und Scope
-Zentraler Index fuer Evidence-/Hardening-Dokumente, die Claims aus `SECURITY.md` nachweisbar machen, ohne `SECURITY.md` selbst zu aendern.
-Root-Landing-Page fuer Dritte: `SECURITY_ASSURANCE_INDEX.md`.
+## Zweck und Geltungsbereich
+Zentraler Index fuer Nachweis-/Hardeningsdokumente, die Aussagen aus `SECURITY.md` belegbar machen, ohne `SECURITY.md` selbst zu aendern.
+Zentrale Einstiegsseite fuer Dritte: `SECURITY_ASSURANCE_INDEX.md`.
 
 ## Dokumente
 - `docs/audit/000_HASHING_BASELINE.MD`
@@ -25,7 +25,7 @@ Root-Landing-Page fuer Dritte: `SECURITY_ASSURANCE_INDEX.md`.
 - `docs/audit/013_SCORECARD_GOVERNANCE_ALERT_MAPPING.MD`
 - `docs/audit/014_EVIDENCE_REPORT_ISSUE_67.MD`
 
-## Maschinelle Evidence
+## Maschinelle Nachweise
 - `artifacts/ci/security-claims-evidence/`
 - `artifacts/ci/code-analysis-evidence/`
 - `artifacts/audit/code_inventory.json`
@@ -44,7 +44,7 @@ python3 tools/check-docs.py
 bash tools/versioning/verify-version-convergence.sh
 ```
 
-## Externe Assurance
+## Externe Nachweise
 - OpenSSF Scorecard Workflow: `.github/workflows/scorecard.yml`
 - Artifact Attestations im Release-Workflow: `.github/workflows/release.yml`
 - Deep Analysis Evidence Workflow: `.github/workflows/code-analysis-evidence.yml`

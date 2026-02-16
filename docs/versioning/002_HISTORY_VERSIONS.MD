@@ -14,34 +14,38 @@ Heuristik fuer die Rueckwirkungs-Zuordnung:
 Aktueller Entwicklungsstand:
 - Aktuelle Entwicklungslinie enthaelt `5.x` (aktuell veroeffentlichtes Tag: `v5.1.4`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
 
+Hinweis:
+- Die Spalte `Keyword` verwendet den technischen Klassifizierungswert aus der Historie.
+- Einzelne Committitel bleiben in der Originalsprache, wenn sie als exakter Quelltextnachweis uebernommen wurden.
+
 | Version | Kurzbeschreibung | Commit | Keyword |
 |---|---|---|---|
 | `5.1.4` | Refactor-Cluster 7C abgeschlossen + Qodana-Alerts auf 0 + Version-Bump fuer Release | [2adeb83](https://github.com/tomtastisch/FileClassifier/commit/2adeb83) | patch |
 | `5.1.3` | PR-Governance-Haertung (DE-Naming, PR-Template, fail-closed Gate fuer `security/code-scanning/tools = 0`) | [0b488ac](https://github.com/tomtastisch/FileClassifier/commit/0b488ac) | patch |
 | `5.1.2` | Gate4 Polling-Optimierung und Release-Haertung | [f12711d](https://github.com/tomtastisch/FileClassifier/commit/f12711d) | patch |
 | `5.1.1` | Dependabot security-only mode und fail-closed Guards fuer secret-pflichtige Workflows | [d0ad8ec](https://github.com/tomtastisch/FileClassifier/commit/d0ad8ec) | patch |
-| `5.1.0` | Security/Governance hardening wave: pinned actions, dependency review, labeler fixes, root assurance index | [e2a4a42](https://github.com/tomtastisch/FileClassifier/commit/e2a4a42) | minor |
-| `5.0.0` | Finalize hashing API rename to EvidenceHashing and add optional HMAC digests | [444d027](https://github.com/tomtastisch/FileClassifier/commit/444d027) | breaking |
-| `4.2.1` | Bump version to 4.2.1 for quality-gate hardening | [8ab274d](https://github.com/tomtastisch/FileClassifier/commit/8ab274d) | chore |
-| `4.2.0` | docs: fix root readme parity, link sha targets, and preflight version gate | [9691bec](https://github.com/tomtastisch/FileClassifier/commit/9691bec) | docs |
-| `4.1.3` | docs: deterministic restructure with SHA-locked links and policy-roc gate | [90a2825](https://github.com/tomtastisch/FileClassifier/commit/90a2825) | docs |
-| `4.1.2` | chore(version): bump version for xunit v3 migration release | [d1ed2a9](https://github.com/tomtastisch/FileClassifier/commit/d1ed2a9) | chore |
-| `4.1.1` | chore(version): bump patch version to satisfy CI guard | [d67050c](https://github.com/tomtastisch/FileClassifier/commit/d67050c) | chore |
-| `4.1.0` | chore: update version to 4.1.0 and improve versioning logic | [a3dfe23](https://github.com/tomtastisch/FileClassifier/commit/a3dfe23) | chore |
-| `4.0.0` | chore(versioning): bump baseline to 4.0.0 | [2a78f97](https://github.com/tomtastisch/FileClassifier/commit/2a78f97) | chore |
-| `3.0.24` | docs: fix umlaut spellings | [22d40b9](https://github.com/tomtastisch/FileClassifier/commit/22d40b9) | docs |
-| `3.0.23` | docs: normalize markdown language | [90310a0](https://github.com/tomtastisch/FileClassifier/commit/90310a0) | docs |
-| `3.0.22` | docs: unify markdown structure and add maintenance checklists | [cb3341d](https://github.com/tomtastisch/FileClassifier/commit/cb3341d) | docs |
-| `3.0.21` | docs(guides): unify structure and add step-by-step checklists with examples | [5f5c6ab](https://github.com/tomtastisch/FileClassifier/commit/5f5c6ab) | docs |
-| `3.0.20` | docs: add guides for options and datatype extensions (#5) | [392c628](https://github.com/tomtastisch/FileClassifier/commit/392c628) | docs |
-| `3.0.19` | docs(guides): add options and datatype extension playbooks | [1427e1e](https://github.com/tomtastisch/FileClassifier/commit/1427e1e) | docs |
-| `3.0.18` | Refactor: deterministic hashing, archive hardening, and test/CI stabilization (#4) | [374732a](https://github.com/tomtastisch/FileClassifier/commit/374732a) | refactor |
-| `3.0.17` | tooling(test): simplify readable output and strip technical test noise | [514922c](https://github.com/tomtastisch/FileClassifier/commit/514922c) | tooling |
-| `3.0.16` | ci(docs): validate markdown heading anchors in link checker | [02884ff](https://github.com/tomtastisch/FileClassifier/commit/02884ff) | ci |
-| `3.0.15` | ci(docs): add markdown link check gate | [cdbdfbd](https://github.com/tomtastisch/FileClassifier/commit/cdbdfbd) | ci |
-| `3.0.14` | docs(structure): enforce readme coverage and update all abstraction references | [0d4cc5e](https://github.com/tomtastisch/FileClassifier/commit/0d4cc5e) | docs |
-| `3.0.13` | docs(readme): add abstractions folder hierarchy graphic | [5853dd9](https://github.com/tomtastisch/FileClassifier/commit/5853dd9) | docs |
-| `3.0.12` | docs(abstractions): finalize references after model folder split | [afdc592](https://github.com/tomtastisch/FileClassifier/commit/afdc592) | docs |
+| `5.1.0` | Security-/Governance-Haertungswelle: gepinnte Actions, Dependency-Review, Labeler-Fixes, Root-Assurance-Index | [e2a4a42](https://github.com/tomtastisch/FileClassifier/commit/e2a4a42) | minor |
+| `5.0.0` | Hashing-API-Rename auf `EvidenceHashing` finalisiert und optionale HMAC-Digests hinzugefuegt | [444d027](https://github.com/tomtastisch/FileClassifier/commit/444d027) | breaking |
+| `4.2.1` | Version auf 4.2.1 fuer Quality-Gate-Haertung angehoben | [8ab274d](https://github.com/tomtastisch/FileClassifier/commit/8ab274d) | chore |
+| `4.2.0` | Dokumentation: Root-README-Paritaet korrigiert, SHA-Links angepasst und Preflight-Version-Gate haerter gemacht | [9691bec](https://github.com/tomtastisch/FileClassifier/commit/9691bec) | docs |
+| `4.1.3` | Dokumentation: deterministische Restrukturierung mit SHA-fixierten Links und Policy-RoC-Gate | [90a2825](https://github.com/tomtastisch/FileClassifier/commit/90a2825) | docs |
+| `4.1.2` | Versionierungs-Chore: Versionsbump fuer xUnit-v3-Migrationsrelease | [d1ed2a9](https://github.com/tomtastisch/FileClassifier/commit/d1ed2a9) | chore |
+| `4.1.1` | Versionierungs-Chore: Patch-Version erhoeht, um CI-Guard zu erfuellen | [d67050c](https://github.com/tomtastisch/FileClassifier/commit/d67050c) | chore |
+| `4.1.0` | Version auf 4.1.0 aktualisiert und Versionierungslogik verbessert | [a3dfe23](https://github.com/tomtastisch/FileClassifier/commit/a3dfe23) | chore |
+| `4.0.0` | Versionierungs-Basislinie auf 4.0.0 angehoben | [2a78f97](https://github.com/tomtastisch/FileClassifier/commit/2a78f97) | chore |
+| `3.0.24` | Dokumentation: Umlaut-Schreibweisen korrigiert | [22d40b9](https://github.com/tomtastisch/FileClassifier/commit/22d40b9) | docs |
+| `3.0.23` | Dokumentation: Markdown-Sprache normalisiert | [90310a0](https://github.com/tomtastisch/FileClassifier/commit/90310a0) | docs |
+| `3.0.22` | Dokumentation: Struktur vereinheitlicht und Wartungs-Checklisten ergaenzt | [cb3341d](https://github.com/tomtastisch/FileClassifier/commit/cb3341d) | docs |
+| `3.0.21` | Dokumentation (Guides): Struktur vereinheitlicht und Schritt-fuer-Schritt-Checklisten mit Beispielen ergaenzt | [5f5c6ab](https://github.com/tomtastisch/FileClassifier/commit/5f5c6ab) | docs |
+| `3.0.20` | Dokumentation: Leitfaeden fuer Optionen und Datentyp-Erweiterungen hinzugefuegt (#5) | [392c628](https://github.com/tomtastisch/FileClassifier/commit/392c628) | docs |
+| `3.0.19` | Dokumentation (Guides): Playbooks fuer Optionen und Datentyp-Erweiterungen hinzugefuegt | [1427e1e](https://github.com/tomtastisch/FileClassifier/commit/1427e1e) | docs |
+| `3.0.18` | Refactor: deterministisches Hashing, Archive-Haertung und Test/CI-Stabilisierung (#4) | [374732a](https://github.com/tomtastisch/FileClassifier/commit/374732a) | refactor |
+| `3.0.17` | Tooling (Test): lesbares Ausgabeformat vereinfacht und technisches Testrauschen reduziert | [514922c](https://github.com/tomtastisch/FileClassifier/commit/514922c) | tooling |
+| `3.0.16` | CI (Docs): Markdown-Heading-Anker im Link-Checker validiert | [02884ff](https://github.com/tomtastisch/FileClassifier/commit/02884ff) | ci |
+| `3.0.15` | CI (Docs): Markdown-Link-Check als Gate hinzugefuegt | [cdbdfbd](https://github.com/tomtastisch/FileClassifier/commit/cdbdfbd) | ci |
+| `3.0.14` | Dokumentation (Struktur): README-Abdeckung erzwungen und Abstraction-Referenzen aktualisiert | [0d4cc5e](https://github.com/tomtastisch/FileClassifier/commit/0d4cc5e) | docs |
+| `3.0.13` | Dokumentation (README): Grafik fuer Abstractions-Ordnerhierarchie hinzugefuegt | [5853dd9](https://github.com/tomtastisch/FileClassifier/commit/5853dd9) | docs |
+| `3.0.12` | Dokumentation (Abstractions): Referenzen nach Model-Ordnersplit finalisiert | [afdc592](https://github.com/tomtastisch/FileClassifier/commit/afdc592) | docs |
 | `3.0.11` | refactor(abstractions): split models into detection archive hashing folders | [f25256f](https://github.com/tomtastisch/FileClassifier/commit/f25256f) | refactor |
 | `3.0.10` | tooling(test): render bdd-readable output as clean per-test blocks | [268afe5](https://github.com/tomtastisch/FileClassifier/commit/268afe5) | tooling |
 | `3.0.9` | test(core): add fail-closed internals coverage and raise ci gates | [27659c8](https://github.com/tomtastisch/FileClassifier/commit/27659c8) | test |

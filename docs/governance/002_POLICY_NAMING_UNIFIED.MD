@@ -2,38 +2,38 @@
 [DE](002_POLICY_NAMING_UNIFIED.MD) | [EN](102_POLICY_NAMING_UNIFIED.MD)
 <!-- LANG_SWITCH:END -->
 
-# Unified Naming Policy (SSOT)
+# Einheitliche Naming-Richtlinie (SSOT)
 
-## 1. Purpose
-This policy defines one canonical public identity for package naming, assembly naming, namespace root, docs install snippets, and CI checks.
+## 1. Zweck
+Diese Richtlinie definiert eine kanonische oeffentliche Identitaet fuer Paketname, Assembly-Name, Namespace-Root, Doku-Install-Snippets und CI-Checks.
 
 ## 2. SSOT
-Normative source: `tools/ci/policies/data/naming.json`.
+Normative Quelle: `tools/ci/policies/data/naming.json`.
 
-## 3. SHALL Statements (Canonical Equality)
-- `canonical_name` SHALL equal `package_id`.
-- `canonical_name` SHALL equal `assembly_name`.
-- `canonical_name` SHALL equal `root_namespace`.
-- `canonical_name` SHALL be the public root namespace in source declarations.
-- Canonical value is `Tomtastisch.FileClassifier`.
+## 3. SHALL-Statements (kanonische Gleichheit)
+- `canonical_name` SHALL gleich `package_id` sein.
+- `canonical_name` SHALL gleich `assembly_name` sein.
+- `canonical_name` SHALL gleich `root_namespace` sein.
+- `canonical_name` SHALL als oeffentlicher Namespace-Root in Source-Definitionen verwendet werden.
+- Kanonischer Wert ist `Tomtastisch.FileClassifier`.
 
-## 4. Deprecated Package Rule
-- `deprecated_package_ids` SHALL list legacy package IDs.
-- Deprecated package IDs (from SSOT `deprecated_package_ids`) SHALL NOT appear in install snippets or PackageReference examples.
-- Deprecated IDs MAY appear only in migration documentation.
+## 4. Regel fuer veraltete Pakete
+- `deprecated_package_ids` SHALL veraltete Paket-IDs listen.
+- Veraltete Paket-IDs (aus SSOT `deprecated_package_ids`) SHALL NICHT in Install-Snippets oder PackageReference-Beispielen erscheinen.
+- Veraltete IDs MAY nur in Migrationsdokumentation erscheinen.
 
-## 5. GitHub Slug Limitation
-- GitHub repository slug is operational identity (`repo_identity`) and MAY differ from package ID.
-- Current slug is `FileClassifier`; canonical package remains `Tomtastisch.FileClassifier`.
-- If literal slug equality is required, manual rename steps are required:
-  1. GitHub repository Settings -> Rename repository.
-  2. Update `repository_url` in `tools/ci/policies/data/naming.json`.
-  3. Update `RepositoryUrl`/`PackageProjectUrl` in `src/FileTypeDetection/FileTypeDetectionLib.vbproj`.
-  4. Update local remotes (`git remote set-url origin ...`) and CI references.
+## 5. GitHub-Slug-Einschraenkung
+- GitHub-Repository-Slug ist operative Identitaet (`repo_identity`) und MAY von der Paket-ID abweichen.
+- Aktueller Slug ist `FileClassifier`; kanonisches Paket bleibt `Tomtastisch.FileClassifier`.
+- Falls literal gleiche Slugs erforderlich sind, sind manuelle Rename-Schritte notwendig:
+  1. GitHub Repository Settings -> Rename repository.
+  2. `repository_url` in `tools/ci/policies/data/naming.json` aktualisieren.
+  3. `RepositoryUrl`/`PackageProjectUrl` in `src/FileTypeDetection/FileTypeDetectionLib.vbproj` aktualisieren.
+  4. Lokale Remotes (`git remote set-url origin ...`) und CI-Referenzen aktualisieren.
 
-## 6. CI Enforcement Mapping
-- Rule ID is fixed: `CI-NAMING-001`.
-- Rule file: `tools/ci/policies/rules/naming_snt.yaml`.
+## 6. CI-Enforcement-Mapping
+- Rule-ID ist fix: `CI-NAMING-001`.
+- Regeldatei: `tools/ci/policies/rules/naming_snt.yaml`.
 - Checker: `tools/ci/check-naming-snt.sh`.
 - Reports:
   - `artifacts/naming_snt_report.json`
