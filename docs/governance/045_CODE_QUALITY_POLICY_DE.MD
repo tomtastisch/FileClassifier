@@ -750,3 +750,11 @@ Namespace Global.Tomtastisch.FileClassifier
 
 End Namespace
 ```
+
+## 11. Policy/RoC-Mapping (CI)
+Diese Policy ist in der CI-RoC-Matrix auf folgende Regeldateien gemappt:
+- `tools/ci/policies/rules/artifact_contract.yaml`
+- `tools/ci/policies/rules/docs_drift.yaml`
+- `tools/ci/policies/rules/naming_snt.yaml`
+- `tools/ci/policies/rules/shell_safety.yaml`
+- `tools/ci/policies/rules/versioning_svt.yaml`

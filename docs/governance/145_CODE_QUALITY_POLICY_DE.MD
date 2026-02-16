@@ -132,3 +132,11 @@ Deviations are allowed only when technically required and must be justified in d
 ## Source of Truth Note
 This English edition is provided for accessibility. If wording differs, the German policy file
 `docs/governance/045_CODE_QUALITY_POLICY_DE.MD` is authoritative.
+
+## 11. Policy/RoC Mapping (CI)
+This policy is mapped in the CI RoC matrix to the following rule files:
+- `tools/ci/policies/rules/artifact_contract.yaml`
+- `tools/ci/policies/rules/docs_drift.yaml`
+- `tools/ci/policies/rules/naming_snt.yaml`
+- `tools/ci/policies/rules/shell_safety.yaml`
+- `tools/ci/policies/rules/versioning_svt.yaml`
