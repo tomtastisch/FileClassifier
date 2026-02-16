@@ -76,7 +76,7 @@ Namespace Global.Tomtastisch.FileClassifier
                                         End If
                                     End Using
                                 End Using
-                            Catch ex As Exception When TypeOf ex Is Exception
+                            Catch ex As Exception
                                 LogGuard.Debug(opt.Logger, $"[ArchiveGate] Nested-Fehler: {ex.Message}")
                                 Return False
                             End Try
