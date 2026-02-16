@@ -2,35 +2,35 @@
 [DE](004_GUIDE_MIGRATE_LEGACY_NUGET.MD) | [EN](104_GUIDE_MIGRATE_LEGACY_NUGET.MD)
 <!-- LANG_SWITCH:END -->
 
-# Migration Guide: Legacy NuGet ID to Canonical Package
+# Migrationsleitfaden: Legacy-NuGet-ID zum kanonischen Paket
 
-## Scope
-This guide covers migration from deprecated package `Tomtastisch.FileTypeDetection` to canonical package `Tomtastisch.FileClassifier`.
+## Geltungsbereich
+Dieser Leitfaden beschreibt die Migration vom veralteten Paket `Tomtastisch.FileTypeDetection` auf das kanonische Paket `Tomtastisch.FileClassifier`.
 
-## Why
-- Legacy package is deprecated and unlisted on NuGet.org.
-- Canonical package receives ongoing updates and policy-backed CI validation.
-- Public root namespace is unified to `Tomtastisch.FileClassifier` (Level 3 public surface rename).
+## Warum
+- Das Legacy-Paket ist veraltet und auf NuGet.org unlisted.
+- Das kanonische Paket erhaelt laufende Updates und policy-gestuetzte CI-Validierung.
+- Der oeffentliche Root-Namespace ist auf `Tomtastisch.FileClassifier` vereinheitlicht (Level-3 Public-Surface-Rename).
 
-## PackageReference Migration
-Replace:
+## PackageReference-Migration
+Ersetze:
 ```xml
 <PackageReference Include="Tomtastisch.FileTypeDetection" Version="X.Y.Z" />
 ```
-with:
+durch:
 ```xml
 <PackageReference Include="Tomtastisch.FileClassifier" Version="X.Y.Z" />
 ```
 
-CLI install command:
+CLI-Installationskommando:
 ```bash
 dotnet add package Tomtastisch.FileClassifier --version X.Y.Z
 ```
 
-## Namespace Migration
-Update source imports/usings from legacy root namespace to `Tomtastisch.FileClassifier`.
+## Namespace-Migration
+Passe Source-Imports/Usings vom Legacy-Root-Namespace auf `Tomtastisch.FileClassifier` an.
 
-## Unlist + Deprecate Policy
-- Legacy versions are unlisted using `dotnet nuget delete` (NuGet.org unlist semantics).
-- Deprecation should point users to `Tomtastisch.FileClassifier`.
-- If CLI deprecation is unavailable, apply deprecation in NuGet.org UI for all legacy versions.
+## Unlist- und Deprecation-Policy
+- Legacy-Versionen werden mit `dotnet nuget delete` unlisted (NuGet.org-Unlist-Semantik).
+- Deprecation soll auf `Tomtastisch.FileClassifier` verweisen.
+- Falls CLI-Deprecation nicht verfuegbar ist, Deprecation fuer alle Legacy-Versionen in der NuGet.org-UI setzen.

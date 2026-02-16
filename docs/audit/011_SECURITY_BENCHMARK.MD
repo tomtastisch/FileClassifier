@@ -2,11 +2,11 @@
 [DE](011_SECURITY_BENCHMARK.MD) | [EN](111_SECURITY_BENCHMARK.MD)
 <!-- LANG_SWITCH:END -->
 
-# Security-Policy Benchmark (Stand: 2026-02-13)
+# Security-Policy-Benchmark (Stand: 2026-02-13)
 
 ## 1. Ziel und Scope
 Vergleich der Security-Policy-Reife von `tomtastisch/FileClassifier` (PR-Branch `tomtastisch-patch-1`) mit verbreiteten .NET-Open-Source-Repositories anhand nachweisbarer GitHub- und Repository-Fakten.
-Dieser Benchmark ist ein Snapshot vor Merge in `main` (Stand 2026-02-13).
+Dieser Benchmark ist ein Snapshot vor dem Merge in `main` (Stand 2026-02-13).
 
 Verglichene Repositories:
 - `tomtastisch/FileClassifier`
@@ -22,7 +22,7 @@ Verglichene Repositories:
 - `NLog/NLog`
 
 ## 2. Methodik (nur faktenbasiert)
-Erhoben via GitHub API und lokale Dateiinspektion:
+Erhoben ueber GitHub API und lokale Dateiinspektion:
 - Vorhandensein `SECURITY.md` (FileClassifier: repo-root `SECURITY.md`; andere Repos ggf. alternativ `.github/SECURITY.md`)
 - Status `private-vulnerability-reporting`
 - Sichtbare `security_and_analysis`-Felder (`dependabot_security_updates`, `secret_scanning`)
@@ -30,7 +30,7 @@ Erhoben via GitHub API und lokale Dateiinspektion:
 - Vorhandensein von Workflow-Dateien mit `codeql` im Dateinamen
 - Inhaltsmerkmale der `SECURITY.md`: Support-Tabelle, Reporting, SLA-Zeitangaben, Safe Harbor, ISO/IEC 29147/30111, koordinierte Offenlegung
 
-## 3. Ergebnis A - Plattform-/Repo-Merkmale
+## 3. Ergebnis A - Plattform-/Repository-Merkmale
 | Repository | SECURITY.md | Private Vulnerability Reporting | Dependabot Security Updates | Secret Scanning | CodeQL Workflow-Datei | dependabot.yml |
 |---|---|---|---|---|---|---|
 | tomtastisch/FileClassifier | nein (Snapshot vor Merge in `main`) | true | enabled | enabled | nein | nein |
@@ -78,7 +78,7 @@ Diese Punkte sind ausserhalb einer einzelnen `SECURITY.md`, aber notwendig fuer 
 
 ## 7. Reproduzierbarkeit
 Verwendete Kommandos (Auszug):
-All commands are intended to run from the repository root.
+Alle Kommandos sind fuer die Ausfuehrung im Repository-Root gedacht.
 ```bash
 REPO="<owner>/<repo>"
 gh api "repos/$REPO"

@@ -2,56 +2,56 @@
 [DE](001_POLICY_CI.MD) | [EN](101_POLICY_CI.MD)
 <!-- LANG_SWITCH:END -->
 
-# CI Policy (SSOT)
+# CI-Richtlinie (SSOT)
 
-## Scope
-This document defines policy principles, severity handling, and exit code policy.
-Normative policy definitions live in:
+## Geltungsbereich
+Dieses Dokument definiert Richtlinienprinzipien, Severity-Behandlung und Exit-Code-Politik fuer die CI.
+Normative Richtliniendefinitionen liegen in:
 - `tools/ci/policies/schema/rules.schema.json`
 - `tools/ci/policies/rules/`
-Entry index:
+Einstiegsindex:
 - `docs/governance/006_INDEX_CI_RULES.MD`
 
-## Global Rules
-- Fail-closed: no silent bypass paths.
-- Workflow YAML only calls entry scripts under `tools/ci/bin/`.
-- Required branch-protection contexts remain fixed: `preflight`, `version-policy`, `build`, `api-contract`, `pack`, `consumer-smoke`, `package-backed-tests`, `security-nuget`, `tests-bdd-coverage`.
-  Evidence: branch protection API (`required_status_checks.contexts`) and `.github/workflows/ci.yml:59-347`.
+## Globale Regeln
+- Fail-closed: keine stillen Bypass-Pfade.
+- Workflow-YAML ruft nur Entry-Skripte unter `tools/ci/bin/` auf.
+- Erforderliche Branch-Protection-Contexts bleiben fix: `preflight`, `version-policy`, `build`, `api-contract`, `pack`, `consumer-smoke`, `package-backed-tests`, `security-nuget`, `tests-bdd-coverage`.
+  Nachweis: Branch-Protection-API (`required_status_checks.contexts`) und `.github/workflows/ci.yml:59-347`.
 
-## Result Contract
-All required checks MUST write:
+## Ergebnisvertrag
+Alle erforderlichen Checks MUESSEN schreiben:
 - `artifacts/ci/<check_id>/raw.log`
 - `artifacts/ci/<check_id>/summary.md`
 - `artifacts/ci/<check_id>/result.json`
 
-`result.json` must comply with `tools/ci/schema/result.schema.json`.
-Implementation evidence: `tools/ci/lib/result.sh:12-20`, `tools/ci/lib/result.sh:28-34`, `tools/ci/lib/result.sh:78-112`.
+`result.json` muss `tools/ci/schema/result.schema.json` entsprechen.
+Implementierungsnachweis: `tools/ci/lib/result.sh:12-20`, `tools/ci/lib/result.sh:28-34`, `tools/ci/lib/result.sh:78-112`.
 
-## Governance View (Execution Boundary)
+## Governance-Sicht (Ausfuehrungsgrenze)
 ```mermaid
 flowchart LR
-  yml["Workflow declarations\n.github/workflows/*.yml"] --> run["Single entrypoint\n tools/ci/bin/run.sh <check_id>"]
-  run --> result["Result contract artifacts\nraw.log / summary.md / result.json / diag.json"]
-  result --> policy["Policy validators / schema\nPolicyRunner + result schema"]
+  yml["Workflow-Deklarationen\n.github/workflows/*.yml"] --> run["Einziger Einstiegspunkt\n tools/ci/bin/run.sh <check_id>"]
+  run --> result["Ergebnisvertrag-Artefakte\nraw.log / summary.md / result.json / diag.json"]
+  result --> policy["Policy-Validatoren / Schema\nPolicyRunner + Result-Schema"]
 ```
 
-The detailed job DAG and contract matrix are maintained in `docs/ci/001_PIPELINE_CI.MD` to avoid duplication.
+Der detaillierte Job-DAG und die Vertragsmatrix liegen in `docs/ci/001_PIPELINE_CI.MD`, um Duplikate zu vermeiden.
 
-## Rule Catalog
-- Rule IDs and file ownership are indexed in `docs/governance/006_INDEX_CI_RULES.MD`.
-- Evaluation details and thresholds are defined only in `tools/ci/policies/rules/`.
+## Regelkatalog
+- Rule-IDs und Datei-Zuordnung sind in `docs/governance/006_INDEX_CI_RULES.MD` indexiert.
+- Auswertungsdetails und Schwellwerte sind ausschliesslich in `tools/ci/policies/rules/` definiert.
 
-## Severity Rules
-- `warn`: visible, non-blocking.
-- `fail`: blocking, exit code non-zero.
+## Severity-Regeln
+- `warn`: sichtbar, nicht blockierend.
+- `fail`: blockierend, Exit-Code ungleich Null.
 
-## Exit Code Matrix
-- `0`: success (`pass` or `warn`)
-- `1`: policy/contract/check failure (`fail`)
-- `2`: invalid invocation or missing prerequisites
+## Exit-Code-Matrix
+- `0`: Erfolg (`pass` oder `warn`)
+- `1`: Richtlinien-/Vertrags-/Check-Fehler (`fail`)
+- `2`: ungueltiger Aufruf oder fehlende Voraussetzungen
 
-## Allow-lists
-Allow-list definitions are managed in rule parameters under `tools/ci/policies/rules/`.
+## Allow-Lists
+Allow-List-Definitionen werden in Regelparametern unter `tools/ci/policies/rules/` gepflegt.
 
 ## RoC-Bezug
 - [Artifact-Contract-Regel](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/artifact_contract.yaml)

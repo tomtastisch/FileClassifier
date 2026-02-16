@@ -4,13 +4,13 @@
 
 # CI-Pipeline (SSOT)
 
-## Zweck und Scope
+## Zweck und Geltungsbereich
 Dieses Dokument beschreibt die ausfuehrbare CI-Topologie und den Artefaktvertrag.
 Normative Policy-Schwellenwerte und Regelparameter liegen in `tools/ci/policies/rules/` und `docs/governance/001_POLICY_CI.MD`.
 
 ## Erforderliche Status-Contexts
 Die Branch-Protection auf `main` verlangt exakt diese Contexts (`strict: true`): `preflight`, `version-policy`, `build`, `api-contract`, `pack`, `consumer-smoke`, `package-backed-tests`, `security-nuget`, `tests-bdd-coverage`.
-Evidence: Branch-Protection API Output (`required_status_checks.contexts`), `.github/workflows/ci.yml:59-347` und `.github/workflows/ruleset-placeholders.yml` (Context `version-policy`).
+Nachweis: Branch-Protection-API-Ausgabe (`required_status_checks.contexts`), `.github/workflows/ci.yml:59-347` und `.github/workflows/ruleset-placeholders.yml` (Context `version-policy`).
 Hinweis: Die normative Versionierungsentscheidung (RaC) wird zusaetzlich durch `.github/workflows/version-policy.yml` als Check `versioning-policy` ausgewertet (nicht Teil der Branch-Protection-Contexts).
 
 ## Workflow-Topologie
@@ -69,11 +69,11 @@ Jeder Aufruf `tools/ci/bin/run.sh <check_id>` initialisiert und finalisiert ein 
 - `result.json`
 - `diag.json`
 
-Evidence:
+Nachweis:
 - Artefaktpfad-Initialisierung: `tools/ci/lib/result.sh:12-20`.
 - File-Materialisierung: `tools/ci/lib/result.sh:28-34`.
 - Finale `result.json` Komposition: `tools/ci/lib/result.sh:78-112`.
-- Universal Runner Wiring: `tools/ci/bin/run.sh:16-28`.
+- Universelles Runner-Wiring: `tools/ci/bin/run.sh:16-28`.
 
 ## Vertragsmatrix
 | Job | Entrypoint | Artefaktpfad | Vertragsvalidierung | Evidence |
@@ -92,14 +92,14 @@ Evidence:
 | `summary` | `bash tools/ci/bin/run.sh summary` | `artifacts/ci/summary/` | Policy contract aggregation | `.github/workflows/ci.yml:417-427`, `tools/ci/bin/run.sh:424-430` |
 | `pr-labeling` | `bash tools/ci/bin/run.sh pr-labeling` | `artifacts/ci/pr-labeling/` | Label decision schema + apply+verify | `.github/workflows/ci.yml:45-57`, `tools/ci/bin/run.sh:350-400` |
 
-## Labeling- und Versionierungs-Entscheidungspfad
-- Decision-Generierung: `compute-pr-labels.js` schreibt `decision.json` (`tools/ci/bin/run.sh:371-372`).
+## Labeling- und Versionierungsentscheidungs-Pfad
+- Entscheidungs-Generierung: `compute-pr-labels.js` schreibt `decision.json` (`tools/ci/bin/run.sh:371-372`).
 - Schema-Validierung: `validate-label-decision.js` (`tools/ci/bin/run.sh:374`).
-- Label-Anwendung und Post-Apply-Verifikation: deterministischer GitHub API PUT (curl-backed) und anschliessender Re-Read (`tools/ci/bin/run.sh:375-399`, `tools/ci/bin/github_api.py`).
+- Label-Anwendung und Post-Apply-Verifikation: deterministischer GitHub-API-PUT (curl-backed) und anschliessender Re-Read (`tools/ci/bin/run.sh:375-399`, `tools/ci/bin/github_api.py`).
 - Workflow-Token-Quelle: `GH_TOKEN: ${{ github.token }}` (`.github/workflows/ci.yml:46-50`).
 
 ## Qodana: Vertragsposition
 Qodana laeuft in einem separaten Workflow und wird durch `run.sh qodana` validiert:
-- Qodana action execution and SARIF output path (`.github/workflows/qodana.yml:34-40`, `.github/workflows/qodana.yml:59`).
-- Contract check invocation (`.github/workflows/qodana.yml:47-48`, `tools/ci/bin/run.sh:402-422`).
-- Qodana artifact upload (`.github/workflows/qodana.yml:54-60`).
+- Qodana-Action-Ausfuehrung und SARIF-Ausgabepfad (`.github/workflows/qodana.yml:34-40`, `.github/workflows/qodana.yml:59`).
+- Vertragscheck-Aufruf (`.github/workflows/qodana.yml:47-48`, `tools/ci/bin/run.sh:402-422`).
+- Qodana-Artefakt-Upload (`.github/workflows/qodana.yml:54-60`).

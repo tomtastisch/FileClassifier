@@ -2,12 +2,12 @@
 [DE](003_SECURITY_ASSERTION_TRACEABILITY.MD) | [EN](103_SECURITY_ASSERTION_TRACEABILITY.MD)
 <!-- LANG_SWITCH:END -->
 
-# Traceability: Security-Claims (SECURITY.md)
+# Rueckverfolgbarkeit: Sicherheitsaussagen (SECURITY.md)
 
-## Zweck und Scope
-Mapping von Claims in `SECURITY.md` auf Evidence-Quellen und Verifikationskommandos.
+## Zweck und Geltungsbereich
+Abbildung von Aussagen in `SECURITY.md` auf Nachweisquellen und Verifikationskommandos.
 
-| Claim ID | SECURITY-Anker | Claim-Zusammenfassung | Evidence-Quelle | Verifikationskommando | Pass-Kriterium | Blocker |
+| Claim ID | SECURITY-Anker | Claim-Zusammenfassung | Nachweisquelle | Verifikationskommando | Pass-Kriterium | Blocker |
 |---|---|---|---|---|---|---|
 | SEC-CLAIM-001 | 2. Unterstuetzte Versionen | Security-Support ist an Major 5 gebunden | `src/FileTypeDetection/FileTypeDetectionLib.vbproj` | `sed -n 's:.*<Version>\([^<]*\)</Version>.*:\1:p' src/FileTypeDetection/FileTypeDetectionLib.vbproj` | Version-Major ist `5` | yes |
 | SEC-CLAIM-002 | 3. Meldung | Private Vulnerability Reporting ist aktiv | GitHub API `private-vulnerability-reporting` | `gh api "repos/$REPO/private-vulnerability-reporting"` | `.enabled == true` | yes |
@@ -26,10 +26,10 @@ Mapping von Claims in `SECURITY.md` auf Evidence-Quellen und Verifikationskomman
 | SEC-CLAIM-015 | 1. Zweck/Geltungsbereich | ISO/IEC 29147 und 30111 Orientierung ist dokumentiert | Policy + Roadmap-Dokus | `rg -n "29147|30111" SECURITY.md docs/audit/004_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD` | Referenzen vorhanden (ohne Zertifizierungsclaim) | report-only |
 | SEC-CLAIM-016 | 9. Zertifizierungsgrenze | Es wird keine formale Produkt-Zertifizierung behauptet | `SECURITY.md` Section 9 | `rg -n "keine.*Zertifizierung|kein.*Rechtsgutachten" SECURITY.md` | expliziter Non-Claim vorhanden | yes |
 
-## Full-Coverage-Hinweis
-Claims, die normative Prozess-Statements sind (Policy-Intent), werden als `report-only` klassifiziert, solange sie nicht in deterministische Machine-Checks ueberfuehrt werden koennen.
+## Vollstaendigkeits-Hinweis
+Claims, die normative Prozessaussagen sind (Policy-Intent), werden als `report-only` klassifiziert, solange sie nicht in deterministische maschinelle Checks ueberfuehrt werden koennen.
 
-## CI-Claim-Mapping
+## CI-Claim-Abbildung
 Das Verifikationsscript verwendet `CI-SEC-CLAIM-*` Rule-IDs. Mapping auf normative Claims:
 - `CI-SEC-CLAIM-001` -> `SEC-CLAIM-002` (Repository/Reporting-Context ist aufloesbar)
 - `CI-SEC-CLAIM-002` -> `SEC-CLAIM-001` (Supported-Major-Version-Claim)

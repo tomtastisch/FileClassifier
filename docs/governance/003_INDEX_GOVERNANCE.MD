@@ -2,11 +2,11 @@
 [DE](003_INDEX_GOVERNANCE.MD) | [EN](103_INDEX_GOVERNANCE.MD)
 <!-- LANG_SWITCH:END -->
 
-# Policy Index (SSOT Navigation)
+# Richtlinienindex (SSOT-Navigation)
 
-This index is non-normative. Normative policy definitions are the rule files under `tools/ci/policies/rules/`.
+Dieser Index ist nicht normativ. Normative Richtliniendefinitionen sind die Regeldateien unter `tools/ci/policies/rules/`.
 
-| Rule ID | Rule File |
+| Rule ID | Regeldatei |
 | --- | --- |
 | `CI-ARTIFACT-001` | `tools/ci/policies/rules/artifact_contract.yaml` |
 | `CI-SHELL-001` | `tools/ci/policies/rules/shell_safety.yaml` |
