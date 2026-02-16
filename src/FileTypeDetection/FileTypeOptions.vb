@@ -159,9 +159,6 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf ex Is FormatException
                 LogGuard.Warn(GetSnapshot().Logger, $"[Config] Parse-Fehler: {ex.Message}")
                 Return False
-            Catch ex As Exception
-                LogGuard.Warn(GetSnapshot().Logger, $"[Config] Parse-Fehler: {ex.Message}")
-                Return False
             End Try
         End Function
 

@@ -314,6 +314,7 @@ Namespace Global.Tomtastisch.FileClassifier
             (
                 data As Byte()
             ) As FileType
+
             Dim opt = GetDefaultOptions()
             Return DetectInternalBytes(data, opt)
         End Function
