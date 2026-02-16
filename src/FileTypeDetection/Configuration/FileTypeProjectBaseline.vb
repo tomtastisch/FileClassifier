@@ -3,14 +3,18 @@ Option Explicit On
 
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
-    '''     Liefert ein konservatives, deterministisches Sicherheitsprofil für die Dateityp-Erkennung.
+    '''     Stellt ein konservatives, deterministisches Sicherheitsprofil für die Bibliothek bereit.
     ''' </summary>
+    ''' <remarks>
+    '''     Das Profil bündelt fail-closed Standardgrenzen für Detektion, Archivverarbeitung und Hashing, die auf
+    '''     produktionsnahe Sicherheitsanforderungen ausgerichtet sind.
+    ''' </remarks>
     Public NotInheritable Class FileTypeProjectBaseline
         Private Sub New()
         End Sub
 
         ''' <summary>
-        '''     Erzeugt ein hartes Default-Profil fuer produktive, fail-closed Szenarien.
+        '''     Erzeugt ein hartes Default-Profil für produktive, fail-closed Szenarien.
         ''' </summary>
         Private Shared Function CreateDeterministicDefaults() As FileTypeProjectOptions
             Return New FileTypeProjectOptions With {
@@ -33,8 +37,12 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         ''' <summary>
-        '''     Aktiviert das Sicherheitsprofil global als neue Default-Optionen.
+        '''     Aktiviert das deterministische Sicherheitsprofil global als neuen Default-Snapshot.
         ''' </summary>
+        ''' <remarks>
+        '''     Nebenwirkung: Nach erfolgreichem Aufruf verwenden nachfolgende Bibliotheksoperationen die gesetzten
+        '''     Baseline-Werte, sofern sie keinen expliziten Snapshot erhalten.
+        ''' </remarks>
         Public Shared Sub ApplyDeterministicDefaults()
             FileTypeOptions.SetSnapshot(CreateDeterministicDefaults())
         End Sub

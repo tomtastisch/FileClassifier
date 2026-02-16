@@ -3,16 +3,50 @@ Option Explicit On
 
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
-    '''     Deterministische Hash-Sammlung fuer einen Verarbeitungsschritt.
+    '''     Deterministische Digest-Sammlung für einen Verarbeitungsschritt.
     ''' </summary>
+    ''' <remarks>
+    '''     Enthält logische und physische Hashwerte (inklusive optionaler Fast- und HMAC-Digests) in normalisierter Form.
+    ''' </remarks>
     Public NotInheritable Class HashDigestSet
+        ''' <summary>
+        '''     Physischer SHA-256-Digest des Quellpayloads.
+        ''' </summary>
         Public ReadOnly Property PhysicalSha256 As String
+
+        ''' <summary>
+        '''     Logischer SHA-256-Digest der kanonischen Sicht.
+        ''' </summary>
         Public ReadOnly Property LogicalSha256 As String
+
+        ''' <summary>
+        '''     Optionaler schneller physischer XxHash3-Digest.
+        ''' </summary>
         Public ReadOnly Property FastPhysicalXxHash3 As String
+
+        ''' <summary>
+        '''     Optionaler schneller logischer XxHash3-Digest.
+        ''' </summary>
         Public ReadOnly Property FastLogicalXxHash3 As String
+
+        ''' <summary>
+        '''     Optionaler HMAC-SHA256-Digest für den physischen Payload.
+        ''' </summary>
         Public ReadOnly Property HmacPhysicalSha256 As String
+
+        ''' <summary>
+        '''     Optionaler HMAC-SHA256-Digest für den logischen Payload.
+        ''' </summary>
         Public ReadOnly Property HmacLogicalSha256 As String
+
+        ''' <summary>
+        '''     Kennzeichnet, ob ein physischer Hashwert vorliegt.
+        ''' </summary>
         Public ReadOnly Property HasPhysicalHash As Boolean
+
+        ''' <summary>
+        '''     Kennzeichnet, ob ein logischer Hashwert vorliegt.
+        ''' </summary>
         Public ReadOnly Property HasLogicalHash As Boolean
 
         Friend Sub New(

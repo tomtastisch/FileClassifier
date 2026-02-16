@@ -7,15 +7,20 @@ Imports System.Diagnostics.CodeAnalysis
 
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
-    '''     Oeffentliche API zur inhaltsbasierten Dateityp-Erkennung.
-    '''     <remarks>
-    '''         Sicherheits- und Architekturprinzipien:
-    '''         - fail-closed: jeder Fehlerpfad liefert FileKind.Unknown.
-    '''         - SSOT: Signatur- und Typdaten liegen zentral in FileTypeRegistry.
-    '''         - Dateiendung ist nur Metadatum; die Entscheidung basiert auf Content.
-    '''         - ZIP-Dateien laufen immer durch ZIP-Gate und optionales OOXML-Refinement.
-    '''     </remarks>
+    '''     Öffentliche Haupt-API zur inhaltsbasierten Dateityp-Erkennung, Archivvalidierung und sicheren Extraktion.
     ''' </summary>
+    ''' <remarks>
+    '''     <para>
+    '''         Sicherheits- und Architekturprinzipien:
+    '''         1) fail-closed: Fehlerpfade liefern deterministisch <see cref="FileKind.Unknown"/>.
+    '''         2) SSOT: Signatur- und Typwissen wird zentral aus <c>FileTypeRegistry</c> aufgelöst.
+    '''         3) Dateiendungen sind Metadaten; Primärentscheidung basiert auf Inhalt.
+    '''         4) Archive durchlaufen Sicherheits-Gates und optionales strukturiertes Refinement.
+    '''     </para>
+    '''     <para>
+    '''         Nebenwirkungen: Dateisystemzugriffe (Lesen/Extraktion) und Protokollierung über den konfigurierten Logger.
+    '''     </para>
+    ''' </remarks>
     Public NotInheritable Class FileTypeDetector
         Private Const ReasonUnknown As String = "Unknown"
         Private Const ReasonFileNotFound As String = "FileNotFound"
@@ -39,7 +44,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <summary>
         '''     Setzt globale Default-Optionen als Snapshot.
         ''' </summary>
-        ''' <param name="opt">Quelloptionen fuer den globalen Snapshot.</param>
+        ''' <param name="opt">Quelloptionen für den globalen Snapshot.</param>
         Friend Shared Sub SetDefaultOptions(opt As FileTypeProjectOptions)
             FileTypeOptions.SetSnapshot(opt)
         End Sub
@@ -47,17 +52,30 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <summary>
         '''     Liefert einen Snapshot der aktuellen Default-Optionen.
         ''' </summary>
-        ''' <returns>Unabhaengige Kopie der globalen Optionen.</returns>
+        ''' <returns>Unabhängige Kopie der globalen Optionen.</returns>
         Friend Shared Function GetDefaultOptions() As FileTypeProjectOptions
             Return FileTypeOptions.GetSnapshot()
         End Function
 
         ''' <summary>
-        '''     Liest eine Datei begrenzt in Memory ein. Wird z. B. fuer Detect(byte())-Workflows verwendet.
+        '''     Liest eine Datei begrenzt in den Arbeitsspeicher ein.
         ''' </summary>
-        ''' <param name="path">Dateipfad.</param>
-        ''' <returns>Gelesene Bytes oder leeres Array bei Fehler/Verletzung der Grenzen.</returns>
-        Public Shared Function ReadFileSafe(path As String) As Byte()
+        ''' <remarks>
+        '''     Die Methode erzwingt Größenlimits und liefert fail-closed ein leeres Byte-Array bei Fehlern.
+        ''' </remarks>
+        ''' <param name="path">Dateipfad der Quelldatei.</param>
+        ''' <returns>Gelesene Bytes oder ein leeres Array bei Fehlern bzw. Regelverletzungen.</returns>
+        ''' <exception cref="UnauthorizedAccessException">Kann bei Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="System.Security.SecurityException">Kann bei sicherheitsrelevantem Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="IOException">Kann bei I/O-Zugriff intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="InvalidDataException">Kann bei ungültigen Datenzuständen intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Pfadformaten intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
+        Public Shared Function ReadFileSafe _
+            (
+                path As String
+            ) As Byte()
+            
             Dim opt = GetDefaultOptions()
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(opt.Logger, "[Detect] Datei nicht gefunden.")
@@ -80,58 +98,85 @@ Namespace Global.Tomtastisch.FileClassifier
                         Return ms.ToArray()
                     End Using
                 End Using
-            Catch ex As UnauthorizedAccessException
-                Return LogReadFileSafeFailure(opt, ex)
-            Catch ex As System.Security.SecurityException
-                Return LogReadFileSafeFailure(opt, ex)
-            Catch ex As IOException
-                Return LogReadFileSafeFailure(opt, ex)
-            Catch ex As InvalidDataException
-                Return LogReadFileSafeFailure(opt, ex)
-            Catch ex As NotSupportedException
-                Return LogReadFileSafeFailure(opt, ex)
-            Catch ex As ArgumentException
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is IOException OrElse
+                TypeOf ex Is InvalidDataException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException
                 Return LogReadFileSafeFailure(opt, ex)
             End Try
         End Function
 
         ''' <summary>
         '''     Erkennt den Dateityp anhand eines Dateipfads.
-        '''     Entscheidungspfad:
-        '''     1) Header lesen + Registry-Magic-Detektion (SSOT)
-        '''     2) ZIP-Gate und OOXML-Refinement
-        '''     3) fail-closed auf Unknown
         ''' </summary>
-        ''' <param name="path">Dateipfad.</param>
-        ''' <returns>Erkannter Typ oder Unknown.</returns>
-        Public Function Detect(path As String) As FileType
+        ''' <remarks>
+        '''     Delegiert auf die Überladung mit Endungsprüfung deaktiviert.
+        ''' </remarks>
+        ''' <param name="path">Dateipfad der zu klassifizierenden Datei.</param>
+        ''' <returns>Erkannter Typ oder <see cref="FileKind.Unknown"/> bei Fehlern.</returns>
+        Public Function Detect _
+            (
+                path As String
+            ) As FileType
             Return Detect(path, verifyExtension:=False)
         End Function
 
         ''' <summary>
-        '''     Erkennt den Dateityp anhand eines Dateipfads und optionaler Endungspruefung.
+        '''     Erkennt den Dateityp anhand eines Dateipfads mit optionaler Endungsprüfung.
         ''' </summary>
-        ''' <param name="path">Dateipfad.</param>
-        ''' <param name="verifyExtension">Aktiviert die fail-closed Endungspruefung nach Inhaltsdetektion.</param>
-        ''' <returns>Erkannter Typ oder Unknown bei Mismatch/Fehler.</returns>
-        Public Function Detect(path As String, verifyExtension As Boolean) As FileType
+        ''' <remarks>
+        '''     Entscheidungspfad:
+        '''     1) Header-/Registry-Erkennung (SSOT),
+        '''     2) Archiv-Gate und optionales OOXML-Refinement,
+        '''     3) optionale Endungs-Policy.
+        ''' </remarks>
+        ''' <param name="path">Dateipfad der zu klassifizierenden Datei.</param>
+        ''' <param name="verifyExtension"><c>True</c> erzwingt die fail-closed Endungsprüfung nach Inhaltsdetektion.</param>
+        ''' <returns>Erkannter Typ oder <see cref="FileKind.Unknown"/> bei Mismatch oder Fehlern.</returns>
+        Public Function Detect _
+            (
+                path As String,
+                verifyExtension As Boolean
+            ) As FileType
             Dim detected = DetectPathCore(path)
             Return ApplyExtensionPolicy(path, detected, verifyExtension)
         End Function
 
         ''' <summary>
-        '''     Liefert ein detailliertes, auditierbares Detektionsergebnis.
+        '''     Liefert ein detailliertes, auditierbares Detektionsergebnis ohne Endungsprüfung.
         ''' </summary>
-        Public Function DetectDetailed(path As String) As DetectionDetail
+        ''' <remarks>
+        '''     Delegiert auf die Überladung mit <c>verifyExtension:=False</c>.
+        ''' </remarks>
+        ''' <param name="path">Dateipfad der zu klassifizierenden Datei.</param>
+        ''' <returns>Detailliertes Detektionsergebnis inklusive Reason-Code und Trace-Flags.</returns>
+        Public Function DetectDetailed _
+            (
+                path As String
+            ) As DetectionDetail
             Return DetectDetailed(path, verifyExtension:=False)
         End Function
 
         ''' <summary>
-        '''     Liefert ein detailliertes, auditierbares Detektionsergebnis inkl. Endungs-Policy.
+        '''     Liefert ein detailliertes, auditierbares Detektionsergebnis inklusive optionaler Endungs-Policy.
         ''' </summary>
+        ''' <remarks>
+        '''     Bei Endungs-Mismatch wird fail-closed auf <see cref="FileKind.Unknown"/> gesetzt und der Reason-Code angepasst.
+        ''' </remarks>
+        ''' <param name="path">Dateipfad der zu klassifizierenden Datei.</param>
+        ''' <param name="verifyExtension"><c>True</c> aktiviert die Endungsprüfung nach Inhaltsdetektion.</param>
+        ''' <returns>Detailliertes Detektionsergebnis mit typisiertem Trace-Kontext.</returns>
         ' ReSharper disable once MemberCanBeMadeStatic.Global
         <SuppressMessage("Performance", "CA1822:Mark members as static", Justification:="Public instance API; changing to Shared would be a breaking API change.")>
-        Public Function DetectDetailed(path As String, verifyExtension As Boolean) As DetectionDetail
+        Public Function DetectDetailed _
+            (
+                path As String,
+                verifyExtension As Boolean
+            ) As DetectionDetail
+            
             Dim opt = GetDefaultOptions()
             Dim trace As DetectionTrace = DetectionTrace.Empty
 
@@ -154,19 +199,33 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         ''' <summary>
-        '''     Prueft, ob die Dateiendung zum inhaltsbasiert erkannten Typ passt.
+        '''     Prüft, ob die Dateiendung zum inhaltsbasiert erkannten Typ passt.
         ''' </summary>
-        ''' <param name="path">Dateipfad.</param>
-        ''' <returns>True bei fehlender Endung oder passender Endung, sonst False.</returns>
-        Public Function DetectAndVerifyExtension(path As String) As Boolean
+        ''' <remarks>
+        '''     Fehlende Endung wird als neutral bewertet; unbekannter erkannter Typ führt fail-closed zu <c>False</c>.
+        ''' </remarks>
+        ''' <param name="path">Dateipfad der zu klassifizierenden Datei.</param>
+        ''' <returns><c>True</c> bei passender oder fehlender Endung; sonst <c>False</c>.</returns>
+        Public Function DetectAndVerifyExtension _
+            (
+                path As String
+            ) As Boolean
             Dim detected = Detect(path)
             Return ExtensionMatchesKind(path, detected.Kind)
         End Function
 
         ''' <summary>
-        '''     Prueft, ob eine Datei ein sicherer Archiv-Container ist (inkl. ZIP).
+        '''     Prüft fail-closed, ob eine Datei einen sicheren Archiv-Container repräsentiert.
         ''' </summary>
-        Public Shared Function TryValidateArchive(path As String) As Boolean
+        ''' <remarks>
+        '''     Die Methode beschreibt den Containertyp und validiert den Archivinhalt gegen Sicherheitsgrenzen.
+        ''' </remarks>
+        ''' <param name="path">Dateipfad der zu validierenden Archivdatei.</param>
+        ''' <returns><c>True</c>, wenn der Container valide und sicher ist; andernfalls <c>False</c>.</returns>
+        Public Shared Function TryValidateArchive _
+            (
+                path As String
+            ) As Boolean
             Dim opt = GetDefaultOptions()
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then Return False
 
@@ -180,7 +239,15 @@ Namespace Global.Tomtastisch.FileClassifier
                     If fs.CanSeek Then fs.Position = 0
                     Return ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, descriptor, depth:=0)
                 End Using
-            Catch
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is IOException OrElse
+                TypeOf ex Is InvalidDataException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException
+                Return False
+            Catch ex As Exception
                 Return False
             End Try
         End Function
@@ -218,17 +285,13 @@ Namespace Global.Tomtastisch.FileClassifier
                     Dim header = ReadHeader(fs, opt.SniffBytes, opt.MaxBytes)
                     Return ResolveByHeaderForPath(header, opt, trace, fs)
                 End Using
-            Catch ex As UnauthorizedAccessException
-                Return LogDetectFailure(opt, trace, ex)
-            Catch ex As System.Security.SecurityException
-                Return LogDetectFailure(opt, trace, ex)
-            Catch ex As IOException
-                Return LogDetectFailure(opt, trace, ex)
-            Catch ex As InvalidDataException
-                Return LogDetectFailure(opt, trace, ex)
-            Catch ex As NotSupportedException
-                Return LogDetectFailure(opt, trace, ex)
-            Catch ex As ArgumentException
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is IOException OrElse
+                TypeOf ex Is InvalidDataException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException
                 Return LogDetectFailure(opt, trace, ex)
             End Try
         End Function
@@ -236,22 +299,35 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <summary>
         '''     Erkennt den Dateityp anhand von In-Memory-Daten.
         ''' </summary>
-        ''' <param name="data">Zu pruefende Nutzdaten.</param>
-        ''' <returns>Erkannter Typ oder Unknown.</returns>
+        ''' <remarks>
+        '''     Die Operation ist rein speicherbasiert und unterliegt denselben Größen- und Sicherheitsregeln wie die Pfadvariante.
+        ''' </remarks>
+        ''' <param name="data">Zu prüfende Nutzdaten.</param>
+        ''' <returns>Erkannter Typ oder <see cref="FileKind.Unknown"/> bei Fehlern.</returns>
         ' ReSharper disable once MemberCanBeMadeStatic.Global
         <SuppressMessage("Performance", "CA1822:Mark members as static", Justification:="Public instance API; changing to Shared would be a breaking API change.")>
-        Public Function Detect(data As Byte()) As FileType
+        Public Function Detect _
+            (
+                data As Byte()
+            ) As FileType
             Dim opt = GetDefaultOptions()
             Return DetectInternalBytes(data, opt)
         End Function
 
         ''' <summary>
-        '''     Deterministische Typpruefung als Convenience-API.
+        '''     Führt eine deterministische Typprüfung als Convenience-API aus.
         ''' </summary>
-        ''' <param name="data">Zu pruefende Nutzdaten.</param>
-        ''' <param name="kind">Erwarteter Typ.</param>
-        ''' <returns>True bei Typgleichheit, sonst False.</returns>
-        Public Function IsOfType(data As Byte(), kind As FileKind) As Boolean
+        ''' <remarks>
+        '''     Ergebnis basiert vollständig auf der inhaltsbasierten Detektion.
+        ''' </remarks>
+        ''' <param name="data">Zu prüfende Nutzdaten.</param>
+        ''' <param name="kind">Erwarteter Dateityp.</param>
+        ''' <returns><c>True</c> bei Typgleichheit, sonst <c>False</c>.</returns>
+        Public Function IsOfType _
+            (
+                data As Byte(),
+                kind As FileKind
+            ) As Boolean
             Return Detect(data).Kind = kind
         End Function
 
@@ -259,12 +335,25 @@ Namespace Global.Tomtastisch.FileClassifier
         '''     Entpackt ein Archiv deterministisch und fail-closed in ein neues Zielverzeichnis.
         '''     Sicherheitsregeln (Traversal/Limits/Nesting) sind immer aktiv.
         ''' </summary>
+        ''' <remarks>
+        '''     Persistenz erfolgt über <see cref="FileMaterializer"/> mit aktivem Sicherheitsmodus.
+        ''' </remarks>
         ''' <param name="path">Pfad zur Archivdatei.</param>
         ''' <param name="destinationDirectory">Leeres, noch nicht existierendes Zielverzeichnis.</param>
-        ''' <param name="verifyBeforeExtract">Optionale Vorpruefung ueber Detect(path).</param>
-        ''' <returns>True bei erfolgreichem, atomarem Entpacken.</returns>
-        Public Function ExtractArchiveSafe(path As String, destinationDirectory As String,
-                                           verifyBeforeExtract As Boolean) As Boolean
+        ''' <param name="verifyBeforeExtract"><c>True</c> aktiviert eine vorgelagerte Typprüfung über <c>Detect(path)</c>.</param>
+        ''' <returns><c>True</c> bei erfolgreichem, atomarem Entpacken; sonst <c>False</c>.</returns>
+        ''' <exception cref="UnauthorizedAccessException">Kann bei Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="System.Security.SecurityException">Kann bei sicherheitsrelevantem Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="IOException">Kann bei I/O-Zugriff intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="InvalidDataException">Kann bei ungültigen Archivdaten intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Pfadformaten intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
+        Public Function ExtractArchiveSafe _
+            (
+                path As String,
+                destinationDirectory As String,
+                verifyBeforeExtract As Boolean
+            ) As Boolean
             Dim opt = GetDefaultOptions()
             If Not CanExtractArchivePath(path, verifyBeforeExtract, opt) Then Return False
 
@@ -273,29 +362,38 @@ Namespace Global.Tomtastisch.FileClassifier
                 If payload.Length = 0 Then Return False
                 Return _
                     FileMaterializer.Persist(payload, destinationDirectory, overwrite:=False, secureExtract:=True)
-            Catch ex As UnauthorizedAccessException
-                Return LogArchiveExtractFailure(opt, ex)
-            Catch ex As System.Security.SecurityException
-                Return LogArchiveExtractFailure(opt, ex)
-            Catch ex As IOException
-                Return LogArchiveExtractFailure(opt, ex)
-            Catch ex As InvalidDataException
-                Return LogArchiveExtractFailure(opt, ex)
-            Catch ex As NotSupportedException
-                Return LogArchiveExtractFailure(opt, ex)
-            Catch ex As ArgumentException
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is IOException OrElse
+                TypeOf ex Is InvalidDataException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException
                 Return LogArchiveExtractFailure(opt, ex)
             End Try
         End Function
 
         ''' <summary>
-        '''     Extrahiert Archiv-Inhalte sicher in Memory und gibt sie als wiederverwendbare Objekte zurueck.
+        '''     Extrahiert Archiv-Inhalte sicher in Memory und gibt sie als wiederverwendbare Objekte zurück.
         '''     Es erfolgt keine persistente Speicherung; Fehler liefern fail-closed eine leere Liste.
         ''' </summary>
+        ''' <remarks>
+        '''     Die Methode liefert keine Dateisystem-Nebenwirkungen und gibt fail-closed eine leere Liste zurück.
+        ''' </remarks>
         ''' <param name="path">Pfad zur Archivdatei.</param>
-        ''' <param name="verifyBeforeExtract">Optionale Vorpruefung ueber Detect(path).</param>
-        ''' <returns>Read-only Liste extrahierter Eintraege oder leer bei Fehler.</returns>
-        Public Function ExtractArchiveSafeToMemory(path As String, verifyBeforeExtract As Boolean) _
+        ''' <param name="verifyBeforeExtract"><c>True</c> aktiviert eine vorgelagerte Typprüfung über <c>Detect(path)</c>.</param>
+        ''' <returns>Read-only Liste extrahierter Einträge oder leer bei Fehler.</returns>
+        ''' <exception cref="UnauthorizedAccessException">Kann bei Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="System.Security.SecurityException">Kann bei sicherheitsrelevantem Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="IOException">Kann bei I/O-Zugriff intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="InvalidDataException">Kann bei ungültigen Archivdaten intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Pfadformaten intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
+        Public Function ExtractArchiveSafeToMemory _
+            (
+                path As String,
+                verifyBeforeExtract As Boolean
+            ) _
             As IReadOnlyList(Of ZipExtractedEntry)
             Dim opt = GetDefaultOptions()
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
@@ -309,17 +407,13 @@ Namespace Global.Tomtastisch.FileClassifier
                                        InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
                     Return ArchiveExtractor.TryExtractArchiveStreamToMemory(fs, opt)
                 End Using
-            Catch ex As UnauthorizedAccessException
-                Return LogArchiveExtractFailure(opt, ex, emptyResult)
-            Catch ex As System.Security.SecurityException
-                Return LogArchiveExtractFailure(opt, ex, emptyResult)
-            Catch ex As IOException
-                Return LogArchiveExtractFailure(opt, ex, emptyResult)
-            Catch ex As InvalidDataException
-                Return LogArchiveExtractFailure(opt, ex, emptyResult)
-            Catch ex As NotSupportedException
-                Return LogArchiveExtractFailure(opt, ex, emptyResult)
-            Catch ex As ArgumentException
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is IOException OrElse
+                TypeOf ex Is InvalidDataException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException
                 Return LogArchiveExtractFailure(opt, ex, emptyResult)
             End Try
         End Function
@@ -334,23 +428,19 @@ Namespace Global.Tomtastisch.FileClassifier
             Try
                 Dim trace As DetectionTrace = DetectionTrace.Empty
                 Return ResolveByHeaderForBytes(data, opt, trace, data)
-            Catch ex As UnauthorizedAccessException
-                Return LogDetectFailure(opt, ex)
-            Catch ex As System.Security.SecurityException
-                Return LogDetectFailure(opt, ex)
-            Catch ex As IOException
-                Return LogDetectFailure(opt, ex)
-            Catch ex As InvalidDataException
-                Return LogDetectFailure(opt, ex)
-            Catch ex As NotSupportedException
-                Return LogDetectFailure(opt, ex)
-            Catch ex As ArgumentException
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is IOException OrElse
+                TypeOf ex Is InvalidDataException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException
                 Return LogDetectFailure(opt, ex)
             End Try
         End Function
 
         ''' <summary>
-        '''     Entscheidungslogik fuer die Pfad-Variante.
+        '''     Entscheidungslogik für die Pfad-Variante.
         ''' </summary>
         Private Shared Function ResolveByHeaderForPath(
                                                 header As Byte(),
@@ -376,7 +466,7 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         ''' <summary>
-        '''     Entscheidungslogik fuer die Byte-Variante.
+        '''     Entscheidungslogik für die Byte-Variante.
         ''' </summary>
         Private Shared Function ResolveByHeaderForBytes(
                                                  header As Byte(),
@@ -586,7 +676,15 @@ Namespace Global.Tomtastisch.FileClassifier
                 End If
 
                 Return buf
-            Catch
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is IOException OrElse
+                TypeOf ex Is InvalidDataException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException
+                Return Array.Empty(Of Byte)()
+            Catch ex As Exception
                 Return Array.Empty(Of Byte)()
             End Try
         End Function

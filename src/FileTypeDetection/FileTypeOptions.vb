@@ -3,8 +3,21 @@ Option Explicit On
 
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
-    '''     Zentrale, globale Optionsverwaltung als JSON-Schnittstelle.
+    '''     Verwaltet die globalen Bibliotheksoptionen als thread-sicheren Snapshot mit JSON-Ein- und Ausgabe.
     ''' </summary>
+    ''' <remarks>
+    '''     <para>
+    '''         Verantwortung: Die Klasse bildet die öffentliche Konfigurationsschnittstelle für Konsumenten und kapselt
+    '''         Validierung, Normalisierung und Snapshot-Aktualisierung.
+    '''     </para>
+    '''     <para>
+    '''         Nebenwirkungen: Änderungen wirken global auf nachfolgende Operationen der Bibliothek.
+    '''         Fehlerhafte Konfigurationen werden fail-closed verworfen.
+    '''     </para>
+    '''     <para>
+    '''         Threading: Lese- und Schreibzugriffe auf den aktuellen Snapshot sind über ein zentrales Lock synchronisiert.
+    '''     </para>
+    ''' </remarks>
     Public NotInheritable Class FileTypeOptions
         Private Shared ReadOnly _optionsLock As New Object()
         Private Shared _currentOptions As FileTypeProjectOptions = FileTypeProjectOptions.DefaultOptions()
@@ -13,10 +26,27 @@ Namespace Global.Tomtastisch.FileClassifier
         End Sub
 
         ''' <summary>
-        '''     Laedt globale Optionen aus JSON.
-        '''     Nicht gesetzte Felder bleiben auf Default-Werten.
+        '''     Lädt globale Optionen aus einem JSON-Dokument und ersetzt den aktuellen Snapshot atomar bei Erfolg.
         ''' </summary>
-        Public Shared Function LoadOptions(json As String) As Boolean
+        ''' <remarks>
+        '''     <para>
+        '''         Nicht gesetzte Felder bleiben auf normierten Default-Werten. Unbekannte Schlüssel werden ignoriert
+        '''         und protokolliert.
+        '''     </para>
+        '''     <para>
+        '''         Fail-Closed: Bei Parse- oder Validierungsfehlern bleibt der bisherige Snapshot unverändert und die
+        '''         Methode liefert <c>False</c>.
+        '''     </para>
+        ''' </remarks>
+        ''' <param name="json">JSON-Konfiguration mit unterstützten Optionsfeldern.</param>
+        ''' <returns><c>True</c>, wenn ein gültiger Snapshot gesetzt wurde; andernfalls <c>False</c>.</returns>
+        ''' <exception cref="System.Text.Json.JsonException">Kann bei ungültiger JSON-Struktur intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
+        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützter JSON-Konstellation intern auftreten und wird fail-closed behandelt.</exception>
+        Public Shared Function LoadOptions _
+            (
+                json As String
+            ) As Boolean
             If String.IsNullOrWhiteSpace(json) Then Return False
 
             Dim defaults = FileTypeProjectOptions.DefaultOptions()
@@ -121,6 +151,14 @@ Namespace Global.Tomtastisch.FileClassifier
                 nextOptions.NormalizeInPlace()
                 SetSnapshot(nextOptions)
                 Return True
+            Catch ex As Exception When _
+                TypeOf ex Is ArgumentException OrElse
+                TypeOf ex Is System.Text.Json.JsonException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is InvalidOperationException OrElse
+                TypeOf ex Is FormatException
+                LogGuard.Warn(GetSnapshot().Logger, $"[Config] Parse-Fehler: {ex.Message}")
+                Return False
             Catch ex As Exception
                 LogGuard.Warn(GetSnapshot().Logger, $"[Config] Parse-Fehler: {ex.Message}")
                 Return False
@@ -128,8 +166,12 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         ''' <summary>
-        '''     Liefert die aktuell gesetzten globalen Optionen als JSON.
+        '''     Liefert den aktuell gesetzten globalen Options-Snapshot als JSON-Dokument.
         ''' </summary>
+        ''' <remarks>
+        '''     Ausgabe dient der auditierbaren Repräsentation der effektiven Laufzeitkonfiguration.
+        ''' </remarks>
+        ''' <returns>JSON-Serialisierung der normierten Optionen.</returns>
         Public Shared Function GetOptions() As String
             Dim opt = GetSnapshot()
             Dim dto As New Dictionary(Of String, Object) From {
@@ -160,7 +202,14 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Try
                 Return LoadOptions(Global.System.IO.File.ReadAllText(path))
-            Catch
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is Global.System.IO.IOException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException
+                Return False
+            Catch ex As Exception
                 Return False
             End Try
         End Function
