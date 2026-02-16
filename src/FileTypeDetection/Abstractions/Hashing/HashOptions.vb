@@ -63,14 +63,14 @@ Namespace Global.Tomtastisch.FileClassifier
             If String.IsNullOrWhiteSpace(normalized) Then Return "deterministic-roundtrip.bin"
 
             Try
-                normalized = Global.System.IO.Path.GetFileName(normalized)
+                normalized = IO.Path.GetFileName(normalized)
             Catch
                 Return "deterministic-roundtrip.bin"
             End Try
 
             If String.IsNullOrWhiteSpace(normalized) Then Return "deterministic-roundtrip.bin"
 
-            For Each invalidChar In Global.System.IO.Path.GetInvalidFileNameChars()
+            For Each invalidChar In IO.Path.GetInvalidFileNameChars()
                 If normalized.IndexOf(invalidChar) >= 0 Then
                     Return "deterministic-roundtrip.bin"
                 End If

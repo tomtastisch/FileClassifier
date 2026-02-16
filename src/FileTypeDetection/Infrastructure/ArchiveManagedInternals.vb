@@ -19,7 +19,7 @@ Namespace Global.Tomtastisch.FileClassifier
     '''     Eine Iterationslogik für Validierung und sichere Extraktion.
     ''' </summary>
     Friend NotInheritable Class ArchiveStreamEngine
-        Private Shared ReadOnly _recyclableStreams As New Microsoft.IO.RecyclableMemoryStreamManager()
+        Private Shared ReadOnly RecyclableStreams As New Microsoft.IO.RecyclableMemoryStreamManager()
 
         Private Sub New()
         End Sub
@@ -67,7 +67,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
                             Try
                                 Using es = e.Open()
-                                    Using nestedMs = _recyclableStreams.GetStream("ArchiveStreamEngine.Nested")
+                                    Using nestedMs = RecyclableStreams.GetStream("ArchiveStreamEngine.Nested")
                                         StreamBounds.CopyBounded(es, nestedMs, opt.MaxZipNestedBytes)
                                         nestedMs.Position = 0
 

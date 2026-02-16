@@ -99,8 +99,8 @@ Namespace Global.Tomtastisch.FileClassifier
     '''     Interne Hilfsklasse <c>ArchiveBackendRegistry</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
     ''' </summary>
     Friend NotInheritable Class ArchiveBackendRegistry
-        Private Shared ReadOnly _managedArchiveBackend As New ArchiveManagedBackend()
-        Private Shared ReadOnly _sharpCompressBackend As New SharpCompressArchiveBackend()
+        Private Shared ReadOnly ManagedArchiveBackend As New ArchiveManagedBackend()
+        Private Shared ReadOnly SharpCompressBackend As New SharpCompressArchiveBackend()
 
         Private Sub New()
         End Sub
@@ -108,10 +108,10 @@ Namespace Global.Tomtastisch.FileClassifier
         Friend Shared Function Resolve(containerType As ArchiveContainerType) As IArchiveBackend
             Select Case containerType
                 Case ArchiveContainerType.Zip
-                    Return _managedArchiveBackend
+                    Return ManagedArchiveBackend
                 Case ArchiveContainerType.Tar, ArchiveContainerType.GZip, ArchiveContainerType.SevenZip,
                     ArchiveContainerType.Rar
-                    Return _sharpCompressBackend
+                    Return SharpCompressBackend
                 Case Else
                     Return Nothing
             End Select
@@ -220,7 +220,7 @@ Namespace Global.Tomtastisch.FileClassifier
     '''     Interne Hilfsklasse <c>ArchiveExtractor</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
     ''' </summary>
     Friend NotInheritable Class ArchiveExtractor
-        Private Shared ReadOnly _recyclableStreams As New Microsoft.IO.RecyclableMemoryStreamManager()
+        Private Shared ReadOnly RecyclableStreams As New Microsoft.IO.RecyclableMemoryStreamManager()
 
         Private Sub New()
         End Sub
@@ -396,7 +396,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Try
                 Using source = entry.OpenStream()
                     If source Is Nothing OrElse Not source.CanRead Then Return False
-                    Using ms = _recyclableStreams.GetStream("ArchiveExtractor.MemoryEntry")
+                    Using ms = RecyclableStreams.GetStream("ArchiveExtractor.MemoryEntry")
                         StreamBounds.CopyBounded(source, ms, opt.MaxZipEntryUncompressedBytes)
                         Dim payload As Byte() = Array.Empty(Of Byte)()
                         If ms.Length > 0 Then
