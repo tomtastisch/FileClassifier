@@ -1,3 +1,12 @@
+' ============================================================================
+' FILE: FileTypeProjectOptions.vb
+'
+' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
+' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.MD
+' - Try/Catch konsistent im Catch-Filter-Schema
+' - Variablen im Deklarationsblock, spaltenartig ausgerichtet
+' ============================================================================
+
 Option Strict On
 Option Explicit On
 
@@ -75,7 +84,7 @@ Namespace Global.Tomtastisch.FileClassifier
         Public Property AllowUnknownArchiveEntrySize As Boolean = False
 
         ''' <summary>Optionaler Logger für Diagnosezwecke.</summary>
-        Public Property Logger As Global.Microsoft.Extensions.Logging.ILogger = Nothing
+        Public Property Logger As Microsoft.Extensions.Logging.ILogger = Nothing
 
         ''' <summary>
         '''     Optionen für deterministische Hash-/Evidence-Funktionen.

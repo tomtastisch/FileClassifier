@@ -1,3 +1,12 @@
+' ============================================================================
+' FILE: EvidenceHashing.vb
+'
+' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
+' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.MD
+' - Try/Catch konsistent im Catch-Filter-Schema
+' - Variablen im Deklarationsblock, spaltenartig ausgerichtet
+' ============================================================================
+
 Option Strict On
 Option Explicit On
 
@@ -718,6 +727,9 @@ Namespace Global.Tomtastisch.FileClassifier
             Return False
         End Function
 
+        ''' <summary>
+        '''     Interne Hilfsklasse <c>NormalizedEntry</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+        ''' </summary>
         Private NotInheritable Class NormalizedEntry
             Friend ReadOnly Property RelativePath As String
             Friend ReadOnly Property Content As Byte()

@@ -1,3 +1,12 @@
+' ============================================================================
+' FILE: CoreInternals.vb
+'
+' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
+' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.MD
+' - Try/Catch konsistent im Catch-Filter-Schema
+' - Variablen im Deklarationsblock, spaltenartig ausgerichtet
+' ============================================================================
+
 Option Strict On
 Option Explicit On
 
@@ -6,6 +15,9 @@ Imports System.IO.Compression
 Imports Microsoft.Extensions.Logging
 
 Namespace Global.Tomtastisch.FileClassifier
+    ''' <summary>
+    '''     Interne Hilfsklasse <c>InternalIoDefaults</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    ''' </summary>
     Friend NotInheritable Class InternalIoDefaults
         Friend Const CopyBufferSize As Integer = 8192
         Friend Const FileStreamBufferSize As Integer = 81920
@@ -16,7 +28,7 @@ Namespace Global.Tomtastisch.FileClassifier
     End Class
 
     ''' <summary>
-    '''     Zentrale IO-Helfer fuer harte Grenzen.
+    '''     Zentrale IO-Helfer für harte Grenzen.
     '''     SSOT-Regel: bounded copy wird nur hier gepflegt.
     ''' </summary>
     Friend NotInheritable Class StreamBounds
@@ -57,7 +69,7 @@ Namespace Global.Tomtastisch.FileClassifier
     End Class
 
     ''' <summary>
-    '''     Sicherheits-Gate fuer Archive-Container.
+    '''     Sicherheits-Gate für Archive-Container.
     ''' </summary>
     Friend NotInheritable Class ArchiveSafetyGate
         Private Sub New()
@@ -88,7 +100,7 @@ Namespace Global.Tomtastisch.FileClassifier
     End Class
 
     ''' <summary>
-    '''     Gemeinsame Guards fuer signaturbasierte Archiv-Byte-Payloads.
+    '''     Gemeinsame Guards für signaturbasierte Archiv-Byte-Payloads.
     ''' </summary>
     Friend NotInheritable Class ArchiveSignaturePayloadGuard
         Private Sub New()
@@ -101,7 +113,7 @@ Namespace Global.Tomtastisch.FileClassifier
     End Class
 
     ''' <summary>
-    '''     Gemeinsame Guards fuer beliebige Archive-Byte-Payloads.
+    '''     Gemeinsame Guards für beliebige Archive-Byte-Payloads.
     ''' </summary>
     Friend NotInheritable Class ArchivePayloadGuard
         Private Sub New()
@@ -119,7 +131,7 @@ Namespace Global.Tomtastisch.FileClassifier
     End Class
 
     ''' <summary>
-    '''     Gemeinsame Zielpfad-Policy fuer Materialisierung und Archiv-Extraktion.
+    '''     Gemeinsame Zielpfad-Policy für Materialisierung und Archiv-Extraktion.
     ''' </summary>
     Friend NotInheritable Class DestinationPathGuard
         Private Sub New()
@@ -184,7 +196,7 @@ Namespace Global.Tomtastisch.FileClassifier
     End Class
 
     ''' <summary>
-    '''     Gemeinsame Normalisierung fuer relative Archiv-Entry-Pfade.
+    '''     Gemeinsame Normalisierung für relative Archiv-Entry-Pfade.
     ''' </summary>
     Friend NotInheritable Class ArchiveEntryPathPolicy
         Private Sub New()
@@ -306,7 +318,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
     ''' <summary>
     '''     Defensiver Logger-Schutz.
-    '''     Logging darf niemals zu Erkennungsfehlern oder Exceptions fuehren.
+    '''     Logging darf niemals zu Erkennungsfehlern oder Exceptions führen.
     ''' </summary>
     Friend NotInheritable Class LogGuard
         Private Sub New()

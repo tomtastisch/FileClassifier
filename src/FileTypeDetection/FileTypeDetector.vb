@@ -1,3 +1,12 @@
+' ============================================================================
+' FILE: FileTypeDetector.vb
+'
+' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
+' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.MD
+' - Try/Catch konsistent im Catch-Filter-Schema
+' - Variablen im Deklarationsblock, spaltenartig ausgerichtet
+' ============================================================================
+
 Option Strict On
 Option Explicit On
 
@@ -181,6 +190,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <exception cref="InvalidDataException">Kann bei ungültigen Datenzuständen intern auftreten und wird fail-closed behandelt.</exception>
         ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Pfadformaten intern auftreten und wird fail-closed behandelt.</exception>
         ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
+        <SuppressMessage("Performance", "CA1822:Mark members as static", Justification:="Public instance API; changing to Shared would be a breaking API change.")>
         Public Function Detect _
             (
                 path As String,
@@ -896,6 +906,9 @@ Namespace Global.Tomtastisch.FileClassifier
             Return New MemoryStream(data, 0, data.Length, writable:=False, publiclyVisible:=False)
         End Function
 
+        ''' <summary>
+        '''     Interner, unveränderlicher Datenträger <c>DetectionTrace</c> für strukturierte Verarbeitungsschritte.
+        ''' </summary>
         Private Structure DetectionTrace
             Friend ReasonCode As String
             Friend UsedZipContentCheck As Boolean

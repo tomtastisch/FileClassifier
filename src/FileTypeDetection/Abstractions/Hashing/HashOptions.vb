@@ -1,5 +1,16 @@
+' ============================================================================
+' FILE: HashOptions.vb
+'
+' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
+' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.MD
+' - Try/Catch konsistent im Catch-Filter-Schema
+' - Variablen im Deklarationsblock, spaltenartig ausgerichtet
+' ============================================================================
+
 Option Strict On
 Option Explicit On
+
+Imports System.Diagnostics.CodeAnalysis
 
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
@@ -49,19 +60,20 @@ Namespace Global.Tomtastisch.FileClassifier
             Return cloned
         End Function
 
+        <SuppressMessage("Usage", "CA2249:Use 'string.Contains' instead of 'string.IndexOf' to improve readability", Justification:="IndexOf bleibt hier für deterministische Zeichenprüfung ohne Semantikänderung bestehen.")>
         Private Shared Function NormalizeMaterializedFileName(candidate As String) As String
             Dim normalized = If(candidate, String.Empty).Trim()
             If String.IsNullOrWhiteSpace(normalized) Then Return "deterministic-roundtrip.bin"
 
             Try
-                normalized = Global.System.IO.Path.GetFileName(normalized)
+                normalized = IO.Path.GetFileName(normalized)
             Catch
                 Return "deterministic-roundtrip.bin"
             End Try
 
             If String.IsNullOrWhiteSpace(normalized) Then Return "deterministic-roundtrip.bin"
 
-            For Each invalidChar In Global.System.IO.Path.GetInvalidFileNameChars()
+            For Each invalidChar In IO.Path.GetInvalidFileNameChars()
                 If normalized.IndexOf(invalidChar) >= 0 Then
                     Return "deterministic-roundtrip.bin"
                 End If

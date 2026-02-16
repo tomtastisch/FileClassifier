@@ -1,3 +1,12 @@
+' ============================================================================
+' FILE: FileMaterializer.vb
+'
+' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
+' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.MD
+' - Try/Catch konsistent im Catch-Filter-Schema
+' - Variablen im Deklarationsblock, spaltenartig ausgerichtet
+' ============================================================================
+
 Option Strict On
 Option Explicit On
 
@@ -138,7 +147,6 @@ Namespace Global.Tomtastisch.FileClassifier
 
             ' Pfadnormalisierung: Absoluten Zielpfad auflösen.
             Dim destinationFull As String
-            Dim errorMessage As String = Nothing
 
             Try
                 destinationFull = Path.GetFullPath(destinationPath)
@@ -146,12 +154,12 @@ Namespace Global.Tomtastisch.FileClassifier
             Catch ex As Exception When _
                 TypeOf ex Is ArgumentException OrElse
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is NotSupportedException OrElse
                 TypeOf ex Is PathTooLongException OrElse
                 TypeOf ex Is IOException
 
-                LogGuard.Warn(opt.Logger, $"[Materialize] Ungueltiger Zielpfad: {errorMessage}")
+                LogGuard.Warn(opt.Logger, $"[Materialize] Ungueltiger Zielpfad: {ex.Message}")
                 Return False
             End Try
 
@@ -206,7 +214,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse _
-                TypeOf ex Is System.Security.SecurityException OrElse _
+                TypeOf ex Is Security.SecurityException OrElse _
                 TypeOf ex Is IOException OrElse _
                 TypeOf ex Is InvalidDataException OrElse _
                 TypeOf ex Is NotSupportedException OrElse _
@@ -236,7 +244,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse _
-                TypeOf ex Is System.Security.SecurityException OrElse _
+                TypeOf ex Is Security.SecurityException OrElse _
                 TypeOf ex Is IOException OrElse _
                 TypeOf ex Is InvalidDataException OrElse _
                 TypeOf ex Is NotSupportedException OrElse _

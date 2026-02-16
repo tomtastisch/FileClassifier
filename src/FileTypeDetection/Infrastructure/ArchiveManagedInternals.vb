@@ -1,3 +1,12 @@
+' ============================================================================
+' FILE: ArchiveManagedInternals.vb
+'
+' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
+' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.MD
+' - Try/Catch konsistent im Catch-Filter-Schema
+' - Variablen im Deklarationsblock, spaltenartig ausgerichtet
+' ============================================================================
+
 Option Strict On
 Option Explicit On
 
@@ -6,11 +15,11 @@ Imports System.IO.Compression
 
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
-    '''     Zentrale SSOT-Engine fuer archivbasierte Verarbeitung.
-    '''     Eine Iterationslogik fuer Validierung und sichere Extraktion.
+    '''     Zentrale SSOT-Engine für archivbasierte Verarbeitung.
+    '''     Eine Iterationslogik für Validierung und sichere Extraktion.
     ''' </summary>
     Friend NotInheritable Class ArchiveStreamEngine
-        Private Shared ReadOnly _recyclableStreams As New Microsoft.IO.RecyclableMemoryStreamManager()
+        Private Shared ReadOnly RecyclableStreams As New Microsoft.IO.RecyclableMemoryStreamManager()
 
         Private Sub New()
         End Sub
@@ -58,7 +67,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
                             Try
                                 Using es = e.Open()
-                                    Using nestedMs = _recyclableStreams.GetStream("ArchiveStreamEngine.Nested")
+                                    Using nestedMs = RecyclableStreams.GetStream("ArchiveStreamEngine.Nested")
                                         StreamBounds.CopyBounded(es, nestedMs, opt.MaxZipNestedBytes)
                                         nestedMs.Position = 0
 
@@ -109,15 +118,25 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
     End Class
 
+    ''' <summary>
+    '''     Managed-ZIP-Backend zur Verarbeitung von ZIP-Archiven über <see cref="System.IO.Compression"/>.
+    '''     Kapselt Guard-, I/O- und Policy-Logik und delegiert an die <see cref="ArchiveStreamEngine"/>.
+    ''' </summary>
     Friend NotInheritable Class ArchiveManagedBackend
         Implements IArchiveBackend
 
+        ''' <summary>
+        '''     Liefert den vom Managed-Backend unterstützten Containertyp.
+        ''' </summary>
         Public ReadOnly Property ContainerType As ArchiveContainerType Implements IArchiveBackend.ContainerType
             Get
                 Return ArchiveContainerType.Zip
             End Get
         End Property
 
+        ''' <summary>
+        '''     Verarbeitet ZIP-Archive fail-closed über die Managed-Archive-Engine.
+        ''' </summary>
         Public Function Process(
                                 stream As Stream,
                                 opt As FileTypeProjectOptions,
@@ -141,6 +160,10 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
     End Class
 
+    ''' <summary>
+    '''     Adapter-Modell für Managed-ZIP-Einträge (<see cref="ZipArchiveEntry"/>) zur Bereitstellung einer
+    '''     einheitlichen <see cref="IArchiveEntryModel"/>-Schnittstelle im Managed-Archiv-Backend.
+    ''' </summary>
     Friend NotInheritable Class ArchiveManagedEntryModel
         Implements IArchiveEntryModel
 
@@ -150,6 +173,9 @@ Namespace Global.Tomtastisch.FileClassifier
             _entry = entry
         End Sub
 
+        ''' <summary>
+        '''     Liefert den relativen Archivpfad des Managed-Eintrags.
+        ''' </summary>
         Public ReadOnly Property RelativePath As String Implements IArchiveEntryModel.RelativePath
             Get
                 If _entry Is Nothing Then Return String.Empty
@@ -157,6 +183,9 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
+        ''' <summary>
+        '''     Kennzeichnet, ob der Managed-Eintrag ein Verzeichnis repräsentiert.
+        ''' </summary>
         Public ReadOnly Property IsDirectory As Boolean Implements IArchiveEntryModel.IsDirectory
             Get
                 If _entry Is Nothing Then Return False
@@ -165,6 +194,9 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
+        ''' <summary>
+        '''     Liefert die unkomprimierte Größe des Eintrags, sofern verfügbar.
+        ''' </summary>
         Public ReadOnly Property UncompressedSize As Long? Implements IArchiveEntryModel.UncompressedSize
             Get
                 If _entry Is Nothing Then Return Nothing
@@ -172,6 +204,9 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
+        ''' <summary>
+        '''     Liefert die komprimierte Größe des Eintrags, sofern verfügbar.
+        ''' </summary>
         Public ReadOnly Property CompressedSize As Long? Implements IArchiveEntryModel.CompressedSize
             Get
                 If _entry Is Nothing Then Return Nothing
@@ -179,12 +214,18 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
+        ''' <summary>
+        '''     Liefert für Managed-ZIP immer eine leere Zeichenfolge (keine Link-Metadaten).
+        ''' </summary>
         Public ReadOnly Property LinkTarget As String Implements IArchiveEntryModel.LinkTarget
             Get
                 Return String.Empty
             End Get
         End Property
 
+        ''' <summary>
+        '''     Öffnet einen lesbaren Stream auf den Eintragsinhalt.
+        ''' </summary>
         Public Function OpenStream() As Stream Implements IArchiveEntryModel.OpenStream
             If _entry Is Nothing Then Return Stream.Null
             Return _entry.Open()

@@ -1,3 +1,12 @@
+' ============================================================================
+' FILE: HashEvidence.vb
+'
+' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
+' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.MD
+' - Try/Catch konsistent im Catch-Filter-Schema
+' - Variablen im Deklarationsblock, spaltenartig ausgerichtet
+' ============================================================================
+
 Option Strict On
 Option Explicit On
 
@@ -33,12 +42,12 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <summary>
         '''     Optional mitgeführte komprimierte Bytes.
         ''' </summary>
-        Public ReadOnly Property CompressedBytes As Global.System.Collections.Immutable.ImmutableArray(Of Byte)
+        Public ReadOnly Property CompressedBytes As Immutable.ImmutableArray(Of Byte)
 
         ''' <summary>
         '''     Optional mitgeführte unkomprimierte bzw. logische Bytes.
         ''' </summary>
-        Public ReadOnly Property UncompressedBytes As Global.System.Collections.Immutable.ImmutableArray(Of Byte)
+        Public ReadOnly Property UncompressedBytes As Immutable.ImmutableArray(Of Byte)
 
         ''' <summary>
         '''     Anzahl berücksichtigter Entries im Nachweis.
@@ -98,11 +107,11 @@ Namespace Global.Tomtastisch.FileClassifier
                 notes:=notes)
         End Function
 
-        Private Shared Function ToImmutable(data As Byte()) As Global.System.Collections.Immutable.ImmutableArray(Of Byte)
+        Private Shared Function ToImmutable(data As Byte()) As Immutable.ImmutableArray(Of Byte)
             If data Is Nothing OrElse data.Length = 0 Then
-                Return Global.System.Collections.Immutable.ImmutableArray(Of Byte).Empty
+                Return Immutable.ImmutableArray(Of Byte).Empty
             End If
-            Return Global.System.Collections.Immutable.ImmutableArray.Create(data)
+            Return Immutable.ImmutableArray.Create(data)
         End Function
     End Class
 End Namespace
