@@ -119,7 +119,8 @@ Namespace Global.Tomtastisch.FileClassifier
     End Class
 
     ''' <summary>
-    '''     Interne Hilfsklasse <c>ArchiveManagedBackend</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    '''     Managed-ZIP-Backend zur Verarbeitung von ZIP-Archiven über <see cref="System.IO.Compression"/>.
+    '''     Kapselt Guard-, I/O- und Policy-Logik und delegiert an die <see cref="ArchiveStreamEngine"/>.
     ''' </summary>
     Friend NotInheritable Class ArchiveManagedBackend
         Implements IArchiveBackend
@@ -160,7 +161,8 @@ Namespace Global.Tomtastisch.FileClassifier
     End Class
 
     ''' <summary>
-    '''     Interne Hilfsklasse <c>ArchiveManagedEntryModel</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    '''     Adapter-Modell für Managed-ZIP-Einträge (<see cref="ZipArchiveEntry"/>) zur Bereitstellung einer
+    '''     einheitlichen <see cref="IArchiveEntryModel"/>-Schnittstelle im Managed-Archiv-Backend.
     ''' </summary>
     Friend NotInheritable Class ArchiveManagedEntryModel
         Implements IArchiveEntryModel

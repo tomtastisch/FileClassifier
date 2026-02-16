@@ -190,6 +190,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <exception cref="InvalidDataException">Kann bei ungültigen Datenzuständen intern auftreten und wird fail-closed behandelt.</exception>
         ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Pfadformaten intern auftreten und wird fail-closed behandelt.</exception>
         ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
+        <SuppressMessage("Performance", "CA1822:Mark members as static", Justification:="Public instance API; changing to Shared would be a breaking API change.")>
         Public Function Detect _
             (
                 path As String,
@@ -356,7 +357,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf ex Is NotSupportedException OrElse
                 TypeOf ex Is ArgumentException
                 Return False
-            Catch ex As Exception When TypeOf ex Is Exception
+            Catch ex As Exception
                 ' Kompatibilitäts-Catch: unbekannte Ausnahme bleibt fail-closed.
                 Return False
             End Try
@@ -842,7 +843,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf ex Is NotSupportedException OrElse
                 TypeOf ex Is ArgumentException
                 Return Array.Empty(Of Byte)()
-            Catch ex As Exception When TypeOf ex Is Exception
+            Catch ex As Exception
                 Return Array.Empty(Of Byte)()
             End Try
         End Function

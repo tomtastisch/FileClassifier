@@ -89,6 +89,8 @@ Use visible block separation (empty line + block comment markers):
 
 ## 7. Exception Handling & Logging (Fail-Closed)
 - Prefer catch filter form in VB: `Catch ex As Exception When TypeOf ex Is ...`
+- Forbidden redundant pseudo-filter: `Catch ex As Exception When TypeOf ex Is Exception`
+  If all exceptions must be handled, use `Catch ex As Exception` instead.
 - No unfiltered catch-all unless technically required and documented.
 - No silent swallow: log (`Warn`/`Error`) and preserve prior fail-closed behavior.
 - Keep log wording consistent (German with proper umlauts in this project).

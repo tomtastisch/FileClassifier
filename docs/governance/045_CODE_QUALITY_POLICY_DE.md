@@ -165,6 +165,9 @@ C#-Konventionen (Projektstandard):
 ## 7. Exception-Handling & Logging (Fail-Closed)
 - Catch-Filter-Form bevorzugt (VB):
   Catch ex As Exception When TypeOf ex Is ...
+- Verboten ist der redundante Pseudo-Filter:
+  Catch ex As Exception When TypeOf ex Is Exception
+  Wenn alle Exceptions behandelt werden sollen, ist stattdessen `Catch ex As Exception` zu verwenden.
 - Keine catch-all ohne Filter, außer wenn zwingend notwendig UND dokumentiert.
 - Keine stillen Swallows: bei Fehler -> loggen (Warn/Error) + fail-closed Rückgabe/Exception wie bisher.
 - Log-Text ist konsistent, deutsch, mit Umlauten.

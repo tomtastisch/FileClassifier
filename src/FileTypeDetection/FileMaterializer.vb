@@ -147,7 +147,6 @@ Namespace Global.Tomtastisch.FileClassifier
 
             ' Pfadnormalisierung: Absoluten Zielpfad auflösen.
             Dim destinationFull As String
-            Dim errorMessage    As String = Nothing
 
             Try
                 destinationFull = Path.GetFullPath(destinationPath)
@@ -160,7 +159,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf ex Is PathTooLongException OrElse
                 TypeOf ex Is IOException
 
-                LogGuard.Warn(opt.Logger, $"[Materialize] Ungueltiger Zielpfad: {errorMessage}")
+                LogGuard.Warn(opt.Logger, $"[Materialize] Ungueltiger Zielpfad: {ex.Message}")
                 Return False
             End Try
 

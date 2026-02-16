@@ -26,7 +26,8 @@ Namespace Global.Tomtastisch.FileClassifier
     End Enum
 
     ''' <summary>
-    '''     Interne Hilfsklasse <c>ArchiveDescriptor</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    '''     Unveränderlicher Deskriptor zur Beschreibung erkannter Archivtypen und Containerketten.
+    '''     Enthält Metadaten zu <see cref="LogicalKind"/>, <see cref="ContainerType"/> und <see cref="ContainerChain"/>.
     ''' </summary>
     Friend NotInheritable Class ArchiveDescriptor
         ''' <summary>
@@ -134,7 +135,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Using ms As New MemoryStream(data, writable:=False)
                     Return TryDescribeStream(ms, opt, descriptor)
                 End Using
-            Catch ex As Exception When TypeOf ex Is Exception
+            Catch ex As Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveDetect] Byte-Erkennung fehlgeschlagen: {ex.Message}")
                 descriptor = ArchiveDescriptor.UnknownDescriptor()
                 Return False
@@ -157,7 +158,7 @@ Namespace Global.Tomtastisch.FileClassifier
                     descriptor = ArchiveDescriptor.ForContainerType(mapped)
                     Return True
                 End Using
-            Catch ex As Exception When TypeOf ex Is Exception
+            Catch ex As Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveDetect] Stream-Erkennung fehlgeschlagen: {ex.Message}")
                 descriptor = ArchiveDescriptor.UnknownDescriptor()
                 Return False
@@ -227,7 +228,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Friend Shared Function TryExtractArchiveStreamToMemory(stream As Stream, opt As FileTypeProjectOptions) _
             As IReadOnlyList(Of ZipExtractedEntry)
-            Dim descriptor  As ArchiveDescriptor                   = Nothing
+            Dim descriptor As ArchiveDescriptor = Nothing
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             If Not ArchiveTypeResolver.TryDescribeStream(stream, opt, descriptor) Then Return emptyResult
             Return TryExtractArchiveStreamToMemory(stream, opt, descriptor)
@@ -259,7 +260,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End If
 
                 Return entries.AsReadOnly()
-            Catch ex As Exception When TypeOf ex Is Exception
+            Catch ex As Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveExtract] InMemory-Fehler: {ex.Message}")
                 entries.Clear()
                 Return emptyResult
@@ -284,7 +285,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim destinationFull As String
             Try
                 destinationFull = Path.GetFullPath(destinationDirectory)
-            Catch ex As Exception When TypeOf ex Is Exception
+            Catch ex As Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveExtract] Ungueltiger Zielpfad: {ex.Message}")
                 Return False
             End Try
@@ -314,7 +315,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
                 Directory.Move(stageDir, destinationFull)
                 Return True
-            Catch ex As Exception When TypeOf ex Is Exception
+            Catch ex As Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveExtract] Fehler: {ex.Message}")
                 Return False
             Finally
@@ -375,7 +376,7 @@ Namespace Global.Tomtastisch.FileClassifier
                     End Using
                 End Using
                 Return True
-            Catch ex As Exception When TypeOf ex Is Exception
+            Catch ex As Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveExtract] Entry-Fehler: {ex.Message}")
                 Return False
             End Try
@@ -407,7 +408,7 @@ Namespace Global.Tomtastisch.FileClassifier
                     End Using
                 End Using
                 Return True
-            Catch ex As Exception When TypeOf ex Is Exception
+            Catch ex As Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveExtract] InMemory-Entry-Fehler: {ex.Message}")
                 Return False
             End Try
@@ -522,7 +523,8 @@ Namespace Global.Tomtastisch.FileClassifier
     End Class
 
     ''' <summary>
-    '''     Interne Hilfsklasse <c>SharpCompressArchiveBackend</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    '''     SharpCompress-Backend zur Verarbeitung verschiedener Archivformate (z. B. TAR, RAR, 7z).
+    '''     Kapselt Guard-, I/O- und Policy-Logik für nicht-managed Container.
     ''' </summary>
     Friend NotInheritable Class SharpCompressArchiveBackend
         Implements IArchiveBackend
@@ -597,7 +599,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
 
                 Return True
-            Catch ex As Exception When TypeOf ex Is Exception
+            Catch ex As Exception
                 LogGuard.Debug(opt.Logger, $"[ArchiveGate] SharpCompress-Fehler: {ex.Message}")
                 Return False
             End Try

@@ -215,7 +215,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf ex Is NotSupportedException OrElse
                 TypeOf ex Is ArgumentException
                 Return False
-            Catch ex As Exception When TypeOf ex Is Exception
+            Catch ex As Exception
                 Return False
             End Try
         End Function

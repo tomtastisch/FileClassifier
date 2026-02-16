@@ -37,7 +37,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Friend Shared Sub CopyBounded(input As Stream, output As Stream, maxBytes As Long)
             Dim buf(InternalIoDefaults.CopyBufferSize - 1) As Byte
-            Dim total                                      As Long = 0
+            Dim total As Long = 0
 
             While True
                 Dim n = input.Read(buf, 0, buf.Length)

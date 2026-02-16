@@ -10,6 +10,8 @@
 Option Strict On
 Option Explicit On
 
+Imports System.Diagnostics.CodeAnalysis
+
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
     '''     Konfiguriert das Verhalten der öffentlichen deterministischen Hashing-APIs.
@@ -58,6 +60,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Return cloned
         End Function
 
+        <SuppressMessage("Usage", "CA2249:Use 'string.Contains' instead of 'string.IndexOf' to improve readability", Justification:="IndexOf bleibt hier für deterministische Zeichenprüfung ohne Semantikänderung bestehen.")>
         Private Shared Function NormalizeMaterializedFileName(candidate As String) As String
             Dim normalized = If(candidate, String.Empty).Trim()
             If String.IsNullOrWhiteSpace(normalized) Then Return "deterministic-roundtrip.bin"

@@ -375,7 +375,7 @@ Namespace Global.Tomtastisch.FileClassifier
                     TypeOf ex Is IO.IOException OrElse
                     TypeOf ex Is NotSupportedException OrElse
                     TypeOf ex Is ArgumentException
-                Catch ex As Exception When TypeOf ex Is Exception
+                Catch ex As Exception
                 End Try
             End Try
 
@@ -624,7 +624,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 key = Array.Empty(Of Byte)()
                 note = $"Secure hashing requested but env var '{HmacKeyEnvVarB64}' is invalid Base64; HMAC digests omitted."
                 Return False
-            Catch ex As Exception When TypeOf ex Is Exception
+            Catch ex As Exception
                 key = Array.Empty(Of Byte)()
                 note = $"Secure hashing requested but env var '{HmacKeyEnvVarB64}' is invalid Base64; HMAC digests omitted."
                 Return False
