@@ -1,5 +1,5 @@
 <!-- LANG_SWITCH:BEGIN -->
-[DE](045_CODE_QUALITY_POLICY_DE.md) | [EN](145_CODE_QUALITY_POLICY_DE.md)
+[DE](045_CODE_QUALITY_POLICY_DE.MD) | [EN](145_CODE_QUALITY_POLICY_DE.MD)
 <!-- LANG_SWITCH:END -->
 
 # Code Quality & Documentation Policy (EN)
@@ -125,10 +125,10 @@ For each file in `src/FileTypeDetection/*`:
 - no behavior drift (no new dependencies, no semantic changes)
 
 ## 10. Style Reference (SSOT)
-The authoritative style/semantics template is the reference block in `docs/governance/045_CODE_QUALITY_POLICY_DE.md` section “10. STYLE REFERENCE (SSOT)”.
+The authoritative style/semantics template is the reference block in `docs/governance/045_CODE_QUALITY_POLICY_DE.MD` section “10. STYLE REFERENCE (SSOT)”.
 Apply that schema to all files in `src/FileTypeDetection/*`.
 Deviations are allowed only when technically required and must be justified in diff summary.
 
 ## Source of Truth Note
 This English edition is provided for accessibility. If wording differs, the German policy file
-`docs/governance/045_CODE_QUALITY_POLICY_DE.md` is authoritative.
+`docs/governance/045_CODE_QUALITY_POLICY_DE.MD` is authoritative.

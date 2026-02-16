@@ -1,5 +1,5 @@
 <!-- LANG_SWITCH:BEGIN -->
-[DE](045_CODE_QUALITY_POLICY_DE.md) | [EN](145_CODE_QUALITY_POLICY_DE.md)
+[DE](045_CODE_QUALITY_POLICY_DE.MD) | [EN](145_CODE_QUALITY_POLICY_DE.MD)
 <!-- LANG_SWITCH:END -->
 
 # Code-Quality- & Dokumentations-Policy (DE)
@@ -21,10 +21,10 @@ das sich an etablierten Normen für Informationsqualität und Softwarequalität 
   Quelle: https://www.dinmedia.de/en/standard/iso-iec-ieee-26514/350342422
 
 - ISO/IEC 25010:2023 — Systems and software engineering: Product quality model (SQuaRE)
-  Quelle: https://www.iso.org/standard/78176.html
+  Quelle: ISO-Katalogeintrag 78176 (über die ISO-Suche abrufbar)
 
 - ISO/IEC/IEEE 15289:2019 — Content of life-cycle information items (documentation)
-  Quelle: https://www.iso.org/standard/74909.html
+  Quelle: ISO-Katalogeintrag 74909 (über die ISO-Suche abrufbar)
 
 Optional (für generische Nutzungsinformationen):
 - DIN EN IEC/IEEE 82079-1:2021-09 — Erstellung von Nutzungsinformationen (Gebrauchsanleitungen) für Produkte
