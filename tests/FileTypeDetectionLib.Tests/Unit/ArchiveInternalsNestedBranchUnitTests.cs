@@ -68,8 +68,12 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
     [Fact]
     public void TryReadEntryPayloadBounded_ReturnsFalse_ForInvalidInputs()
     {
-        var method = typeof(SharpCompressArchiveBackend).GetMethod("TryReadEntryPayloadBounded",
-            BindingFlags.NonPublic | BindingFlags.Static)!;
+        var method = typeof(SharpCompressArchiveBackend).GetMethod(
+            "TryReadEntryPayloadBounded",
+            BindingFlags.NonPublic | BindingFlags.Static,
+            binder: null,
+            types: new[] { typeof(IArchiveEntry), typeof(long), typeof(byte[]).MakeByRefType() },
+            modifiers: null)!;
         Assert.NotNull(method);
 
         Assert.False(TestGuard.Unbox<bool>(method.Invoke(null, new object?[] { null, 10L, null })));

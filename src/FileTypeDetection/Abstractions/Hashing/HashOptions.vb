@@ -53,9 +53,11 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Friend Shared Function Normalize(options As HashOptions) As HashOptions
+            Dim cloned As HashOptions = Nothing
+
             If options Is Nothing Then options = New HashOptions()
 
-            Dim cloned = options.Clone()
+            cloned = options.Clone()
             cloned.MaterializedFileName = NormalizeMaterializedFileName(cloned.MaterializedFileName)
             Return cloned
         End Function
@@ -67,7 +69,12 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Try
                 normalized = IO.Path.GetFileName(normalized)
-            Catch
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is IO.IOException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException
                 Return "deterministic-roundtrip.bin"
             End Try
 

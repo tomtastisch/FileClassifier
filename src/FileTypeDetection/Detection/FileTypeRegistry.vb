@@ -67,13 +67,16 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function BuildDefinitionsFromEnum() As ImmutableArray(Of FileTypeDefinition)
             Dim b = ImmutableArray.CreateBuilder(Of FileTypeDefinition)()
+            Dim canonicalExtension As String = String.Empty
+            Dim aliases As String() = Array.Empty(Of String)()
+            Dim magicPatterns As ImmutableArray(Of MagicPattern) = ImmutableArray(Of MagicPattern).Empty
 
             For Each kind In OrderedKinds()
                 If kind = FileKind.Unknown Then Continue For
 
-                Dim canonicalExtension = GetCanonicalExtension(kind)
-                Dim aliases = BuildAliases(kind, canonicalExtension)
-                Dim magicPatterns = GetMagicPatterns(kind)
+                canonicalExtension = GetCanonicalExtension(kind)
+                aliases = BuildAliases(kind, canonicalExtension)
+                magicPatterns = GetMagicPatterns(kind)
 
                 b.Add(New FileTypeDefinition(kind, canonicalExtension, aliases, magicPatterns))
             Next
@@ -99,14 +102,17 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function BuildAliases(kind As FileKind, canonicalExtension As String) As String()
             Dim aliases As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
+            Dim extAlias As String = String.Empty
+            Dim enumAlias As String = String.Empty
+            Dim additional As ImmutableArray(Of String) = ImmutableArray(Of String).Empty
+            Dim orderedAliases As List(Of String) = Nothing
 
-            Dim extAlias = NormalizeAlias(canonicalExtension)
+            extAlias = NormalizeAlias(canonicalExtension)
             If extAlias.Length > 0 Then aliases.Add(extAlias)
 
-            Dim enumAlias = NormalizeAlias(kind.ToString())
+            enumAlias = NormalizeAlias(kind.ToString())
             If enumAlias.Length > 0 Then aliases.Add(enumAlias)
 
-            Dim additional As ImmutableArray(Of String) = ImmutableArray(Of String).Empty
             If AliasOverrides.TryGetValue(kind, additional) Then
                 additional.
                     Select(Function(item) NormalizeAlias(item)).
@@ -115,7 +121,7 @@ Namespace Global.Tomtastisch.FileClassifier
                     ForEach(Sub(normalized) aliases.Add(normalized))
             End If
 
-            Dim orderedAliases = aliases.ToList()
+            orderedAliases = aliases.ToList()
             orderedAliases.Sort(StringComparer.Ordinal)
             Return orderedAliases.ToArray()
         End Function
@@ -145,13 +151,17 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Friend Shared Function DetectByMagic(header As Byte()) As FileKind
+            Dim rule As MagicRule = Nothing
+            Dim patterns As ImmutableArray(Of MagicPattern) = ImmutableArray(Of MagicPattern).Empty
+            Dim segments As ImmutableArray(Of MagicSegment) = ImmutableArray(Of MagicSegment).Empty
+
             If header Is Nothing OrElse header.Length = 0 Then Return FileKind.Unknown
 
             For i = 0 To MagicRules.Length - 1
-                Dim rule = MagicRules(i)
-                Dim patterns = rule.Patterns
+                rule = MagicRules(i)
+                patterns = rule.Patterns
                 For j = 0 To patterns.Length - 1
-                    Dim segments = patterns(j).Segments
+                    segments = patterns(j).Segments
                     If segments.All(Function(segment) HasSegment(header, segment)) Then
                         Return rule.Kind
                     End If
@@ -162,8 +172,9 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Friend Shared Function HasDirectHeaderDetection(kind As FileKind) As Boolean
-            If kind = FileKind.Unknown Then Return False
             Dim patterns As ImmutableArray(Of MagicPattern) = ImmutableArray(Of MagicPattern).Empty
+
+            If kind = FileKind.Unknown Then Return False
             Return MagicPatternCatalog.TryGetValue(kind, patterns) AndAlso Not patterns.IsDefaultOrEmpty
         End Function
 
@@ -229,11 +240,13 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function HasSegment(data As Byte(), segment As MagicSegment) As Boolean
+            Dim endPos As Integer = 0
+
             If data Is Nothing Then Return False
             If segment.Offset < 0 Then Return False
             If segment.Bytes.IsDefaultOrEmpty Then Return False
 
-            Dim endPos = segment.Offset + segment.Bytes.Length
+            endPos = segment.Offset + segment.Bytes.Length
             If endPos < 0 OrElse data.Length < endPos Then Return False
 
             For i = 0 To segment.Bytes.Length - 1
@@ -244,23 +257,22 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function BuildAliasMap(types As ImmutableDictionary(Of FileKind, FileType)) _
             As ImmutableDictionary(Of String, FileKind)
+            Dim entries As List(Of Tuple(Of FileKind, String)) = Nothing
+
             If types Is Nothing Then Return ImmutableDictionary(Of String, FileKind).Empty
 
-            Dim entries = types.
+            entries = types.
                 Where(Function(kv) kv.Value IsNot Nothing).
                 Where(Function(kv) Not kv.Value.Aliases.IsDefault AndAlso kv.Value.Aliases.Length > 0).
                 SelectMany(Function(kv) kv.Value.Aliases.
-                    Select(Function(aliasValue) New With {
-                        .Kind = kv.Key,
-                        .Normalized = NormalizeAlias(aliasValue)
-                    })).
-                Where(Function(item) item.Normalized.Length > 0).
+                    Select(Function(aliasValue) Tuple.Create(kv.Key, NormalizeAlias(aliasValue)))).
+                Where(Function(item) item.Item2.Length > 0).
                 ToList()
 
             Return entries.
                 Aggregate(ImmutableDictionary.CreateBuilder(Of String, FileKind)(StringComparer.OrdinalIgnoreCase),
                           Function(builder, entry)
-                              builder(entry.Normalized) = entry.Kind
+                              builder(entry.Item2) = entry.Item1
                               Return builder
                           End Function).
                 ToImmutable()

@@ -35,7 +35,14 @@ Namespace Global.Tomtastisch.FileClassifier
                                                     depth As Integer,
                                                     extractEntry As Func(Of ZipArchiveEntry, Boolean)
                                                     ) As Boolean
+            Dim totalUncompressed As Long = 0
+            Dim ordered As IEnumerable(Of ZipArchiveEntry) = Nothing
+            Dim u As Long = 0
+            Dim c As Long = 0
+            Dim ratio As Double = 0
+
             If Not StreamGuard.IsReadable(stream) Then Return False
+            If opt Is Nothing Then Return False
             If depth > opt.MaxZipNestingDepth Then Return False
 
             Try
@@ -44,12 +51,12 @@ Namespace Global.Tomtastisch.FileClassifier
                 Using zip As New ZipArchive(stream, ZipArchiveMode.Read, leaveOpen:=True)
                     If zip.Entries.Count > opt.MaxZipEntries Then Return False
 
-                    Dim totalUncompressed As Long = 0
-                    Dim ordered = zip.Entries.OrderBy(Function(e) If(e.FullName, String.Empty), StringComparer.Ordinal)
+                    totalUncompressed = 0
+                    ordered = zip.Entries.OrderBy(Function(e) If(e.FullName, String.Empty), StringComparer.Ordinal)
 
                     For Each e In ordered
-                        Dim u As Long = e.Length
-                        Dim c As Long = e.CompressedLength
+                        u = e.Length
+                        c = e.CompressedLength
 
                         If u > opt.MaxZipEntryUncompressedBytes Then Return False
 
@@ -57,11 +64,11 @@ Namespace Global.Tomtastisch.FileClassifier
                         If totalUncompressed > opt.MaxZipTotalUncompressedBytes Then Return False
 
                         If c > 0 AndAlso opt.MaxZipCompressionRatio > 0 Then
-                            Dim ratio As Double = CDbl(u) / CDbl(c)
+                            ratio = CDbl(u) / CDbl(c)
                             If ratio > opt.MaxZipCompressionRatio Then Return False
                         End If
 
-                        If IsNestedArchiveEntry(e) Then
+                        If IsNestedArchiveEntry(e, opt) Then
                             If depth >= opt.MaxZipNestingDepth Then Return False
                             If u <= 0 OrElse u > opt.MaxZipNestedBytes Then Return False
 
@@ -76,7 +83,15 @@ Namespace Global.Tomtastisch.FileClassifier
                                         End If
                                     End Using
                                 End Using
-                            Catch ex As Exception
+                            Catch ex As Exception When _
+                                TypeOf ex Is UnauthorizedAccessException OrElse
+                                TypeOf ex Is System.Security.SecurityException OrElse
+                                TypeOf ex Is IOException OrElse
+                                TypeOf ex Is InvalidDataException OrElse
+                                TypeOf ex Is NotSupportedException OrElse
+                                TypeOf ex Is ArgumentException OrElse
+                                TypeOf ex Is InvalidOperationException OrElse
+                                TypeOf ex Is ObjectDisposedException
                                 LogGuard.Debug(opt.Logger, $"[ArchiveGate] Nested-Fehler: {ex.Message}")
                                 Return False
                             End Try
@@ -89,30 +104,50 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
 
                 Return True
-            Catch ex As Exception
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is IOException OrElse
+                TypeOf ex Is InvalidDataException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException OrElse
+                TypeOf ex Is InvalidOperationException OrElse
+                TypeOf ex Is ObjectDisposedException
                 LogGuard.Debug(opt.Logger, $"[ArchiveGate] Stream-Fehler: {ex.Message}")
                 Return False
             End Try
         End Function
 
-        Private Shared Function IsNestedArchiveEntry(entry As ZipArchiveEntry) As Boolean
+        Private Shared Function IsNestedArchiveEntry(entry As ZipArchiveEntry, opt As FileTypeProjectOptions) As Boolean
+            Dim header(15) As Byte
+            Dim read As Integer = 0
+            Dim exact As Byte() = Array.Empty(Of Byte)()
+
             If entry Is Nothing Then Return False
 
             Try
                 Using entryStream = entry.Open()
-                    Dim header(15) As Byte
-                    Dim read = entryStream.Read(header, 0, header.Length)
+                    read = entryStream.Read(header, 0, header.Length)
                     If read < 4 Then Return False
 
                     If read = header.Length Then
                         Return FileTypeRegistry.DetectByMagic(header) = FileKind.Zip
                     End If
 
-                    Dim exact(read - 1) As Byte
+                    exact = New Byte(read - 1) {}
                     Buffer.BlockCopy(header, 0, exact, 0, read)
                     Return FileTypeRegistry.DetectByMagic(exact) = FileKind.Zip
                 End Using
-            Catch
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is IOException OrElse
+                TypeOf ex Is InvalidDataException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException OrElse
+                TypeOf ex Is InvalidOperationException OrElse
+                TypeOf ex Is ObjectDisposedException
+                LogGuard.Debug(opt.Logger, $"[ArchiveGate] Nested-Header-Fehler: {ex.Message}")
                 Return False
             End Try
         End Function
