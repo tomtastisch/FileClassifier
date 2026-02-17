@@ -110,7 +110,7 @@ Determinische Ursache:
 
 Schritte:
 1. Im NuGet-Package-Manager `Include prerelease` aktivieren.
-2. Quelle pruefen: [NuGet v3 Index](https://api.nuget.org/v3/index.json).
+2. Quelle prüfen: [NuGet v3 Index](https://api.nuget.org/v3/index.json).
 3. Lokalen Cache leeren:
    ```bash
    dotnet nuget locals all --clear
