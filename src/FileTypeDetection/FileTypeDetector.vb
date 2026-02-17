@@ -101,7 +101,8 @@ Namespace Global.Tomtastisch.FileClassifier
                 path As String
             ) As Byte()
 
-            Dim opt = GetDefaultOptions()
+            Dim opt As FileTypeProjectOptions = GetDefaultOptions()
+            Dim fi As FileInfo
 
             ' Guard-Clauses: Pfad und Dateiexistenz.
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
@@ -111,7 +112,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Try
                 ' Größenprüfung: Datei muss innerhalb der konfigurierten Grenzen liegen.
-                Dim fi As New FileInfo(path)
+                fi = New FileInfo(path)
                 If fi.Length < 0 OrElse fi.Length > opt.MaxBytes Then
                     LogGuard.Warn(opt.Logger, $"[Detect] Datei zu groß ({fi.Length} > {opt.MaxBytes}).")
                     Return Array.Empty(Of Byte)()
@@ -140,10 +141,10 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         ''' <summary>
-        '''     Erkennt den Dateityp anhand eines Dateipfads.
+        '''     Erkennt den Dateityp anhand eines Dateipfads ohne Endungsprüfung.
         ''' </summary>
         ''' <remarks>
-        '''     Delegiert auf die Überladung mit deaktivierter Endungsprüfung (<c>verifyExtension:=False</c>).
+        '''     Delegiert auf die Überladung mit <c>verifyExtension:=False</c>.
         ''' </remarks>
         ''' <param name="path">Dateipfad der zu klassifizierenden Datei.</param>
         ''' <returns>Erkannter Typ oder <see cref="FileKind.Unknown"/> bei Fehlern.</returns>
@@ -225,7 +226,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' End If
         '''     </code>
         ''' </example>
-        ' ReSharper disable once MemberCanBeMadeStatic.Global
         <SuppressMessage("Performance", "CA1822:Mark members as static", Justification:="Public instance API; changing to Shared would be a breaking API change.")>
         Public Function DetectDetailed _
             (
@@ -296,7 +296,8 @@ Namespace Global.Tomtastisch.FileClassifier
                 path As String
             ) As Boolean
 
-            Dim opt = GetDefaultOptions()
+            Dim opt As FileTypeProjectOptions = GetDefaultOptions()
+            Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
 
             ' Guard-Clauses: Pfad und Dateiexistenz.
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then Return False
@@ -307,7 +308,6 @@ Namespace Global.Tomtastisch.FileClassifier
                     fs As _
                         New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read,
                                        InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
-                    Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
                     If Not ArchiveTypeResolver.TryDescribeStream(fs, opt, descriptor) Then Return False
                     If fs.CanSeek Then fs.Position = 0
                     Return ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, descriptor, depth:=0)
@@ -318,10 +318,9 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
-                TypeOf ex Is ArgumentException
-                Return False
-            Catch ex As Exception
-                ' Kompatibilitäts-Catch: unbekannte Ausnahme bleibt fail-closed.
+                TypeOf ex Is ArgumentException OrElse
+                TypeOf ex Is InvalidOperationException OrElse
+                TypeOf ex Is ObjectDisposedException
                 Return False
             End Try
         End Function
@@ -341,6 +340,9 @@ Namespace Global.Tomtastisch.FileClassifier
                 ByRef trace As DetectionTrace
             ) As FileType
 
+            Dim fi As FileInfo
+            Dim header As Byte()
+
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(opt.Logger, "[Detect] Datei nicht gefunden.")
                 trace.ReasonCode = ReasonFileNotFound
@@ -348,7 +350,7 @@ Namespace Global.Tomtastisch.FileClassifier
             End If
 
             Try
-                Dim fi As New FileInfo(path)
+                fi = New FileInfo(path)
                 If fi.Length < 0 Then
                     trace.ReasonCode = ReasonInvalidLength
                     Return UnknownType()
@@ -368,7 +370,7 @@ Namespace Global.Tomtastisch.FileClassifier
                         FileOptions.SequentialScan
                     )
 
-                    Dim header = ReadHeader(fs, opt.SniffBytes, opt.MaxBytes)
+                    header = ReadHeader(fs, opt.SniffBytes, opt.MaxBytes)
                     Return ResolveByHeaderForPath(header, opt, trace, fs)
 
                 End Using
@@ -392,7 +394,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </remarks>
         ''' <param name="data">Zu prüfende Nutzdaten.</param>
         ''' <returns>Erkannter Typ oder <see cref="FileKind.Unknown"/> bei Fehlern.</returns>
-        ' ReSharper disable once MemberCanBeMadeStatic.Global
         <SuppressMessage("Performance", "CA1822:Mark members as static", Justification:="Public instance API; changing to Shared would be a breaking API change.")>
         Public Function Detect _
             (
@@ -447,11 +448,12 @@ Namespace Global.Tomtastisch.FileClassifier
                 verifyBeforeExtract As Boolean
             ) As Boolean
 
-            Dim opt = GetDefaultOptions()
+            Dim opt As FileTypeProjectOptions = GetDefaultOptions()
+            Dim payload As Byte()
             If Not CanExtractArchivePath(path, verifyBeforeExtract, opt) Then Return False
 
             Try
-                Dim payload = ReadFileSafe(path)
+                payload = ReadFileSafe(path)
 
                 If payload.Length = 0 Then Return False
 
@@ -532,6 +534,8 @@ Namespace Global.Tomtastisch.FileClassifier
                 opt As FileTypeProjectOptions
             ) As FileType
 
+            Dim trace As DetectionTrace = DetectionTrace.Empty
+
             If data Is Nothing OrElse data.Length = 0 Then Return UnknownType()
 
             If CLng(data.Length) > opt.MaxBytes Then
@@ -540,7 +544,6 @@ Namespace Global.Tomtastisch.FileClassifier
             End If
 
             Try
-                Dim trace As DetectionTrace = DetectionTrace.Empty
                 Return ResolveByHeaderForBytes(data, opt, trace, data)
 
             Catch ex As Exception When _
@@ -569,9 +572,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 opt,
                 trace,
                 tryDescribe:=Function()
-                                 Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
-                                 If Not ArchiveTypeResolver.TryDescribeStream(fs, opt, descriptor) Then Return Nothing
-                                 Return descriptor
+                                 Return TryDescribeArchiveStreamDescriptor(fs, opt)
                              End Function,
                 tryValidate:=Function(descriptor)
                                  Return ValidateArchiveStreamRaw(fs, opt, descriptor)
@@ -596,9 +597,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 opt,
                 trace,
                 tryDescribe:=Function()
-                                 Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
-                                 If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then Return Nothing
-                                 Return descriptor
+                                 Return TryDescribeArchiveBytesDescriptor(data, opt)
                              End Function,
                 tryValidate:=Function(descriptor)
                                  Return ValidateArchiveBytesRaw(data, opt, descriptor)
@@ -619,18 +618,20 @@ Namespace Global.Tomtastisch.FileClassifier
                                                tryRefine As Func(Of FileType)
                                                ) As FileType
 
+            Dim magicKind As FileKind
+            Dim descriptor As ArchiveDescriptor
+
             If header Is Nothing OrElse header.Length = 0 Then
                 trace.ReasonCode = ReasonHeaderUnknown
                 Return UnknownType()
             End If
 
-            Dim magicKind = FileTypeRegistry.DetectByMagic(header)
+            magicKind = FileTypeRegistry.DetectByMagic(header)
             If magicKind <> FileKind.Unknown AndAlso magicKind <> FileKind.Zip Then
                 trace.ReasonCode = ReasonHeaderMatch
                 Return FileTypeRegistry.Resolve(magicKind)
             End If
 
-            Dim descriptor As ArchiveDescriptor
             If magicKind = FileKind.Zip Then
                 descriptor = ArchiveDescriptor.ForContainerType(ArchiveContainerType.Zip)
             Else
@@ -649,6 +650,28 @@ Namespace Global.Tomtastisch.FileClassifier
             End If
 
             Return ResolveAfterArchiveGate(magicKind, opt, trace, tryRefine)
+        End Function
+
+        Private Shared Function TryDescribeArchiveStreamDescriptor(
+                                                                   fs As FileStream,
+                                                                   opt As FileTypeProjectOptions
+                                                                   ) As ArchiveDescriptor
+
+            Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
+
+            If Not ArchiveTypeResolver.TryDescribeStream(fs, opt, descriptor) Then Return Nothing
+            Return descriptor
+        End Function
+
+        Private Shared Function TryDescribeArchiveBytesDescriptor(
+                                                                  data As Byte(),
+                                                                  opt As FileTypeProjectOptions
+                                                                  ) As ArchiveDescriptor
+
+            Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
+
+            If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then Return Nothing
+            Return descriptor
         End Function
 
         Private Shared Function ValidateArchiveStreamRaw(
@@ -678,12 +701,14 @@ Namespace Global.Tomtastisch.FileClassifier
                 tryRefine As Func(Of FileType)
             ) As FileType
 
+            Dim refined As FileType
+
             If magicKind <> FileKind.Zip Then
                 trace.ReasonCode = ReasonArchiveGeneric
                 Return FileTypeRegistry.Resolve(FileKind.Zip)
             End If
 
-            Dim refined = tryRefine()
+            refined = tryRefine()
             Return FinalizeArchiveDetection(refined, opt, trace)
         End Function
 
@@ -713,13 +738,15 @@ Namespace Global.Tomtastisch.FileClassifier
                 opt As FileTypeProjectOptions
             ) As Boolean
 
+            Dim detected As FileType
+
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(opt.Logger, "[ArchiveExtract] Quelldatei fehlt.")
                 Return False
             End If
 
             If verifyBeforeExtract Then
-                Dim detected = Detect(path)
+                detected = Detect(path)
                 If Not IsArchiveContainerKind(detected.Kind) Then
                     LogGuard.Warn(opt.Logger, $"[ArchiveExtract] Vorprüfung fehlgeschlagen ({detected.Kind}).")
                     Return False
@@ -756,13 +783,16 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function ExtensionMatchesKind(path As String, detectedKind As FileKind) As Boolean
 
-            Dim ext = IO.Path.GetExtension(If(path, String.Empty))
+            Dim ext As String = IO.Path.GetExtension(If(path, String.Empty))
+            Dim normalizedExt As String
+            Dim detectedType As FileType
+
             If String.IsNullOrWhiteSpace(ext) Then Return True
 
             If detectedKind = FileKind.Unknown Then Return False
 
-            Dim normalizedExt = FileTypeRegistry.NormalizeAlias(ext)
-            Dim detectedType = FileTypeRegistry.Resolve(detectedKind)
+            normalizedExt = FileTypeRegistry.NormalizeAlias(ext)
+            detectedType = FileTypeRegistry.Resolve(detectedKind)
 
             If normalizedExt = FileTypeRegistry.NormalizeAlias(detectedType.CanonicalExtension) Then
                 Return True
@@ -778,6 +808,13 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function ReadHeader(input As FileStream, sniffBytes As Integer, maxBytes As Long) As Byte()
 
+            Dim want As Integer
+            Dim take As Integer
+            Dim off As Integer
+            Dim n As Integer
+            Dim buf As Byte()
+            Dim exact As Byte()
+
             Try
                 If input Is Nothing OrElse Not input.CanRead Then Return Array.Empty(Of Byte)()
                 If maxBytes <= 0 Then Return Array.Empty(Of Byte)()
@@ -786,25 +823,25 @@ Namespace Global.Tomtastisch.FileClassifier
                     input.Position = 0
                 End If
 
-                Dim want As Integer = sniffBytes
+                want = sniffBytes
                 If want <= 0 Then want = InternalIoDefaults.DefaultSniffBytes
-                Dim take As Integer = want
+                take = want
                 If input.CanSeek Then
                     take = CInt(Math.Min(input.Length, want))
                 End If
                 If take <= 0 Then Return Array.Empty(Of Byte)()
 
-                Dim buf(take - 1) As Byte
-                Dim off = 0
+                buf = New Byte(take - 1) {}
+                off = 0
                 While off < take
-                    Dim n = input.Read(buf, off, take - off)
+                    n = input.Read(buf, off, take - off)
                     If n <= 0 Then Exit While
                     off += n
                 End While
 
                 If off <= 0 Then Return Array.Empty(Of Byte)()
                 If off < take Then
-                    Dim exact(off - 1) As Byte
+                    exact = New Byte(off - 1) {}
                     Array.Copy(buf, exact, off)
                     Return exact
                 End If
@@ -816,9 +853,9 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
-                TypeOf ex Is ArgumentException
-                Return Array.Empty(Of Byte)()
-            Catch ex As Exception
+                TypeOf ex Is ArgumentException OrElse
+                TypeOf ex Is InvalidOperationException OrElse
+                TypeOf ex Is ObjectDisposedException
                 Return Array.Empty(Of Byte)()
             End Try
         End Function

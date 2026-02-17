@@ -115,7 +115,9 @@ Namespace Global.Tomtastisch.FileClassifier
                 secureExtract As Boolean
             ) As Boolean
 
-            Dim opt = FileTypeOptions.GetSnapshot()
+            Dim opt As FileTypeProjectOptions = FileTypeOptions.GetSnapshot()
+            Dim destinationFull As String
+            Dim descriptor As ArchiveDescriptor = Nothing
 
             ' Guard-Clauses: Null-, Größen- und Zielpfadprüfung.
             If data Is Nothing Then Return False
@@ -128,8 +130,6 @@ Namespace Global.Tomtastisch.FileClassifier
             If String.IsNullOrWhiteSpace(destinationPath) Then Return False
 
             ' Pfadnormalisierung: Absoluten Zielpfad auflösen.
-            Dim destinationFull As String
-
             Try
                 destinationFull = Path.GetFullPath(destinationPath)
 
@@ -147,8 +147,6 @@ Namespace Global.Tomtastisch.FileClassifier
 
             ' Secure-Extract-Branch: describe -> safety gate -> extract.
             If secureExtract Then
-                Dim descriptor As ArchiveDescriptor = Nothing
-
                 If ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then
                     If Not ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor) Then
                         LogGuard.Warn(opt.Logger, "[Materialize] Archiv-Validierung fehlgeschlagen.")
@@ -177,11 +175,13 @@ Namespace Global.Tomtastisch.FileClassifier
                 opt As FileTypeProjectOptions
             ) As Boolean
 
+            Dim parent As String
+
             Try
                 If Not DestinationPathGuard.PrepareMaterializationTarget(destinationFull, overwrite, opt) Then _
                     Return False
 
-                Dim parent = Path.GetDirectoryName(destinationFull)
+                parent = Path.GetDirectoryName(destinationFull)
                 If String.IsNullOrWhiteSpace(parent) Then Return False
                 Directory.CreateDirectory(parent)
 

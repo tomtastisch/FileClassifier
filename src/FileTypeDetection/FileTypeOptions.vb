@@ -54,25 +54,27 @@ Namespace Global.Tomtastisch.FileClassifier
                 json As String
             ) As Boolean
 
-            If String.IsNullOrWhiteSpace(json) Then Return False
+            Dim defaults As FileTypeProjectOptions = FileTypeProjectOptions.DefaultOptions()
+            Dim headerOnlyNonZip As Boolean = defaults.HeaderOnlyNonZip
+            Dim maxBytes As Long = defaults.MaxBytes
+            Dim sniffBytes As Integer = defaults.SniffBytes
+            Dim maxZipEntries As Integer = defaults.MaxZipEntries
+            Dim maxZipTotalUncompressedBytes As Long = defaults.MaxZipTotalUncompressedBytes
+            Dim maxZipEntryUncompressedBytes As Long = defaults.MaxZipEntryUncompressedBytes
+            Dim maxZipCompressionRatio As Integer = defaults.MaxZipCompressionRatio
+            Dim maxZipNestingDepth As Integer = defaults.MaxZipNestingDepth
+            Dim maxZipNestedBytes As Long = defaults.MaxZipNestedBytes
+            Dim rejectArchiveLinks As Boolean = defaults.RejectArchiveLinks
+            Dim allowUnknownArchiveEntrySize As Boolean = defaults.AllowUnknownArchiveEntrySize
+            Dim hashIncludePayloadCopies As Boolean = defaults.DeterministicHash.IncludePayloadCopies
+            Dim hashIncludeFastHash As Boolean = defaults.DeterministicHash.IncludeFastHash
+            Dim hashIncludeSecureHash As Boolean = defaults.DeterministicHash.IncludeSecureHash
+            Dim hashMaterializedFileName As String = defaults.DeterministicHash.MaterializedFileName
+            Dim logger As Microsoft.Extensions.Logging.ILogger = defaults.Logger
+            Dim nextHashOptions As HashOptions
+            Dim nextOptions As FileTypeProjectOptions
 
-            Dim defaults = FileTypeProjectOptions.DefaultOptions()
-            Dim headerOnlyNonZip = defaults.HeaderOnlyNonZip
-            Dim maxBytes = defaults.MaxBytes
-            Dim sniffBytes = defaults.SniffBytes
-            Dim maxZipEntries = defaults.MaxZipEntries
-            Dim maxZipTotalUncompressedBytes = defaults.MaxZipTotalUncompressedBytes
-            Dim maxZipEntryUncompressedBytes = defaults.MaxZipEntryUncompressedBytes
-            Dim maxZipCompressionRatio = defaults.MaxZipCompressionRatio
-            Dim maxZipNestingDepth = defaults.MaxZipNestingDepth
-            Dim maxZipNestedBytes = defaults.MaxZipNestedBytes
-            Dim rejectArchiveLinks = defaults.RejectArchiveLinks
-            Dim allowUnknownArchiveEntrySize = defaults.AllowUnknownArchiveEntrySize
-            Dim hashIncludePayloadCopies = defaults.DeterministicHash.IncludePayloadCopies
-            Dim hashIncludeFastHash = defaults.DeterministicHash.IncludeFastHash
-            Dim hashIncludeSecureHash = defaults.DeterministicHash.IncludeSecureHash
-            Dim hashMaterializedFileName = defaults.DeterministicHash.MaterializedFileName
-            Dim logger = defaults.Logger
+            If String.IsNullOrWhiteSpace(json) Then Return False
 
             Try
                 Using doc = Text.Json.JsonDocument.Parse(
@@ -134,14 +136,14 @@ Namespace Global.Tomtastisch.FileClassifier
                     Next
                 End Using
 
-                Dim nextHashOptions = New HashOptions With {
+                nextHashOptions = New HashOptions With {
                         .IncludePayloadCopies = hashIncludePayloadCopies,
                         .IncludeFastHash = hashIncludeFastHash,
                         .IncludeSecureHash = hashIncludeSecureHash,
                         .MaterializedFileName = hashMaterializedFileName
                         }
 
-                Dim nextOptions = New FileTypeProjectOptions(headerOnlyNonZip) With {
+                nextOptions = New FileTypeProjectOptions(headerOnlyNonZip) With {
                         .MaxBytes = maxBytes,
                         .SniffBytes = sniffBytes,
                         .MaxZipEntries = maxZipEntries,
@@ -213,9 +215,9 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is IO.IOException OrElse
                 TypeOf ex Is NotSupportedException OrElse
-                TypeOf ex Is ArgumentException
-                Return False
-            Catch ex As Exception
+                TypeOf ex Is ArgumentException OrElse
+                TypeOf ex Is Text.Json.JsonException OrElse
+                TypeOf ex Is InvalidOperationException
                 Return False
             End Try
         End Function
@@ -286,8 +288,11 @@ Namespace Global.Tomtastisch.FileClassifier
                                             name As String,
                                             logger As Microsoft.Extensions.Logging.ILogger) _
             As String
+
+            Dim value As String
+
             If el.ValueKind = Text.Json.JsonValueKind.String Then
-                Dim value = el.GetString()
+                value = el.GetString()
                 If value IsNot Nothing Then Return value
             End If
             LogGuard.Warn(logger, $"[Config] Ungültiger Wert für '{name}', fallback={fallback}.")
@@ -349,8 +354,10 @@ Namespace Global.Tomtastisch.FileClassifier
                 opt As FileTypeProjectOptions
              ) As FileTypeProjectOptions
 
+            Dim snap As FileTypeProjectOptions
+
             If opt Is Nothing Then Return FileTypeProjectOptions.DefaultOptions()
-            Dim snap = opt.Clone()
+            snap = opt.Clone()
             snap.NormalizeInPlace()
             Return snap
 

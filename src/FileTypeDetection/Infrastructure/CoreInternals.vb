@@ -38,9 +38,10 @@ Namespace Global.Tomtastisch.FileClassifier
         Friend Shared Sub CopyBounded(input As Stream, output As Stream, maxBytes As Long)
             Dim buf(InternalIoDefaults.CopyBufferSize - 1) As Byte
             Dim total As Long = 0
+            Dim n As Integer
 
             While True
-                Dim n = input.Read(buf, 0, buf.Length)
+                n = input.Read(buf, 0, buf.Length)
                 If n <= 0 Then Exit While
 
                 total += n
@@ -85,7 +86,15 @@ Namespace Global.Tomtastisch.FileClassifier
                 Using ms As New MemoryStream(data, writable:=False)
                     Return IsArchiveSafeStream(ms, opt, descriptor, depth:=0)
                 End Using
-            Catch ex As Exception
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is IOException OrElse
+                TypeOf ex Is InvalidDataException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException OrElse
+                TypeOf ex Is InvalidOperationException OrElse
+                TypeOf ex Is ObjectDisposedException
                 LogGuard.Debug(opt.Logger, $"[ArchiveGate] Bytes-Fehler: {ex.Message}")
                 Return False
             End Try
@@ -120,11 +129,12 @@ Namespace Global.Tomtastisch.FileClassifier
         End Sub
 
         Friend Shared Function IsSafeArchivePayload(data As Byte(), opt As FileTypeProjectOptions) As Boolean
+            Dim descriptor As ArchiveDescriptor = Nothing
+
             If data Is Nothing OrElse data.Length = 0 Then Return False
             If opt Is Nothing Then Return False
             If CLng(data.Length) > opt.MaxBytes Then Return False
 
-            Dim descriptor As ArchiveDescriptor = Nothing
             If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then Return False
             Return ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor)
         End Function
@@ -157,6 +167,8 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Friend Shared Function ValidateNewExtractionTarget(destinationFull As String, opt As FileTypeProjectOptions) _
             As Boolean
+            Dim parent As String
+
             If IsRootPath(destinationFull) Then
                 LogGuard.Warn(opt.Logger, "[PathGuard] Ziel darf kein Root-Verzeichnis sein.")
                 Return False
@@ -167,7 +179,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return False
             End If
 
-            Dim parent = Path.GetDirectoryName(destinationFull)
+            parent = Path.GetDirectoryName(destinationFull)
             If String.IsNullOrWhiteSpace(parent) Then
                 LogGuard.Warn(opt.Logger, "[PathGuard] Ziel ohne gültigen Parent.")
                 Return False
@@ -177,12 +189,18 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Friend Shared Function IsRootPath(destinationFull As String) As Boolean
+            Dim rootPath As String
+
             If String.IsNullOrWhiteSpace(destinationFull) Then Return False
 
-            Dim rootPath As String
             Try
                 rootPath = Path.GetPathRoot(destinationFull)
-            Catch
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is IOException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException
                 Return False
             End Try
 
@@ -208,10 +226,14 @@ Namespace Global.Tomtastisch.FileClassifier
                                                         ByRef normalizedPath As String,
                                                         ByRef isDirectory As Boolean
                                                         ) As Boolean
+            Dim safe As String
+            Dim trimmed As String
+            Dim segments As String()
+
             normalizedPath = String.Empty
             isDirectory = False
 
-            Dim safe = If(rawPath, String.Empty).Trim()
+            safe = If(rawPath, String.Empty).Trim()
             If safe.Length = 0 Then Return False
             If safe.Contains(ChrW(0)) Then Return False
 
@@ -220,7 +242,7 @@ Namespace Global.Tomtastisch.FileClassifier
             safe = safe.TrimStart("/"c)
             If safe.Length = 0 Then Return False
 
-            Dim trimmed = safe.TrimEnd("/"c)
+            trimmed = safe.TrimEnd("/"c)
             If trimmed.Length = 0 Then
                 If Not allowDirectoryMarker Then Return False
                 normalizedPath = safe
@@ -228,7 +250,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return True
             End If
 
-            Dim segments = trimmed.Split("/"c)
+            segments = trimmed.Split("/"c)
             For Each seg In segments
                 If seg.Length = 0 Then Return False
                 If seg = "." OrElse seg = ".." Then Return False
@@ -261,7 +283,15 @@ Namespace Global.Tomtastisch.FileClassifier
                 Using s = streamFactory()
                     Return TryRefineStream(s)
                 End Using
-            Catch
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is IOException OrElse
+                TypeOf ex Is InvalidDataException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException OrElse
+                TypeOf ex Is InvalidOperationException OrElse
+                TypeOf ex Is ObjectDisposedException
                 Return FileTypeRegistry.Resolve(FileKind.Unknown)
             End Try
         End Function
@@ -272,21 +302,31 @@ Namespace Global.Tomtastisch.FileClassifier
             Try
                 StreamGuard.RewindToStart(stream)
                 Return DetectKindFromArchivePackage(stream)
-            Catch
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is IOException OrElse
+                TypeOf ex Is InvalidDataException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException OrElse
+                TypeOf ex Is InvalidOperationException OrElse
+                TypeOf ex Is ObjectDisposedException
                 Return FileTypeRegistry.Resolve(FileKind.Unknown)
             End Try
         End Function
 
         Private Shared Function DetectKindFromArchivePackage(stream As Stream) As FileType
+            Dim hasContentTypes As Boolean = False
+            Dim hasDocxMarker As Boolean = False
+            Dim hasXlsxMarker As Boolean = False
+            Dim hasPptxMarker As Boolean = False
+            Dim name As String
+
             Try
                 Using zip As New ZipArchive(stream, ZipArchiveMode.Read, leaveOpen:=True)
-                    Dim hasContentTypes = False
-                    Dim hasDocxMarker = False
-                    Dim hasXlsxMarker = False
-                    Dim hasPptxMarker = False
 
                     For Each entry In zip.Entries
-                        Dim name = If(entry.FullName, String.Empty)
+                        name = If(entry.FullName, String.Empty)
 
                         If String.Equals(name, "[Content_Types].xml", StringComparison.OrdinalIgnoreCase) Then
                             hasContentTypes = True
@@ -308,7 +348,15 @@ Namespace Global.Tomtastisch.FileClassifier
                         If hasPptxMarker Then Return FileTypeRegistry.Resolve(FileKind.Pptx)
                     End If
                 End Using
-            Catch
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is IOException OrElse
+                TypeOf ex Is InvalidDataException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException OrElse
+                TypeOf ex Is InvalidOperationException OrElse
+                TypeOf ex Is ObjectDisposedException
                 Return FileTypeRegistry.Resolve(FileKind.Unknown)
             End Try
 
@@ -329,7 +377,12 @@ Namespace Global.Tomtastisch.FileClassifier
             If Not logger.IsEnabled(LogLevel.Debug) Then Return
             Try
                 logger.LogDebug("{Message}", message)
-            Catch
+            Catch ex As Exception When _
+                TypeOf ex Is InvalidOperationException OrElse
+                TypeOf ex Is ObjectDisposedException OrElse
+                TypeOf ex Is FormatException OrElse
+                TypeOf ex Is ArgumentException
+                ' Keine Rekursion im Logger-Schutz: Logging-Fehler werden bewusst fail-closed unterdrückt.
             End Try
         End Sub
 
@@ -338,7 +391,12 @@ Namespace Global.Tomtastisch.FileClassifier
             If Not logger.IsEnabled(LogLevel.Warning) Then Return
             Try
                 logger.LogWarning("{Message}", message)
-            Catch
+            Catch ex As Exception When _
+                TypeOf ex Is InvalidOperationException OrElse
+                TypeOf ex Is ObjectDisposedException OrElse
+                TypeOf ex Is FormatException OrElse
+                TypeOf ex Is ArgumentException
+                ' Keine Rekursion im Logger-Schutz: Logging-Fehler werden bewusst fail-closed unterdrückt.
             End Try
         End Sub
 
@@ -347,7 +405,12 @@ Namespace Global.Tomtastisch.FileClassifier
             If Not logger.IsEnabled(LogLevel.Error) Then Return
             Try
                 logger.LogError(ex, "{Message}", message)
-            Catch
+            Catch logEx As Exception When _
+                TypeOf logEx Is InvalidOperationException OrElse
+                TypeOf logEx Is ObjectDisposedException OrElse
+                TypeOf logEx Is FormatException OrElse
+                TypeOf logEx Is ArgumentException
+                ' Keine Rekursion im Logger-Schutz: Logging-Fehler werden bewusst fail-closed unterdrückt.
             End Try
         End Sub
     End Class

@@ -97,12 +97,12 @@ Namespace Global.Tomtastisch.FileClassifier
             (
                 data As Byte()
             ) As IReadOnlyList(Of ZipExtractedEntry)
-            Dim opt = FileTypeOptions.GetSnapshot()
+            Dim opt As FileTypeProjectOptions = FileTypeOptions.GetSnapshot()
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
+            Dim entries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
 
             If data Is Nothing OrElse data.Length = 0 Then Return emptyResult
 
-            Dim entries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             If Not ArchiveEntryCollector.TryCollectFromBytes(data, opt, entries) Then Return emptyResult
             Return entries
         End Function
