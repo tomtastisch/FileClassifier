@@ -667,11 +667,10 @@ Namespace Global.Tomtastisch.FileClassifier
             Return copy
         End Function
 
-        Private Shared Function ResolveHashOptions _
-            (
-                projectOptions As FileTypeProjectOptions,
-                options As HashOptions
-            ) As HashOptions
+        Private Shared Function ResolveHashOptions(
+                                                   projectOptions As FileTypeProjectOptions,
+                                                   options As HashOptions
+                                               ) As HashOptions
 
             If options IsNot Nothing Then Return HashOptions.Normalize(options)
             If projectOptions IsNot Nothing Then _
