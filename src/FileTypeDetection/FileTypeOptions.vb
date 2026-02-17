@@ -53,7 +53,7 @@ Namespace Global.Tomtastisch.FileClassifier
             (
                 json As String
             ) As Boolean
-            
+
             If String.IsNullOrWhiteSpace(json) Then Return False
 
             Dim defaults = FileTypeProjectOptions.DefaultOptions()
@@ -158,7 +158,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 nextOptions.NormalizeInPlace()
                 SetSnapshot(nextOptions)
                 Return True
-                
+
             Catch ex As Exception When _
                 TypeOf ex Is ArgumentException OrElse
                 TypeOf ex Is Text.Json.JsonException OrElse
@@ -178,7 +178,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </remarks>
         ''' <returns>JSON-Serialisierung der normierten Optionen.</returns>
         Public Shared Function GetOptions() As String
-            
+
             Dim opt = GetSnapshot()
             Dim dto As New Dictionary(Of String, Object) From {
                     {"headerOnlyNonZip", opt.HeaderOnlyNonZip},
@@ -301,7 +301,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 ByRef includeSecureHash As Boolean,
                 ByRef materializedFileName As String,
                 logger As Microsoft.Extensions.Logging.ILogger
-            ) 
+            )
 
             If el.ValueKind <> Text.Json.JsonValueKind.Object Then
                 LogGuard.Warn(logger, "[Config] 'deterministicHash' muss ein JSON-Objekt sein.")
@@ -348,12 +348,12 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Shared Function Snapshot(
                 opt As FileTypeProjectOptions
              ) As FileTypeProjectOptions
-            
+
             If opt Is Nothing Then Return FileTypeProjectOptions.DefaultOptions()
             Dim snap = opt.Clone()
             snap.NormalizeInPlace()
             Return snap
-            
+
         End Function
     End Class
 End Namespace

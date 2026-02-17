@@ -336,7 +336,7 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function DetectPathCoreWithTrace(
-                path As String, 
+                path As String,
                 opt As FileTypeProjectOptions,
                 ByRef trace As DetectionTrace
             ) As FileType
@@ -353,7 +353,7 @@ Namespace Global.Tomtastisch.FileClassifier
                     trace.ReasonCode = ReasonInvalidLength
                     Return UnknownType()
                 End If
-                
+
                 If fi.Length > opt.MaxBytes Then
                     LogGuard.Warn(opt.Logger, $"[Detect] Datei zu groß ({fi.Length} > {opt.MaxBytes}).")
                     trace.ReasonCode = ReasonFileTooLarge
@@ -361,18 +361,18 @@ Namespace Global.Tomtastisch.FileClassifier
                 End If
 
                 Using fs As New FileStream(
-                        path, FileMode.Open, 
-                        FileAccess.Read, 
+                        path, FileMode.Open,
+                        FileAccess.Read,
                         FileShare.Read,
-                        InternalIoDefaults.FileStreamBufferSize, 
+                        InternalIoDefaults.FileStreamBufferSize,
                         FileOptions.SequentialScan
                     )
-                    
+
                     Dim header = ReadHeader(fs, opt.SniffBytes, opt.MaxBytes)
                     Return ResolveByHeaderForPath(header, opt, trace, fs)
-                    
+
                 End Using
-                
+
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
                 TypeOf ex Is Security.SecurityException OrElse
@@ -452,16 +452,16 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Try
                 Dim payload = ReadFileSafe(path)
-                
+
                 If payload.Length = 0 Then Return False
-                
+
                 Return FileMaterializer.Persist(
-                        payload, 
-                        destinationDirectory, 
-                        overwrite:=False, 
+                        payload,
+                        destinationDirectory,
+                        overwrite:=False,
                         secureExtract:=True
                     )
-                
+
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
                 TypeOf ex Is Security.SecurityException OrElse
@@ -505,17 +505,17 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Try
                 Using fs As New FileStream(
-                        path, 
-                        FileMode.Open, 
-                        FileAccess.Read, 
+                        path,
+                        FileMode.Open,
+                        FileAccess.Read,
                         FileShare.Read,
-                        InternalIoDefaults.FileStreamBufferSize, 
+                        InternalIoDefaults.FileStreamBufferSize,
                         FileOptions.SequentialScan
                     )
                     Return ArchiveExtractor.TryExtractArchiveStreamToMemory(fs, opt)
-                    
+
                 End Using
-                
+
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
                 TypeOf ex Is Security.SecurityException OrElse
@@ -528,12 +528,12 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function DetectInternalBytes(
-                data As Byte(), 
+                data As Byte(),
                 opt As FileTypeProjectOptions
             ) As FileType
 
             If data Is Nothing OrElse data.Length = 0 Then Return UnknownType()
-            
+
             If CLng(data.Length) > opt.MaxBytes Then
                 LogGuard.Warn(opt.Logger, $"[Detect] Daten zu groß ({data.Length} > {opt.MaxBytes}).")
                 Return UnknownType()
@@ -542,7 +542,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Try
                 Dim trace As DetectionTrace = DetectionTrace.Empty
                 Return ResolveByHeaderForBytes(data, opt, trace, data)
-                
+
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
                 TypeOf ex Is Security.SecurityException OrElse
@@ -688,7 +688,7 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function FinalizeArchiveDetection(
-                refined As FileType, 
+                refined As FileType,
                 opt As FileTypeProjectOptions,
                 ByRef trace As DetectionTrace
             ) As FileType
@@ -708,7 +708,7 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Function CanExtractArchivePath(
-                path As String, 
+                path As String,
                 verifyBeforeExtract As Boolean,
                 opt As FileTypeProjectOptions
             ) As Boolean
