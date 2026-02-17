@@ -141,14 +141,6 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         ''' <summary>
-        '''     Erkennt den Dateityp anhand eines Dateipfads.
-        ''' </summary>
-        ''' <remarks>
-        '''     Delegiert auf die Überladung mit deaktivierter Endungsprüfung (<c>verifyExtension:=False</c>).
-        ''' </remarks>
-        ''' <param name="path">Dateipfad der zu klassifizierenden Datei.</param>
-        ''' <returns>Erkannter Typ oder <see cref="FileKind.Unknown"/> bei Fehlern.</returns>
-        ''' <summary>
         '''     Erkennt den Dateityp anhand eines Dateipfads ohne Endungsprüfung.
         ''' </summary>
         ''' <remarks>

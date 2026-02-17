@@ -124,6 +124,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim exact As Byte() = Array.Empty(Of Byte)()
 
             If entry Is Nothing Then Return False
+            If opt Is Nothing Then Return False
 
             Try
                 Using entryStream = entry.Open()
