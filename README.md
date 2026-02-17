@@ -35,7 +35,7 @@ dotnet add package Tomtastisch.FileClassifier --version X.Y.Z
 ```bash
 EXPECTED_VERSION=X.Y.Z bash tools/ci/verify_nuget_release.sh
 ```
-- Release-Ablauf: `Release Publish` blockiert post-publish auf `registration + flatcontainer`; die vollständige Online-Konvergenz inkl. `search` läuft asynchron über `NuGet Online Convergence` (Details: `docs/ci/002_NUGET_TRUSTED_PUBLISHING.MD`).
+- Release-Ablauf: `Release Publish` blockiert post-publish immer auf `flatcontainer`; `registration` ist für stabile Tags blocker und für Pre-Release-Tags standardmäßig entkoppelt. Die vollständige Online-Konvergenz inkl. `search + registration` läuft asynchron über `NuGet Online Convergence` (Details: `docs/ci/002_NUGET_TRUSTED_PUBLISHING.MD`).
 - Details: [NuGet Usage Guide](https://github.com/tomtastisch/FileClassifier/blob/main/docs/021_USAGE_NUGET.MD)
 - Portable-Integration: [Portable Adoption Guide](https://github.com/tomtastisch/FileClassifier/blob/main/docs/guides/003_GUIDE_PORTABLE.MD)
 - Maintainer-Hinweis: Das Publish-Helper-Skript nutzt `NUGET_API_KEY` aus dem Keychain und gibt den Token nicht aus.

@@ -9,13 +9,19 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 
 ## [Unreleased]
 - Added:
-  - TBD
+  - Incode-Dokumentation fuer die TFM-Providermethoden komplettiert (`HashPrimitivesProvider` fuer `netstandard2.0` und `net8.0+`).
 - Changed:
-  - TBD
+  - Public XML-Dokumentation auf Policy-045 ausgerichtet: unzulaessige `<exception>`-Tags in fail-closed APIs entfernt.
+  - Deutsche Log-/Dokumentationstexte mit korrekten Umlauten harmonisiert.
+  - Gate 4 (`tools/ci/release/gate4_verify_postpublish.sh`) fuer Pre-Release-Tags robust gemacht:
+    - laengeres Retry-Fenster,
+    - `registration` standardmaessig entkoppelt bei `vX.Y.Z-<label>`,
+    - weiterhin fail-closed auf `flatcontainer`.
 - Fixed:
-  - TBD
+  - Release-Blocker beseitigt, bei dem Pre-Release-Publish trotz erfolgreichem Push an verzögerter Registration-Sichtbarkeit scheiterte.
 - Docs/CI/Tooling:
-  - TBD
+  - NuGet-Trusted-Publishing-Doku (DE/EN) und Root-README auf den angepassten Gate-4-Ablauf aktualisiert.
+  - Versionshistorie (DE/EN) auf aktuellen Pre-Release-Stand (`v5.2.0-rc.2`) aktualisiert.
 
 ## [5.1.4]
 - Changed:
