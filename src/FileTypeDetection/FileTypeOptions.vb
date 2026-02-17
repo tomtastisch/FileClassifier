@@ -49,13 +49,11 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </remarks>
         ''' <param name="json">JSON-Konfiguration mit unterstützten Optionsfeldern.</param>
         ''' <returns><c>True</c>, wenn ein gültiger Snapshot gesetzt wurde; andernfalls <c>False</c>.</returns>
-        ''' <exception cref="System.Text.Json.JsonException">Kann bei ungültiger JSON-Struktur intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützter JSON-Konstellation intern auftreten und wird fail-closed behandelt.</exception>
         Public Shared Function LoadOptions _
             (
                 json As String
             ) As Boolean
+            
             If String.IsNullOrWhiteSpace(json) Then Return False
 
             Dim defaults = FileTypeProjectOptions.DefaultOptions()
@@ -131,7 +129,7 @@ Namespace Global.Tomtastisch.FileClassifier
                             Case "deterministichashmaterializedfilename"
                                 hashMaterializedFileName = ParseString(p.Value, hashMaterializedFileName, p.Name, logger)
                             Case Else
-                                LogGuard.Warn(logger, $"[Config] Unbekannter Schluessel '{p.Name}' ignoriert.")
+                                LogGuard.Warn(logger, $"[Config] Unbekannter Schlüssel '{p.Name}' ignoriert.")
                         End Select
                     Next
                 End Using
@@ -160,6 +158,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 nextOptions.NormalizeInPlace()
                 SetSnapshot(nextOptions)
                 Return True
+                
             Catch ex As Exception When _
                 TypeOf ex Is ArgumentException OrElse
                 TypeOf ex Is Text.Json.JsonException OrElse
@@ -179,6 +178,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </remarks>
         ''' <returns>JSON-Serialisierung der normierten Optionen.</returns>
         Public Shared Function GetOptions() As String
+            
             Dim opt = GetSnapshot()
             Dim dto As New Dictionary(Of String, Object) From {
                     {"headerOnlyNonZip", opt.HeaderOnlyNonZip},
@@ -249,7 +249,7 @@ Namespace Global.Tomtastisch.FileClassifier
                                                  logger As Microsoft.Extensions.Logging.ILogger) As Integer
             Dim v = SafeInt(el, fallback)
             If v > 0 Then Return v
-            LogGuard.Warn(logger, $"[Config] Ungueltiger Wert fuer '{name}', fallback={fallback}.")
+            LogGuard.Warn(logger, $"[Config] Ungültiger Wert für '{name}', fallback={fallback}.")
             Return fallback
         End Function
 
@@ -258,7 +258,7 @@ Namespace Global.Tomtastisch.FileClassifier
                                                     logger As Microsoft.Extensions.Logging.ILogger) As Integer
             Dim v = SafeInt(el, fallback)
             If v >= 0 Then Return v
-            LogGuard.Warn(logger, $"[Config] Ungueltiger Wert fuer '{name}', fallback={fallback}.")
+            LogGuard.Warn(logger, $"[Config] Ungültiger Wert für '{name}', fallback={fallback}.")
             Return fallback
         End Function
 
@@ -268,7 +268,7 @@ Namespace Global.Tomtastisch.FileClassifier
             As Long
             Dim v = SafeLong(el, fallback)
             If v > 0 Then Return v
-            LogGuard.Warn(logger, $"[Config] Ungueltiger Wert fuer '{name}', fallback={fallback}.")
+            LogGuard.Warn(logger, $"[Config] Ungültiger Wert für '{name}', fallback={fallback}.")
             Return fallback
         End Function
 
@@ -278,7 +278,7 @@ Namespace Global.Tomtastisch.FileClassifier
             As Boolean
             If el.ValueKind = Text.Json.JsonValueKind.True Then Return True
             If el.ValueKind = Text.Json.JsonValueKind.False Then Return False
-            LogGuard.Warn(logger, $"[Config] Ungueltiger Wert fuer '{name}', fallback={fallback}.")
+            LogGuard.Warn(logger, $"[Config] Ungültiger Wert für '{name}', fallback={fallback}.")
             Return fallback
         End Function
 
@@ -290,17 +290,18 @@ Namespace Global.Tomtastisch.FileClassifier
                 Dim value = el.GetString()
                 If value IsNot Nothing Then Return value
             End If
-            LogGuard.Warn(logger, $"[Config] Ungueltiger Wert fuer '{name}', fallback={fallback}.")
+            LogGuard.Warn(logger, $"[Config] Ungültiger Wert für '{name}', fallback={fallback}.")
             Return fallback
         End Function
 
         Private Shared Sub TryParseHashOptions(
-                                                            el As Text.Json.JsonElement,
-                                                            ByRef includePayloadCopies As Boolean,
-                                                            ByRef includeFastHash As Boolean,
-                                                            ByRef includeSecureHash As Boolean,
-                                                            ByRef materializedFileName As String,
-                                                            logger As Microsoft.Extensions.Logging.ILogger)
+                el As Text.Json.JsonElement,
+                ByRef includePayloadCopies As Boolean,
+                ByRef includeFastHash As Boolean,
+                ByRef includeSecureHash As Boolean,
+                ByRef materializedFileName As String,
+                logger As Microsoft.Extensions.Logging.ILogger
+            ) 
 
             If el.ValueKind <> Text.Json.JsonValueKind.Object Then
                 LogGuard.Warn(logger, "[Config] 'deterministicHash' muss ein JSON-Objekt sein.")
@@ -339,16 +340,20 @@ Namespace Global.Tomtastisch.FileClassifier
                         )
 
                     Case Else
-                        LogGuard.Warn(logger, $"[Config] Unbekannter Schluessel 'deterministicHash.{p.Name}' ignoriert.")
+                        LogGuard.Warn(logger, $"[Config] Unbekannter Schlüssel 'deterministicHash.{p.Name}' ignoriert.")
                 End Select
             Next
         End Sub
 
-        Private Shared Function Snapshot(opt As FileTypeProjectOptions) As FileTypeProjectOptions
+        Private Shared Function Snapshot(
+                opt As FileTypeProjectOptions
+             ) As FileTypeProjectOptions
+            
             If opt Is Nothing Then Return FileTypeProjectOptions.DefaultOptions()
             Dim snap = opt.Clone()
             snap.NormalizeInPlace()
             Return snap
+            
         End Function
     End Class
 End Namespace

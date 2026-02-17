@@ -58,6 +58,11 @@ Namespace Global.Tomtastisch.FileClassifier
         Private NotInheritable Class LowerHexCodec
             Implements IHexCodec
 
+            ''' <summary>
+            '''     Kodiert Byte-Daten deterministisch als Hex-String in Kleinbuchstaben.
+            ''' </summary>
+            ''' <param name="data">Zu kodierende Eingabedaten; <c>Nothing</c> wird als leeres Array behandelt.</param>
+            ''' <returns>Hex-String in Kleinbuchstaben ohne Trennzeichen.</returns>
             Public Function EncodeLowerHex(data As Byte()) As String Implements IHexCodec.EncodeLowerHex
                 Dim safeData = If(data, Array.Empty(Of Byte)())
                 Return Convert.ToHexString(safeData).ToLowerInvariant()
@@ -75,15 +80,29 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Private ReadOnly _codec As IHexCodec
 
+            ''' <summary>
+            '''     Initialisiert die SHA256-Primitive mit dem bereitgestellten Hex-Codec.
+            ''' </summary>
+            ''' <param name="codec">Hex-Codec zur Ausgabe von Hashwerten als Kleinbuchstaben-Hex.</param>
             Public Sub New(codec As IHexCodec)
                 _codec = codec
             End Sub
 
+            ''' <summary>
+            '''     Berechnet den SHA256-Hash für die übergebenen Daten.
+            ''' </summary>
+            ''' <param name="data">Eingabedaten; <c>Nothing</c> wird als leeres Array behandelt.</param>
+            ''' <returns>SHA256-Digest als Byte-Array.</returns>
             Public Function ComputeHash(data As Byte()) As Byte() Implements ISha256Primitives.ComputeHash
                 Dim safeData = If(data, Array.Empty(Of Byte)())
                 Return Security.Cryptography.SHA256.HashData(safeData)
             End Function
 
+            ''' <summary>
+            '''     Berechnet den SHA256-Hash und liefert ihn als Kleinbuchstaben-Hex.
+            ''' </summary>
+            ''' <param name="data">Eingabedaten; <c>Nothing</c> wird als leeres Array behandelt.</param>
+            ''' <returns>SHA256-Digest als Hex-String in Kleinbuchstaben.</returns>
             Public Function ComputeHashHex(data As Byte()) As String Implements ISha256Primitives.ComputeHashHex
                 Return _codec.EncodeLowerHex(ComputeHash(data))
             End Function
@@ -98,11 +117,21 @@ Namespace Global.Tomtastisch.FileClassifier
         Private NotInheritable Class FastHash64Primitives
             Implements IFastHash64
 
+            ''' <summary>
+            '''     Berechnet einen deterministischen 64-Bit-Fasthash (XxHash3).
+            ''' </summary>
+            ''' <param name="data">Eingabedaten; <c>Nothing</c> wird als leeres Array behandelt.</param>
+            ''' <returns>Fasthash als <see cref="ULong"/>.</returns>
             Public Function ComputeHashUInt64(data As Byte()) As ULong Implements IFastHash64.ComputeHashUInt64
                 Dim safeData = If(data, Array.Empty(Of Byte)())
                 Return IO.Hashing.XxHash3.HashToUInt64(safeData)
             End Function
 
+            ''' <summary>
+            '''     Berechnet den 64-Bit-Fasthash und liefert ihn als festen Hex-String.
+            ''' </summary>
+            ''' <param name="data">Eingabedaten; <c>Nothing</c> wird als leeres Array behandelt.</param>
+            ''' <returns>16-stelliger Hex-String in Kleinbuchstaben.</returns>
             Public Function ComputeHashHex(data As Byte()) As String Implements IFastHash64.ComputeHashHex
                 Return ComputeHashUInt64(data).ToString("x16", CultureInfo.InvariantCulture)
             End Function

@@ -40,9 +40,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </remarks>
         ''' <param name="path">Pfad zur zu prüfenden Datei.</param>
         ''' <returns><c>True</c>, wenn das Archiv die Sicherheitsregeln erfüllt; andernfalls <c>False</c>.</returns>
-        ''' <exception cref="UnauthorizedAccessException">Kann bei Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.Security.SecurityException">Kann bei sicherheitsrelevantem Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.IO.IOException">Kann bei I/O-Zugriff intern auftreten und wird fail-closed behandelt.</exception>
         Public Shared Function TryValidate _
             (
                 path As String
@@ -78,10 +75,6 @@ Namespace Global.Tomtastisch.FileClassifier
         '''     <c>True</c> aktiviert eine vorgelagerte Typprüfung; <c>False</c> extrahiert direkt unter Sicherheitsregeln.
         ''' </param>
         ''' <returns>Read-only Liste der extrahierten Einträge oder eine leere Liste bei Fehlern.</returns>
-        ''' <exception cref="UnauthorizedAccessException">Kann bei Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.Security.SecurityException">Kann bei sicherheitsrelevantem Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.IO.IOException">Kann bei I/O-Zugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.IO.InvalidDataException">Kann bei ungültigen Archivstrukturen intern auftreten und wird fail-closed behandelt.</exception>
         Public Shared Function ExtractToMemory _
             (
                 path As String,
