@@ -20,7 +20,7 @@ All changes are documented here in technical terms. The release version itself i
   - Resolved release blocker where pre-release publishing failed due delayed registration visibility despite successful push.
 - Docs/CI/Tooling:
   - Updated NuGet trusted-publishing docs (DE/EN) and root README for the adjusted Gate 4 behavior.
-  - Updated version history (DE/EN) to the current pre-release state (`v5.2.0-rc.2`).
+  - Added commit reference for version 5.2.0 in version history (DE/EN).
 
 ## [5.1.4]
 - Changed:

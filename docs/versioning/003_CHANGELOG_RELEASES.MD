@@ -21,7 +21,7 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
   - Release-Blocker beseitigt, bei dem Pre-Release-Publish trotz erfolgreichem Push an verzögerter Registration-Sichtbarkeit scheiterte.
 - Docs/CI/Tooling:
   - NuGet-Trusted-Publishing-Doku (DE/EN) und Root-README auf den angepassten Gate-4-Ablauf aktualisiert.
-  - Versionshistorie (DE/EN) auf aktuellen Pre-Release-Stand (`v5.2.0-rc.2`) aktualisiert.
+  - Commit-Referenz fuer Version 5.2.0 in Versionshistorie (DE/EN) hinzugefuegt.
 
 ## [5.1.4]
 - Changed:
