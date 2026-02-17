@@ -176,9 +176,11 @@ PY
 }
 
 query_search() {
-  SEARCH_URL="https://azuresearch-usnc.nuget.org/query?q=packageid:${PKG_ID}&take=5"
+  # Always query with prerelease + SemVer2 enabled so RC versions are visible
+  # in the search index during convergence checks.
+  SEARCH_URL="https://azuresearch-usnc.nuget.org/query?q=packageid:${PKG_ID}&take=5&prerelease=true&semVerLevel=2.0.0"
   local response
-  response="$(curl -fsS --max-time "${TIMEOUT_SECONDS}" "${SEARCH_URL}")" || return 1
+  response="$(curl -fsS --compressed --max-time "${TIMEOUT_SECONDS}" "${SEARCH_URL}")" || return 1
 
   local out
   out="$(SEARCH_RESPONSE="${response}" python3 - "$PKG_ID" "$PKG_VER" <<'PY'
@@ -231,7 +233,7 @@ query_registration() {
   fi
 
   local response
-  response="$(curl -fsS --max-time "${TIMEOUT_SECONDS}" "${REGISTRATION_URL}")" || return 1
+  response="$(curl -fsS --compressed --max-time "${TIMEOUT_SECONDS}" "${REGISTRATION_URL}")" || return 1
 
   REGISTRATION_RESPONSE="${response}" python3 - "$PKG_VER" <<'PY' >/dev/null || return 1
 import json
