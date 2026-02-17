@@ -160,7 +160,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             If CLng(data.Length) > detectorOptions.MaxBytes Then
                 Return _
-                    HashEvidence.CreateFailure(HashSourceType.RawBytes, label, "Payload groesser als MaxBytes.")
+                    HashEvidence.CreateFailure(HashSourceType.RawBytes, label, "Payload größer als MaxBytes.")
             End If
 
             Dim detectedType = New FileTypeDetector().Detect(data)
@@ -549,7 +549,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
                 Dim normalizedPath As String = Nothing
                 If Not TryNormalizeEntryPath(entry.RelativePath, normalizedPath) Then
-                    errorMessage = $"Ungueltiger Entry-Pfad: '{entry.RelativePath}'."
+                    errorMessage = $"Ungültiger Entry-Pfad: '{entry.RelativePath}'."
                     Return False
                 End If
 
@@ -583,7 +583,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
                     For Each entry In entries
                         Dim pathBytes = Text.Encoding.UTF8.GetBytes(entry.RelativePath)
-                        Dim contentHash = Security.Cryptography.SHA256.HashData(entry.Content)
+                        Dim contentHash = HashPrimitives.Current.Sha256.ComputeHash(entry.Content)
                         writer.Write(pathBytes.Length)
                         writer.Write(pathBytes)
                         writer.Write(CLng(entry.Content.LongLength))
@@ -597,7 +597,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function ComputeSha256Hex(payload As Byte()) As String
             Dim data = If(payload, Array.Empty(Of Byte)())
-            Return Convert.ToHexString(Security.Cryptography.SHA256.HashData(data)).ToLowerInvariant()
+            Return HashPrimitives.Current.Sha256.ComputeHashHex(data)
         End Function
 
         Private Shared Function TryResolveHmacKey(ByRef key As Byte(), ByRef note As String) As Boolean
@@ -635,15 +635,14 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim safeKey = If(key, Array.Empty(Of Byte)())
             Dim data = If(payload, Array.Empty(Of Byte)())
             Using hmac As New Security.Cryptography.HMACSHA256(safeKey)
-                Return Convert.ToHexString(hmac.ComputeHash(data)).ToLowerInvariant()
+                Return HashPrimitives.Current.HexCodec.EncodeLowerHex(hmac.ComputeHash(data))
             End Using
         End Function
 
         Private Shared Function ComputeFastHash(payload As Byte(), options As HashOptions) As String
             If options Is Nothing OrElse Not options.IncludeFastHash Then Return String.Empty
             Dim data = If(payload, Array.Empty(Of Byte)())
-            Dim value = IO.Hashing.XxHash3.HashToUInt64(data)
-            Return value.ToString("x16", Globalization.CultureInfo.InvariantCulture)
+            Return HashPrimitives.Current.FastHash64.ComputeHashHex(data)
         End Function
 
         Private Shared Function AppendNoteIfAny(baseNotes As String, toAppend As String) As String
@@ -697,7 +696,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End If
 
                 If fi.Length > detectorOptions.MaxBytes Then
-                    errorMessage = "Datei groesser als MaxBytes."
+                    errorMessage = "Datei größer als MaxBytes."
                     Return False
                 End If
 

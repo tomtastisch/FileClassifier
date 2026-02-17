@@ -1144,6 +1144,38 @@ public sealed class HashingEvidenceModelTests
     }
 }
 
+public sealed class HashPrimitivesCompositionTests
+{
+    [Fact]
+    public void HashPrimitives_Current_UsesExpectedProviderForCurrentTfm()
+    {
+        var assembly = typeof(EvidenceHashing).Assembly;
+        var compositionType = assembly.GetType("Tomtastisch.FileClassifier.HashPrimitives");
+        Assert.NotNull(compositionType);
+
+        var currentProperty = compositionType!.GetProperty(
+            "Current",
+            BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+        Assert.NotNull(currentProperty);
+
+        var currentProvider = currentProperty!.GetValue(null);
+        Assert.NotNull(currentProvider);
+
+        var markerProperty = currentProvider!.GetType().GetProperty(
+            "ProviderMarker",
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        Assert.NotNull(markerProperty);
+
+        var marker = TestGuard.NotNull(markerProperty!.GetValue(currentProvider) as string);
+#if NETSTANDARD2_0
+        const string expected = "NetStandard2_0";
+#else
+        const string expected = "Net8_0Plus";
+#endif
+        Assert.Equal(expected, marker);
+    }
+}
+
 [Trait("Category", "ApiContract")]
 public sealed class HashingEvidenceApiContractTests
 {

@@ -42,7 +42,7 @@ EXPECTED_VERSION=X.Y.Z bash tools/ci/verify_nuget_release.sh
 - Migration: Verwende ausschließlich `Tomtastisch.FileClassifier` (Details in `docs/guides/004_GUIDE_MIGRATE_LEGACY_NUGET.MD`).
 
 ## 5. Compatibility / TFMs
-- Library-Zielplattformen: `net8.0` und `net10.0`
+- Library-Zielplattformen: `netstandard2.0`, `net8.0` und `net10.0`
 - Release-Versioning: Git-Tag `vX.Y.Z` (optional `-prerelease`) ist SSOT
 
 ## 6. Architekturüberblick

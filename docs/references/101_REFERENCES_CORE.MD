@@ -66,7 +66,7 @@ flowchart LR
     MIME["Mime (HeyRed.Mime)"]
     RMS["Microsoft.IO.RecyclableMemoryStream"]
     SHARP["SharpCompress"]
-    LOG["Microsoft.Extensions.Logging via Microsoft.AspNetCore.App"]
+    LOG["Microsoft.Extensions.Logging.Abstractions"]
 
     API --> INF
     INF --> ZIP
@@ -83,7 +83,7 @@ flowchart LR
 | `Mime` | `Infrastructure/MimeProvider.vb` | MIME resolution from extension |
 | `Microsoft.IO.RecyclableMemoryStream` | `Infrastructure/ArchiveManagedInternals.vb` | controlled memory streams |
 | `SharpCompress` | `Infrastructure/ArchiveInternals.vb`, `FileMaterializer.vb` | archive type detection, generic archive iteration, defensive readability check |
-| `Microsoft.AspNetCore.App` (FrameworkReference) | logging via `Microsoft.Extensions.Logging` | optional diagnostics |
+| `Microsoft.Extensions.Logging.Abstractions` | `Configuration/FileTypeProjectOptions.vb`, `FileTypeOptions.vb`, `Infrastructure/CoreInternals.vb` | logging interfaces for optional diagnostics without ASP.NET framework reference |
 
 ## 6. Reference index (where to find what?)
 | Topic | Primary document |

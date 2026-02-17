@@ -5,6 +5,6 @@
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     </PropertyGroup>
   <PropertyGroup>
-    <RepoVersion>5.1.4</RepoVersion>
+    <RepoVersion>5.2.0</RepoVersion>
   </PropertyGroup>
 </Project>

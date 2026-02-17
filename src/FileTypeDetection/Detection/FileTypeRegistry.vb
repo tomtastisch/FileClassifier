@@ -82,8 +82,8 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function OrderedKinds() As ImmutableArray(Of FileKind)
-            Return [Enum].
-                GetValues(Of FileKind)().
+            Dim values = [Enum].GetValues(GetType(FileKind)).Cast(Of FileKind)()
+            Return values.
                 OrderBy(Function(kind) CInt(kind)).
                 ToImmutableArray()
         End Function
