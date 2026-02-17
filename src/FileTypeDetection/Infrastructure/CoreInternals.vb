@@ -38,7 +38,7 @@ Namespace Global.Tomtastisch.FileClassifier
         Friend Shared Sub CopyBounded(input As Stream, output As Stream, maxBytes As Long)
             Dim buf(InternalIoDefaults.CopyBufferSize - 1) As Byte
             Dim total As Long = 0
-            Dim n As Integer = 0
+            Dim n As Integer
 
             While True
                 n = input.Read(buf, 0, buf.Length)
@@ -167,7 +167,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Friend Shared Function ValidateNewExtractionTarget(destinationFull As String, opt As FileTypeProjectOptions) _
             As Boolean
-            Dim parent As String = Nothing
+            Dim parent As String
 
             If IsRootPath(destinationFull) Then
                 LogGuard.Warn(opt.Logger, "[PathGuard] Ziel darf kein Root-Verzeichnis sein.")
@@ -189,7 +189,7 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Friend Shared Function IsRootPath(destinationFull As String) As Boolean
-            Dim rootPath As String = Nothing
+            Dim rootPath As String
 
             If String.IsNullOrWhiteSpace(destinationFull) Then Return False
 
@@ -226,9 +226,9 @@ Namespace Global.Tomtastisch.FileClassifier
                                                         ByRef normalizedPath As String,
                                                         ByRef isDirectory As Boolean
                                                         ) As Boolean
-            Dim safe As String = String.Empty
-            Dim trimmed As String = String.Empty
-            Dim segments As String() = Array.Empty(Of String)()
+            Dim safe As String
+            Dim trimmed As String
+            Dim segments As String()
 
             normalizedPath = String.Empty
             isDirectory = False
@@ -320,7 +320,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim hasDocxMarker As Boolean = False
             Dim hasXlsxMarker As Boolean = False
             Dim hasPptxMarker As Boolean = False
-            Dim name As String = String.Empty
+            Dim name As String
 
             Try
                 Using zip As New ZipArchive(stream, ZipArchiveMode.Read, leaveOpen:=True)

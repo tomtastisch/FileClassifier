@@ -71,8 +71,8 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim hashIncludeSecureHash As Boolean = defaults.DeterministicHash.IncludeSecureHash
             Dim hashMaterializedFileName As String = defaults.DeterministicHash.MaterializedFileName
             Dim logger As Microsoft.Extensions.Logging.ILogger = defaults.Logger
-            Dim nextHashOptions As HashOptions = Nothing
-            Dim nextOptions As FileTypeProjectOptions = Nothing
+            Dim nextHashOptions As HashOptions
+            Dim nextOptions As FileTypeProjectOptions
 
             If String.IsNullOrWhiteSpace(json) Then Return False
 
@@ -289,7 +289,7 @@ Namespace Global.Tomtastisch.FileClassifier
                                             logger As Microsoft.Extensions.Logging.ILogger) _
             As String
 
-            Dim value As String = Nothing
+            Dim value As String
 
             If el.ValueKind = Text.Json.JsonValueKind.String Then
                 value = el.GetString()
@@ -354,7 +354,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 opt As FileTypeProjectOptions
              ) As FileTypeProjectOptions
 
-            Dim snap As FileTypeProjectOptions = Nothing
+            Dim snap As FileTypeProjectOptions
 
             If opt Is Nothing Then Return FileTypeProjectOptions.DefaultOptions()
             snap = opt.Clone()

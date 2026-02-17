@@ -35,11 +35,11 @@ Namespace Global.Tomtastisch.FileClassifier
                                                     depth As Integer,
                                                     extractEntry As Func(Of ZipArchiveEntry, Boolean)
                                                     ) As Boolean
-            Dim totalUncompressed As Long = 0
-            Dim ordered As IEnumerable(Of ZipArchiveEntry) = Nothing
-            Dim u As Long = 0
-            Dim c As Long = 0
-            Dim ratio As Double = 0
+            Dim totalUncompressed As Long
+            Dim ordered As IEnumerable(Of ZipArchiveEntry)
+            Dim u As Long
+            Dim c As Long
+            Dim ratio As Double
 
             If Not StreamGuard.IsReadable(stream) Then Return False
             If opt Is Nothing Then Return False
@@ -120,8 +120,8 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function IsNestedArchiveEntry(entry As ZipArchiveEntry, opt As FileTypeProjectOptions) As Boolean
             Dim header(15) As Byte
-            Dim read As Integer = 0
-            Dim exact As Byte() = Array.Empty(Of Byte)()
+            Dim read As Integer
+            Dim exact As Byte()
 
             If entry Is Nothing Then Return False
             If opt Is Nothing Then Return False

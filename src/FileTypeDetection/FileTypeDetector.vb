@@ -102,7 +102,7 @@ Namespace Global.Tomtastisch.FileClassifier
             ) As Byte()
 
             Dim opt As FileTypeProjectOptions = GetDefaultOptions()
-            Dim fi As FileInfo = Nothing
+            Dim fi As FileInfo
 
             ' Guard-Clauses: Pfad und Dateiexistenz.
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
@@ -340,8 +340,8 @@ Namespace Global.Tomtastisch.FileClassifier
                 ByRef trace As DetectionTrace
             ) As FileType
 
-            Dim fi As FileInfo = Nothing
-            Dim header As Byte() = Array.Empty(Of Byte)()
+            Dim fi As FileInfo
+            Dim header As Byte()
 
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(opt.Logger, "[Detect] Datei nicht gefunden.")
@@ -449,7 +449,7 @@ Namespace Global.Tomtastisch.FileClassifier
             ) As Boolean
 
             Dim opt As FileTypeProjectOptions = GetDefaultOptions()
-            Dim payload As Byte() = Array.Empty(Of Byte)()
+            Dim payload As Byte()
             If Not CanExtractArchivePath(path, verifyBeforeExtract, opt) Then Return False
 
             Try
@@ -618,8 +618,8 @@ Namespace Global.Tomtastisch.FileClassifier
                                                tryRefine As Func(Of FileType)
                                                ) As FileType
 
-            Dim magicKind As FileKind = FileKind.Unknown
-            Dim descriptor As ArchiveDescriptor = Nothing
+            Dim magicKind As FileKind
+            Dim descriptor As ArchiveDescriptor
 
             If header Is Nothing OrElse header.Length = 0 Then
                 trace.ReasonCode = ReasonHeaderUnknown
@@ -701,7 +701,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 tryRefine As Func(Of FileType)
             ) As FileType
 
-            Dim refined As FileType = FileTypeRegistry.Resolve(FileKind.Unknown)
+            Dim refined As FileType
 
             If magicKind <> FileKind.Zip Then
                 trace.ReasonCode = ReasonArchiveGeneric
@@ -738,7 +738,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 opt As FileTypeProjectOptions
             ) As Boolean
 
-            Dim detected As FileType = FileTypeRegistry.Resolve(FileKind.Unknown)
+            Dim detected As FileType
 
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(opt.Logger, "[ArchiveExtract] Quelldatei fehlt.")
@@ -784,8 +784,8 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Shared Function ExtensionMatchesKind(path As String, detectedKind As FileKind) As Boolean
 
             Dim ext As String = IO.Path.GetExtension(If(path, String.Empty))
-            Dim normalizedExt As String = String.Empty
-            Dim detectedType As FileType = FileTypeRegistry.Resolve(FileKind.Unknown)
+            Dim normalizedExt As String
+            Dim detectedType As FileType
 
             If String.IsNullOrWhiteSpace(ext) Then Return True
 
@@ -808,12 +808,12 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function ReadHeader(input As FileStream, sniffBytes As Integer, maxBytes As Long) As Byte()
 
-            Dim want As Integer = 0
-            Dim take As Integer = 0
-            Dim off As Integer = 0
-            Dim n As Integer = 0
-            Dim buf As Byte() = Array.Empty(Of Byte)()
-            Dim exact As Byte() = Array.Empty(Of Byte)()
+            Dim want As Integer
+            Dim take As Integer
+            Dim off As Integer
+            Dim n As Integer
+            Dim buf As Byte()
+            Dim exact As Byte()
 
             Try
                 If input Is Nothing OrElse Not input.CanRead Then Return Array.Empty(Of Byte)()

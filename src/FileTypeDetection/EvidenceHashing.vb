@@ -69,7 +69,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim normalizedOptions As HashOptions = ResolveHashOptions(detectorOptions, options)
             Dim fileBytes As Byte() = Array.Empty(Of Byte)()
             Dim readError As String = String.Empty
-            Dim detectedType As FileType = FileTypeRegistry.Resolve(FileKind.Unknown)
+            Dim detectedType As FileType
             Dim entries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
 
             If String.IsNullOrWhiteSpace(path) OrElse Not IO.File.Exists(path) Then
@@ -153,7 +153,7 @@ Namespace Global.Tomtastisch.FileClassifier
             As HashEvidence
             Dim detectorOptions As FileTypeProjectOptions = FileTypeOptions.GetSnapshot()
             Dim normalizedOptions As HashOptions = ResolveHashOptions(detectorOptions, options)
-            Dim detectedType As FileType = FileTypeRegistry.Resolve(FileKind.Unknown)
+            Dim detectedType As FileType
             Dim entries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
 
             If data Is Nothing Then
@@ -289,17 +289,17 @@ Namespace Global.Tomtastisch.FileClassifier
             As HashRoundTripReport
             Dim detectorOptions As FileTypeProjectOptions = FileTypeOptions.GetSnapshot()
             Dim normalizedOptions As HashOptions = ResolveHashOptions(detectorOptions, options)
-            Dim failed As HashEvidence = Nothing
-            Dim h1 As HashEvidence = Nothing
+            Dim failed As HashEvidence
+            Dim h1 As HashEvidence
             Dim originalBytes As Byte() = Array.Empty(Of Byte)()
             Dim readError As String = String.Empty
             Dim archiveEntries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
-            Dim isArchiveInput As Boolean = False
-            Dim h2 As HashEvidence = Nothing
-            Dim canonicalBytes As Byte() = Array.Empty(Of Byte)()
-            Dim normalizedEntries As List(Of NormalizedEntry) = Nothing
-            Dim normalizeError As String = String.Empty
-            Dim h3 As HashEvidence = Nothing
+            Dim isArchiveInput As Boolean
+            Dim h2 As HashEvidence
+            Dim canonicalBytes As Byte()
+            Dim normalizedEntries As List(Of NormalizedEntry)
+            Dim normalizeError As String
+            Dim h3 As HashEvidence
             Dim h4 As HashEvidence = HashEvidence.CreateFailure(
                     HashSourceType.MaterializedFile,
                     "roundtrip-h4-file",
@@ -310,8 +310,8 @@ Namespace Global.Tomtastisch.FileClassifier
                     "ftd-roundtrip-" &
                     Guid.NewGuid().ToString("N", Globalization.CultureInfo.InvariantCulture)
                 )
-            Dim targetFile As String = Nothing
-            Dim notes As String = String.Empty
+            Dim targetFile As String
+            Dim notes As String
 
             If String.IsNullOrWhiteSpace(path) OrElse Not IO.File.Exists(path) Then
                 failed = HashEvidence.CreateFailure(HashSourceType.FilePath, path, "Datei nicht gefunden.")
@@ -408,23 +408,23 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Dim normalizedEntries As List(Of NormalizedEntry) = Nothing
             Dim normalizeError As String = String.Empty
-            Dim logicalBytes As Byte() = Array.Empty(Of Byte)()
-            Dim logicalSha As String = String.Empty
-            Dim fastLogical As String = String.Empty
-            Dim hmacLogical As String = String.Empty
-            Dim physicalSha As String = String.Empty
-            Dim fastPhysical As String = String.Empty
-            Dim hmacPhysical As String = String.Empty
-            Dim hasPhysical As Boolean = False
-            Dim secureNote As String = String.Empty
-            Dim hmacKey As Byte() = Array.Empty(Of Byte)()
-            Dim hasHmacKey As Boolean = False
+            Dim logicalBytes As Byte()
+            Dim logicalSha As String
+            Dim fastLogical As String
+            Dim hmacLogical As String
+            Dim physicalSha As String
+            Dim fastPhysical As String
+            Dim hmacPhysical As String
+            Dim hasPhysical As Boolean
+            Dim secureNote As String
+            Dim hmacKey As Byte()
+            Dim hasHmacKey As Boolean
             Dim firstEntry As ZipExtractedEntry = Nothing
-            Dim digestSet As HashDigestSet = Nothing
-            Dim combinedNotes As String = String.Empty
-            Dim totalBytes As Long = 0
-            Dim persistedCompressed As Byte() = Array.Empty(Of Byte)()
-            Dim persistedLogical As Byte() = Array.Empty(Of Byte)()
+            Dim digestSet As HashDigestSet
+            Dim combinedNotes As String
+            Dim totalBytes As Long
+            Dim persistedCompressed As Byte()
+            Dim persistedLogical As Byte()
 
             If Not TryNormalizeEntries(entries, normalizedEntries, normalizeError) Then
                 Return HashEvidence.CreateFailure(sourceType, label, normalizeError)
@@ -515,10 +515,10 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim hmacLogical As String = String.Empty
             Dim secureNote As String = String.Empty
             Dim hmacKey As Byte() = Array.Empty(Of Byte)()
-            Dim persistedPayload As Byte() = Array.Empty(Of Byte)()
-            Dim entry As ZipExtractedEntry = Nothing
-            Dim digestSet As HashDigestSet = Nothing
-            Dim combinedNotes As String = String.Empty
+            Dim persistedPayload As Byte()
+            Dim entry As ZipExtractedEntry
+            Dim digestSet As HashDigestSet
+            Dim combinedNotes As String
 
             If hashOptions IsNot Nothing AndAlso hashOptions.IncludeSecureHash Then
                 If TryResolveHmacKey(hmacKey, secureNote) Then
@@ -562,8 +562,8 @@ Namespace Global.Tomtastisch.FileClassifier
             ) As Boolean
 
             Dim seen As HashSet(Of String) = New HashSet(Of String)(StringComparer.Ordinal)
-            Dim normalizedPath As String = Nothing
-            Dim payload As Byte() = Array.Empty(Of Byte)()
+            Dim normalizedPath As String
+            Dim payload As Byte()
 
             normalizedEntries = New List(Of NormalizedEntry)()
             errorMessage = String.Empty
@@ -606,9 +606,9 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function BuildLogicalManifestBytes(entries As IReadOnlyList(Of NormalizedEntry)) As Byte()
-            Dim versionBytes As Byte() = Array.Empty(Of Byte)()
-            Dim pathBytes As Byte() = Array.Empty(Of Byte)()
-            Dim contentHash As Byte() = Array.Empty(Of Byte)()
+            Dim versionBytes As Byte()
+            Dim pathBytes As Byte()
+            Dim contentHash As Byte()
 
             Using ms As New IO.MemoryStream()
                 Using writer As New IO.BinaryWriter(ms, Text.Encoding.UTF8, leaveOpen:=True)
@@ -637,7 +637,7 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function TryResolveHmacKey(ByRef key As Byte(), ByRef note As String) As Boolean
-            Dim b64 As String = String.Empty
+            Dim b64 As String
 
             key = Array.Empty(Of Byte)()
             note = String.Empty
@@ -674,7 +674,7 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function ComputeFastHash(payload As Byte(), options As HashOptions) As String
-            Dim data As Byte() = Array.Empty(Of Byte)()
+            Dim data As Byte()
 
             If options Is Nothing OrElse Not options.IncludeFastHash Then Return String.Empty
             data = If(payload, Array.Empty(Of Byte)())
@@ -696,7 +696,7 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function CopyBytes(data As Byte()) As Byte()
-            Dim copy As Byte() = Array.Empty(Of Byte)()
+            Dim copy As Byte()
 
             If data Is Nothing OrElse data.Length = 0 Then Return Array.Empty(Of Byte)()
             copy = New Byte(data.Length - 1) {}
@@ -717,7 +717,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function TryReadFileBounded(path As String, detectorOptions As FileTypeProjectOptions,
                                                    ByRef bytes As Byte(), ByRef errorMessage As String) As Boolean
-            Dim fi As IO.FileInfo = Nothing
+            Dim fi As IO.FileInfo
 
             bytes = Array.Empty(Of Byte)()
             errorMessage = String.Empty

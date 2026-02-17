@@ -53,7 +53,7 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Friend Shared Function Normalize(options As HashOptions) As HashOptions
-            Dim cloned As HashOptions = Nothing
+            Dim cloned As HashOptions
 
             If options Is Nothing Then options = New HashOptions()
 

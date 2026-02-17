@@ -67,9 +67,9 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function BuildDefinitionsFromEnum() As ImmutableArray(Of FileTypeDefinition)
             Dim b = ImmutableArray.CreateBuilder(Of FileTypeDefinition)()
-            Dim canonicalExtension As String = String.Empty
-            Dim aliases As String() = Array.Empty(Of String)()
-            Dim magicPatterns As ImmutableArray(Of MagicPattern) = ImmutableArray(Of MagicPattern).Empty
+            Dim canonicalExtension As String
+            Dim aliases As String()
+            Dim magicPatterns As ImmutableArray(Of MagicPattern)
 
             For Each kind In OrderedKinds()
                 If kind = FileKind.Unknown Then Continue For
@@ -102,10 +102,10 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function BuildAliases(kind As FileKind, canonicalExtension As String) As String()
             Dim aliases As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
-            Dim extAlias As String = String.Empty
-            Dim enumAlias As String = String.Empty
+            Dim extAlias As String
+            Dim enumAlias As String
             Dim additional As ImmutableArray(Of String) = ImmutableArray(Of String).Empty
-            Dim orderedAliases As List(Of String) = Nothing
+            Dim orderedAliases As List(Of String)
 
             extAlias = NormalizeAlias(canonicalExtension)
             If extAlias.Length > 0 Then aliases.Add(extAlias)
@@ -151,9 +151,9 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Friend Shared Function DetectByMagic(header As Byte()) As FileKind
-            Dim rule As MagicRule = Nothing
-            Dim patterns As ImmutableArray(Of MagicPattern) = ImmutableArray(Of MagicPattern).Empty
-            Dim segments As ImmutableArray(Of MagicSegment) = ImmutableArray(Of MagicSegment).Empty
+            Dim rule As MagicRule
+            Dim patterns As ImmutableArray(Of MagicPattern)
+            Dim segments As ImmutableArray(Of MagicSegment)
 
             If header Is Nothing OrElse header.Length = 0 Then Return FileKind.Unknown
 
@@ -240,7 +240,7 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function HasSegment(data As Byte(), segment As MagicSegment) As Boolean
-            Dim endPos As Integer = 0
+            Dim endPos As Integer
 
             If data Is Nothing Then Return False
             If segment.Offset < 0 Then Return False
@@ -257,7 +257,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function BuildAliasMap(types As ImmutableDictionary(Of FileKind, FileType)) _
             As ImmutableDictionary(Of String, FileKind)
-            Dim entries As List(Of Tuple(Of FileKind, String)) = Nothing
+            Dim entries As List(Of Tuple(Of FileKind, String))
 
             If types Is Nothing Then Return ImmutableDictionary(Of String, FileKind).Empty
 

@@ -116,7 +116,7 @@ Namespace Global.Tomtastisch.FileClassifier
             ) As Boolean
 
             Dim opt As FileTypeProjectOptions = FileTypeOptions.GetSnapshot()
-            Dim destinationFull As String = Nothing
+            Dim destinationFull As String
             Dim descriptor As ArchiveDescriptor = Nothing
 
             ' Guard-Clauses: Null-, Größen- und Zielpfadprüfung.
@@ -175,7 +175,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 opt As FileTypeProjectOptions
             ) As Boolean
 
-            Dim parent As String = Nothing
+            Dim parent As String
 
             Try
                 If Not DestinationPathGuard.PrepareMaterializationTarget(destinationFull, overwrite, opt) Then _

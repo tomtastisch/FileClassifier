@@ -153,7 +153,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Friend Shared Function TryDescribeStream(stream As Stream, opt As FileTypeProjectOptions,
                                                  ByRef descriptor As ArchiveDescriptor) As Boolean
-            Dim mapped As ArchiveContainerType = ArchiveContainerType.Unknown
+            Dim mapped As ArchiveContainerType
 
             descriptor = ArchiveDescriptor.UnknownDescriptor()
             If Not StreamGuard.IsReadable(stream) Then Return False
@@ -235,7 +235,7 @@ Namespace Global.Tomtastisch.FileClassifier
                                                     descriptor As ArchiveDescriptor,
                                                     extractEntry As Func(Of IArchiveEntryModel, Boolean)
                                                     ) As Boolean
-            Dim backend As IArchiveBackend = Nothing
+            Dim backend As IArchiveBackend
 
             If Not StreamGuard.IsReadable(stream) Then Return False
             If opt Is Nothing Then Return False
@@ -269,7 +269,7 @@ Namespace Global.Tomtastisch.FileClassifier
             As IReadOnlyList(Of ZipExtractedEntry)
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             Dim entries As List(Of ZipExtractedEntry) = New List(Of ZipExtractedEntry)()
-            Dim ok As Boolean = False
+            Dim ok As Boolean
 
             If Not StreamGuard.IsReadable(stream) Then Return emptyResult
             If opt Is Nothing Then Return emptyResult
@@ -317,11 +317,11 @@ Namespace Global.Tomtastisch.FileClassifier
         Friend Shared Function TryExtractArchiveStream(stream As Stream, destinationDirectory As String,
                                                        opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor) _
             As Boolean
-            Dim destinationFull As String = Nothing
-            Dim parent As String = Nothing
-            Dim stageDir As String = Nothing
-            Dim stagePrefix As String = Nothing
-            Dim ok As Boolean = False
+            Dim destinationFull As String
+            Dim parent As String
+            Dim stageDir As String
+            Dim stagePrefix As String
+            Dim ok As Boolean
 
             If Not StreamGuard.IsReadable(stream) Then Return False
             If opt Is Nothing Then Return False
@@ -397,8 +397,8 @@ Namespace Global.Tomtastisch.FileClassifier
                                                         opt As FileTypeProjectOptions) As Boolean
             Dim entryName As String = Nothing
             Dim isDirectory As Boolean = False
-            Dim targetPath As String = Nothing
-            Dim targetDir As String = Nothing
+            Dim targetPath As String
+            Dim targetDir As String
 
             If entry Is Nothing Then Return False
             If opt Is Nothing Then Return False
@@ -468,7 +468,7 @@ Namespace Global.Tomtastisch.FileClassifier
                                                      opt As FileTypeProjectOptions) As Boolean
             Dim entryName As String = Nothing
             Dim isDirectory As Boolean = False
-            Dim payload As Byte() = Array.Empty(Of Byte)()
+            Dim payload As Byte()
 
             If entry Is Nothing OrElse entries Is Nothing Then Return False
             If opt Is Nothing Then Return False
@@ -536,7 +536,7 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function ValidateEntrySize(entry As IArchiveEntryModel, opt As FileTypeProjectOptions) As Boolean
-            Dim sizeValue As Long? = Nothing
+            Dim sizeValue As Long?
 
             If entry Is Nothing OrElse opt Is Nothing Then Return False
             If entry.IsDirectory Then Return True
@@ -663,14 +663,14 @@ Namespace Global.Tomtastisch.FileClassifier
                                 containerTypeValue As ArchiveContainerType,
                                 extractEntry As Func(Of IArchiveEntryModel, Boolean)
                                 ) As Boolean Implements IArchiveBackend.Process
-            Dim mapped As ArchiveContainerType = ArchiveContainerType.Unknown
-            Dim entries As List(Of SharpCompress.Archives.IArchiveEntry) = Nothing
+            Dim mapped As ArchiveContainerType
+            Dim entries As List(Of SharpCompress.Archives.IArchiveEntry)
             Dim nestedResult As Boolean = False
-            Dim nestedHandled As Boolean = False
-            Dim totalUncompressed As Long = 0
-            Dim model As IArchiveEntryModel = Nothing
-            Dim knownSize As Long = 0
-            Dim requireKnownForTotal As Boolean = False
+            Dim nestedHandled As Boolean
+            Dim totalUncompressed As Long
+            Dim model As IArchiveEntryModel
+            Dim knownSize As Long
+            Dim requireKnownForTotal As Boolean
 
             If Not StreamGuard.IsReadable(stream) Then Return False
             If opt Is Nothing Then Return False
@@ -744,8 +744,8 @@ Namespace Global.Tomtastisch.FileClassifier
                                                          extractEntry As Func(Of IArchiveEntryModel, Boolean),
                                                          ByRef nestedResult As Boolean
                                                          ) As Boolean
-            Dim onlyEntry As SharpCompress.Archives.IArchiveEntry = Nothing
-            Dim model As IArchiveEntryModel = Nothing
+            Dim onlyEntry As SharpCompress.Archives.IArchiveEntry
+            Dim model As IArchiveEntryModel
             Dim payload As Byte() = Nothing
             Dim nestedDescriptor As ArchiveDescriptor = Nothing
 
@@ -827,7 +827,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function TryGetValidatedSize(entry As IArchiveEntryModel, opt As FileTypeProjectOptions,
                                                     ByRef knownSize As Long, requireKnownForTotal As Boolean) As Boolean
-            Dim value As Long? = Nothing
+            Dim value As Long?
 
             knownSize = 0
             If entry Is Nothing Then Return False
@@ -852,7 +852,7 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Shared Function TryMeasureEntrySize(entry As IArchiveEntryModel, opt As FileTypeProjectOptions,
                                                     ByRef measured As Long) As Boolean
             Dim buf(InternalIoDefaults.CopyBufferSize - 1) As Byte
-            Dim n As Integer = 0
+            Dim n As Integer
 
             measured = 0
             If entry Is Nothing OrElse opt Is Nothing Then Return False
