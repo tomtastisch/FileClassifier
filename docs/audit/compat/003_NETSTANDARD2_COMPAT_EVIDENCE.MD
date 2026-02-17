@@ -45,19 +45,20 @@ MSBuild-Conditionen in `src/FileTypeDetection/FileTypeDetectionLib.vbproj`:
 ### 4.1 Befehle und Exit-Codes
 1. `dotnet --info` -> `0`
 2. `dotnet restore FileClassifier.sln -v minimal` -> `0`
-3. `dotnet restore --locked-mode FileClassifier.sln -v minimal` -> `0`
-4. `dotnet build FileClassifier.sln -c Release --no-restore -warnaserror -v minimal` -> `0`
-5. `dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --no-build -v minimal` -> `0` (`414` Tests gruen)
-6. `dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --no-build --filter "Category=ApiContract" -v minimal` -> `0` (`3` Tests gruen)
-7. `dotnet pack src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release --no-build -o artifacts/ci/netstandard2-compat/nuget -v minimal` -> `0`
-8. `dotnet build src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -f netstandard2.0 -v diag > artifacts/ci/netstandard2-compat/build-netstandard2.0.log` -> `0`
-9. `dotnet build src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -f net8.0 -v diag > artifacts/ci/netstandard2-compat/build-net8.0.log` -> `0`
-10. `dotnet build src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -f net10.0 -v diag > artifacts/ci/netstandard2-compat/build-net10.0.log` -> `0`
-11. `python3 tools/check-doc-consistency.py` -> `0`
-12. `python3 tools/check-docs.py` -> `0`
-13. `bash tools/ci/bin/run.sh versioning-svt` -> `0`
-14. `bash tools/ci/bin/run.sh version-convergence` -> `0`
-15. `bash tools/ci/bin/run.sh security-nuget` -> `0`
+3. `dotnet build FileClassifier.sln -c Release --no-restore -warnaserror -v minimal` -> `0`
+4. `dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --no-build -v minimal` -> `0` (`414` Tests gruen)
+5. `dotnet pack src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release --no-build -o artifacts/ci/netstandard2-compat/nuget -v minimal` -> `0`
+6. `dotnet build src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -f netstandard2.0 -v diag > artifacts/ci/netstandard2-compat/build-netstandard2.0.log` -> `0`
+7. `dotnet build src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -f net8.0 -v diag > artifacts/ci/netstandard2-compat/build-net8.0.log` -> `0`
+8. `dotnet build src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -f net10.0 -v diag > artifacts/ci/netstandard2-compat/build-net10.0.log` -> `0`
+9. `python3 tools/check-doc-consistency.py` -> `0`
+10. `python3 tools/check-docs.py` -> `0`
+11. `bash tools/versioning/verify-version-convergence.sh` -> `0`
+12. `bash tools/ci/bin/run.sh security-nuget` -> `0`
+13. `EXPECTED_RELEASE_TAG=v5.2.0-rc.3 REQUIRE_RELEASE_TAG=1 bash tools/ci/check-versioning-svt.sh --repo-root . --out artifacts/ci/versioning-svt/versioning-svt-summary.json` -> `0`
+14. `bash tools/ci/release/gate2_version_policy.sh release v5.2.0-rc.3 artifacts/nuget/Tomtastisch.FileClassifier.5.2.0-rc.3.nupkg` -> `0`
+15. `VERIFY_ONLINE=0 bash tools/ci/release/gate4_verify_postpublish.sh 5.2.0-rc.3 artifacts/nuget/Tomtastisch.FileClassifier.5.2.0-rc.3.nupkg` -> `0`
+16. `VERIFY_ONLINE=0 bash tools/ci/release/gate4_verify_postpublish.sh 5.2.0 artifacts/ci/netstandard2-compat/nuget/Tomtastisch.FileClassifier.5.2.0.nupkg` -> `0`
 
 ### 4.2 Build-/Pack-Proof
 - Build-Matrix erfolgreich:
@@ -70,18 +71,22 @@ MSBuild-Conditionen in `src/FileTypeDetection/FileTypeDetectionLib.vbproj`:
   - `lib/net10.0/Tomtastisch.FileClassifier.dll`
 
 ### 4.3 Provider-Compile-Proof
-- `netstandard2.0`:
-  - `artifacts/ci/netstandard2-compat/build-netstandard2.0.log:48497`
-  - Treffer: `Providers/NetStandard2_0/HashPrimitivesProvider.vb (Aufgaben-ID: 7)`
-- `net8.0`:
-  - `artifacts/ci/netstandard2-compat/build-net8.0.log:48421`
-  - Treffer: `Providers/Net8_0Plus/HashPrimitivesProvider.vb (Aufgaben-ID: 12)`
-- `net10.0`:
-  - `artifacts/ci/netstandard2-compat/build-net10.0.log:48416`
-  - Treffer: `Providers/Net8_0Plus/HashPrimitivesProvider.vb (Aufgaben-ID: 12)`
-- Negativ-Proof:
-  - kein Treffer fuer `Providers/Net8_0Plus/HashPrimitivesProvider.vb (Aufgaben-ID: 7)` in `build-netstandard2.0.log`
-  - kein Treffer fuer `Providers/NetStandard2_0/HashPrimitivesProvider.vb (Aufgaben-ID: 12)` in `build-net8.0.log` und `build-net10.0.log`
+- Build-Logs enthalten die erwarteten Providerpfade je TFM:
+  - `artifacts/ci/netstandard2-compat/build-netstandard2.0.log` mit `Providers/NetStandard2_0/HashPrimitivesProvider.vb`
+  - `artifacts/ci/netstandard2-compat/build-net8.0.log` mit `Providers/Net8_0Plus/HashPrimitivesProvider.vb`
+  - `artifacts/ci/netstandard2-compat/build-net10.0.log` mit `Providers/Net8_0Plus/HashPrimitivesProvider.vb`
+- Runtime-nahe Marker-Probe aus den drei Build-Artefakten:
+  - `netstandard2.0:NetStandard2_0`
+  - `net8.0:Net8_0Plus`
+  - `net10.0:Net8_0Plus`
+- Probe-Kommando:
+```bash
+tmpdir=$(mktemp -d)
+cd "$tmpdir"
+dotnet new console -n Probe -f net10.0
+# Program.cs laedt jede TFM-DLL in eigenem AssemblyLoadContext und liest ProviderMarker via Reflection.
+dotnet run -c Release --no-restore
+```
 
 ### 4.4 Forbidden-API Grep-Proof (Core)
 Befehl:
@@ -89,20 +94,23 @@ Befehl:
 rg -n "Convert\.ToHexString|SHA256\.HashData|System\.IO\.Hashing|Microsoft\.AspNetCore\.App" src/FileTypeDetection/Core
 ```
 Ergebnis:
-- keine Treffer, Exit-Code `1` (expected for no-match)
+- keine Treffer (`forbidden_core_refs=none`)
 
 ### 4.5 CI-Teilchecks
-- `artifacts/ci/versioning-svt/versioning-svt-summary.json` -> `status: pass`
+- `artifacts/ci/versioning-svt/versioning-svt-summary.json` -> `status: pass` (pre-release `v5.2.0-rc.3`, core-match `5.2.0`)
 - `artifacts/ci/version-convergence/summary.json` -> `status: pass`, `repo_version=5.2.0`, `vbproj_version=5.2.0`, `docs_latest_version=5.2.0`
 - `artifacts/ci/security-nuget/result.json` -> `status: pass`
+- Gate-4-PreRelease-Probe (`VERIFY_ONLINE=0`) zeigt `require_registration=0`.
+- Gate-4-Stable-Probe (`VERIFY_ONLINE=0`) zeigt `require_registration=1`.
 
-### 4.6 Policy Ambiguity
+### 4.6 Policy/Konvergenz-Notiz
 Ambiguitaet zwischen:
 - `docs/versioning/001_POLICY_VERSIONING.MD:43` (in PR/CI keine statischen Versionfelder), und
 - existierendem SVT/Convergence-Setup (`verify-version-convergence.sh`, `check-versioning-svt.sh`), das `RepoVersion` und `Version`/`PackageVersion` in `FileTypeDetectionLib.vbproj` erwartet.
 
 Entscheidung fuer diesen Scope:
 - fail-closed nach bestehendem CI/Repo-Vertrag: Versionen auf `5.2.0` synchron gehalten und durch `versioning-svt` + `version-convergence` verifiziert.
+- Pre-Releases werden ueber Tag `v5.2.0-rc.N` abgebildet; die Projektfelder bleiben semantisch auf Kernversion `5.2.0`.
 
 ## 5. Grenzen/Nicht-Ziele
 - Keine oeffentliche API-Signatur geaendert.

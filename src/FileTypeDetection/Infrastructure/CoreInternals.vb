@@ -169,7 +169,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Dim parent = Path.GetDirectoryName(destinationFull)
             If String.IsNullOrWhiteSpace(parent) Then
-                LogGuard.Warn(opt.Logger, "[PathGuard] Ziel ohne gueltigen Parent.")
+                LogGuard.Warn(opt.Logger, "[PathGuard] Ziel ohne gültigen Parent.")
                 Return False
             End If
 

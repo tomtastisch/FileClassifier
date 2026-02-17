@@ -96,12 +96,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </remarks>
         ''' <param name="path">Dateipfad der Quelldatei.</param>
         ''' <returns>Gelesene Bytes oder ein leeres Array bei Fehlern bzw. Regelverletzungen.</returns>
-        ''' <exception cref="UnauthorizedAccessException">Kann bei Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.Security.SecurityException">Kann bei sicherheitsrelevantem Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="IOException">Kann bei I/O-Zugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="InvalidDataException">Kann bei ungültigen Datenzuständen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Pfadformaten intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
         Public Shared Function ReadFileSafe _
             (
                 path As String
@@ -119,7 +113,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 ' Größenprüfung: Datei muss innerhalb der konfigurierten Grenzen liegen.
                 Dim fi As New FileInfo(path)
                 If fi.Length < 0 OrElse fi.Length > opt.MaxBytes Then
-                    LogGuard.Warn(opt.Logger, $"[Detect] Datei zu gross ({fi.Length} > {opt.MaxBytes}).")
+                    LogGuard.Warn(opt.Logger, $"[Detect] Datei zu groß ({fi.Length} > {opt.MaxBytes}).")
                     Return Array.Empty(Of Byte)()
                 End If
 
@@ -153,12 +147,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </remarks>
         ''' <param name="path">Dateipfad der zu klassifizierenden Datei.</param>
         ''' <returns>Erkannter Typ oder <see cref="FileKind.Unknown"/> bei Fehlern.</returns>
-        ''' <exception cref="UnauthorizedAccessException">Kann bei Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.Security.SecurityException">Kann bei sicherheitsrelevantem Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="IOException">Kann bei I/O-Zugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="InvalidDataException">Kann bei ungültigen Datenzuständen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Pfadformaten intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
         Public Function Detect _
             (
                 path As String
@@ -184,12 +172,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="path">Dateipfad der zu klassifizierenden Datei.</param>
         ''' <param name="verifyExtension"><c>True</c> erzwingt die fail-closed Endungsprüfung nach Inhaltsdetektion.</param>
         ''' <returns>Erkannter Typ oder <see cref="FileKind.Unknown"/> bei Mismatch oder Fehlern.</returns>
-        ''' <exception cref="UnauthorizedAccessException">Kann bei Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.Security.SecurityException">Kann bei sicherheitsrelevantem Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="IOException">Kann bei I/O-Zugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="InvalidDataException">Kann bei ungültigen Datenzuständen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Pfadformaten intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
         <SuppressMessage("Performance", "CA1822:Mark members as static", Justification:="Public instance API; changing to Shared would be a breaking API change.")>
         Public Function Detect _
             (
@@ -209,12 +191,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </remarks>
         ''' <param name="path">Dateipfad der zu klassifizierenden Datei.</param>
         ''' <returns>Detailliertes Detektionsergebnis inklusive Reason-Code und Trace-Flags.</returns>
-        ''' <exception cref="UnauthorizedAccessException">Kann bei Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.Security.SecurityException">Kann bei sicherheitsrelevantem Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="IOException">Kann bei I/O-Zugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="InvalidDataException">Kann bei ungültigen Datenzuständen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Pfadformaten intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
         Public Function DetectDetailed _
             (
                 path As String
@@ -240,12 +216,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="path">Dateipfad der zu klassifizierenden Datei.</param>
         ''' <param name="verifyExtension"><c>True</c> aktiviert die Endungsprüfung nach Inhaltsdetektion.</param>
         ''' <returns>Detailliertes Detektionsergebnis mit typisiertem Trace-Kontext.</returns>
-        ''' <exception cref="UnauthorizedAccessException">Kann bei Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.Security.SecurityException">Kann bei sicherheitsrelevantem Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="IOException">Kann bei I/O-Zugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="InvalidDataException">Kann bei ungültigen Datenzuständen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Pfadformaten intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
         ''' <example>
         '''     <code language="vb">
         ''' Dim detector As New FileTypeDetector()
@@ -296,7 +266,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </remarks>
         ''' <param name="path">Dateipfad der zu klassifizierenden Datei.</param>
         ''' <returns><c>True</c> bei passender oder fehlender Endung; sonst <c>False</c>.</returns>
-        ''' <exception cref="ArgumentException">Kann bei ungültigen Pfad-/Typzuständen intern auftreten und wird fail-closed behandelt.</exception>
         Public Function DetectAndVerifyExtension _
             (
                 path As String
@@ -322,12 +291,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </remarks>
         ''' <param name="path">Dateipfad der zu validierenden Archivdatei.</param>
         ''' <returns><c>True</c>, wenn der Container valide und sicher ist; andernfalls <c>False</c>.</returns>
-        ''' <exception cref="UnauthorizedAccessException">Kann bei Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.Security.SecurityException">Kann bei sicherheitsrelevantem Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="IOException">Kann bei I/O-Zugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="InvalidDataException">Kann bei ungültigen Archivdaten intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Pfadformaten intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
         Public Shared Function TryValidateArchive _
             (
                 path As String
@@ -363,15 +326,20 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Private Shared Function DetectPathCore(path As String) As FileType
+        Private Shared Function DetectPathCore(
+                path As String
+            ) As FileType
 
             Dim opt = GetDefaultOptions()
             Dim trace As DetectionTrace = DetectionTrace.Empty
             Return DetectPathCoreWithTrace(path, opt, trace)
         End Function
 
-        Private Shared Function DetectPathCoreWithTrace(path As String, opt As FileTypeProjectOptions,
-                                                        ByRef trace As DetectionTrace) As FileType
+        Private Shared Function DetectPathCoreWithTrace(
+                path As String,
+                opt As FileTypeProjectOptions,
+                ByRef trace As DetectionTrace
+            ) As FileType
 
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(opt.Logger, "[Detect] Datei nicht gefunden.")
@@ -385,19 +353,26 @@ Namespace Global.Tomtastisch.FileClassifier
                     trace.ReasonCode = ReasonInvalidLength
                     Return UnknownType()
                 End If
+
                 If fi.Length > opt.MaxBytes Then
-                    LogGuard.Warn(opt.Logger, $"[Detect] Datei zu gross ({fi.Length} > {opt.MaxBytes}).")
+                    LogGuard.Warn(opt.Logger, $"[Detect] Datei zu groß ({fi.Length} > {opt.MaxBytes}).")
                     trace.ReasonCode = ReasonFileTooLarge
                     Return UnknownType()
                 End If
 
-                Using _
-                    fs As _
-                        New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read,
-                                       InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
+                Using fs As New FileStream(
+                        path, FileMode.Open,
+                        FileAccess.Read,
+                        FileShare.Read,
+                        InternalIoDefaults.FileStreamBufferSize,
+                        FileOptions.SequentialScan
+                    )
+
                     Dim header = ReadHeader(fs, opt.SniffBytes, opt.MaxBytes)
                     Return ResolveByHeaderForPath(header, opt, trace, fs)
+
                 End Using
+
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
                 TypeOf ex Is Security.SecurityException OrElse
@@ -417,12 +392,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </remarks>
         ''' <param name="data">Zu prüfende Nutzdaten.</param>
         ''' <returns>Erkannter Typ oder <see cref="FileKind.Unknown"/> bei Fehlern.</returns>
-        ''' <exception cref="UnauthorizedAccessException">Kann bei Datenzugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.Security.SecurityException">Kann bei sicherheitsrelevantem Zugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="IOException">Kann bei I/O-nahen Operationen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="InvalidDataException">Kann bei ungültigen Datenzuständen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Konstellationen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
         ' ReSharper disable once MemberCanBeMadeStatic.Global
         <SuppressMessage("Performance", "CA1822:Mark members as static", Justification:="Public instance API; changing to Shared would be a breaking API change.")>
         Public Function Detect _
@@ -443,12 +412,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="data">Zu prüfende Nutzdaten.</param>
         ''' <param name="kind">Erwarteter Dateityp.</param>
         ''' <returns><c>True</c> bei Typgleichheit, sonst <c>False</c>.</returns>
-        ''' <exception cref="UnauthorizedAccessException">Kann bei Datenzugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.Security.SecurityException">Kann bei sicherheitsrelevantem Zugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="IOException">Kann bei I/O-nahen Operationen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="InvalidDataException">Kann bei ungültigen Datenzuständen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Konstellationen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
         Public Function IsOfType _
             (
                 data As Byte(),
@@ -477,12 +440,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="destinationDirectory">Leeres, noch nicht existierendes Zielverzeichnis.</param>
         ''' <param name="verifyBeforeExtract"><c>True</c> aktiviert eine vorgelagerte Typprüfung über <c>Detect(path)</c>.</param>
         ''' <returns><c>True</c> bei erfolgreichem, atomarem Entpacken; sonst <c>False</c>.</returns>
-        ''' <exception cref="UnauthorizedAccessException">Kann bei Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.Security.SecurityException">Kann bei sicherheitsrelevantem Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="IOException">Kann bei I/O-Zugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="InvalidDataException">Kann bei ungültigen Archivdaten intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Pfadformaten intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
         Public Function ExtractArchiveSafe _
             (
                 path As String,
@@ -495,9 +452,16 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Try
                 Dim payload = ReadFileSafe(path)
+
                 If payload.Length = 0 Then Return False
-                Return _
-                    FileMaterializer.Persist(payload, destinationDirectory, overwrite:=False, secureExtract:=True)
+
+                Return FileMaterializer.Persist(
+                        payload,
+                        destinationDirectory,
+                        overwrite:=False,
+                        secureExtract:=True
+                    )
+
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
                 TypeOf ex Is Security.SecurityException OrElse
@@ -527,12 +491,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="path">Pfad zur Archivdatei.</param>
         ''' <param name="verifyBeforeExtract"><c>True</c> aktiviert eine vorgelagerte Typprüfung über <c>Detect(path)</c>.</param>
         ''' <returns>Read-only Liste extrahierter Einträge oder leer bei Fehler.</returns>
-        ''' <exception cref="UnauthorizedAccessException">Kann bei Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.Security.SecurityException">Kann bei sicherheitsrelevantem Dateizugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="IOException">Kann bei I/O-Zugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="InvalidDataException">Kann bei ungültigen Archivdaten intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Pfadformaten intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumentzuständen intern auftreten und wird fail-closed behandelt.</exception>
         Public Function ExtractArchiveSafeToMemory _
             (
                 path As String,
@@ -546,12 +504,18 @@ Namespace Global.Tomtastisch.FileClassifier
             If Not CanExtractArchivePath(path, verifyBeforeExtract, opt) Then Return emptyResult
 
             Try
-                Using _
-                    fs As _
-                        New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read,
-                                       InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
+                Using fs As New FileStream(
+                        path,
+                        FileMode.Open,
+                        FileAccess.Read,
+                        FileShare.Read,
+                        InternalIoDefaults.FileStreamBufferSize,
+                        FileOptions.SequentialScan
+                    )
                     Return ArchiveExtractor.TryExtractArchiveStreamToMemory(fs, opt)
+
                 End Using
+
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
                 TypeOf ex Is Security.SecurityException OrElse
@@ -563,17 +527,22 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Private Shared Function DetectInternalBytes(data As Byte(), opt As FileTypeProjectOptions) As FileType
+        Private Shared Function DetectInternalBytes(
+                data As Byte(),
+                opt As FileTypeProjectOptions
+            ) As FileType
 
             If data Is Nothing OrElse data.Length = 0 Then Return UnknownType()
+
             If CLng(data.Length) > opt.MaxBytes Then
-                LogGuard.Warn(opt.Logger, $"[Detect] Daten zu gross ({data.Length} > {opt.MaxBytes}).")
+                LogGuard.Warn(opt.Logger, $"[Detect] Daten zu groß ({data.Length} > {opt.MaxBytes}).")
                 Return UnknownType()
             End If
 
             Try
                 Dim trace As DetectionTrace = DetectionTrace.Empty
                 Return ResolveByHeaderForBytes(data, opt, trace, data)
+
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
                 TypeOf ex Is Security.SecurityException OrElse
@@ -589,11 +558,11 @@ Namespace Global.Tomtastisch.FileClassifier
         '''     Entscheidungslogik für die Pfad-Variante.
         ''' </summary>
         Private Shared Function ResolveByHeaderForPath(
-                                                header As Byte(),
-                                                opt As FileTypeProjectOptions,
-                                                ByRef trace As DetectionTrace,
-                                                fs As FileStream
-                                                ) As FileType
+                header As Byte(),
+                opt As FileTypeProjectOptions,
+                ByRef trace As DetectionTrace,
+                fs As FileStream
+            ) As FileType
 
             Return ResolveByHeaderCommon(
                 header,
@@ -683,10 +652,10 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function ValidateArchiveStreamRaw(
-                                                  fs As FileStream,
-                                                  opt As FileTypeProjectOptions,
-                                                  descriptor As ArchiveDescriptor
-                                                  ) As Boolean
+                fs As FileStream,
+                opt As FileTypeProjectOptions,
+                descriptor As ArchiveDescriptor
+            ) As Boolean
 
             If fs Is Nothing OrElse Not fs.CanRead Then Return False
             If fs.CanSeek Then fs.Position = 0
@@ -694,20 +663,20 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function ValidateArchiveBytesRaw(
-                                                 data As Byte(),
-                                                 opt As FileTypeProjectOptions,
-                                                 descriptor As ArchiveDescriptor
-                                                 ) As Boolean
+                data As Byte(),
+                opt As FileTypeProjectOptions,
+                descriptor As ArchiveDescriptor
+            ) As Boolean
 
             Return ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor)
         End Function
 
         Private Shared Function ResolveAfterArchiveGate(
-                                                 magicKind As FileKind,
-                                                 opt As FileTypeProjectOptions,
-                                                 ByRef trace As DetectionTrace,
-                                                 tryRefine As Func(Of FileType)
-                                                 ) As FileType
+                magicKind As FileKind,
+                opt As FileTypeProjectOptions,
+                ByRef trace As DetectionTrace,
+                tryRefine As Func(Of FileType)
+            ) As FileType
 
             If magicKind <> FileKind.Zip Then
                 trace.ReasonCode = ReasonArchiveGeneric
@@ -718,8 +687,11 @@ Namespace Global.Tomtastisch.FileClassifier
             Return FinalizeArchiveDetection(refined, opt, trace)
         End Function
 
-        Private Shared Function FinalizeArchiveDetection(refined As FileType, opt As FileTypeProjectOptions,
-                                                  ByRef trace As DetectionTrace) As FileType
+        Private Shared Function FinalizeArchiveDetection(
+                refined As FileType,
+                opt As FileTypeProjectOptions,
+                ByRef trace As DetectionTrace
+            ) As FileType
 
             If refined.Kind <> FileKind.Unknown Then
                 WarnIfNoDirectContentDetection(refined.Kind, opt)
@@ -735,8 +707,11 @@ Namespace Global.Tomtastisch.FileClassifier
             Return FileTypeRegistry.Resolve(FileKind.Zip)
         End Function
 
-        Private Function CanExtractArchivePath(path As String, verifyBeforeExtract As Boolean,
-                                               opt As FileTypeProjectOptions) As Boolean
+        Private Function CanExtractArchivePath(
+                path As String,
+                verifyBeforeExtract As Boolean,
+                opt As FileTypeProjectOptions
+            ) As Boolean
 
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
                 LogGuard.Warn(opt.Logger, "[ArchiveExtract] Quelldatei fehlt.")
@@ -746,7 +721,7 @@ Namespace Global.Tomtastisch.FileClassifier
             If verifyBeforeExtract Then
                 Dim detected = Detect(path)
                 If Not IsArchiveContainerKind(detected.Kind) Then
-                    LogGuard.Warn(opt.Logger, $"[ArchiveExtract] Vorpruefung fehlgeschlagen ({detected.Kind}).")
+                    LogGuard.Warn(opt.Logger, $"[ArchiveExtract] Vorprüfung fehlgeschlagen ({detected.Kind}).")
                     Return False
                 End If
             End If
@@ -775,7 +750,7 @@ Namespace Global.Tomtastisch.FileClassifier
             If kind = FileKind.Unknown Then Return
             If FileTypeRegistry.HasDirectContentDetection(kind) Then Return
             LogGuard.Warn(opt.Logger,
-                          $"[Detect] Keine direkte Content-Erkennung fuer Typ '{kind _
+                          $"[Detect] Keine direkte Content-Erkennung für Typ '{kind _
                              }'. Ergebnis stammt aus Fallback/Refinement.")
         End Sub
 

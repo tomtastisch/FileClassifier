@@ -21,13 +21,15 @@ The active trusted-publishing policy is bound to the following identity:
 - After a successful `dotnet nuget push`, NuGet indexing (search/registration/flatcontainer) can become visible with a delay.
 - Gate 4 in the release workflow remains **fail-closed** for publish-critical endpoints:
   - `REQUIRE_FLATCONTAINER=1`
-  - `REQUIRE_REGISTRATION=1`
+  - `REQUIRE_REGISTRATION=1` for stable tags `vX.Y.Z`
+  - `REQUIRE_REGISTRATION=0` for pre-release tags `vX.Y.Z-<label>` (default; can be overridden via `SVT_POSTPUBLISH_REQUIRE_REGISTRATION=1`)
   - `REQUIRE_SEARCH=0` (search is decoupled from the blocking gate).
 - Default wait window for Gate 4:
-  - `SVT_POSTPUBLISH_RETRY_SCHEDULE_SECONDS=2,3,5,8,13,21,34,55,89,89,89`
-  - `SVT_POSTPUBLISH_RETRY_COUNT=11` (derived dynamically from schedule length unless explicitly set)
+  - stable: `SVT_POSTPUBLISH_RETRY_SCHEDULE_SECONDS=2,3,5,8,13,21,34,55,89,89,89`
+  - pre-release: `SVT_POSTPUBLISH_RETRY_SCHEDULE_SECONDS=2,3,5,8,13,21,34,55,89,144,233,377`
+  - `SVT_POSTPUBLISH_RETRY_COUNT` is derived dynamically from schedule length unless explicitly set
   - `SVT_POSTPUBLISH_RETRY_SLEEP_SECONDS=10`
-  - deterministically corresponds to a retry sleep budget of up to 408s (6m48s), plus HTTP timeout portions per attempt.
+  - deterministically corresponds to a retry sleep budget of up to 408s (stable) or 984s (pre-release), plus HTTP timeout portions per attempt.
 - For incident diagnostics, the window can be increased via these variables without changing workflow job names or required contexts.
 
 ## 5. Decoupled Online Convergence (Async)

@@ -12,7 +12,7 @@ Heuristik fuer die Rueckwirkungs-Zuordnung:
 - `docs|test|ci|chore|tooling|refactor|fix` => Patch
 
 Aktueller Entwicklungsstand:
-- Aktuelle Entwicklungslinie enthaelt `5.x` (Release-Stand: `v5.1.4`, naechster Zielstand in Arbeit: `5.2.0`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
+- Aktuelle Entwicklungslinie enthaelt `5.x` (aktueller Pre-Release-Stand: `v5.2.0-rc.2`, naechster stabiler Zielstand: `5.2.0`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
 
 Hinweis:
 - Die Spalte `Keyword` verwendet den technischen Klassifizierungswert aus der Historie.
@@ -20,7 +20,7 @@ Hinweis:
 
 | Version | Kurzbeschreibung | Commit | Keyword |
 |---|---|---|---|
-| `5.2.0` | netstandard2.0-Compat-Layer eingefuehrt, Provider-Struktur konsolidiert und TFM-Multi-Targeting erweitert | n/a (branch: `codex/chore/netstandard2-compat-structure`) | minor |
+| `5.2.0` | netstandard2.0-Compat-Layer eingefuehrt, Provider-Struktur konsolidiert und TFM-Multi-Targeting erweitert | [8d65a52](https://github.com/tomtastisch/FileClassifier/commit/8d65a52) | minor |
 | `5.1.4` | Refactor-Cluster 7C abgeschlossen + Qodana-Alerts auf 0 + Version-Bump fuer Release | [2adeb83](https://github.com/tomtastisch/FileClassifier/commit/2adeb83) | patch |
 | `5.1.3` | PR-Governance-Haertung (DE-Naming, PR-Template, fail-closed Gate fuer `security/code-scanning/tools = 0`) | [0b488ac](https://github.com/tomtastisch/FileClassifier/commit/0b488ac) | patch |
 | `5.1.2` | Gate4 Polling-Optimierung und Release-Haertung | [f12711d](https://github.com/tomtastisch/FileClassifier/commit/f12711d) | patch |

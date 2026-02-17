@@ -8,13 +8,19 @@ All changes are documented here in technical terms. The release version itself i
 
 ## [Unreleased]
 - Added:
-  - TBD
+  - Completed in-code documentation for TFM provider methods (`HashPrimitivesProvider` for `netstandard2.0` and `net8.0+`).
 - Changed:
-  - TBD
+  - Aligned public XML docs with Policy 045 by removing invalid `<exception>` tags from fail-closed APIs.
+  - Harmonized German log/doc strings to use proper umlauts.
+  - Hardened Gate 4 (`tools/ci/release/gate4_verify_postpublish.sh`) for pre-release tags:
+    - longer retry window,
+    - `registration` decoupled by default for `vX.Y.Z-<label>`,
+    - still fail-closed on `flatcontainer`.
 - Fixed:
-  - TBD
+  - Resolved release blocker where pre-release publishing failed due delayed registration visibility despite successful push.
 - Docs/CI/Tooling:
-  - TBD
+  - Updated NuGet trusted-publishing docs (DE/EN) and root README for the adjusted Gate 4 behavior.
+  - Added commit reference for version 5.2.0 in version history (DE/EN).
 
 ## [5.1.4]
 - Changed:

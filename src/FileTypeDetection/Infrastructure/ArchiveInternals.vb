@@ -286,7 +286,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Try
                 destinationFull = Path.GetFullPath(destinationDirectory)
             Catch ex As Exception
-                LogGuard.Debug(opt.Logger, $"[ArchiveExtract] Ungueltiger Zielpfad: {ex.Message}")
+                LogGuard.Debug(opt.Logger, $"[ArchiveExtract] Ungültiger Zielpfad: {ex.Message}")
                 Return False
             End Try
 

@@ -51,12 +51,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="data">Zu persistierende Nutzdaten.</param>
         ''' <param name="destinationPath">Dateisystemziel für die Materialisierung.</param>
         ''' <returns><c>True</c> bei erfolgreicher Persistierung; andernfalls <c>False</c>.</returns>
-        ''' <exception cref="UnauthorizedAccessException">Kann aus I/O-Operationen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.Security.SecurityException">Kann bei Zugriff auf geschützte Pfade intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="IOException">Kann bei Datei- oder Verzeichniszugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="InvalidDataException">Kann bei ungültigen Datenzuständen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Pfadformaten intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumenten intern auftreten und wird fail-closed behandelt.</exception>
         ''' <example>
         '''     <code language="vb">
         ''' Dim payload As Byte() = File.ReadAllBytes("input.bin")
@@ -83,12 +77,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="destinationPath">Dateisystemziel für die Materialisierung.</param>
         ''' <param name="overwrite"><c>True</c>, um ein bestehendes Ziel gemäß Zielpfad-Policy zu ersetzen; sonst <c>False</c>.</param>
         ''' <returns><c>True</c> bei erfolgreicher Persistierung; andernfalls <c>False</c>.</returns>
-        ''' <exception cref="UnauthorizedAccessException">Kann aus I/O-Operationen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.Security.SecurityException">Kann bei Zugriff auf geschützte Pfade intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="IOException">Kann bei Datei- oder Verzeichniszugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="InvalidDataException">Kann bei ungültigen Datenzuständen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Pfadformaten intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumenten intern auftreten und wird fail-closed behandelt.</exception>
         Public Shared Function Persist _
             (
                 data As Byte(),
@@ -119,12 +107,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="overwrite"><c>True</c>, um ein vorhandenes Ziel gemäß Zielpfad-Policy zu ersetzen.</param>
         ''' <param name="secureExtract"><c>True</c>, um Archivpayloads sicher zu validieren und zu extrahieren; sonst Rohpersistenz.</param>
         ''' <returns><c>True</c> bei erfolgreicher Materialisierung; andernfalls <c>False</c>.</returns>
-        ''' <exception cref="UnauthorizedAccessException">Kann bei Pfad- und I/O-Zugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="System.Security.SecurityException">Kann bei sicherheitsrelevanten Dateisystemoperationen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="IOException">Kann bei Dateisystemzugriff intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="InvalidDataException">Kann bei ungültigen Archiv- oder Payloaddaten intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="NotSupportedException">Kann bei nicht unterstützten Pfad-/I/O-Konstellationen intern auftreten und wird fail-closed behandelt.</exception>
-        ''' <exception cref="ArgumentException">Kann bei ungültigen Argumenten intern auftreten und wird fail-closed behandelt.</exception>
         Public Shared Function Persist _
             (
                 data As Byte(),
@@ -139,7 +121,7 @@ Namespace Global.Tomtastisch.FileClassifier
             If data Is Nothing Then Return False
 
             If CLng(data.Length) > opt.MaxBytes Then
-                LogGuard.Warn(opt.Logger, $"[Materialize] Daten zu gross ({data.Length} > {opt.MaxBytes}).")
+                LogGuard.Warn(opt.Logger, $"[Materialize] Daten zu groß ({data.Length} > {opt.MaxBytes}).")
                 Return False
             End If
 
@@ -159,7 +141,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf ex Is PathTooLongException OrElse
                 TypeOf ex Is IOException
 
-                LogGuard.Warn(opt.Logger, $"[Materialize] Ungueltiger Zielpfad: {ex.Message}")
+                LogGuard.Warn(opt.Logger, $"[Materialize] Ungültiger Zielpfad: {ex.Message}")
                 Return False
             End Try
 
