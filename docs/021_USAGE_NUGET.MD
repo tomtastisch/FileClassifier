@@ -100,3 +100,29 @@ Hinweise:
   EXPECTED_VERSION=X.Y.Z VERIFY_ONLINE=1 RETRY_COUNT=60 RETRY_SLEEP_SECONDS=10 bash tools/ci/verify_nuget_release.sh
   ```
 - Release-Gate-4 prüft Search bewusst nicht blockierend. Search-Konvergenz wird separat im Async-Workflow geprüft und bei Fehlern als Incident eskaliert.
+
+## G) Runbook: RC-Version in Visual Studio nicht sichtbar
+Symptom:
+- NuGet-Package-Manager zeigt nur stabile Versionen (z. B. `Aktuellste stabile Version`).
+
+Determinische Ursache:
+- Pre-Release-Filter ist in der Visual-Studio-Ansicht nicht aktiv oder lokale Metadaten sind veraltet.
+
+Schritte:
+1. Im NuGet-Package-Manager `Include prerelease` aktivieren.
+2. Quelle prüfen: [NuGet v3 Index](https://api.nuget.org/v3/index.json).
+3. Lokalen Cache leeren:
+   ```bash
+   dotnet nuget locals all --clear
+   ```
+4. Visual Studio neu starten und Paketliste aktualisieren.
+5. Falls weiterhin unsichtbar, Version explizit pinnen:
+   ```xml
+   <ItemGroup>
+     <PackageReference Include="Tomtastisch.FileClassifier" Version="X.Y.Z-rc.N" />
+   </ItemGroup>
+   ```
+
+Verifikation:
+- Search ohne Pre-Release-Flag zeigt nur stabile Versionen.
+- Search mit `prerelease=true&semVerLevel=2.0.0` zeigt RC-Versionen.
