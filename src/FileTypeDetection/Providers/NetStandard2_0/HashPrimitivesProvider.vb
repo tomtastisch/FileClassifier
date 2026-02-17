@@ -1,6 +1,8 @@
 ' ============================================================================
 ' FILE: HashPrimitivesProvider.vb
 ' TFM: netstandard2.0
+' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
+' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.MD
 ' ============================================================================
 
 Option Strict On
@@ -10,6 +12,12 @@ Imports System.Globalization
 Imports System.Security.Cryptography
 
 Namespace Global.Tomtastisch.FileClassifier
+    ''' <summary>
+    '''     Providerimplementierung der Hash-Primitive für `netstandard2.0`.
+    ''' </summary>
+    ''' <remarks>
+    '''     Zweck: Kapselt kompatible SHA256-, Hex- und FastHash64-Operationen ohne moderne TFM-only APIs.
+    ''' </remarks>
     Friend NotInheritable Class HashPrimitivesProvider
         Implements IHashPrimitives
 
@@ -41,6 +49,12 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
+        ''' <summary>
+        '''     Deterministische Lower-Hex-Kodierung per Nibble-Map.
+        ''' </summary>
+        ''' <remarks>
+        '''     Zweck: Liefert eine TFM-unabhängige Hex-Ausgabe in Kleinbuchstaben.
+        ''' </remarks>
         Private NotInheritable Class LowerHexCodec
             Implements IHexCodec
 
@@ -48,20 +62,28 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Public Function EncodeLowerHex(data As Byte()) As String Implements IHexCodec.EncodeLowerHex
                 Dim safeData = If(data, Array.Empty(Of Byte)())
+                Dim chars As Char() = Nothing
+                Dim index As Integer = 0
+
                 If safeData.Length = 0 Then Return String.Empty
 
-                Dim chars(safeData.Length * 2 - 1) As Char
-                Dim c = 0
-                For Each b In safeData
-                    chars(c) = HexDigits((b >> 4) And &HF)
-                    c += 1
-                    chars(c) = HexDigits(b And &HF)
-                    c += 1
+                chars = New Char(safeData.Length * 2 - 1) {}
+                For Each byteValue In safeData
+                    chars(index) = HexDigits((byteValue >> 4) And &HF)
+                    index += 1
+                    chars(index) = HexDigits(byteValue And &HF)
+                    index += 1
                 Next
                 Return New String(chars)
             End Function
         End Class
 
+        ''' <summary>
+        '''     SHA256-Primitive auf Basis von `SHA256.Create()`.
+        ''' </summary>
+        ''' <remarks>
+        '''     Zweck: Realisiert SHA256-Bytes und -Hex über `netstandard2.0`-kompatible Kryptografie-APIs.
+        ''' </remarks>
         Private NotInheritable Class Sha256Primitives
             Implements ISha256Primitives
 
@@ -83,6 +105,12 @@ Namespace Global.Tomtastisch.FileClassifier
             End Function
         End Class
 
+        ''' <summary>
+        '''     FastHash64-Primitive auf Basis von `System.IO.Hashing.XxHash3`.
+        ''' </summary>
+        ''' <remarks>
+        '''     Zweck: Liefert deterministische UInt64- und Hex-Werte für schnelle Hashvergleiche.
+        ''' </remarks>
         Private NotInheritable Class FastHash64Primitives
             Implements IFastHash64
 

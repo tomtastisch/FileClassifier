@@ -1,7 +1,7 @@
 # Providers Modul
 
 ## 1. Zweck
-Dieses Verzeichnis kapselt TFM-spezifische Implementierungen fuer interne Hashing-Primitive.
+Dieses Verzeichnis kapselt TFM-spezifische Implementierungen für interne Hashing-Primitive.
 
 ## 2. Inhalt
 - `NetStandard2_0/`

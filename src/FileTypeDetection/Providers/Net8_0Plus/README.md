@@ -1,15 +1,15 @@
 # Providers Net8_0Plus Modul
 
 ## 1. Zweck
-Dieses Verzeichnis implementiert interne Hashing-Primitive fuer net8.0 und net10.0.
+Dieses Verzeichnis implementiert interne Hashing-Primitive für net8.0 und net10.0.
 
 ## 2. Inhalt
 - `HashPrimitivesProvider.vb`
 
 ## 3. API und Verhalten
-- SHA256 wird ueber `SHA256.HashData` berechnet.
-- Lower-Hex wird ueber `Convert.ToHexString(...).ToLowerInvariant()` ausgegeben.
-- FastHash64 wird ueber `System.IO.Hashing.XxHash3` als lower-hex ausgegeben.
+- SHA256 wird über `SHA256.HashData` berechnet.
+- Lower-Hex wird über `Convert.ToHexString(...).ToLowerInvariant()` ausgegeben.
+- FastHash64 wird über `System.IO.Hashing.XxHash3` als lower-hex ausgegeben.
 
 ## 4. Verifikation
 - Build mit `-f net8.0` und `-f net10.0` muss diesen Provider kompilieren.

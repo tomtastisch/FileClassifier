@@ -7,9 +7,9 @@ Dieses Verzeichnis implementiert interne Hashing-Primitive ohne moderne, net8/ne
 - `HashPrimitivesProvider.vb`
 
 ## 3. API und Verhalten
-- SHA256 wird ueber `SHA256.Create()` berechnet.
-- Lower-Hex wird deterministisch ueber nibble-map kodiert.
-- FastHash64 wird ueber `System.IO.Hashing.XxHash3` als lower-hex ausgegeben.
+- SHA256 wird über `SHA256.Create()` berechnet.
+- Lower-Hex wird deterministisch über nibble-map kodiert.
+- FastHash64 wird über `System.IO.Hashing.XxHash3` als lower-hex ausgegeben.
 
 ## 4. Verifikation
 - Build mit `-f netstandard2.0` muss diesen Provider kompilieren.

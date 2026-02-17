@@ -1,7 +1,7 @@
 # Composition Modul
 
 ## 1. Zweck
-Dieses Verzeichnis kapselt den einzigen Kompositionspunkt fuer interne Hashing-Provider.
+Dieses Verzeichnis kapselt den einzigen Kompositionspunkt für interne Hashing-Provider.
 
 ## 2. Inhalt
 - `HashPrimitives.vb`
@@ -11,7 +11,7 @@ Dieses Verzeichnis kapselt den einzigen Kompositionspunkt fuer interne Hashing-P
 - Kein Runtime-Branching, keine Environment-Erkennung, keine DI-basierte Provider-Umschaltung.
 
 ## 4. Verifikation
-- Reflection-Tests pruefen die Verfuegbarkeit und den Provider-Marker.
+- Reflection-Tests prüfen die Verfügbarkeit und den Provider-Marker.
 
 ## 5. Diagramm
 ```mermaid

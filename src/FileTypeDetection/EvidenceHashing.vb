@@ -160,7 +160,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             If CLng(data.Length) > detectorOptions.MaxBytes Then
                 Return _
-                    HashEvidence.CreateFailure(HashSourceType.RawBytes, label, "Payload groesser als MaxBytes.")
+                    HashEvidence.CreateFailure(HashSourceType.RawBytes, label, "Payload größer als MaxBytes.")
             End If
 
             Dim detectedType = New FileTypeDetector().Detect(data)
@@ -549,7 +549,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
                 Dim normalizedPath As String = Nothing
                 If Not TryNormalizeEntryPath(entry.RelativePath, normalizedPath) Then
-                    errorMessage = $"Ungueltiger Entry-Pfad: '{entry.RelativePath}'."
+                    errorMessage = $"Ungültiger Entry-Pfad: '{entry.RelativePath}'."
                     Return False
                 End If
 
@@ -696,7 +696,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End If
 
                 If fi.Length > detectorOptions.MaxBytes Then
-                    errorMessage = "Datei groesser als MaxBytes."
+                    errorMessage = "Datei größer als MaxBytes."
                     Return False
                 End If
 

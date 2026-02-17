@@ -1,7 +1,7 @@
 # Abstractions Providers Modul
 
 ## 1. Zweck
-Dieses Verzeichnis enthaelt interne Vertrage fuer TFM-sensitive Hashing-Primitive.
+Dieses Verzeichnis enthält interne Verträge für TFM-sensitive Hashing-Primitive.
 
 ## 2. Inhalt
 - `IHexCodec`
@@ -10,11 +10,11 @@ Dieses Verzeichnis enthaelt interne Vertrage fuer TFM-sensitive Hashing-Primitiv
 - `IHashPrimitives`
 
 ## 3. API und Verhalten
-- Die Interfaces sind intern (`Friend`) und gehoeren nicht zur Public API.
+- Die Interfaces sind intern (`Friend`) und gehören nicht zur Public API.
 - Core-/Fassadenlogik konsumiert nur diese Abstraktionen statt direkter TFM-APIs.
 
 ## 4. Verifikation
-- Provider-Implementierungen muessen die gleichen Ausgabekontrakte je TFM einhalten.
+- Provider-Implementierungen müssen die gleichen Ausgabekontrakte je TFM einhalten.
 
 ## 5. Diagramm
 ```mermaid

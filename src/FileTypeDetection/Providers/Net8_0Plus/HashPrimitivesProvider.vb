@@ -1,6 +1,8 @@
 ' ============================================================================
 ' FILE: HashPrimitivesProvider.vb
 ' TFM: net8.0/net10.0
+' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
+' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.MD
 ' ============================================================================
 
 Option Strict On
@@ -10,6 +12,12 @@ Imports System.Globalization
 Imports System.Security.Cryptography
 
 Namespace Global.Tomtastisch.FileClassifier
+    ''' <summary>
+    '''     Providerimplementierung der Hash-Primitive für `net8.0` und `net10.0`.
+    ''' </summary>
+    ''' <remarks>
+    '''     Zweck: Kapselt moderne SHA256-, Hex- und FastHash64-APIs hinter stabilen internen Verträgen.
+    ''' </remarks>
     Friend NotInheritable Class HashPrimitivesProvider
         Implements IHashPrimitives
 
@@ -41,6 +49,12 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
+        ''' <summary>
+        '''     Deterministische Lower-Hex-Kodierung über `Convert.ToHexString`.
+        ''' </summary>
+        ''' <remarks>
+        '''     Zweck: Stellt die einheitliche Kleinschreibung der Hex-Ausgabe sicher.
+        ''' </remarks>
         Private NotInheritable Class LowerHexCodec
             Implements IHexCodec
 
@@ -50,6 +64,12 @@ Namespace Global.Tomtastisch.FileClassifier
             End Function
         End Class
 
+        ''' <summary>
+        '''     SHA256-Primitive auf Basis von `SHA256.HashData`.
+        ''' </summary>
+        ''' <remarks>
+        '''     Zweck: Liefert konsistente SHA256-Bytes und -Hex für aktuelle TFMs.
+        ''' </remarks>
         Private NotInheritable Class Sha256Primitives
             Implements ISha256Primitives
 
@@ -69,6 +89,12 @@ Namespace Global.Tomtastisch.FileClassifier
             End Function
         End Class
 
+        ''' <summary>
+        '''     FastHash64-Primitive auf Basis von `System.IO.Hashing.XxHash3`.
+        ''' </summary>
+        ''' <remarks>
+        '''     Zweck: Liefert deterministische UInt64- und Hex-Werte für schnelle Hashvergleiche.
+        ''' </remarks>
         Private NotInheritable Class FastHash64Primitives
             Implements IFastHash64
 
