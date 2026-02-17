@@ -60,6 +60,12 @@ violations = []
 checks = []
 require_release_tag = os.environ.get("REQUIRE_RELEASE_TAG", "0") == "1"
 expected_release_tag = os.environ.get("EXPECTED_RELEASE_TAG", "").strip()
+release_tag_regex = re.compile(r"^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$")
+
+
+def semver_core(version: str) -> str:
+    m = re.match(r"^([0-9]+\.[0-9]+\.[0-9]+)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$", version or "")
+    return m.group(1) if m else ""
 
 
 def rel(p: Path) -> str:
@@ -118,7 +124,7 @@ try:
     raw_tags = subprocess.check_output(["git", "-C", str(repo_root), "tag", "--points-at", "HEAD"], text=True)
     for line in raw_tags.splitlines():
         t = line.strip()
-        if re.match(r"^v[0-9]+\.[0-9]+\.[0-9]+$", t):
+        if release_tag_regex.match(t):
             head_tags.append(t)
 except Exception as ex:
     fail("git.tag_lookup", "command succeeds", "failed", ".git", f"Failed to resolve HEAD tags: {ex}")
@@ -128,8 +134,8 @@ expected_version = ""
 # workflow_dispatch releases provide EXPECTED_RELEASE_TAG explicitly.
 # tag-push releases derive the expected version from the exact release tag on HEAD.
 if expected_release_tag:
-    if not re.match(r"^v[0-9]+\.[0-9]+\.[0-9]+$", expected_release_tag):
-        fail("svt.expected_release_tag", "vX.Y.Z", expected_release_tag, "env:EXPECTED_RELEASE_TAG", "Invalid EXPECTED_RELEASE_TAG format")
+    if not release_tag_regex.match(expected_release_tag):
+        fail("svt.expected_release_tag", "vX.Y.Z[-prerelease]", expected_release_tag, "env:EXPECTED_RELEASE_TAG", "Invalid EXPECTED_RELEASE_TAG format")
     else:
         expected_version = expected_release_tag[1:]
         checks.append({
@@ -141,9 +147,9 @@ if expected_release_tag:
         })
 elif len(head_tags) == 0:
     if require_release_tag:
-        fail("svt.head_tag", "exactly one tag vX.Y.Z on HEAD", "none", ".git", "No exact release tag on HEAD")
+        fail("svt.head_tag", "exactly one tag vX.Y.Z[-prerelease] on HEAD", "none", ".git", "No exact release tag on HEAD")
 elif len(head_tags) > 1:
-    fail("svt.head_tag", "exactly one tag vX.Y.Z on HEAD", ",".join(head_tags), ".git", "Multiple release tags on HEAD")
+    fail("svt.head_tag", "exactly one tag vX.Y.Z[-prerelease] on HEAD", ",".join(head_tags), ".git", "Multiple release tags on HEAD")
 else:
     expected_version = head_tags[0][1:]
 # --- repo SSOT version consistency (no mixed versions) ---
@@ -179,7 +185,13 @@ else:
         fail("repo.ssot.RepoVersion.semver", "X.Y.Z", repo_version, rel(repo_props), "RepoVersion is not semver X.Y.Z")
     # if tag defines the release version, RepoVersion must match exactly
     if expected_version:
-        check("repo.ssot.RepoVersion", expected_version, repo_version, rel(repo_props))
+        expected_core_version = semver_core(expected_version)
+        if expected_core_version == "":
+            fail("repo.ssot.RepoVersion.tag.semver", "X.Y.Z[-prerelease]", expected_version, "env:EXPECTED_RELEASE_TAG", "Expected release version is not semver-compatible")
+        elif "-" in expected_version:
+            check("repo.ssot.RepoVersion.core", expected_core_version, repo_version, rel(repo_props))
+        else:
+            check("repo.ssot.RepoVersion", expected_version, repo_version, rel(repo_props))
 
 check_csproj_uses_repo_version(repo_root / "samples" / "PortableConsumer" / "PortableConsumer.csproj", "PortableConsumerPackageVersion")
 check_csproj_uses_repo_version(repo_root / "tests" / "PackageBacked.Tests" / "PackageBacked.Tests.csproj", "PackageBackedVersion")
@@ -210,8 +222,15 @@ if isinstance(project_files, list) and len(project_files) > 0:
             check("vbproj.Version_vs_PackageVersion", vbproj_version, vbproj_package_version, rel(project_path))
 
 if expected_version and project_path is not None and project_path.exists():
-    check("svt.tag_vs_vbproj.Version", expected_version, vbproj_version, rel(project_path))
-    check("svt.tag_vs_vbproj.PackageVersion", expected_version, vbproj_package_version, rel(project_path))
+    expected_core_version = semver_core(expected_version)
+    if expected_core_version == "":
+        fail("svt.expected_version.semver", "X.Y.Z[-prerelease]", expected_version, "env:EXPECTED_RELEASE_TAG", "Derived expected version is not semver-compatible")
+    elif "-" in expected_version:
+        check("svt.tag_core_vs_vbproj.Version", expected_core_version, vbproj_version, rel(project_path))
+        check("svt.tag_core_vs_vbproj.PackageVersion", expected_core_version, vbproj_package_version, rel(project_path))
+    else:
+        check("svt.tag_vs_vbproj.Version", expected_version, vbproj_version, rel(project_path))
+        check("svt.tag_vs_vbproj.PackageVersion", expected_version, vbproj_package_version, rel(project_path))
 
 nupkg_dir = repo_root / "artifacts" / "nuget"
 nupkg_files = sorted([p for p in nupkg_dir.glob("*.nupkg") if not p.name.endswith(".snupkg")])
