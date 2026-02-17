@@ -389,14 +389,14 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function BuildEvidenceFromEntries(
-                                                     sourceType As HashSourceType,
-                                                     label As String,
-                                                     detectedType As FileType,
-                                                     compressedBytes As Byte(),
-                                                     entries As IReadOnlyList(Of ZipExtractedEntry),
-                                                     hashOptions As HashOptions,
-                                                     notes As String
-                                                 ) As HashEvidence
+                 sourceType As HashSourceType,
+                 label As String,
+                 detectedType As FileType,
+                 compressedBytes As Byte(),
+                 entries As IReadOnlyList(Of ZipExtractedEntry),
+                 hashOptions As HashOptions,
+                 notes As String
+             ) As HashEvidence
 
             Dim normalizedEntries As List(Of NormalizedEntry) = Nothing
             Dim normalizeError As String = String.Empty
@@ -474,13 +474,13 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function BuildEvidenceFromRawPayload(
-                                                                sourceType As HashSourceType,
-                                                                label As String,
-                                                                detectedType As FileType,
-                                                                payload As Byte(),
-                                                                hashOptions As HashOptions,
-                                                                notes As String
-                                                            ) As HashEvidence
+                sourceType As HashSourceType,
+                label As String,
+                detectedType As FileType,
+                payload As Byte(),
+                hashOptions As HashOptions,
+                notes As String
+            ) As HashEvidence
 
             Dim safePayload = If(payload, Array.Empty(Of Byte)())
             Dim physicalSha = ComputeSha256Hex(safePayload)
@@ -528,10 +528,11 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Private Shared Function TryNormalizeEntries(
-                                                    entries As IReadOnlyList(Of ZipExtractedEntry),
-                                                    ByRef normalizedEntries As List(Of NormalizedEntry),
-                                                    ByRef errorMessage As String
-                                                    ) As Boolean
+                entries As IReadOnlyList(Of ZipExtractedEntry),
+                ByRef normalizedEntries As List(Of NormalizedEntry),
+                ByRef errorMessage As String
+            ) As Boolean
+
             normalizedEntries = New List(Of NormalizedEntry)()
             errorMessage = String.Empty
 
@@ -666,8 +667,12 @@ Namespace Global.Tomtastisch.FileClassifier
             Return copy
         End Function
 
-        Private Shared Function ResolveHashOptions(projectOptions As FileTypeProjectOptions,
-                                                   options As HashOptions) As HashOptions
+        Private Shared Function ResolveHashOptions _
+            (
+                projectOptions As FileTypeProjectOptions,
+                options As HashOptions
+            ) As HashOptions
+
             If options IsNot Nothing Then Return HashOptions.Normalize(options)
             If projectOptions IsNot Nothing Then _
                 Return HashOptions.Normalize(projectOptions.DeterministicHash)
