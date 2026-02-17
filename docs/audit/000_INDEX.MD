@@ -24,6 +24,9 @@ Zentrale Einstiegsseite fuer Dritte: `SECURITY_ASSURANCE_INDEX.md`.
 - `docs/audit/012_WAVE_EXECUTION_DOD.MD`
 - `docs/audit/013_SCORECARD_GOVERNANCE_ALERT_MAPPING.MD`
 - `docs/audit/014_EVIDENCE_REPORT_ISSUE_67.MD`
+- `docs/audit/compat/001_NETSTANDARD2_POLICY_SNAPSHOT.MD`
+- `docs/audit/compat/002_NETSTANDARD2_INVENTORY.MD`
+- `docs/audit/compat/003_NETSTANDARD2_COMPAT_EVIDENCE.MD`
 
 ## Maschinelle Nachweise
 - `artifacts/ci/security-claims-evidence/`

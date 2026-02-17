@@ -12,13 +12,14 @@ Heuristics for retroactive classification:
 - `docs|test|ci|chore|tooling|refactor|fix` => patch
 
 Current state:
-- Current release line contains `5.x` (latest published tag: `v5.1.4`; details in `docs/versioning/103_CHANGELOG_RELEASES.MD`).
+- Current release line contains `5.x` (release state: `v5.1.4`, next target in progress: `5.2.0`; details in `docs/versioning/103_CHANGELOG_RELEASES.MD`).
 
 Note:
 - The \"short description\" column follows the original commit/PR intent text for deterministic traceability and is not normalized to a single language.
 
 | Version | Short description | Commit | Keyword |
 |---|---|---|---|
+| `5.2.0` | Introduce netstandard2.0 compatibility layer, consolidate provider structure, and extend TFM multi-targeting | n/a (branch: `codex/chore/netstandard2-compat-structure`) | minor |
 | `5.1.4` | Refactor-Cluster 7C abgeschlossen + Qodana-Alerts auf 0 + Version-Bump fuer Release | [2adeb83](https://github.com/tomtastisch/FileClassifier/commit/2adeb83) | patch |
 | `5.1.3` | PR-Governance-Haertung (DE-Naming, PR-Template, fail-closed Gate fuer `security/code-scanning/tools = 0`) | [0b488ac](https://github.com/tomtastisch/FileClassifier/commit/0b488ac) | patch |
 | `5.1.2` | Gate4 Polling-Optimierung und Release-Haertung | [f12711d](https://github.com/tomtastisch/FileClassifier/commit/f12711d) | patch |

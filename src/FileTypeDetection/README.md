@@ -5,7 +5,7 @@ Dieses Verzeichnis stellt die öffentliche Bibliotheksoberfläche für Dateitype
 
 ## 2. Inhalt
 - Öffentliche API-Einstiegspunkte: `FileTypeDetector`, `ArchiveProcessing`, `FileMaterializer`, `FileTypeOptions`, `EvidenceHashing`.
-- Submodule für Modellklassen, Registry/Detection, Konfiguration und Infrastruktur.
+- Submodule für Modellklassen, Registry/Detection, Konfiguration, Infrastruktur, Provider-Abstraktionen und TFM-spezifische Provider.
 
 ## 3. API und Verhalten
 - `FileTypeDetector`: Typdetektion aus Pfad/Bytes, Detailnachweise und sichere Archivpfade.
@@ -34,6 +34,8 @@ flowchart LR
 - [Infrastruktur-Submodul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md)
 - [Konfiguration-Submodul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/README.md)
 - [Abstractions-Submodul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md)
+- [Composition-Submodul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Composition/README.md)
+- [Providers-Submodul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Providers/README.md)
 
 ## 7. Provenance Verification
 ```bash
