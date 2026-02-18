@@ -447,12 +447,11 @@ Namespace Global.Tomtastisch.FileClassifier
 
             If entry Is Nothing Then Return String.Empty
             If maxBytes <= 0 Then Return String.Empty
-            If entry.Length < 0 OrElse entry.Length > maxBytes Then Return String.Empty
+            If entry.Length <= 0 OrElse entry.Length > maxBytes Then Return String.Empty
 
             Try
                 Using entryStream As Stream = entry.Open()
                     buffer = New Byte(CInt(entry.Length) - 1) {}
-                    If buffer.Length = 0 Then Return String.Empty
 
                     While readTotal < buffer.Length
                         readCount = entryStream.Read(buffer, readTotal, buffer.Length - readTotal)

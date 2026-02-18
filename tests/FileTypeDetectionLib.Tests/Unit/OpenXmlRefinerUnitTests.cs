@@ -57,6 +57,17 @@ public sealed class OpenXmlRefinerUnitTests
     }
 
     [Fact]
+    public void TryRefineStream_ReturnsUnknown_WhenOpenDocumentMimeEntryIsEmpty()
+    {
+        var payload = CreateOpenDocumentPackage(string.Empty);
+        using var stream = new MemoryStream(payload, false);
+
+        var result = OpenXmlRefiner.TryRefineStream(stream);
+
+        Assert.Equal(FileKind.Unknown, result.Kind);
+    }
+
+    [Fact]
     public void TryRefineStream_ReturnsUnknown_WhenContentTypesMissing()
     {
         var payload = CreateZipWithEntries("word/document.xml");

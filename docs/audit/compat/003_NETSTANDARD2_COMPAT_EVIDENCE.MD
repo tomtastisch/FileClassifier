@@ -53,7 +53,7 @@ MSBuild-Conditionen in `src/FileTypeDetection/FileTypeDetectionLib.vbproj`:
 2. `dotnet restore FileClassifier.sln -v minimal` -> `0`
 3. `dotnet restore --locked-mode FileClassifier.sln -v minimal` -> `0`
 4. `dotnet build FileClassifier.sln -c Release --no-restore -warnaserror -v minimal` -> `0`
-5. `dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --no-build -v minimal` -> `0` (`543` Tests gruen)
+5. `dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --no-build -v minimal` -> `0` (`544` Tests gruen)
 6. `dotnet pack src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release --no-build -o artifacts/ci/netstandard2-compat/nuget -v minimal` -> `0`
 7. `dotnet build src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -f netstandard2.0 -v diag > artifacts/ci/netstandard2-compat/build-netstandard2.0.log` -> `0`
 8. `dotnet build src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -f net8.0 -v diag > artifacts/ci/netstandard2-compat/build-net8.0.log` -> `0`
