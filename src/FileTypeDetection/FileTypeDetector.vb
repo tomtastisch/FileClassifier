@@ -61,6 +61,7 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Const ReasonArchiveStructuredRefined As String = "ArchiveStructuredRefined"
         Private Const ReasonArchiveRefined As String = "ArchiveRefined"
         Private Const ReasonArchiveGeneric As String = "ArchiveGeneric"
+        Private Const ReasonOfficeBinaryRefined As String = "OfficeBinaryRefined"
 
         ''' <summary>
         '''     Setzt globale Default-Optionen als Snapshot.
@@ -276,7 +277,7 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         ''' <summary>
-        '''     Prüft fail-closed, ob eine Datei einen sicheren Archiv-Container repräsentiert.
+        '''     Prüft fail-closed, ob eine Datei ein sicheres, extrahierbares Archiv repräsentiert.
         ''' </summary>
         ''' <remarks>
         '''     <para>
@@ -290,7 +291,7 @@ Namespace Global.Tomtastisch.FileClassifier
         '''     </para>
         ''' </remarks>
         ''' <param name="path">Dateipfad der zu validierenden Archivdatei.</param>
-        ''' <returns><c>True</c>, wenn der Container valide und sicher ist; andernfalls <c>False</c>.</returns>
+        ''' <returns><c>True</c>, wenn Typprüfung und Safety-Gate für ein extrahierbares Archiv bestehen; sonst <c>False</c>.</returns>
         Public Shared Function TryValidateArchive _
             (
                 path As String
@@ -298,9 +299,12 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Dim opt As FileTypeProjectOptions = GetDefaultOptions()
             Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
+            Dim detected As FileType
 
             ' Guard-Clauses: Pfad und Dateiexistenz.
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then Return False
+            detected = DetectPathCore(path)
+            If Not IsArchiveContainerKind(detected.Kind) Then Return False
 
             Try
                 ' describe -> safety gate.
@@ -325,6 +329,11 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Führt die Pfad-Detektion ohne Endungs-Policy aus und liefert nur das inhaltsbasierte Ergebnis.
+        ''' </summary>
+        ''' <param name="path">Pfad zur zu erkennenden Datei.</param>
+        ''' <returns>Erkannter Typ oder <see cref="FileKind.Unknown"/>.</returns>
         Private Shared Function DetectPathCore(
                 path As String
             ) As FileType
@@ -334,6 +343,17 @@ Namespace Global.Tomtastisch.FileClassifier
             Return DetectPathCoreWithTrace(path, opt, trace)
         End Function
 
+        ''' <summary>
+        '''     Kernpfad für inhaltsbasierte Dateityperkennung inklusive Trace-Erfassung.
+        ''' </summary>
+        ''' <remarks>
+        '''     Die Funktion kapselt File-Guards, Header-Lesen und die zentrale Header-/Archiv-Auflösung.
+        '''     Fehlerpfade bleiben fail-closed und setzen den passenden Reason-Code.
+        ''' </remarks>
+        ''' <param name="path">Dateipfad der Quelldatei.</param>
+        ''' <param name="opt">Options-Snapshot für Größen- und Sicherheitsgrenzen.</param>
+        ''' <param name="trace">Rückkanal für auditierbare Entscheidungsinformationen.</param>
+        ''' <returns>Erkannter Typ oder <see cref="FileKind.Unknown"/>.</returns>
         Private Shared Function DetectPathCoreWithTrace(
                 path As String,
                 opt As FileTypeProjectOptions,
@@ -439,7 +459,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </remarks>
         ''' <param name="path">Pfad zur Archivdatei.</param>
         ''' <param name="destinationDirectory">Leeres, noch nicht existierendes Zielverzeichnis.</param>
-        ''' <param name="verifyBeforeExtract"><c>True</c> aktiviert eine vorgelagerte Typprüfung über <c>Detect(path)</c>.</param>
+        ''' <param name="verifyBeforeExtract"><c>True</c> aktiviert zusätzlich eine vollständige Vorvalidierung über <see cref="TryValidateArchive(String)"/>.</param>
         ''' <returns><c>True</c> bei erfolgreichem, atomarem Entpacken; sonst <c>False</c>.</returns>
         Public Function ExtractArchiveSafe _
             (
@@ -491,7 +511,7 @@ Namespace Global.Tomtastisch.FileClassifier
         '''     </para>
         ''' </remarks>
         ''' <param name="path">Pfad zur Archivdatei.</param>
-        ''' <param name="verifyBeforeExtract"><c>True</c> aktiviert eine vorgelagerte Typprüfung über <c>Detect(path)</c>.</param>
+        ''' <param name="verifyBeforeExtract"><c>True</c> aktiviert zusätzlich eine vollständige Vorvalidierung über <see cref="TryValidateArchive(String)"/>.</param>
         ''' <returns>Read-only Liste extrahierter Einträge oder leer bei Fehler.</returns>
         Public Function ExtractArchiveSafeToMemory _
             (
@@ -529,6 +549,12 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Byte-basierte Detektion mit denselben Sicherheitsgrenzen wie die Pfadvariante.
+        ''' </summary>
+        ''' <param name="data">Zu detektierende Nutzdaten.</param>
+        ''' <param name="opt">Options-Snapshot mit Maximalgrenzen.</param>
+        ''' <returns>Erkannter Typ oder <see cref="FileKind.Unknown"/>.</returns>
         Private Shared Function DetectInternalBytes(
                 data As Byte(),
                 opt As FileTypeProjectOptions
@@ -579,7 +605,11 @@ Namespace Global.Tomtastisch.FileClassifier
                              End Function,
                 tryRefine:=Function()
                                Return OpenXmlRefiner.TryRefineStream(fs)
-                           End Function)
+                           End Function,
+                tryRefineLegacyOffice:=Function()
+                                           Return LegacyOfficeBinaryRefiner.TryRefineStream(
+                                               fs, ResolveLegacyOfficeProbeBytes(opt))
+                                       End Function)
         End Function
 
         ''' <summary>
@@ -606,20 +636,43 @@ Namespace Global.Tomtastisch.FileClassifier
                                Using ms = CreateReadOnlyMemoryStream(data)
                                    Return OpenXmlRefiner.TryRefineStream(ms)
                                End Using
-                           End Function)
+                           End Function,
+                tryRefineLegacyOffice:=Function()
+                                           Return LegacyOfficeBinaryRefiner.TryRefineBytes(data)
+                                       End Function)
         End Function
 
+        ''' <summary>
+        '''     Zentraler Entscheidungsfluss für Header-/Archiv-/Refinement-Pfade.
+        ''' </summary>
+        ''' <remarks>
+        '''     Reihenfolge:
+        '''     1) direkte Header-Matches,
+        '''     2) Legacy-Office-Refinement (OLE),
+        '''     3) Archiv-Beschreibung + Safety-Gate,
+        '''     4) optionales strukturiertes ZIP-Refinement.
+        ''' </remarks>
+        ''' <param name="header">Gelesene Header-Bytes.</param>
+        ''' <param name="opt">Options-Snapshot.</param>
+        ''' <param name="trace">Audit-Trace.</param>
+        ''' <param name="tryDescribe">Archiv-Descriptor-Factory.</param>
+        ''' <param name="tryValidate">Archiv-Safety-Validator.</param>
+        ''' <param name="tryRefine">ZIP-basiertes Office/OpenDocument-Refinement.</param>
+        ''' <param name="tryRefineLegacyOffice">OLE-basiertes Legacy-Office-Refinement.</param>
+        ''' <returns>Erkannter Dateityp oder <see cref="FileKind.Unknown"/>.</returns>
         Private Shared Function ResolveByHeaderCommon(
                                                header As Byte(),
                                                opt As FileTypeProjectOptions,
                                                ByRef trace As DetectionTrace,
                                                tryDescribe As Func(Of ArchiveDescriptor),
                                                tryValidate As Func(Of ArchiveDescriptor, Boolean),
-                                               tryRefine As Func(Of FileType)
+                                               tryRefine As Func(Of FileType),
+                                               tryRefineLegacyOffice As Func(Of FileType)
                                                ) As FileType
 
             Dim magicKind As FileKind
             Dim descriptor As ArchiveDescriptor
+            Dim legacyOfficeType As FileType
 
             If header Is Nothing OrElse header.Length = 0 Then
                 trace.ReasonCode = ReasonHeaderUnknown
@@ -630,6 +683,14 @@ Namespace Global.Tomtastisch.FileClassifier
             If magicKind <> FileKind.Unknown AndAlso magicKind <> FileKind.Zip Then
                 trace.ReasonCode = ReasonHeaderMatch
                 Return FileTypeRegistry.Resolve(magicKind)
+            End If
+
+            If magicKind = FileKind.Unknown AndAlso LegacyOfficeBinaryRefiner.IsOleCompoundHeader(header) Then
+                legacyOfficeType = tryRefineLegacyOffice()
+                If legacyOfficeType.Kind <> FileKind.Unknown Then
+                    trace.ReasonCode = ReasonOfficeBinaryRefined
+                    Return legacyOfficeType
+                End If
             End If
 
             If magicKind = FileKind.Zip Then
@@ -650,6 +711,21 @@ Namespace Global.Tomtastisch.FileClassifier
             End If
 
             Return ResolveAfterArchiveGate(magicKind, opt, trace, tryRefine)
+        End Function
+
+        ''' <summary>
+        '''     Ermittelt die maximale Probegröße für Legacy-OLE-Refinement.
+        ''' </summary>
+        ''' <param name="opt">Options-Snapshot oder <c>Nothing</c>.</param>
+        ''' <returns>Probegröße in Byte, defensiv begrenzt auf 1 MiB.</returns>
+        Private Shared Function ResolveLegacyOfficeProbeBytes(opt As FileTypeProjectOptions) As Integer
+            Dim maxProbe As Long
+
+            If opt Is Nothing Then Return 1048576
+
+            maxProbe = Math.Min(opt.MaxBytes, 1048576L)
+            If maxProbe <= 0 Then Return 1048576
+            Return CInt(maxProbe)
         End Function
 
         Private Shared Function TryDescribeArchiveStreamDescriptor(
@@ -745,10 +821,15 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return False
             End If
 
+            detected = Detect(path)
+            If Not IsArchiveContainerKind(detected.Kind) Then
+                LogGuard.Warn(opt.Logger, $"[ArchiveExtract] Kein extrahierbarer Archivtyp ({detected.Kind}).")
+                Return False
+            End If
+
             If verifyBeforeExtract Then
-                detected = Detect(path)
-                If Not IsArchiveContainerKind(detected.Kind) Then
-                    LogGuard.Warn(opt.Logger, $"[ArchiveExtract] Vorprüfung fehlgeschlagen ({detected.Kind}).")
+                If Not TryValidateArchive(path) Then
+                    LogGuard.Warn(opt.Logger, "[ArchiveExtract] Vorvalidierung fehlgeschlagen.")
                     Return False
                 End If
             End If
@@ -756,6 +837,13 @@ Namespace Global.Tomtastisch.FileClassifier
             Return True
         End Function
 
+        ''' <summary>
+        '''     Wendet optional die Endungs-Policy auf ein inhaltsbasiertes Detektionsergebnis an.
+        ''' </summary>
+        ''' <param name="path">Dateipfad der Quelldatei.</param>
+        ''' <param name="detected">Inhaltsbasiert erkannter Typ.</param>
+        ''' <param name="verifyExtension"><c>True</c> aktiviert die Endungsprüfung.</param>
+        ''' <returns>Detektierter Typ oder <see cref="FileKind.Unknown"/> bei aktivem Mismatch.</returns>
         Private Shared Function ApplyExtensionPolicy(path As String, detected As FileType, verifyExtension As Boolean) _
             As FileType
 
@@ -764,12 +852,14 @@ Namespace Global.Tomtastisch.FileClassifier
             Return UnknownType()
         End Function
 
+        ''' <summary>
+        '''     Prüft, ob ein erkannter Typ ein tatsächlich extrahierbarer Archivcontainer ist.
+        ''' </summary>
+        ''' <param name="kind">Erkannter Dateityp.</param>
+        ''' <returns><c>True</c> für extrahierbare Archivtypen, sonst <c>False</c>.</returns>
         Private Shared Function IsArchiveContainerKind(kind As FileKind) As Boolean
 
-            Return kind = FileKind.Zip OrElse
-                   kind = FileKind.Docx OrElse
-                   kind = FileKind.Xlsx OrElse
-                   kind = FileKind.Pptx
+            Return kind = FileKind.Zip
         End Function
 
         Private Shared Sub WarnIfNoDirectContentDetection(kind As FileKind, opt As FileTypeProjectOptions)

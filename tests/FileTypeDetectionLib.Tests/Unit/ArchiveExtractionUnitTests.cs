@@ -60,6 +60,57 @@ public sealed class ArchiveExtractionUnitTests
     }
 
     [Fact]
+    public void ExtractArchiveSafe_Fails_PreVerification_ForDocxPayloadWithPdfExtension()
+    {
+        using var tempRoot = TestTempPaths.CreateScope("ftd-extract-docx-as-pdf");
+        var disguisedPath = Path.Combine(tempRoot.RootPath, "looks-like-pdf.pdf");
+        File.Copy(TestResources.Resolve("sample.docx"), disguisedPath);
+        var destination = Path.Combine(tempRoot.RootPath, "out");
+
+        var ok = new FileTypeDetector().ExtractArchiveSafe(disguisedPath, destination, true);
+
+        Assert.False(ok);
+        Assert.False(Directory.Exists(destination));
+    }
+
+    [Fact]
+    public void ExtractArchiveSafe_Fails_PreVerification_ForDocxInput()
+    {
+        var source = TestResources.Resolve("sample.docx");
+        using var tempRoot = TestTempPaths.CreateScope("ftd-extract-docx");
+        var destination = Path.Combine(tempRoot.RootPath, "out");
+
+        var ok = new FileTypeDetector().ExtractArchiveSafe(source, destination, true);
+
+        Assert.False(ok);
+        Assert.False(Directory.Exists(destination));
+    }
+
+    [Fact]
+    public void ExtractArchiveSafeToMemory_Fails_PreVerification_ForDocxPayloadWithPdfExtension()
+    {
+        using var tempRoot = TestTempPaths.CreateScope("ftd-extract-mem-docx-as-pdf");
+        var disguisedPath = Path.Combine(tempRoot.RootPath, "looks-like-pdf.pdf");
+        File.Copy(TestResources.Resolve("sample.docx"), disguisedPath);
+
+        var entries = new FileTypeDetector().ExtractArchiveSafeToMemory(disguisedPath, true);
+
+        Assert.NotNull(entries);
+        Assert.Empty(entries);
+    }
+
+    [Fact]
+    public void ExtractArchiveSafeToMemory_Fails_PreVerification_ForDocxInput()
+    {
+        var source = TestResources.Resolve("sample.docx");
+
+        var entries = new FileTypeDetector().ExtractArchiveSafeToMemory(source, true);
+
+        Assert.NotNull(entries);
+        Assert.Empty(entries);
+    }
+
+    [Fact]
     public void ExtractArchiveSafe_Fails_ForRootDestinationPath()
     {
         var source = TestResources.Resolve("sample.zip");

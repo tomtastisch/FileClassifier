@@ -206,6 +206,30 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
         Assert.True(okAlias);
     }
 
+    [Theory]
+    [InlineData("file.doc", FileKind.Docx)]
+    [InlineData("file.docm", FileKind.Docx)]
+    [InlineData("file.docx", FileKind.Docx)]
+    [InlineData("file.odt", FileKind.Docx)]
+    [InlineData("file.xls", FileKind.Xlsx)]
+    [InlineData("file.xlsm", FileKind.Xlsx)]
+    [InlineData("file.xlsx", FileKind.Xlsx)]
+    [InlineData("file.xlsb", FileKind.Xlsx)]
+    [InlineData("file.ods", FileKind.Xlsx)]
+    [InlineData("file.ppt", FileKind.Pptx)]
+    [InlineData("file.pptm", FileKind.Pptx)]
+    [InlineData("file.pptx", FileKind.Pptx)]
+    [InlineData("file.odp", FileKind.Pptx)]
+    public void ExtensionMatchesKind_AcceptsOfficeVariantAliases(string path, FileKind expectedKind)
+    {
+        var method =
+            typeof(FileTypeDetector).GetMethod("ExtensionMatchesKind", BindingFlags.NonPublic | BindingFlags.Static)!;
+        Assert.NotNull(method);
+
+        var matches = TestGuard.Unbox<bool>(method.Invoke(null, new object[] { path, expectedKind }));
+        Assert.True(matches);
+    }
+
     [Fact]
     public void ReadHeader_ReturnsEmpty_ForWriteOnlyStream()
     {
