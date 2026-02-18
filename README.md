@@ -44,7 +44,7 @@ EXPECTED_VERSION=X.Y.Z bash tools/ci/verify_nuget_release.sh
 ## 5. Compatibility / TFMs
 - Library-Zielplattformen: `netstandard2.0`, `net8.0` und `net10.0`
 - Release-Versioning: Git-Tag `vX.Y.Z` (optional `-prerelease`) ist SSOT
-- Aktueller Pre-Release-Kanal der `5.2.0`-Linie: `v5.2.0-rc.6`
+- Aktueller stabiler Release-Tag: `v5.2.0`
 
 ## 6. Architekturüberblick
 ### 6.1 Kernklassen (Datenfluss)
