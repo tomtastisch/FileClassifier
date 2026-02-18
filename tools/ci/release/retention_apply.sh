@@ -67,11 +67,50 @@ mapfile -t RELEASE_ROWS < <(gh api "/repos/${REPO}/releases" --paginate | jq -r 
 mapfile -t NUGET_VERSIONS < <(curl -fsSL "https://api.nuget.org/v3-flatcontainer/${NUGET_PACKAGE_ID}/index.json" | jq -r '.versions[]' || true)
 
 # GH packages versions (user endpoint by default; fallback org endpoint)
-PACKAGE_LIST_ENDPOINT="/users/${OWNER}/packages/nuget/${PACKAGE_ID}/versions"
-if ! gh api "${PACKAGE_LIST_ENDPOINT}" >/dev/null 2>&1; then
-  PACKAGE_LIST_ENDPOINT="/orgs/${OWNER}/packages/nuget/${PACKAGE_ID}/versions"
+PACKAGE_ROWS=()
+PACKAGE_LIST_ENDPOINT=""
+fetch_package_rows() {
+  local endpoint="${1}"
+  local out_file err_file rc
+  out_file="$(mktemp)"
+  err_file="$(mktemp)"
+  if gh api "${endpoint}" --paginate --jq '.[] | [.id, .name] | @tsv' >"${out_file}" 2>"${err_file}"; then
+    mapfile -t PACKAGE_ROWS < "${out_file}"
+    rm -f "${out_file}" "${err_file}"
+    PACKAGE_LIST_ENDPOINT="${endpoint}"
+    return 0
+  else
+    rc=$?
+  fi
+  if grep -Eqi '(404|not found)' "${err_file}"; then
+    rm -f "${out_file}" "${err_file}"
+    return 4
+  fi
+  echo "FAIL: gh api failed for package list endpoint ${endpoint} (rc=${rc})" >&2
+  cat "${err_file}" >&2
+  rm -f "${out_file}" "${err_file}"
+  return "${rc}"
+}
+
+if fetch_package_rows "/users/${OWNER}/packages/nuget/${PACKAGE_ID}/versions"; then
+  :
+else
+  rc=$?
+  if [[ "${rc}" -eq 4 ]]; then
+    if fetch_package_rows "/orgs/${OWNER}/packages/nuget/${PACKAGE_ID}/versions"; then
+      :
+    else
+      rc=$?
+      if [[ "${rc}" -eq 4 ]]; then
+        echo "INFO: GH Packages endpoint not found for ${PACKAGE_ID}; skipping GH Packages retention" >&2
+      else
+        exit "${rc}"
+      fi
+    fi
+  else
+    exit "${rc}"
+  fi
 fi
-mapfile -t PACKAGE_ROWS < <(gh api "${PACKAGE_LIST_ENDPOINT}" --paginate | jq -r '.[] | [.id, .name] | @tsv' || true)
 
 {
   echo '{'

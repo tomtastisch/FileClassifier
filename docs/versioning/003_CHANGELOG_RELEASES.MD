@@ -29,7 +29,7 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 - Docs/CI/Tooling:
   - NuGet-Trusted-Publishing-Doku (DE/EN) und Root-README auf den angepassten Gate-4-Ablauf aktualisiert.
   - Commit-Referenz fuer Version 5.2.0 in Versionshistorie (DE/EN) hinzugefuegt.
-  - Retention-Workflow auf OIDC-Key-Fallback (`NuGet/login`) fuer NuGet-Unlist umgestellt.
+  - Retention-Workflow auf Secret-basiertes NuGet-Unlist (`NUGET_API_KEY`) gehaertet; OIDC bleibt auf `release.yml` beschraenkt.
 
 ## [5.1.4]
 - Changed:

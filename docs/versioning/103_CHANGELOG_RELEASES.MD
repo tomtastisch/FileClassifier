@@ -28,7 +28,7 @@ All changes are documented here in technical terms. The release version itself i
 - Docs/CI/Tooling:
   - Updated NuGet trusted-publishing docs (DE/EN) and root README for the adjusted Gate 4 behavior.
   - Added commit reference for version 5.2.0 in version history (DE/EN).
-  - Switched retention workflow to OIDC key fallback (`NuGet/login`) for NuGet unlist operations.
+  - Hardened retention workflow to secret-based NuGet unlist (`NUGET_API_KEY`); OIDC remains scoped to `release.yml`.
 
 ## [5.1.4]
 - Changed:
