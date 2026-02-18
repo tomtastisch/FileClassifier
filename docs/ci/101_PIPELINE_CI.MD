@@ -103,4 +103,4 @@ Qodana runs in a separate workflow and is validated by `run.sh qodana`:
 - Qodana action execution and SARIF output path (`.github/workflows/qodana.yml:34-40`, `.github/workflows/qodana.yml:59`).
 - Contract check invocation (`.github/workflows/qodana.yml:47-48`, `tools/ci/bin/run.sh:402-422`).
 - Qodana artifact upload (`.github/workflows/qodana.yml:54-60`).
-- Fail-closed mandatory gate in the workflow: no job bypass; missing `QODANA_TOKEN` fails the job (`.github/workflows/qodana.yml:14-32`).
+- Fail-closed mandatory gate in trusted contexts: `QODANA_TOKEN` is enforced for `push` and internal PRs, while untrusted PR contexts (fork/dependabot) are explicitly excluded (`.github/workflows/qodana.yml:14-33`).

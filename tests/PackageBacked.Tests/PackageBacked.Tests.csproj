@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <!-- Keep net10 only: package-backed xUnit v3 execution in CI requires apphost/runtimeconfig generation path that is stable on net10. -->
     <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <UseAppHost>true</UseAppHost>

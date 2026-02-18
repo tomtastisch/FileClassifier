@@ -119,6 +119,55 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
     End Class
 
+    Friend NotInheritable Class ArchiveSharpCompressCompat
+        Private Sub New()
+        End Sub
+
+        Friend Shared Function OpenArchive(stream As Stream) As SharpCompress.Archives.IArchive
+            Try
+                Dim options = New SharpCompress.Readers.ReaderOptions() With {.LeaveStreamOpen = True}
+                Return SharpCompress.Archives.ArchiveFactory.OpenArchive(stream, options)
+            Catch ex As Exception When _
+                TypeOf ex Is InvalidOperationException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException
+                Return Nothing
+            End Try
+        End Function
+
+        Friend Shared Function OpenArchiveForContainer(stream As Stream,
+                                                       containerTypeValue As ArchiveContainerType) _
+            As SharpCompress.Archives.IArchive
+            If containerTypeValue = ArchiveContainerType.GZip Then
+                Dim gzipArchive = OpenGZipArchive(stream)
+                If gzipArchive IsNot Nothing Then Return gzipArchive
+            End If
+            Return OpenArchive(stream)
+        End Function
+
+        Friend Shared Function HasGZipMagic(stream As Stream) As Boolean
+            If stream Is Nothing OrElse Not stream.CanRead Then Return False
+            If Not stream.CanSeek Then Return False
+            If stream.Length < 2 Then Return False
+
+            Dim first = stream.ReadByte()
+            Dim second = stream.ReadByte()
+            Return first = &H1F AndAlso second = &H8B
+        End Function
+
+        Private Shared Function OpenGZipArchive(stream As Stream) As SharpCompress.Archives.IArchive
+            Try
+                Dim options = New SharpCompress.Readers.ReaderOptions() With {.LeaveStreamOpen = True}
+                Return SharpCompress.Archives.GZip.GZipArchive.OpenArchive(stream, options)
+            Catch ex As Exception When _
+                TypeOf ex Is InvalidOperationException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException
+                Return Nothing
+            End Try
+        End Function
+    End Class
+
     ''' <summary>
     '''     Interne Hilfsklasse <c>ArchiveTypeResolver</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
     ''' </summary>
@@ -162,9 +211,9 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Try
                 StreamGuard.RewindToStart(stream)
-                gzipWrapped = HasGZipMagic(stream)
+                gzipWrapped = ArchiveSharpCompressCompat.HasGZipMagic(stream)
                 StreamGuard.RewindToStart(stream)
-                Using archive = OpenArchiveCompat(stream)
+                Using archive = ArchiveSharpCompressCompat.OpenArchive(stream)
                     If archive Is Nothing Then Return False
 
                     mapped = MapArchiveType(archive.Type)
@@ -219,28 +268,6 @@ Namespace Global.Tomtastisch.FileClassifier
                 Case Else
                     Return ArchiveContainerType.Unknown
             End Select
-        End Function
-
-        Private Shared Function OpenArchiveCompat(stream As Stream) As SharpCompress.Archives.IArchive
-            Try
-                Dim options = New SharpCompress.Readers.ReaderOptions() With {.LeaveStreamOpen = True}
-                Return SharpCompress.Archives.ArchiveFactory.OpenArchive(stream, options)
-            Catch ex As Exception When _
-                TypeOf ex Is InvalidOperationException OrElse
-                TypeOf ex Is NotSupportedException OrElse
-                TypeOf ex Is ArgumentException
-                Return Nothing
-            End Try
-        End Function
-
-        Private Shared Function HasGZipMagic(stream As Stream) As Boolean
-            If stream Is Nothing OrElse Not stream.CanRead Then Return False
-            If Not stream.CanSeek Then Return False
-            If stream.Length < 2 Then Return False
-
-            Dim first = stream.ReadByte()
-            Dim second = stream.ReadByte()
-            Return first = &H1F AndAlso second = &H8B
         End Function
 
     End Class
@@ -584,31 +611,6 @@ Namespace Global.Tomtastisch.FileClassifier
             Return opt.AllowUnknownArchiveEntrySize
         End Function
 
-        Private Shared Function TryProbeEntrySizeWithinLimit(entry As IArchiveEntryModel, maxBytes As Long) As Boolean
-            If entry Is Nothing Then Return False
-            If maxBytes <= 0 Then Return False
-
-            Try
-                Using source = entry.OpenStream()
-                    If source Is Nothing OrElse Not source.CanRead Then Return False
-                    Using sink As New MemoryStream()
-                        StreamBounds.CopyBounded(source, sink, maxBytes)
-                    End Using
-                End Using
-                Return True
-            Catch ex As Exception When _
-                TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
-                TypeOf ex Is IOException OrElse
-                TypeOf ex Is InvalidDataException OrElse
-                TypeOf ex Is NotSupportedException OrElse
-                TypeOf ex Is ArgumentException OrElse
-                TypeOf ex Is InvalidOperationException OrElse
-                TypeOf ex Is ObjectDisposedException
-                Return False
-            End Try
-        End Function
-
         Private Shared Function EnsureTrailingSeparator(dirPath As String) As String
             If String.IsNullOrEmpty(dirPath) Then Return Path.DirectorySeparatorChar.ToString()
             If dirPath.EndsWith(Path.DirectorySeparatorChar) OrElse dirPath.EndsWith(Path.AltDirectorySeparatorChar) _
@@ -736,7 +738,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Try
                 StreamGuard.RewindToStart(stream)
-                gzipWrapped = HasGZipMagic(stream)
+                gzipWrapped = ArchiveSharpCompressCompat.HasGZipMagic(stream)
                 StreamGuard.RewindToStart(stream)
                 If containerTypeValue = ArchiveContainerType.GZip AndAlso Not gzipWrapped Then Return False
 
@@ -806,45 +808,7 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Shared Function OpenArchiveForContainerCompat(stream As Stream,
                                                               containerTypeValue As ArchiveContainerType) _
             As SharpCompress.Archives.IArchive
-            If containerTypeValue = ArchiveContainerType.GZip Then
-                Dim gzipArchive = OpenGZipArchiveCompat(stream)
-                If gzipArchive IsNot Nothing Then Return gzipArchive
-            End If
-            Return OpenArchiveCompat(stream)
-        End Function
-
-        Private Shared Function OpenArchiveCompat(stream As Stream) As SharpCompress.Archives.IArchive
-            Try
-                Dim options = New SharpCompress.Readers.ReaderOptions() With {.LeaveStreamOpen = True}
-                Return SharpCompress.Archives.ArchiveFactory.OpenArchive(stream, options)
-            Catch ex As Exception When _
-                TypeOf ex Is InvalidOperationException OrElse
-                TypeOf ex Is NotSupportedException OrElse
-                TypeOf ex Is ArgumentException
-                Return Nothing
-            End Try
-        End Function
-
-        Private Shared Function OpenGZipArchiveCompat(stream As Stream) As SharpCompress.Archives.IArchive
-            Try
-                Dim options = New SharpCompress.Readers.ReaderOptions() With {.LeaveStreamOpen = True}
-                Return SharpCompress.Archives.GZip.GZipArchive.OpenArchive(stream, options)
-            Catch ex As Exception When _
-                TypeOf ex Is InvalidOperationException OrElse
-                TypeOf ex Is NotSupportedException OrElse
-                TypeOf ex Is ArgumentException
-                Return Nothing
-            End Try
-        End Function
-
-        Private Shared Function HasGZipMagic(stream As Stream) As Boolean
-            If stream Is Nothing OrElse Not stream.CanRead Then Return False
-            If Not stream.CanSeek Then Return False
-            If stream.Length < 2 Then Return False
-
-            Dim first = stream.ReadByte()
-            Dim second = stream.ReadByte()
-            Return first = &H1F AndAlso second = &H8B
+            Return ArchiveSharpCompressCompat.OpenArchiveForContainer(stream, containerTypeValue)
         End Function
 
         Private Shared Function TryProcessNestedGArchive(
