@@ -68,10 +68,16 @@ mapfile -t NUGET_VERSIONS < <(curl -fsSL "https://api.nuget.org/v3-flatcontainer
 
 # GH packages versions (user endpoint by default; fallback org endpoint)
 PACKAGE_LIST_ENDPOINT="/users/${OWNER}/packages/nuget/${PACKAGE_ID}/versions"
-if ! gh api "${PACKAGE_LIST_ENDPOINT}" >/dev/null 2>&1; then
+if gh api "${PACKAGE_LIST_ENDPOINT}" >/dev/null 2>&1; then
+  mapfile -t PACKAGE_ROWS < <(gh api "${PACKAGE_LIST_ENDPOINT}" --paginate --jq '.[] | [.id, .name] | @tsv')
+else
   PACKAGE_LIST_ENDPOINT="/orgs/${OWNER}/packages/nuget/${PACKAGE_ID}/versions"
+  if gh api "${PACKAGE_LIST_ENDPOINT}" >/dev/null 2>&1; then
+    mapfile -t PACKAGE_ROWS < <(gh api "${PACKAGE_LIST_ENDPOINT}" --paginate --jq '.[] | [.id, .name] | @tsv')
+  else
+    PACKAGE_ROWS=()
+  fi
 fi
-mapfile -t PACKAGE_ROWS < <(gh api "${PACKAGE_LIST_ENDPOINT}" --paginate | jq -r '.[] | [.id, .name] | @tsv' || true)
 
 {
   echo '{'
