@@ -51,10 +51,15 @@ declare -A KEEP_TAGS=()
 [[ -n "${PREV_STABLE}" ]] && KEEP_TAGS["${PREV_STABLE}"]=1
 [[ -n "${BASELINE}" ]] && KEEP_TAGS["${BASELINE}"]=1
 
-# Keep an RC only while there is no stable release yet.
-# After a stable tag exists, all RCs are subject to retention cleanup.
-if [[ -z "${LATEST_STABLE}" && -n "${LATEST_RC}" ]]; then
-  KEEP_TAGS["${LATEST_RC}"]=1
+# Keep the latest RC when it belongs to a newer version line than the latest stable.
+# RCs that match an already published stable version line are subject to cleanup.
+if [[ -n "${LATEST_RC}" ]]; then
+  latest_rc_core="${LATEST_RC%%-rc.*}"
+  if [[ -z "${LATEST_STABLE}" ]]; then
+    KEEP_TAGS["${LATEST_RC}"]=1
+  elif [[ "${latest_rc_core#v}" != "${LATEST_STABLE#v}" ]] && [[ "$(printf '%s\n%s\n' "${LATEST_STABLE#v}" "${latest_rc_core#v}" | sort -V | tail -n1)" == "${latest_rc_core#v}" ]]; then
+    KEEP_TAGS["${LATEST_RC}"]=1
+  fi
 fi
 
 # GH releases actions

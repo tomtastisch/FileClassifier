@@ -22,7 +22,7 @@ All changes are documented here in technical terms. The release version itself i
     - longer retry window,
     - `registration` decoupled by default for `vX.Y.Z-<label>`,
     - still fail-closed on `flatcontainer`.
-  - Updated release retention (`tools/ci/release/retention_apply.sh`) so RC versions are no longer kept once a stable tag exists.
+  - Updated release retention (`tools/ci/release/retention_apply.sh`) so RCs for an already released stable base version are cleaned up, while the latest RC of a higher upcoming version is kept.
 - Fixed:
   - Resolved release blocker where pre-release publishing failed due delayed registration visibility despite successful push.
 - Docs/CI/Tooling:
