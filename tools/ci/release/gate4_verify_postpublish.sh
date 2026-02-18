@@ -8,8 +8,9 @@ if [[ "${expected_version}" == *-* ]]; then
   is_prerelease="1"
 fi
 
-# Stable NuGet registration can lag several minutes after push; keep fail-closed
-# but allow enough convergence time before declaring a hard failure.
+# Stable NuGet registration can lag for tens of minutes after push; keep fail-closed
+# and allow enough convergence time before declaring a hard failure (stable schedule
+# below currently sums to ~29 minutes of potential wait time).
 default_retry_schedule_stable="2,3,5,8,13,21,34,55,89,144,233,377,377,377"
 default_retry_schedule_prerelease="2,3,5,8,13,21,34,55,89,144,233,377"
 if [[ "${is_prerelease}" == "1" ]]; then
