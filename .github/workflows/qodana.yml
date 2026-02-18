@@ -12,7 +12,6 @@ permissions:
 
 jobs:
   qodana:
-    if: github.event_name != 'pull_request' || github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -26,9 +25,7 @@ jobs:
           fetch-depth: 0
 
       - name: Assert QODANA_TOKEN present
-        # Fail-closed for push/workflow_dispatch AND same-repo PRs.
-        # Do not fail fork PRs (secrets not provided there).
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
+        # Fail-closed in CI: Qodana is a required security gate.
         shell: bash
         run: |
           test -n "${QODANA_TOKEN:-}" || (echo "FAIL: QODANA_TOKEN missing" >&2; exit 1)

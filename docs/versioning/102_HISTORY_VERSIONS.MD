@@ -12,13 +12,14 @@ Heuristics for retroactive classification:
 - `docs|test|ci|chore|tooling|refactor|fix` => patch
 
 Current state:
-- Current release line contains `5.x` (current stable state: `v5.2.0`; details in `docs/versioning/103_CHANGELOG_RELEASES.MD`).
+- Current release line contains `5.x` (current working state: `v5.2.1`; details in `docs/versioning/103_CHANGELOG_RELEASES.MD`).
 
 Note:
 - The \"short description\" column follows the original commit/PR intent text for deterministic traceability and is not normalized to a single language.
 
 | Version | Short description | Commit | Keyword |
 |---|---|---|---|
+| `5.2.1` | Switched SharpCompress calls to type-safe APIs, hardened tar.gz fail-closed handling, and enforced/documented Qodana CI as a mandatory gate | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v5.2.0...HEAD) | patch |
 | `5.2.0` | Introduce netstandard2.0 compatibility layer, consolidate provider structure, and extend TFM multi-targeting | [8d65a52](https://github.com/tomtastisch/FileClassifier/commit/8d65a52) | minor |
 | `5.1.4` | Refactor-Cluster 7C abgeschlossen + Qodana-Alerts auf 0 + Version-Bump fuer Release | [2adeb83](https://github.com/tomtastisch/FileClassifier/commit/2adeb83) | patch |
 | `5.1.3` | PR-Governance-Haertung (DE-Naming, PR-Template, fail-closed Gate fuer `security/code-scanning/tools = 0`) | [0b488ac](https://github.com/tomtastisch/FileClassifier/commit/0b488ac) | patch |

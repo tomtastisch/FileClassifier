@@ -1,6 +1,7 @@
 using System.Text;
 using SharpCompress.Archives;
 using SharpCompress.Common;
+using SharpCompress.Readers;
 using SharpCompress.Writers;
 using Tomtastisch.FileClassifier;
 
@@ -13,7 +14,7 @@ public sealed class SharpCompressEntryModelNonNullUnitTests
     {
         var payload = CreateTarWithEntry("note.txt", "hello");
         using var stream = new MemoryStream(payload, false);
-        using var archive = ArchiveFactory.Open(stream);
+        using var archive = ArchiveFactory.OpenArchive(stream, new ReaderOptions { LeaveStreamOpen = true });
 
         var entry = archive.Entries.First();
         var model = new SharpCompressEntryModel(entry);
@@ -30,7 +31,7 @@ public sealed class SharpCompressEntryModelNonNullUnitTests
     private static byte[] CreateTarWithEntry(string name, string content)
     {
         using var ms = new MemoryStream();
-        using (var writer = WriterFactory.Open(ms, ArchiveType.Tar, new WriterOptions(CompressionType.None)))
+        using (var writer = WriterFactory.OpenWriter(ms, ArchiveType.Tar, new WriterOptions(CompressionType.None)))
         using (var data = new MemoryStream(Encoding.UTF8.GetBytes(content)))
         {
             writer.Write(name, data, DateTime.UnixEpoch);

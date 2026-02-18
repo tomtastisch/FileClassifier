@@ -109,7 +109,7 @@ public sealed class SharpCompressArchiveBackendUnitTests
     private static byte[] CreateTarWithEntries(int entryCount, int entrySize)
     {
         using var ms = new MemoryStream();
-        using (var writer = WriterFactory.Open(ms, ArchiveType.Tar, new WriterOptions(CompressionType.None)))
+        using (var writer = WriterFactory.OpenWriter(ms, ArchiveType.Tar, new WriterOptions(CompressionType.None)))
         {
             for (var i = 0; i < entryCount; i++)
             {

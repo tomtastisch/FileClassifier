@@ -10,7 +10,7 @@ internal static class ArchivePayloadFactory
     internal static byte[] CreateZipWithSingleEntry(string entryName, string content)
     {
         using var ms = new MemoryStream();
-        using (var writer = WriterFactory.Open(ms, ArchiveType.Zip, new WriterOptions(CompressionType.Deflate)))
+        using (var writer = WriterFactory.OpenWriter(ms, ArchiveType.Zip, new WriterOptions(CompressionType.Deflate)))
         using (var payload = new MemoryStream(Encoding.UTF8.GetBytes(content)))
         {
             writer.Write(string.IsNullOrWhiteSpace(entryName) ? "note.txt" : entryName, payload, DateTime.UnixEpoch);
@@ -22,7 +22,7 @@ internal static class ArchivePayloadFactory
     internal static byte[] CreateTarWithSingleEntry(string entryName, string content)
     {
         using var ms = new MemoryStream();
-        using (var writer = WriterFactory.Open(ms, ArchiveType.Tar, new WriterOptions(CompressionType.None)))
+        using (var writer = WriterFactory.OpenWriter(ms, ArchiveType.Tar, new WriterOptions(CompressionType.None)))
         using (var payload = new MemoryStream(Encoding.UTF8.GetBytes(content)))
         {
             writer.Write(string.IsNullOrWhiteSpace(entryName) ? "note.txt" : entryName, payload, DateTime.UnixEpoch);
@@ -34,7 +34,7 @@ internal static class ArchivePayloadFactory
     internal static byte[] CreateGZipWithSingleEntry(string entryName, byte[] payload)
     {
         using var ms = new MemoryStream();
-        using (var writer = WriterFactory.Open(ms, ArchiveType.GZip, new WriterOptions(CompressionType.GZip)))
+        using (var writer = WriterFactory.OpenWriter(ms, ArchiveType.GZip, new WriterOptions(CompressionType.GZip)))
         using (var source = new MemoryStream(payload, false))
         {
             writer.Write(string.IsNullOrWhiteSpace(entryName) ? "payload.bin" : entryName, source, DateTime.UnixEpoch);
