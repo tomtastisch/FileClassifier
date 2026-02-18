@@ -7,12 +7,13 @@
 Alle Aenderungen werden hier technisch dokumentiert. Die Release-Version selbst ist
 der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 
-## [Unreleased]
+## [5.2.0]
 - Added:
   - Incode-Dokumentation fuer die TFM-Providermethoden komplettiert (`HashPrimitivesProvider` fuer `netstandard2.0` und `net8.0+`).
   - Legacy-Office-Refinement (`LegacyOfficeBinaryRefiner`) fuer OLE2-Dokumente mit fail-closed Marker-Logik eingefuehrt.
   - Erweiterte E2E-Matrix-Tests fuer falsche Endungen, korrupte Payloads und Office/OpenDocument-Varianten ergänzt.
 - Changed:
+  - Release-Linie von `v5.2.0-rc.6` auf stabilen Tag `v5.2.0` gehoben.
   - Public XML-Dokumentation auf Policy-045 ausgerichtet: unzulaessige `<exception>`-Tags in fail-closed APIs entfernt.
   - Deutsche Log-/Dokumentationstexte mit korrekten Umlauten harmonisiert.
   - Office-/OpenOffice-Aliasauflösung im `FileTypeRegistry` konsolidiert (`doc/docx/odt`, `xls/xlsx/ods`, `ppt/pptx/odp`).
@@ -22,11 +23,13 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
     - laengeres Retry-Fenster,
     - `registration` standardmaessig entkoppelt bei `vX.Y.Z-<label>`,
     - weiterhin fail-closed auf `flatcontainer`.
+  - Release-Retention (`tools/ci/release/retention_apply.sh`) so angepasst, dass nach vorhandenem korrespondierendem Stable-Tag `vX.Y.Z` die RCs derselben Basisversion bereinigt werden (konkret: Promotion `v5.2.0-rc.6` -> `v5.2.0`), waehrend ein RC ohne korrespondierenden Stable-Tag erhalten bleibt.
 - Fixed:
   - Release-Blocker beseitigt, bei dem Pre-Release-Publish trotz erfolgreichem Push an verzögerter Registration-Sichtbarkeit scheiterte.
 - Docs/CI/Tooling:
   - NuGet-Trusted-Publishing-Doku (DE/EN) und Root-README auf den angepassten Gate-4-Ablauf aktualisiert.
   - Commit-Referenz fuer Version 5.2.0 in Versionshistorie (DE/EN) hinzugefuegt.
+  - Retention-Workflow auf OIDC-Key-Fallback (`NuGet/login`) fuer NuGet-Unlist umgestellt.
 
 ## [5.1.4]
 - Changed:

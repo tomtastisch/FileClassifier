@@ -6,12 +6,13 @@
 
 All changes are documented here in technical terms. The release version itself is the Git tag `vX.Y.Z` (optional `-prerelease`) as SSOT.
 
-## [Unreleased]
+## [5.2.0]
 - Added:
   - Completed in-code documentation for TFM provider methods (`HashPrimitivesProvider` for `netstandard2.0` and `net8.0+`).
   - Added legacy Office refinement (`LegacyOfficeBinaryRefiner`) for OLE2 documents with fail-closed marker logic.
   - Added extended E2E matrix tests for wrong extensions, corrupted payloads, and Office/OpenDocument variants.
 - Changed:
+  - Promoted the release line from `v5.2.0-rc.6` to the stable tag `v5.2.0`.
   - Aligned public XML docs with Policy 045 by removing invalid `<exception>` tags from fail-closed APIs.
   - Harmonized German log/doc strings to use proper umlauts.
   - Consolidated Office/OpenOffice alias resolution in `FileTypeRegistry` (`doc/docx/odt`, `xls/xlsx/ods`, `ppt/pptx/odp`).
@@ -21,11 +22,13 @@ All changes are documented here in technical terms. The release version itself i
     - longer retry window,
     - `registration` decoupled by default for `vX.Y.Z-<label>`,
     - still fail-closed on `flatcontainer`.
+  - Updated release retention (`tools/ci/release/retention_apply.sh`) so RCs are cleaned up once the corresponding stable tag `vX.Y.Z` exists (for example `v5.2.0-rc.6` -> `v5.2.0`), while an RC without a corresponding stable tag is kept.
 - Fixed:
   - Resolved release blocker where pre-release publishing failed due delayed registration visibility despite successful push.
 - Docs/CI/Tooling:
   - Updated NuGet trusted-publishing docs (DE/EN) and root README for the adjusted Gate 4 behavior.
   - Added commit reference for version 5.2.0 in version history (DE/EN).
+  - Switched retention workflow to OIDC key fallback (`NuGet/login`) for NuGet unlist operations.
 
 ## [5.1.4]
 - Changed:

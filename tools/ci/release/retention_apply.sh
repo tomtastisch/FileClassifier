@@ -50,7 +50,15 @@ declare -A KEEP_TAGS=()
 [[ -n "${LATEST_STABLE}" ]] && KEEP_TAGS["${LATEST_STABLE}"]=1
 [[ -n "${PREV_STABLE}" ]] && KEEP_TAGS["${PREV_STABLE}"]=1
 [[ -n "${BASELINE}" ]] && KEEP_TAGS["${BASELINE}"]=1
-[[ -n "${LATEST_RC}" ]] && KEEP_TAGS["${LATEST_RC}"]=1
+
+# Keep the latest RC until the corresponding stable tag (same X.Y.Z) exists.
+# RCs that match an already published stable version line are subject to cleanup.
+if [[ -n "${LATEST_RC}" ]]; then
+  latest_rc_core="${LATEST_RC%%-rc.*}"
+  if ! printf '%s\n' "${STABLE_TAGS[@]}" | grep -xF "${latest_rc_core}" >/dev/null 2>&1; then
+    KEEP_TAGS["${LATEST_RC}"]=1
+  fi
+fi
 
 # GH releases actions
 mapfile -t RELEASE_ROWS < <(gh api "/repos/${REPO}/releases" --paginate | jq -r '.[] | [.id, .tag_name] | @tsv')
