@@ -9,9 +9,14 @@ All changes are documented here in technical terms. The release version itself i
 ## [Unreleased]
 - Added:
   - Completed in-code documentation for TFM provider methods (`HashPrimitivesProvider` for `netstandard2.0` and `net8.0+`).
+  - Added legacy Office refinement (`LegacyOfficeBinaryRefiner`) for OLE2 documents with fail-closed marker logic.
+  - Added extended E2E matrix tests for wrong extensions, corrupted payloads, and Office/OpenDocument variants.
 - Changed:
   - Aligned public XML docs with Policy 045 by removing invalid `<exception>` tags from fail-closed APIs.
   - Harmonized German log/doc strings to use proper umlauts.
+  - Consolidated Office/OpenOffice alias resolution in `FileTypeRegistry` (`doc/docx/odt`, `xls/xlsx/ods`, `ppt/pptx/odp`).
+  - Archive extraction now accepts only real, extractable archives (`Zip`); Office containers are no longer treated as extractable archives.
+  - `TryValidateArchive` now verifies detected container kind before archive safety checks.
   - Hardened Gate 4 (`tools/ci/release/gate4_verify_postpublish.sh`) for pre-release tags:
     - longer retry window,
     - `registration` decoupled by default for `vX.Y.Z-<label>`,

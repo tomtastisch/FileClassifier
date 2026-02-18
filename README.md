@@ -44,12 +44,13 @@ EXPECTED_VERSION=X.Y.Z bash tools/ci/verify_nuget_release.sh
 ## 5. Compatibility / TFMs
 - Library-Zielplattformen: `netstandard2.0`, `net8.0` und `net10.0`
 - Release-Versioning: Git-Tag `vX.Y.Z` (optional `-prerelease`) ist SSOT
+- Aktueller Pre-Release-Kanal der `5.2.0`-Linie: `v5.2.0-rc.6`
 
 ## 6. Architekturüberblick
 ### 6.1 Kernklassen (Datenfluss)
 | Kernklasse | Primäre Inputs | Primäre Outputs | Kernlogik |
 |---|---|---|---|
-| `FileTypeDetector` | `path`, `byte[]`, `verifyExtension` | `FileType`, `DetectionDetail`, `bool`, `IReadOnlyList<ZipExtractedEntry>` | Header/Magic (`FileTypeRegistry`) plus Archiv-Gate (`ArchiveTypeResolver` + `ArchiveSafetyGate`) und optionales OOXML-Refinement (`OpenXmlRefiner`). |
+| `FileTypeDetector` | `path`, `byte[]`, `verifyExtension` | `FileType`, `DetectionDetail`, `bool`, `IReadOnlyList<ZipExtractedEntry>` | Header/Magic (`FileTypeRegistry`) plus Archiv-Gate (`ArchiveTypeResolver` + `ArchiveSafetyGate`) und optionales Container-Refinement (`OpenXmlRefiner` fuer OOXML/OpenDocument, `LegacyOfficeBinaryRefiner` fuer OLE2-Office). |
 | `ArchiveProcessing` | `path`, `byte[]` | `bool`, `IReadOnlyList<ZipExtractedEntry>` | Fassade: path-basierte Validierung/Extraktion delegiert an `FileTypeDetector` (`TryValidateArchive` / `ExtractArchiveSafeToMemory`); byte-basierte Pfade nutzen `ArchivePayloadGuard` und `ArchiveEntryCollector`. |
 | `FileMaterializer` | `byte[]`, `destinationPath`, `overwrite`, `secureExtract` | `bool` | Nur Byte-basierte Persistenz: raw write oder (bei `secureExtract=true` und archivfähigem Payload) sichere Extraktion via `ArchiveExtractor`. |
 | `EvidenceHashing` | `path`, `byte[]`, `IReadOnlyList<ZipExtractedEntry>`, optionale Hash-Optionen | `HashEvidence`, `HashRoundTripReport` | Erkennung + Archivsammlung (`ArchiveEntryCollector`) und deterministische Manifest-/Payload-Hashes, inkl. RoundTrip über `FileMaterializer`. |

@@ -49,7 +49,42 @@ Namespace Global.Tomtastisch.FileClassifier
                                                                                                                "xz",
                                                                                                                "7z",
                                                                                                                "zz",
-                                                                                                               "rar"))
+                                                                                                               "rar")),
+                                            New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Docx,
+                                                                                                     ImmutableArray.
+                                                                                                        Create("doc",
+                                                                                                               "docm",
+                                                                                                               "docb",
+                                                                                                               "dot",
+                                                                                                               "dotm",
+                                                                                                               "dotx",
+                                                                                                               "odt",
+                                                                                                               "ott")),
+                                            New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Xlsx,
+                                                                                                     ImmutableArray.
+                                                                                                        Create("xls",
+                                                                                                               "xlsm",
+                                                                                                               "xlsb",
+                                                                                                               "xlt",
+                                                                                                               "xltm",
+                                                                                                               "xltx",
+                                                                                                               "xltb",
+                                                                                                               "xlam",
+                                                                                                               "xla",
+                                                                                                               "ods",
+                                                                                                               "ots")),
+                                            New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Pptx,
+                                                                                                     ImmutableArray.
+                                                                                                        Create("ppt",
+                                                                                                               "pptm",
+                                                                                                               "pot",
+                                                                                                               "potm",
+                                                                                                               "potx",
+                                                                                                               "pps",
+                                                                                                               "ppsm",
+                                                                                                               "ppsx",
+                                                                                                               "odp",
+                                                                                                               "otp"))
                                         })
 
         Private Shared ReadOnly _

@@ -10,9 +10,14 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 ## [Unreleased]
 - Added:
   - Incode-Dokumentation fuer die TFM-Providermethoden komplettiert (`HashPrimitivesProvider` fuer `netstandard2.0` und `net8.0+`).
+  - Legacy-Office-Refinement (`LegacyOfficeBinaryRefiner`) fuer OLE2-Dokumente mit fail-closed Marker-Logik eingefuehrt.
+  - Erweiterte E2E-Matrix-Tests fuer falsche Endungen, korrupte Payloads und Office/OpenDocument-Varianten ergänzt.
 - Changed:
   - Public XML-Dokumentation auf Policy-045 ausgerichtet: unzulaessige `<exception>`-Tags in fail-closed APIs entfernt.
   - Deutsche Log-/Dokumentationstexte mit korrekten Umlauten harmonisiert.
+  - Office-/OpenOffice-Aliasauflösung im `FileTypeRegistry` konsolidiert (`doc/docx/odt`, `xls/xlsx/ods`, `ppt/pptx/odp`).
+  - Archivextraktion nimmt nur noch echte, extrahierbare Archive (`Zip`) an; Office-Container werden nicht mehr als extrahierbares Archiv behandelt.
+  - `TryValidateArchive` prueft vor Safety-Gate explizit den erkannten Container-Typ.
   - Gate 4 (`tools/ci/release/gate4_verify_postpublish.sh`) fuer Pre-Release-Tags robust gemacht:
     - laengeres Retry-Fenster,
     - `registration` standardmaessig entkoppelt bei `vX.Y.Z-<label>`,

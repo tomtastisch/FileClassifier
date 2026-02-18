@@ -12,7 +12,7 @@ Heuristics for retroactive classification:
 - `docs|test|ci|chore|tooling|refactor|fix` => patch
 
 Current state:
-- Current release line contains `5.x` (current pre-release state: `v5.2.0-rc.2`, next stable target: `5.2.0`; details in `docs/versioning/103_CHANGELOG_RELEASES.MD`).
+- Current release line contains `5.x` (current pre-release state: `v5.2.0-rc.6`, next stable target: `5.2.0`; details in `docs/versioning/103_CHANGELOG_RELEASES.MD`).
 
 Note:
 - The \"short description\" column follows the original commit/PR intent text for deterministic traceability and is not normalized to a single language.
