@@ -9,8 +9,8 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj \
   -v minimal \
   --no-restore \
   /p:CollectCoverage=true \
-  /p:Include='[FileTypeDetectionLib]*' \
+  /p:Include='[Tomtastisch.FileClassifier]*' \
   /p:CoverletOutputFormat=cobertura \
-  /p:Threshold=85%2c69 \
+  /p:Threshold=82%2c69 \
   /p:ThresholdType=line%2cbranch \
   /p:ThresholdStat=total

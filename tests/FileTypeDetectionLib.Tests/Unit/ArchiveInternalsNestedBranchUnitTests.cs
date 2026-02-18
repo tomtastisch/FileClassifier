@@ -3,6 +3,7 @@ using FileTypeDetectionLib.Tests.Support;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
+using SharpCompress.Readers;
 using SharpCompress.Writers;
 using Tomtastisch.FileClassifier;
 
@@ -81,17 +82,17 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
             new object?[] { CreateZipArchiveEntry("a.txt", new byte[] { 1 }), 0L, null })));
     }
 
-    private static ZipArchiveEntry CreateZipArchiveEntry(string name, byte[] payload)
+    private static IArchiveEntry CreateZipArchiveEntry(string name, byte[] payload)
     {
         using var ms = new MemoryStream();
-        using (var writer = WriterFactory.Open(ms, ArchiveType.Zip, new WriterOptions(CompressionType.Deflate)))
+        using (var writer = WriterFactory.OpenWriter(ms, ArchiveType.Zip, new WriterOptions(CompressionType.Deflate)))
         using (var data = new MemoryStream(payload, false))
         {
             writer.Write(name, data, DateTime.UnixEpoch);
         }
 
         ms.Position = 0;
-        var archive = ZipArchive.Open(ms);
+        var archive = ZipArchive.OpenArchive(ms, new ReaderOptions { LeaveStreamOpen = true });
         return archive.Entries.First();
     }
 }

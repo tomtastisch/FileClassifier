@@ -7,6 +7,17 @@
 Alle Aenderungen werden hier technisch dokumentiert. Die Release-Version selbst ist
 der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 
+## [5.2.1]
+- Added:
+  - CI-Dokumentation um expliziten Pflicht-Gate-Charakter fuer Qodana erweitert.
+- Changed:
+  - SharpCompress-Aufrufe in `ArchiveInternals.vb` auf typsichere APIs (`ArchiveFactory.OpenArchive`, `GZipArchive.OpenArchive`) umgestellt.
+  - `qodana.yml` fail-closed gehaertet: Job-Bypass entfernt und `QODANA_TOKEN` als harte Voraussetzung im CI-Job erzwungen.
+- Fixed:
+  - `tar.gz`-Verarbeitung fail-closed stabilisiert (GZip-Mismatch/Nested-Faelle konsistent behandelt).
+- Docs/CI/Tooling:
+  - Versionskonvergenz auf `5.2.1` nachgezogen (`RepoVersion`, `Version`, `PackageVersion`, Versionshistorie DE/EN).
+
 ## [5.2.0]
 - Added:
   - Incode-Dokumentation fuer die TFM-Providermethoden komplettiert (`HashPrimitivesProvider` fuer `netstandard2.0` und `net8.0+`).

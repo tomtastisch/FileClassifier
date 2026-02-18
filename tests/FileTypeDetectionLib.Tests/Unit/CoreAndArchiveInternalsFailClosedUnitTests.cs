@@ -2,6 +2,7 @@ using FileTypeDetectionLib.Tests.Support;
 using Microsoft.Extensions.Logging;
 using SharpCompress.Archives;
 using SharpCompress.Common;
+using SharpCompress.Readers;
 using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
@@ -161,7 +162,7 @@ public sealed class CoreAndArchiveInternalsFailClosedUnitTests
     {
         var payload = ArchivePayloadFactory.CreateTarWithSingleEntry("inner/note.txt", "hello");
         using var ms = new MemoryStream(payload, false);
-        using var archive = ArchiveFactory.Open(ms);
+        using var archive = ArchiveFactory.OpenArchive(ms, new ReaderOptions { LeaveStreamOpen = true });
         var entry = archive.Entries.First(e => !e.IsDirectory);
         var model = new SharpCompressEntryModel(entry);
 
