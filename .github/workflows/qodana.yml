@@ -12,6 +12,8 @@ permissions:
 
 jobs:
   qodana:
+    # In untrusted PR contexts (forks, dependabot), repository secrets are unavailable.
+    if: github.event_name != 'pull_request' || (github.event.pull_request.head.repo.fork == false && github.actor != 'dependabot[bot]')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -25,7 +27,7 @@ jobs:
           fetch-depth: 0
 
       - name: Assert QODANA_TOKEN present
-        # Fail-closed in CI: Qodana is a required security gate.
+        # Fail-closed in trusted CI contexts where Qodana is expected to run.
         shell: bash
         run: |
           test -n "${QODANA_TOKEN:-}" || (echo "FAIL: QODANA_TOKEN missing" >&2; exit 1)

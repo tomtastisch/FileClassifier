@@ -25,6 +25,12 @@
   - auf alle erforderlichen Checks warten,
   - alle Review-Kommentare abarbeiten,
   - alle Threads auf `resolved` setzen (inkl. outdated).
+- Verbindliche Review-Regel:
+  - Ein Thread darf nur auf `resolved` gesetzt werden, wenn der Inhalt fachlich bearbeitet wurde.
+  - Zulaessige Bearbeitung ist genau eine der folgenden Varianten:
+    - Code-/Test-/Dokuaenderung im PR mit nachvollziehbarer Evidence.
+    - begruendete Widerlegung als `ASSUMPTION` + Verifikationsnachweis, warum keine Aenderung noetig ist.
+  - Unzulaessig: Threads ohne Bearbeitung nur aus Prozessgruenden zu resolven.
 - Merge nur wenn:
   - required checks gruener Status,
   - keine offenen Review-Threads,
