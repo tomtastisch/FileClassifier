@@ -46,6 +46,7 @@ Quelle: `FileTypeDetector.vb`.
 | `ArchiveStructuredRefined` | Archiv wurde strukturiert (z. B. OOXML) verfeinert |
 | `ArchiveRefined` | Archivtyp wurde inhaltlich verfeinert |
 | `ArchiveGeneric` | Archiv blieb generisch |
+| `OfficeBinaryRefined` | Legacy-OLE-Dokument wurde über Marker-Refinement als Office-Typ erkannt |
 
 ## 4. Interne Kernpfade (Leseführung)
 | Interner Pfad | Datei | Bedeutung | Detail-README |

@@ -46,6 +46,7 @@ Source: `FileTypeDetector.vb`.
 | `ArchiveStructuredRefined` | archive was refined structurally (e.g. OOXML) |
 | `ArchiveRefined` | archive kind was refined by content |
 | `ArchiveGeneric` | archive stayed generic |
+| `OfficeBinaryRefined` | legacy OLE document was mapped to an Office kind by marker refinement |
 
 ## 4. Internal core paths (guided reading)
 | Internal path | File | Meaning | Detail README |
