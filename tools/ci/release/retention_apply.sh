@@ -51,13 +51,11 @@ declare -A KEEP_TAGS=()
 [[ -n "${PREV_STABLE}" ]] && KEEP_TAGS["${PREV_STABLE}"]=1
 [[ -n "${BASELINE}" ]] && KEEP_TAGS["${BASELINE}"]=1
 
-# Keep the latest RC when it belongs to a newer version line than the latest stable.
+# Keep the latest RC until the corresponding stable tag (same X.Y.Z) exists.
 # RCs that match an already published stable version line are subject to cleanup.
 if [[ -n "${LATEST_RC}" ]]; then
   latest_rc_core="${LATEST_RC%%-rc.*}"
-  if [[ -z "${LATEST_STABLE}" ]]; then
-    KEEP_TAGS["${LATEST_RC}"]=1
-  elif [[ "${latest_rc_core#v}" != "${LATEST_STABLE#v}" ]] && [[ "$(printf '%s\n%s\n' "${LATEST_STABLE#v}" "${latest_rc_core#v}" | sort -V | tail -n1)" == "${latest_rc_core#v}" ]]; then
+  if ! printf '%s\n' "${STABLE_TAGS[@]}" | grep -xF "${latest_rc_core}" >/dev/null 2>&1; then
     KEEP_TAGS["${LATEST_RC}"]=1
   fi
 fi

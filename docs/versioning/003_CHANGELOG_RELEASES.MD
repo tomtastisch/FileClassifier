@@ -23,7 +23,7 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
     - laengeres Retry-Fenster,
     - `registration` standardmaessig entkoppelt bei `vX.Y.Z-<label>`,
     - weiterhin fail-closed auf `flatcontainer`.
-  - Release-Retention (`tools/ci/release/retention_apply.sh`) so angepasst, dass RCs der bereits stabil veroeffentlichten Basisversion bereinigt werden, waehrend der neueste RC einer hoeheren naechsten Version erhalten bleibt.
+  - Release-Retention (`tools/ci/release/retention_apply.sh`) so angepasst, dass nach vorhandenem korrespondierendem Stable-Tag `vX.Y.Z` die RCs derselben Basisversion bereinigt werden (konkret: Promotion `v5.2.0-rc.6` -> `v5.2.0`), waehrend ein RC ohne korrespondierenden Stable-Tag erhalten bleibt.
 - Fixed:
   - Release-Blocker beseitigt, bei dem Pre-Release-Publish trotz erfolgreichem Push an verzögerter Registration-Sichtbarkeit scheiterte.
 - Docs/CI/Tooling:
