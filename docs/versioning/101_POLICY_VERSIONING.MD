@@ -93,6 +93,17 @@ Primary priority is fixed:
 ## 11. Qodana
 Qodana is additional static analysis and does not replace CI quality gates for build/test/coverage/versioning.
 
+## 12. Dependency Upgrade Policy (Canary)
+- Patch/minor upgrades for risky dependencies are pre-verified via the canary workflow:
+  - `.github/workflows/dependency-canary.yml`
+  - `tools/ci/bin/dependency-canary.sh`
+  - `tools/ci/policies/data/dependency_canary.json`
+- Mandatory canary evidence:
+  - focused dependency-specific fail-closed/guard tests pass
+  - Qodana run plus `run.sh qodana` contract validation pass
+- Major upgrades (`X+1.0.0`) are not automatic for all canary dependencies:
+  - only via dedicated PR with API impact review and explicit SemVer decision
+
 ## RoC References
 - [Artifact-Contract-Regel](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/artifact_contract.yaml)
 - [Docs-Drift-Regel](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/docs_drift.yaml)

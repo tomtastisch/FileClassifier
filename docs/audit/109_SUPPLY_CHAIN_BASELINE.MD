@@ -34,6 +34,10 @@ Define minimum reproducible controls for source-to-package integrity in this rep
 - E4 Release/provenance evidence:
   - `.github/workflows/release.yml`
   - `artifacts/nuget/attestation-verify.txt` (when release workflow runs)
+- E5 Dependency canary evidence:
+  - `.github/workflows/dependency-canary.yml`
+  - workflow artifacts `canary-*` with Qodana contract output (`artifacts/ci/qodana/`)
+  - run history: https://github.com/tomtastisch/FileClassifier/actions/workflows/dependency-canary.yml
 
 ## 4. Verification Commands
 All commands are intended to run from the repository root.
@@ -45,6 +49,8 @@ NUPKG="$(find artifacts/nuget -maxdepth 1 -type f -name '*.nupkg' | head -n 1)"
 test -n "$NUPKG"
 dotnet nuget verify "$NUPKG"
 gh attestation verify "$NUPKG" --repo tomtastisch/FileClassifier
+# Optional canary evidence:
+gh run list --workflow dependency-canary.yml --limit 5
 ```
 
 ## 5. Operational Cadence

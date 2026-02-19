@@ -19,14 +19,10 @@ fi
 
 release_version="${release_tag#v}"
 verify_log_path="artifacts/ci/nuget-online-convergence/verify.log"
-package_id="$(python3 - <<'PY'
-import json
-from pathlib import Path
-p = Path("tools/ci/policies/data/naming.json")
-obj = json.loads(p.read_text(encoding="utf-8"))
-print(obj.get("package_id", "Tomtastisch.FileClassifier"))
-PY
-)"
+package_id="$(python3 tools/ci/bin/read_json_field.py --file tools/ci/policies/data/naming.json --field package_id)"
+if [[ -z "${package_id}" ]]; then
+  package_id="Tomtastisch.FileClassifier"
+fi
 mkdir -p artifacts/ci/nuget-online-convergence
 
 {

@@ -93,6 +93,17 @@ Primary-Prioritaet ist fix:
 ## 11. Qodana
 Qodana ist zusaetzliche Static-Analysis und ersetzt keine CI-Quality-Gates fuer Build/Test/Coverage/Versioning.
 
+## 12. Dependency-Upgrade-Policy (Canary)
+- Patch-/Minor-Upgrades fuer risikoreiche Dependencies werden ueber den Canary-Workflow vorab verifiziert:
+  - `.github/workflows/dependency-canary.yml`
+  - `tools/ci/bin/dependency-canary.sh`
+  - `tools/ci/policies/data/dependency_canary.json`
+- Verbindliche Canary-Nachweise:
+  - fokussierte dependency-spezifische Fail-closed-/Guard-Tests erfolgreich
+  - Qodana-Lauf plus `run.sh qodana` Contract-Validierung erfolgreich
+- Major-Upgrades (`X+1.0.0`) sind fuer alle Canary-Dependencies nicht automatisch:
+  - nur via dediziertem PR mit API-Impact-Review und expliziter SemVer-Entscheidung
+
 ## RoC-Bezug
 - [Artifact-Contract-Regel](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/artifact_contract.yaml)
 - [Docs-Drift-Regel](https://github.com/tomtastisch/FileClassifier/blob/main/tools/ci/policies/rules/docs_drift.yaml)

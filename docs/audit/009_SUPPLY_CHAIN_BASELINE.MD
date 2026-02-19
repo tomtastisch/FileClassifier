@@ -34,6 +34,10 @@ Minimum an reproduzierbaren Kontrollen fuer Source-to-Package-Integritaet in die
 - E4 Release/Provenance-Nachweise:
   - `.github/workflows/release.yml`
   - `artifacts/nuget/attestation-verify.txt` (wenn der Release-Workflow laeuft)
+- E5 Dependency-Canary-Nachweise:
+  - `.github/workflows/dependency-canary.yml`
+  - Workflow-Artefakte `canary-*` mit Qodana-Contract-Output (`artifacts/ci/qodana/`)
+  - Laufhistorie: https://github.com/tomtastisch/FileClassifier/actions/workflows/dependency-canary.yml
 
 ## 4. Verifikationskommandos
 Alle Kommandos sind fuer Ausfuehrung im Repository-Root gedacht.
@@ -45,6 +49,8 @@ NUPKG="$(find artifacts/nuget -maxdepth 1 -type f -name '*.nupkg' | head -n 1)"
 test -n "$NUPKG"
 dotnet nuget verify "$NUPKG"
 gh attestation verify "$NUPKG" --repo tomtastisch/FileClassifier
+# Optionaler Canary-Nachweis:
+gh run list --workflow dependency-canary.yml --limit 5
 ```
 
 ## 5. Operative Kadenz

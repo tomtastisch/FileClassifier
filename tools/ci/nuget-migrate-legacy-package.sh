@@ -31,19 +31,7 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
 fi
 
 read_ssot() {
-  python3 - "$SSOT_FILE" <<'PY'
-import json
-import sys
-from pathlib import Path
-obj = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
-canon = str(obj.get('package_id', ''))
-dep = obj.get('deprecated_package_ids', [])
-if not isinstance(dep, list):
-    dep = []
-print(canon)
-for item in dep:
-    print(str(item))
-PY
+  python3 "${REPO_ROOT}/tools/ci/bin/nuget_migration_helpers.py" read-ssot --ssot "$SSOT_FILE"
 }
 
 mapfile -t ssot_lines < <(read_ssot)
@@ -98,15 +86,7 @@ for LEGACY_PACKAGE_ID in "${DEPRECATED_IDS[@]}"; do
     exit 1
   }
 
-  mapfile -t versions < <(VERSIONS_JSON="${versions_json}" python3 - <<'PY'
-import json
-import os
-obj = json.loads(os.environ.get('VERSIONS_JSON', '{}'))
-for v in obj.get('versions', []):
-    if isinstance(v, str) and v.strip():
-        print(v.strip())
-PY
-)
+  mapfile -t versions < <(python3 "${REPO_ROOT}/tools/ci/bin/nuget_migration_helpers.py" extract-versions --versions-json "${versions_json}")
 
   if [[ "${#versions[@]}" -eq 0 ]]; then
     echo "FAIL: no versions found for '${LEGACY_PACKAGE_ID}'" | tee -a "${ARTIFACT_PLAN}" >&2

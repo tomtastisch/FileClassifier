@@ -96,20 +96,7 @@ read_nupkg_metadata() {
 read_naming_ssot_field() {
   local field="$1"
   local ssot_file="${ROOT_DIR}/tools/ci/policies/data/naming.json"
-  python3 - "$ssot_file" "$field" <<'PY'
-import json
-import sys
-from pathlib import Path
-
-ssot_file = Path(sys.argv[1])
-field = sys.argv[2]
-obj = json.loads(ssot_file.read_text(encoding="utf-8"))
-value = obj.get(field, "")
-if isinstance(value, (dict, list)):
-    print("")
-else:
-    print(str(value))
-PY
+  python3 "${ROOT_DIR}/tools/ci/bin/read_json_field.py" --file "$ssot_file" --field "$field"
 }
 
 run_policy_runner_bridge() {
