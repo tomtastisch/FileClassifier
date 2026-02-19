@@ -18,7 +18,27 @@ permissions:
   contents: read
 
 jobs:
+  validate-dispatch-inputs:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate dependency input (fail-closed)
+        shell: bash
+        run: |
+          dep="${{ github.event.inputs.dependency || 'all' }}"
+          case "${dep}" in
+            all|SharpCompress|Microsoft.IO.RecyclableMemoryStream|System.Text.Json)
+              echo "OK: dependency input='${dep}'"
+              ;;
+            *)
+              echo "FAIL: unsupported dependency input='${dep}'" >&2
+              echo "Allowed: all, SharpCompress, Microsoft.IO.RecyclableMemoryStream, System.Text.Json" >&2
+              exit 1
+              ;;
+          esac
+
   canary:
+    needs: [validate-dispatch-inputs]
     if: github.event_name != 'pull_request'
     strategy:
       fail-fast: false
@@ -44,20 +64,20 @@ jobs:
             10.0.102
 
       - name: Run dependency canary update + focused tests
-        if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == matrix.dependency
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.dependency == 'all' || github.event.inputs.dependency == matrix.dependency
         shell: bash
         run: |
-          bash -euo pipefail tools/ci/bin/dependency-canary.sh "${{ matrix.dependency }}" "${{ inputs.version || 'latest' }}"
+          bash -euo pipefail tools/ci/bin/dependency-canary.sh "${{ matrix.dependency }}" "${{ github.event.inputs.version || 'latest' }}"
 
       - name: Assert QODANA_TOKEN present
-        if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == matrix.dependency
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.dependency == 'all' || github.event.inputs.dependency == matrix.dependency
         shell: bash
         run: |
           test -n "${QODANA_TOKEN:-}" || (echo "FAIL: QODANA_TOKEN missing" >&2; exit 1)
           echo "OK: QODANA_TOKEN present"
 
       - name: Run Qodana
-        if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == matrix.dependency
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.dependency == 'all' || github.event.inputs.dependency == matrix.dependency
         uses: JetBrains/qodana-action@42dad391966aca8ca344ca2340a7f43a5507e9b2 # v2025.3.1
         with:
           args: --linter=jetbrains/qodana-dotnet:2025.3
@@ -66,14 +86,14 @@ jobs:
           use-caches: false
 
       - name: Run Qodana contract validator
-        if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == matrix.dependency
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.dependency == 'all' || github.event.inputs.dependency == matrix.dependency
         shell: bash
         env:
           CI_DEFER_ARTIFACT_LINK_RESOLUTION: "1"
         run: bash -euo pipefail tools/ci/bin/run.sh qodana
 
       - name: Upload canary artifacts
-        if: always() && (github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == matrix.dependency)
+        if: always() && (github.event_name != 'workflow_dispatch' || github.event.inputs.dependency == 'all' || github.event.inputs.dependency == matrix.dependency)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: canary-${{ matrix.dependency }}

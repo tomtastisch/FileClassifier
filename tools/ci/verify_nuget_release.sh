@@ -3,6 +3,9 @@ set -euo pipefail
 IFS=$'\n\t'
 LC_ALL=C
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+HELPER_PY="${SCRIPT_DIR}/bin/verify_nuget_release_helpers.py"
+
 NUPKG_PATH="${NUPKG_PATH:-}"
 NUPKG_DIR="${NUPKG_DIR:-artifacts/nuget}"
 PKG_ID="${PKG_ID:-}"
@@ -126,7 +129,7 @@ resolve_nupkg_path() {
 derive_from_filename() {
   local filename
   filename="$(basename "${NUPKG_PATH}")"
-  python3 tools/ci/bin/verify_nuget_release_helpers.py derive-filename --filename "$filename"
+  python3 "${HELPER_PY}" derive-filename --filename "$filename"
 }
 
 derive_from_nuspec() {
@@ -134,7 +137,7 @@ derive_from_nuspec() {
   nuspec_xml="$(unzip -p "${NUPKG_PATH}" '*.nuspec' 2>/dev/null)" || fail "Unable to read .nuspec from ${NUPKG_PATH}"
 
   local parsed
-  parsed="$(python3 tools/ci/bin/verify_nuget_release_helpers.py derive-nuspec --nuspec-xml "${nuspec_xml}")"
+  parsed="$(python3 "${HELPER_PY}" derive-nuspec --nuspec-xml "${nuspec_xml}")"
 
   printf '%s\n' "${parsed}"
 }
@@ -147,7 +150,7 @@ query_search() {
   response="$(curl -fsS --compressed --max-time "${TIMEOUT_SECONDS}" "${SEARCH_URL}")" || return 1
 
   local out
-  out="$(python3 tools/ci/bin/verify_nuget_release_helpers.py query-search --response-json "${response}" --pkg-id "$PKG_ID" --pkg-ver "$PKG_VER")" || return 1
+  out="$(python3 "${HELPER_PY}" query-search --response-json "${response}" --pkg-id "$PKG_ID" --pkg-ver "$PKG_VER")" || return 1
 
   REGISTRATION_URL="${out}"
   SEARCH_OK="ok"
@@ -164,7 +167,7 @@ query_registration() {
   local response
   response="$(curl -fsS --compressed --max-time "${TIMEOUT_SECONDS}" "${REGISTRATION_URL}")" || return 1
 
-  python3 tools/ci/bin/verify_nuget_release_helpers.py registration-contains --response-json "${response}" --pkg-ver "$PKG_VER" >/dev/null || return 1
+  python3 "${HELPER_PY}" registration-contains --response-json "${response}" --pkg-ver "$PKG_VER" >/dev/null || return 1
 
   REGISTRATION_OK="ok"
   return 0
@@ -204,7 +207,7 @@ query_v2_download() {
 }
 
 emit_summary_json() {
-  python3 tools/ci/bin/verify_nuget_release_helpers.py emit-summary
+  python3 "${HELPER_PY}" emit-summary
 }
 
 main() {
