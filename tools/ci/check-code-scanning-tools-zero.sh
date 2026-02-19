@@ -104,6 +104,57 @@ else
   log "INFO: Event=${EVENT_NAME:-<unset>} -> pruefe Code-Scanning Alerts fuer ref=${QUERY_REF}"
 fi
 
+# On main push events, code-scanning alert state can lag until the qodana workflow for the same SHA
+# uploads SARIF. Wait fail-closed for that run to complete to avoid preflight race failures.
+if [[ "${EVENT_NAME}" != "pull_request" && "${QUERY_REF}" == "refs/heads/main" && -n "${GITHUB_SHA:-}" ]]; then
+  wait_attempt=1
+  wait_max_attempts=36
+  wait_delay=10
+  while true; do
+    qodana_runs_json="${OUT_DIR}/qodana-runs.json"
+    if ! gh api "repos/${REPO}/actions/runs?head_sha=${GITHUB_SHA}&event=push&per_page=100" > "${qodana_runs_json}" 2>> "${RAW_LOG}"; then
+      if (( wait_attempt >= wait_max_attempts )); then
+        fail "Qodana-Runstatus fuer aktuellen SHA konnte nicht geladen werden"
+      fi
+      log "WARN: Qodana-Runstatus API-Fehler, retry ${wait_attempt}/${wait_max_attempts}"
+      sleep "${wait_delay}"
+      wait_attempt=$((wait_attempt + 1))
+      continue
+    fi
+
+    qodana_status="$(jq -r '.workflow_runs[] | select(.name=="qodana") | .status' "${qodana_runs_json}" | head -n1)"
+    qodana_conclusion="$(jq -r '.workflow_runs[] | select(.name=="qodana") | .conclusion' "${qodana_runs_json}" | head -n1)"
+    qodana_url="$(jq -r '.workflow_runs[] | select(.name=="qodana") | .html_url' "${qodana_runs_json}" | head -n1)"
+
+    if [[ -z "${qodana_status}" ]]; then
+      if (( wait_attempt >= wait_max_attempts )); then
+        fail "Kein qodana-Run fuer SHA=${GITHUB_SHA} gefunden"
+      fi
+      log "INFO: qodana-Run fuer SHA=${GITHUB_SHA} noch nicht sichtbar (retry ${wait_attempt}/${wait_max_attempts})"
+      sleep "${wait_delay}"
+      wait_attempt=$((wait_attempt + 1))
+      continue
+    fi
+
+    if [[ "${qodana_status}" != "completed" ]]; then
+      if (( wait_attempt >= wait_max_attempts )); then
+        fail "qodana-Run fuer SHA=${GITHUB_SHA} ist nicht abgeschlossen (status=${qodana_status})"
+      fi
+      log "INFO: warte auf qodana-Runabschluss (status=${qodana_status}, retry ${wait_attempt}/${wait_max_attempts})"
+      sleep "${wait_delay}"
+      wait_attempt=$((wait_attempt + 1))
+      continue
+    fi
+
+    if [[ "${qodana_conclusion}" != "success" ]]; then
+      fail "qodana-Run fuer SHA=${GITHUB_SHA} ist fehlgeschlagen (conclusion=${qodana_conclusion:-unknown}, url=${qodana_url:-n/a})"
+    fi
+
+    log "INFO: qodana-Run fuer SHA=${GITHUB_SHA} erfolgreich abgeschlossen (${qodana_url:-n/a})"
+    break
+  done
+fi
+
 attempt=1
 delay=2
 max_attempts=3
