@@ -110,7 +110,7 @@ fi
 # - PR Qodana-cleanup validation (ref=refs/pull/<n>/merge).
 if [[ -n "${GITHUB_SHA:-}" ]]; then
   should_wait_for_qodana="false"
-  if [[ "${EVENT_NAME}" != "pull_request" && "${QUERY_REF}" == "refs/heads/main" ]]; then
+  if [[ "${EVENT_NAME}" == "push" && "${QUERY_REF}" == "refs/heads/main" ]]; then
     should_wait_for_qodana="true"
   fi
   if [[ "${QUERY_REF}" != "refs/heads/main" ]]; then
@@ -146,7 +146,7 @@ if [[ -n "${GITHUB_SHA:-}" ]]; then
     fi
 
     if [[ "${EVENT_NAME}" == "pull_request" ]]; then
-      qodana_status="$(jq -r \
+      qodana_fields="$(jq -r \
         --arg pr_head_sha "${pr_head_sha}" \
         --arg pr_head_ref "${pr_head_ref}" \
         '.workflow_runs
@@ -154,30 +154,20 @@ if [[ -n "${GITHUB_SHA:-}" ]]; then
          | map(select((($pr_head_sha != "") and (.head_sha == $pr_head_sha)) or (($pr_head_ref != "") and (.head_branch == $pr_head_ref))))
          | sort_by(.created_at)
          | reverse
-         | .[0].status // empty' "${qodana_runs_json}")"
-      qodana_conclusion="$(jq -r \
-        --arg pr_head_sha "${pr_head_sha}" \
-        --arg pr_head_ref "${pr_head_ref}" \
-        '.workflow_runs
-         | map(select(.name=="qodana"))
-         | map(select((($pr_head_sha != "") and (.head_sha == $pr_head_sha)) or (($pr_head_ref != "") and (.head_branch == $pr_head_ref))))
-         | sort_by(.created_at)
-         | reverse
-         | .[0].conclusion // empty' "${qodana_runs_json}")"
-      qodana_url="$(jq -r \
-        --arg pr_head_sha "${pr_head_sha}" \
-        --arg pr_head_ref "${pr_head_ref}" \
-        '.workflow_runs
-         | map(select(.name=="qodana"))
-         | map(select((($pr_head_sha != "") and (.head_sha == $pr_head_sha)) or (($pr_head_ref != "") and (.head_branch == $pr_head_ref))))
-         | sort_by(.created_at)
-         | reverse
-         | .[0].html_url // empty' "${qodana_runs_json}")"
+         | .[0]
+         | [(.status // ""), (.conclusion // ""), (.html_url // "")]
+         | @tsv' "${qodana_runs_json}")"
     else
-      qodana_status="$(jq -r '.workflow_runs | map(select(.name=="qodana")) | sort_by(.created_at) | reverse | .[0].status // empty' "${qodana_runs_json}")"
-      qodana_conclusion="$(jq -r '.workflow_runs | map(select(.name=="qodana")) | sort_by(.created_at) | reverse | .[0].conclusion // empty' "${qodana_runs_json}")"
-      qodana_url="$(jq -r '.workflow_runs | map(select(.name=="qodana")) | sort_by(.created_at) | reverse | .[0].html_url // empty' "${qodana_runs_json}")"
+      qodana_fields="$(jq -r \
+        '.workflow_runs
+         | map(select(.name=="qodana"))
+         | sort_by(.created_at)
+         | reverse
+         | .[0]
+         | [(.status // ""), (.conclusion // ""), (.html_url // "")]
+         | @tsv' "${qodana_runs_json}")"
     fi
+    IFS=$'\t' read -r qodana_status qodana_conclusion qodana_url <<< "${qodana_fields:-}"
 
     if [[ -z "${qodana_status}" ]]; then
       if (( wait_attempt >= wait_max_attempts )); then
