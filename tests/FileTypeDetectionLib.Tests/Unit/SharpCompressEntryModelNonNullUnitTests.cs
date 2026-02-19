@@ -2,6 +2,7 @@ using System.Text;
 using FileTypeDetectionLib.Tests.Support;
 using SharpCompress.Common;
 using SharpCompress.Writers;
+using FileTypeDetectionLib.Tests.Support;
 using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
