@@ -291,7 +291,9 @@ query_flatcontainer() {
 }
 
 query_v2_download() {
-  V2_URL="https://www.nuget.org/api/v2/package/${PKG_ID}/${PKG_VER}"
+  local pkg_id_lc
+  pkg_id_lc="$(printf '%s' "${PKG_ID}" | tr '[:upper:]' '[:lower:]')"
+  V2_URL="https://www.nuget.org/api/v2/package/${pkg_id_lc}/${PKG_VER}"
   local status
   status="$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time "${TIMEOUT_SECONDS}" "${V2_URL}" || true)"
   if [[ "${status}" == "200" ]]; then
@@ -314,6 +316,7 @@ print(json.dumps({
     "require_search": os.environ.get("REQUIRE_SEARCH", ""),
     "require_registration": os.environ.get("REQUIRE_REGISTRATION", ""),
     "require_flatcontainer": os.environ.get("REQUIRE_FLATCONTAINER", ""),
+    "require_v2_download": os.environ.get("REQUIRE_V2_DOWNLOAD", ""),
     "registration": os.environ.get("REGISTRATION_URL", ""),
     "search": os.environ.get("SEARCH_OK", "skipped"),
     "registration_check": os.environ.get("REGISTRATION_OK", "skipped"),
