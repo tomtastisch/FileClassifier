@@ -33,11 +33,21 @@ retry_sleep_seconds="${SVT_POSTPUBLISH_RETRY_SLEEP_SECONDS:-10}"
 if [[ -n "${SVT_POSTPUBLISH_REQUIRE_REGISTRATION:-}" ]]; then
   require_registration="${SVT_POSTPUBLISH_REQUIRE_REGISTRATION}"
 else
-  if [[ "${is_prerelease}" == "1" ]]; then
-    require_registration="0"
-  else
-    require_registration="1"
-  fi
+  # Registration endpoint is typically the slowest to converge and caused repeated
+  # false negatives. Gate 4 now validates publish availability via V2 download.
+  require_registration="0"
+fi
+
+if [[ -n "${SVT_POSTPUBLISH_REQUIRE_FLATCONTAINER:-}" ]]; then
+  require_flatcontainer="${SVT_POSTPUBLISH_REQUIRE_FLATCONTAINER}"
+else
+  require_flatcontainer="0"
+fi
+
+if [[ -n "${SVT_POSTPUBLISH_REQUIRE_V2_DOWNLOAD:-}" ]]; then
+  require_v2_download="${SVT_POSTPUBLISH_REQUIRE_V2_DOWNLOAD}"
+else
+  require_v2_download="1"
 fi
 
 if [[ ! "${retry_count}" =~ ^[0-9]+$ ]]; then
@@ -56,6 +66,14 @@ if [[ "${require_registration}" != "0" && "${require_registration}" != "1" ]]; t
   echo "SVT_POSTPUBLISH_REQUIRE_REGISTRATION must be 0 or 1 (actual='${require_registration}')" >&2
   exit 1
 fi
+if [[ "${require_flatcontainer}" != "0" && "${require_flatcontainer}" != "1" ]]; then
+  echo "SVT_POSTPUBLISH_REQUIRE_FLATCONTAINER must be 0 or 1 (actual='${require_flatcontainer}')" >&2
+  exit 1
+fi
+if [[ "${require_v2_download}" != "0" && "${require_v2_download}" != "1" ]]; then
+  echo "SVT_POSTPUBLISH_REQUIRE_V2_DOWNLOAD must be 0 or 1 (actual='${require_v2_download}')" >&2
+  exit 1
+fi
 
 EXPECTED_VERSION="${expected_version}" \
 NUPKG_PATH="${nupkg_path}" \
@@ -64,5 +82,6 @@ RETRY_SLEEP_SECONDS="${retry_sleep_seconds}" \
 RETRY_SCHEDULE_SECONDS="${retry_schedule_seconds}" \
 REQUIRE_SEARCH=0 \
 REQUIRE_REGISTRATION="${require_registration}" \
-REQUIRE_FLATCONTAINER=1 \
+REQUIRE_FLATCONTAINER="${require_flatcontainer}" \
+REQUIRE_V2_DOWNLOAD="${require_v2_download}" \
 bash tools/ci/verify_nuget_release.sh

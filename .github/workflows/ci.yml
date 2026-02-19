@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
   security-events: read
   pull-requests: read
 
@@ -358,66 +359,23 @@ jobs:
           dotnet-version: |
             8.0.x
             10.0.102
-      - name: Download CI Artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: ci-preflight
-          path: artifacts/ci/preflight
-      - name: Download Build Artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: ci-build
-          path: artifacts/ci/build
-      - name: Download API Contract Artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: ci-api-contract
-          path: artifacts/ci/api-contract
-      - name: Download Pack Artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: ci-pack
-          path: artifacts/ci/pack
-      - name: Download Consumer Smoke Artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: ci-consumer-smoke
-          path: artifacts/ci/consumer-smoke
-      - name: Download Package-Backed Artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: ci-package-backed-tests
-          path: artifacts/ci/package-backed-tests
-      - name: Download Security Artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: ci-security-nuget
-          path: artifacts/ci/security-nuget
-      - name: Download Docs Link Artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: ci-docs-links-full
-          path: artifacts/ci/docs-links-full
-      - name: Download Naming Artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: ci-naming-snt
-          path: artifacts/ci/naming-snt
-      - name: Download Versioning Artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: ci-versioning-svt
-          path: artifacts/ci/versioning-svt
-      - name: Download Version Convergence Artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: ci-version-convergence
-          path: artifacts/ci/version-convergence
-      - name: Download Test Artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: ci-tests-bdd-coverage
-          path: artifacts/ci/tests-bdd-coverage
+      - name: Download Required Artifacts (retry/backoff)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash tools/ci/bin/download_artifacts_with_retry.sh "${GITHUB_RUN_ID}" \
+            "ci-preflight=artifacts/ci/preflight" \
+            "ci-build=artifacts/ci/build" \
+            "ci-api-contract=artifacts/ci/api-contract" \
+            "ci-pack=artifacts/ci/pack" \
+            "ci-consumer-smoke=artifacts/ci/consumer-smoke" \
+            "ci-package-backed-tests=artifacts/ci/package-backed-tests" \
+            "ci-security-nuget=artifacts/ci/security-nuget" \
+            "ci-docs-links-full=artifacts/ci/docs-links-full" \
+            "ci-naming-snt=artifacts/ci/naming-snt" \
+            "ci-versioning-svt=artifacts/ci/versioning-svt" \
+            "ci-version-convergence=artifacts/ci/version-convergence" \
+            "ci-tests-bdd-coverage=artifacts/ci/tests-bdd-coverage"
       - name: Run Entry Check
         run: bash -euo pipefail tools/ci/bin/run.sh summary
       - name: Upload Artifact
