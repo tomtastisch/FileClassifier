@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 var nonBlockingHighRuleIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
 {
@@ -13,11 +14,16 @@ var nonBlockingHighRuleIds = new HashSet<string>(StringComparer.OrdinalIgnoreCas
 
 var argsList = args.ToList();
 string? sarifPath = null;
+string? filteredSarifOutPath = null;
 for (var i = 0; i < argsList.Count; i++)
 {
     if (argsList[i] == "--sarif" && i + 1 < argsList.Count)
     {
         sarifPath = argsList[++i];
+    }
+    else if (argsList[i] == "--filtered-sarif-out" && i + 1 < argsList.Count)
+    {
+        filteredSarifOutPath = argsList[++i];
     }
 }
 
@@ -42,7 +48,8 @@ if (!File.Exists(sarifPath))
 
 try
 {
-    using var doc = JsonDocument.Parse(File.ReadAllText(sarifPath));
+    var sarifText = File.ReadAllText(sarifPath);
+    using var doc = JsonDocument.Parse(sarifText);
     if (!doc.RootElement.TryGetProperty("runs", out var runs) || runs.ValueKind != JsonValueKind.Array)
     {
         Console.Error.WriteLine("CI-QODANA-003: SARIF missing runs[] array");
@@ -110,6 +117,15 @@ try
     {
         Console.Error.WriteLine($"CI-QODANA-004: blocking findings detected at severity High+ ({blockingFindings.Count})");
         return 1;
+    }
+
+    if (!string.IsNullOrWhiteSpace(filteredSarifOutPath))
+    {
+        if (!TryWriteFilteredSarif(sarifText, filteredSarifOutPath!, nonBlockingHighRuleIds))
+        {
+            Console.Error.WriteLine("CI-QODANA-003: unable to write filtered SARIF output");
+            return 1;
+        }
     }
 
     var ideaLogPath = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(sarifPath)) ?? ".", "log", "idea.log");
@@ -227,6 +243,97 @@ static string? ExtractString(JsonElement node, string property)
     }
 
     return value.GetString();
+}
+
+static bool TryWriteFilteredSarif(string sarifText, string outputPath, ISet<string> nonBlockingHighRuleIds)
+{
+    JsonNode? rootNode;
+    try
+    {
+        rootNode = JsonNode.Parse(sarifText);
+    }
+    catch
+    {
+        return false;
+    }
+
+    if (rootNode is not JsonObject rootObject)
+    {
+        return false;
+    }
+
+    if (rootObject["runs"] is not JsonArray runsArray)
+    {
+        return false;
+    }
+
+    foreach (var runNode in runsArray)
+    {
+        if (runNode is not JsonObject runObject)
+        {
+            continue;
+        }
+
+        if (runObject["results"] is not JsonArray resultsArray)
+        {
+            continue;
+        }
+
+        var filteredResults = new JsonArray();
+        foreach (var resultNode in resultsArray)
+        {
+            if (resultNode is not JsonObject resultObject)
+            {
+                continue;
+            }
+
+            var severity = ExtractSeverityFromNode(resultObject);
+            var ruleId = resultObject["ruleId"]?.GetValue<string>() ?? "UNKNOWN";
+
+            var isBlocking = SeverityRank(severity) >= SeverityRank("High") &&
+                             !nonBlockingHighRuleIds.Contains(ruleId);
+            if (isBlocking)
+            {
+                filteredResults.Add(resultObject.DeepClone());
+            }
+        }
+
+        runObject["results"] = filteredResults;
+    }
+
+    var outputDirectory = Path.GetDirectoryName(outputPath);
+    if (!string.IsNullOrWhiteSpace(outputDirectory))
+    {
+        Directory.CreateDirectory(outputDirectory);
+    }
+
+    File.WriteAllText(outputPath, rootObject.ToJsonString(new JsonSerializerOptions
+    {
+        WriteIndented = false
+    }));
+    Console.WriteLine($"QODANA_FILTERED_SARIF|path={outputPath}");
+    return true;
+}
+
+static string ExtractSeverityFromNode(JsonObject resultObject)
+{
+    if (resultObject["properties"] is JsonObject propertiesObject)
+    {
+        var qodanaSeverity = propertiesObject["qodanaSeverity"]?.GetValue<string>();
+        if (!string.IsNullOrWhiteSpace(qodanaSeverity))
+        {
+            return qodanaSeverity!;
+        }
+    }
+
+    var level = resultObject["level"]?.GetValue<string>();
+    return level?.ToLowerInvariant() switch
+    {
+        "error" => "High",
+        "warning" => "Moderate",
+        "note" => "Low",
+        _ => "Unknown"
+    };
 }
 
 internal sealed record Finding(string Severity, string RuleId, string Message, string Location);
