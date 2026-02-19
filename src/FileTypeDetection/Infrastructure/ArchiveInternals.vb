@@ -126,8 +126,10 @@ Namespace Global.Tomtastisch.FileClassifier
         Friend Shared Function OpenArchive(stream As Stream) As SharpCompress.Archives.IArchive
             Try
                 Dim options = New SharpCompress.Readers.ReaderOptions() With {.LeaveStreamOpen = True}
-                Return SharpCompress.Archives.ArchiveFactory.OpenArchive(stream, options)
+                Return OpenArchiveFactoryCompat(stream, options)
             Catch ex As Exception When _
+                TypeOf ex Is MissingMethodException OrElse
+                TypeOf ex Is System.Reflection.TargetInvocationException OrElse
                 TypeOf ex Is InvalidOperationException OrElse
                 TypeOf ex Is NotSupportedException OrElse
                 TypeOf ex Is ArgumentException
@@ -158,13 +160,52 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Shared Function OpenGZipArchive(stream As Stream) As SharpCompress.Archives.IArchive
             Try
                 Dim options = New SharpCompress.Readers.ReaderOptions() With {.LeaveStreamOpen = True}
-                Return SharpCompress.Archives.GZip.GZipArchive.OpenArchive(stream, options)
+                Return OpenGZipArchiveCompat(stream, options)
             Catch ex As Exception When _
+                TypeOf ex Is MissingMethodException OrElse
+                TypeOf ex Is System.Reflection.TargetInvocationException OrElse
                 TypeOf ex Is InvalidOperationException OrElse
                 TypeOf ex Is NotSupportedException OrElse
                 TypeOf ex Is ArgumentException
                 Return Nothing
             End Try
+        End Function
+
+        Private Shared Function OpenArchiveFactoryCompat(
+                                                       stream As Stream,
+                                                       options As SharpCompress.Readers.ReaderOptions
+                                                       ) As SharpCompress.Archives.IArchive
+            Dim method = GetOpenCompatMethod(GetType(SharpCompress.Archives.ArchiveFactory))
+            Dim opened = method.Invoke(Nothing, New Object() {stream, options})
+            Return CType(opened, SharpCompress.Archives.IArchive)
+        End Function
+
+        Private Shared Function OpenGZipArchiveCompat(
+                                                    stream As Stream,
+                                                    options As SharpCompress.Readers.ReaderOptions
+                                                    ) As SharpCompress.Archives.IArchive
+            Dim method = GetOpenCompatMethod(GetType(SharpCompress.Archives.GZip.GZipArchive))
+            Dim opened = method.Invoke(Nothing, New Object() {stream, options})
+            Return CType(opened, SharpCompress.Archives.IArchive)
+        End Function
+
+        Private Shared Function GetOpenCompatMethod(type As Type) As System.Reflection.MethodInfo
+            Dim signature = New Type() {GetType(Stream), GetType(SharpCompress.Readers.ReaderOptions)}
+            Dim method = type.GetMethod("OpenArchive", System.Reflection.BindingFlags.Public Or
+                                                       System.Reflection.BindingFlags.Static,
+                                        binder:=Nothing,
+                                        types:=signature,
+                                        modifiers:=Nothing)
+            If method IsNot Nothing Then Return method
+
+            method = type.GetMethod("Open", System.Reflection.BindingFlags.Public Or
+                                            System.Reflection.BindingFlags.Static,
+                                    binder:=Nothing,
+                                    types:=signature,
+                                    modifiers:=Nothing)
+            If method IsNot Nothing Then Return method
+
+            Throw New MissingMethodException(type.FullName, "OpenArchive/Open(Stream, ReaderOptions)")
         End Function
     End Class
 
