@@ -67,7 +67,7 @@ Namespace Global.Tomtastisch.FileClassifier
             ''' <returns>Hex-String in Kleinbuchstaben ohne Trennzeichen.</returns>
             Public Function EncodeLowerHex(data As Byte()) As String Implements IHexCodec.EncodeLowerHex
                 Dim safeData = If(data, Array.Empty(Of Byte)())
-                Dim chars As Char() = Nothing
+                Dim chars As Char()
                 Dim index As Integer = 0
 
                 If safeData.Length = 0 Then Return String.Empty

@@ -67,19 +67,20 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
     }
 
     [Fact]
-    public void TryReadEntryPayloadBounded_ReturnsFalse_ForInvalidInputs()
+    public void TryReadEntryPayloadBoundedWithOptions_ReturnsFalse_ForInvalidInputs()
     {
         var method = typeof(SharpCompressArchiveBackend).GetMethod(
-            "TryReadEntryPayloadBounded",
+            "TryReadEntryPayloadBoundedWithOptions",
             BindingFlags.NonPublic | BindingFlags.Static,
             binder: null,
-            types: new[] { typeof(IArchiveEntry), typeof(long), typeof(byte[]).MakeByRefType() },
+            types: new[] { typeof(IArchiveEntry), typeof(long), typeof(FileTypeProjectOptions), typeof(byte[]).MakeByRefType() },
             modifiers: null)!;
         Assert.NotNull(method);
 
-        Assert.False(TestGuard.Unbox<bool>(method.Invoke(null, new object?[] { null, 10L, null })));
+        var opt = FileTypeProjectOptions.DefaultOptions();
+        Assert.False(TestGuard.Unbox<bool>(method.Invoke(null, new object?[] { null, 10L, opt, null })));
         Assert.False(TestGuard.Unbox<bool>(method.Invoke(null,
-            new object?[] { CreateZipArchiveEntry("a.txt", new byte[] { 1 }), 0L, null })));
+            new object?[] { CreateZipArchiveEntry("a.txt", new byte[] { 1 }), 0L, opt, null })));
     }
 
     private static IArchiveEntry CreateZipArchiveEntry(string name, byte[] payload)
