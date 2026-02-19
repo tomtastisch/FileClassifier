@@ -113,12 +113,6 @@ try
         Console.Error.WriteLine($"QODANA_FINDING|severity={finding.Severity}|rule_id={finding.RuleId}|location={finding.Location}|message={finding.Message}");
     }
 
-    if (blockingFindings.Count > 0)
-    {
-        Console.Error.WriteLine($"CI-QODANA-004: blocking findings detected at severity High+ ({blockingFindings.Count})");
-        return 1;
-    }
-
     if (!string.IsNullOrWhiteSpace(filteredSarifOutPath))
     {
         if (!TryWriteFilteredSarif(sarifText, filteredSarifOutPath!, nonBlockingHighRuleIds))
@@ -126,6 +120,12 @@ try
             Console.Error.WriteLine("CI-QODANA-003: unable to write filtered SARIF output");
             return 1;
         }
+    }
+
+    if (blockingFindings.Count > 0)
+    {
+        Console.Error.WriteLine($"CI-QODANA-004: blocking findings detected at severity High+ ({blockingFindings.Count})");
+        return 1;
     }
 
     var ideaLogPath = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(sarifPath)) ?? ".", "log", "idea.log");
@@ -288,7 +288,7 @@ static bool TryWriteFilteredSarif(string sarifText, string outputPath, ISet<stri
             }
 
             var severity = ExtractSeverityFromNode(resultObject);
-            var ruleId = resultObject["ruleId"]?.GetValue<string>() ?? "UNKNOWN";
+            var ruleId = TryGetNodeString(resultObject["ruleId"]) ?? "UNKNOWN";
 
             var isBlocking = SeverityRank(severity) >= SeverityRank("High") &&
                              !nonBlockingHighRuleIds.Contains(ruleId);
@@ -319,14 +319,14 @@ static string ExtractSeverityFromNode(JsonObject resultObject)
 {
     if (resultObject["properties"] is JsonObject propertiesObject)
     {
-        var qodanaSeverity = propertiesObject["qodanaSeverity"]?.GetValue<string>();
+        var qodanaSeverity = TryGetNodeString(propertiesObject["qodanaSeverity"]);
         if (!string.IsNullOrWhiteSpace(qodanaSeverity))
         {
             return qodanaSeverity!;
         }
     }
 
-    var level = resultObject["level"]?.GetValue<string>();
+    var level = TryGetNodeString(resultObject["level"]);
     return level?.ToLowerInvariant() switch
     {
         "error" => "High",
@@ -334,6 +334,27 @@ static string ExtractSeverityFromNode(JsonObject resultObject)
         "note" => "Low",
         _ => "Unknown"
     };
+}
+
+static string? TryGetNodeString(JsonNode? node)
+{
+    if (node is null)
+    {
+        return null;
+    }
+
+    try
+    {
+        return node.GetValue<string>();
+    }
+    catch (InvalidOperationException)
+    {
+        return null;
+    }
+    catch (FormatException)
+    {
+        return null;
+    }
 }
 
 internal sealed record Finding(string Severity, string RuleId, string Message, string Location);
