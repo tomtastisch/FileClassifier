@@ -16,13 +16,16 @@ VERIFY_ONLINE="${VERIFY_ONLINE:-1}"
 REQUIRE_SEARCH="${REQUIRE_SEARCH:-1}"
 REQUIRE_REGISTRATION="${REQUIRE_REGISTRATION:-1}"
 REQUIRE_FLATCONTAINER="${REQUIRE_FLATCONTAINER:-1}"
+REQUIRE_V2_DOWNLOAD="${REQUIRE_V2_DOWNLOAD:-0}"
 
 SEARCH_OK="skipped"
 REGISTRATION_OK="skipped"
 FLATCONTAINER_OK="skipped"
+V2_DOWNLOAD_OK="skipped"
 REGISTRATION_URL=""
 SEARCH_URL=""
 FLAT_URL=""
+V2_URL=""
 
 fail() {
   echo "FAIL: $*" >&2
@@ -287,6 +290,19 @@ query_flatcontainer() {
   return 1
 }
 
+query_v2_download() {
+  local pkg_id_lc
+  pkg_id_lc="$(printf '%s' "${PKG_ID}" | tr '[:upper:]' '[:lower:]')"
+  V2_URL="https://www.nuget.org/api/v2/package/${pkg_id_lc}/${PKG_VER}"
+  local status
+  status="$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time "${TIMEOUT_SECONDS}" "${V2_URL}" || true)"
+  if [[ "${status}" == "200" ]]; then
+    V2_DOWNLOAD_OK="ok"
+    return 0
+  fi
+  return 1
+}
+
 emit_summary_json() {
   python3 - <<'PY'
 import json
@@ -300,10 +316,12 @@ print(json.dumps({
     "require_search": os.environ.get("REQUIRE_SEARCH", ""),
     "require_registration": os.environ.get("REQUIRE_REGISTRATION", ""),
     "require_flatcontainer": os.environ.get("REQUIRE_FLATCONTAINER", ""),
+    "require_v2_download": os.environ.get("REQUIRE_V2_DOWNLOAD", ""),
     "registration": os.environ.get("REGISTRATION_URL", ""),
     "search": os.environ.get("SEARCH_OK", "skipped"),
     "registration_check": os.environ.get("REGISTRATION_OK", "skipped"),
-    "flatcontainer": os.environ.get("FLATCONTAINER_OK", "skipped")
+    "flatcontainer": os.environ.get("FLATCONTAINER_OK", "skipped"),
+    "v2_download": os.environ.get("V2_DOWNLOAD_OK", "skipped")
 }, separators=(",", ":")))
 PY
 }
@@ -321,6 +339,7 @@ main() {
   require_bool_flag "REQUIRE_SEARCH" "${REQUIRE_SEARCH}"
   require_bool_flag "REQUIRE_REGISTRATION" "${REQUIRE_REGISTRATION}"
   require_bool_flag "REQUIRE_FLATCONTAINER" "${REQUIRE_FLATCONTAINER}"
+  require_bool_flag "REQUIRE_V2_DOWNLOAD" "${REQUIRE_V2_DOWNLOAD}"
 
   if [[ -n "${PKG_ID}" || -n "${PKG_VER}" ]]; then
     if [[ -z "${PKG_ID}" || -z "${PKG_VER}" ]]; then
@@ -398,11 +417,18 @@ main() {
     else
       info "Flatcontainer check skipped (REQUIRE_FLATCONTAINER=${REQUIRE_FLATCONTAINER})."
     fi
+
+    if [[ "${REQUIRE_V2_DOWNLOAD}" == "1" ]]; then
+      retry_network "v2-download" query_v2_download
+      info "V2 download check OK: ${V2_URL}"
+    else
+      info "V2 download check skipped (REQUIRE_V2_DOWNLOAD=${REQUIRE_V2_DOWNLOAD})."
+    fi
   else
     info "Online checks skipped (VERIFY_ONLINE=${VERIFY_ONLINE})."
   fi
 
-  export PKG_ID PKG_VER EXPECTED_VERSION VERIFY_ONLINE REQUIRE_SEARCH REQUIRE_REGISTRATION REQUIRE_FLATCONTAINER REGISTRATION_URL SEARCH_OK REGISTRATION_OK FLATCONTAINER_OK
+  export PKG_ID PKG_VER EXPECTED_VERSION VERIFY_ONLINE REQUIRE_SEARCH REQUIRE_REGISTRATION REQUIRE_FLATCONTAINER REQUIRE_V2_DOWNLOAD REGISTRATION_URL SEARCH_OK REGISTRATION_OK FLATCONTAINER_OK V2_DOWNLOAD_OK
   emit_summary_json
   echo "OK: verify_nuget_release completed."
 }

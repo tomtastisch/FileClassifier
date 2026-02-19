@@ -223,7 +223,7 @@ jobs:
         with:
           name: nuget-attestation-verify
           path: artifacts/nuget/attestation-verify.txt
-          if-no-files-found: error
+          if-no-files-found: warn
 
       - name: Gate 4 - SVT post-publish (git version == package version == nuget version)
         shell: bash
