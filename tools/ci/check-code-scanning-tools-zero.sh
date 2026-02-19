@@ -119,7 +119,8 @@ if [[ -n "${GITHUB_SHA:-}" ]]; then
 
   if [[ "${should_wait_for_qodana}" == "true" ]]; then
   wait_attempt=1
-  wait_max_attempts=48
+  # Qodana can be queued behind runner load; allow a generous fail-closed window.
+  wait_max_attempts=120
   wait_delay=10
   run_event_filter="${EVENT_NAME:-push}"
   while true; do
