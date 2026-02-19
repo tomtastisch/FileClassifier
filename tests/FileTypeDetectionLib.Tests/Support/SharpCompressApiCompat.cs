@@ -32,7 +32,7 @@ internal static class SharpCompressApiCompat
 
         if (method is null)
         {
-            throw new MissingMethodException(typeof(WriterFactory).FullName, "OpenWriter/Open(Stream, ArchiveType, WriterOptions)");
+            throw new MissingMethodException(typeof(WriterFactory).FullName, "OpenWriter/Open(Stream, ArchiveType, WriterOptions) [compat]");
         }
 
         return (IWriter)method.Invoke(null, args)!;
