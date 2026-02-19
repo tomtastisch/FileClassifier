@@ -123,9 +123,19 @@ if [[ -n "${GITHUB_SHA:-}" ]]; then
   wait_max_attempts=120
   wait_delay=10
   run_event_filter="${EVENT_NAME:-push}"
+  pr_head_sha=""
+  pr_head_ref=""
+  if [[ "${EVENT_NAME}" == "pull_request" && -n "${GITHUB_EVENT_PATH:-}" && -f "${GITHUB_EVENT_PATH:-}" ]]; then
+    pr_head_sha="$(jq -r '.pull_request.head.sha // empty' "${GITHUB_EVENT_PATH}")"
+    pr_head_ref="$(jq -r '.pull_request.head.ref // empty' "${GITHUB_EVENT_PATH}")"
+  fi
   while true; do
     qodana_runs_json="${OUT_DIR}/qodana-runs.json"
-    if ! gh api "repos/${REPO}/actions/runs?head_sha=${GITHUB_SHA}&event=${run_event_filter}&per_page=100" > "${qodana_runs_json}" 2>> "${RAW_LOG}"; then
+    api_path="repos/${REPO}/actions/runs?event=${run_event_filter}&per_page=100"
+    if [[ "${EVENT_NAME}" != "pull_request" ]]; then
+      api_path="${api_path}&head_sha=${GITHUB_SHA}"
+    fi
+    if ! gh api "${api_path}" > "${qodana_runs_json}" 2>> "${RAW_LOG}"; then
       if (( wait_attempt >= wait_max_attempts )); then
         fail "Qodana-Runstatus fuer aktuellen SHA konnte nicht geladen werden"
       fi
@@ -135,15 +145,45 @@ if [[ -n "${GITHUB_SHA:-}" ]]; then
       continue
     fi
 
-    qodana_status="$(jq -r '.workflow_runs[] | select(.name=="qodana") | .status' "${qodana_runs_json}" | head -n1)"
-    qodana_conclusion="$(jq -r '.workflow_runs[] | select(.name=="qodana") | .conclusion' "${qodana_runs_json}" | head -n1)"
-    qodana_url="$(jq -r '.workflow_runs[] | select(.name=="qodana") | .html_url' "${qodana_runs_json}" | head -n1)"
+    if [[ "${EVENT_NAME}" == "pull_request" ]]; then
+      qodana_status="$(jq -r \
+        --arg pr_head_sha "${pr_head_sha}" \
+        --arg pr_head_ref "${pr_head_ref}" \
+        '.workflow_runs
+         | map(select(.name=="qodana"))
+         | map(select((($pr_head_sha != "") and (.head_sha == $pr_head_sha)) or (($pr_head_ref != "") and (.head_branch == $pr_head_ref))))
+         | sort_by(.created_at)
+         | reverse
+         | .[0].status // empty' "${qodana_runs_json}")"
+      qodana_conclusion="$(jq -r \
+        --arg pr_head_sha "${pr_head_sha}" \
+        --arg pr_head_ref "${pr_head_ref}" \
+        '.workflow_runs
+         | map(select(.name=="qodana"))
+         | map(select((($pr_head_sha != "") and (.head_sha == $pr_head_sha)) or (($pr_head_ref != "") and (.head_branch == $pr_head_ref))))
+         | sort_by(.created_at)
+         | reverse
+         | .[0].conclusion // empty' "${qodana_runs_json}")"
+      qodana_url="$(jq -r \
+        --arg pr_head_sha "${pr_head_sha}" \
+        --arg pr_head_ref "${pr_head_ref}" \
+        '.workflow_runs
+         | map(select(.name=="qodana"))
+         | map(select((($pr_head_sha != "") and (.head_sha == $pr_head_sha)) or (($pr_head_ref != "") and (.head_branch == $pr_head_ref))))
+         | sort_by(.created_at)
+         | reverse
+         | .[0].html_url // empty' "${qodana_runs_json}")"
+    else
+      qodana_status="$(jq -r '.workflow_runs | map(select(.name=="qodana")) | sort_by(.created_at) | reverse | .[0].status // empty' "${qodana_runs_json}")"
+      qodana_conclusion="$(jq -r '.workflow_runs | map(select(.name=="qodana")) | sort_by(.created_at) | reverse | .[0].conclusion // empty' "${qodana_runs_json}")"
+      qodana_url="$(jq -r '.workflow_runs | map(select(.name=="qodana")) | sort_by(.created_at) | reverse | .[0].html_url // empty' "${qodana_runs_json}")"
+    fi
 
     if [[ -z "${qodana_status}" ]]; then
       if (( wait_attempt >= wait_max_attempts )); then
-        fail "Kein qodana-Run fuer SHA=${GITHUB_SHA} gefunden"
+        fail "Kein qodana-Run fuer aktuellen Kontext gefunden (sha=${GITHUB_SHA}, pr_head_sha=${pr_head_sha:-n/a}, pr_head_ref=${pr_head_ref:-n/a})"
       fi
-      log "INFO: qodana-Run fuer SHA=${GITHUB_SHA} noch nicht sichtbar (retry ${wait_attempt}/${wait_max_attempts})"
+      log "INFO: qodana-Run noch nicht sichtbar (retry ${wait_attempt}/${wait_max_attempts})"
       sleep "${wait_delay}"
       wait_attempt=$((wait_attempt + 1))
       continue
