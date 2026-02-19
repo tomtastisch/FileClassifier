@@ -67,7 +67,7 @@ public sealed class ArchiveInternalsNestedBranchUnitTests
     }
 
     [Fact]
-    public void TryReadEntryPayloadBounded_ReturnsFalse_ForInvalidInputs()
+    public void TryReadEntryPayloadBoundedWithOptions_ReturnsFalse_ForInvalidInputs()
     {
         var method = typeof(SharpCompressArchiveBackend).GetMethod(
             "TryReadEntryPayloadBoundedWithOptions",
