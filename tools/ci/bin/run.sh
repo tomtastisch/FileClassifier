@@ -451,7 +451,8 @@ run_pr_labeling() {
 run_qodana_contract() {
   build_validators
   local sarif_path="${OUT_DIR}/qodana.sarif.json"
-  if ! ci_run_capture "Qodana contract validator" dotnet "${ROOT_DIR}/tools/ci/checks/QodanaContractValidator/bin/Release/net10.0/QodanaContractValidator.dll" --sarif "$sarif_path"; then
+  local filtered_sarif_path="${OUT_DIR}/qodana.upload.sarif.json"
+  if ! ci_run_capture "Qodana contract validator" dotnet "${ROOT_DIR}/tools/ci/checks/QodanaContractValidator/bin/Release/net10.0/QodanaContractValidator.dll" --sarif "$sarif_path" --filtered-sarif-out "$filtered_sarif_path"; then
     if log_contains_code "CI-QODANA-001"; then
       ci_result_add_violation "CI-QODANA-001" "fail" "QODANA_TOKEN missing" "$CI_RAW_LOG"
     elif log_contains_code "CI-QODANA-002"; then
@@ -465,6 +466,10 @@ run_qodana_contract() {
     else
       ci_result_add_violation "CI-QODANA-001" "fail" "Qodana contract validation failed" "$CI_RAW_LOG"
     fi
+    return 1
+  fi
+  if [[ ! -f "${filtered_sarif_path}" ]]; then
+    ci_result_add_violation "CI-QODANA-003" "fail" "Filtered SARIF output missing" "$CI_RAW_LOG" "${filtered_sarif_path}"
     return 1
   fi
   ci_result_append_summary "Qodana contract validation completed."

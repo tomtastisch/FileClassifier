@@ -62,19 +62,39 @@ fi
 
 # Gate strategy:
 # - Default: enforce 0 open alerts on main (prevents unrelated merges while main is red).
-# - Exception: PRs labeled "area:qodana" are allowed to validate against the PR ref, so the cleanup PR itself can merge.
+# - Exception: Qodana-cleanup PRs validate against the PR ref, so the cleanup PR itself can merge.
+#   Detection is fail-safe and deterministic:
+#   1) explicit label "area:qodana", OR
+#   2) changed files include qodana paths (independent of label-job timing).
 EVENT_NAME="${GITHUB_EVENT_NAME:-}"
 QUERY_REF=""
 if [[ "${EVENT_NAME}" == "pull_request" && -n "${GITHUB_EVENT_PATH:-}" && -f "${GITHUB_EVENT_PATH:-}" ]]; then
+  pr_number="$(jq -r '.pull_request.number // empty' "${GITHUB_EVENT_PATH}")"
+  has_qodana_label="false"
   if jq -r '.pull_request.labels[].name // empty' "${GITHUB_EVENT_PATH}" | grep -Fxq -- "area:qodana"; then
+    has_qodana_label="true"
+  fi
+
+  has_qodana_changes="false"
+  if [[ -n "${pr_number}" ]]; then
+    files_json="${OUT_DIR}/pr-files.json"
+    if gh api "repos/${REPO}/pulls/${pr_number}/files?per_page=100" --paginate > "${files_json}" 2>> "${RAW_LOG}"; then
+      if jq -r '.[].filename' "${files_json}" | grep -Eiq '^(\.qodana/|qodana\.ya?ml$|\.github/workflows/qodana\.yml$)'; then
+        has_qodana_changes="true"
+      fi
+    else
+      log "WARN: PR files konnten nicht geladen werden; fallback auf Label-basierte Erkennung."
+    fi
+  fi
+
+  if [[ "${has_qodana_label}" == "true" || "${has_qodana_changes}" == "true" ]]; then
     QUERY_REF="${GITHUB_REF:-}"
     if [[ -z "${QUERY_REF}" ]]; then
-      pr_number="$(jq -r '.pull_request.number // empty' "${GITHUB_EVENT_PATH}")"
       if [[ -n "${pr_number}" ]]; then
         QUERY_REF="refs/pull/${pr_number}/merge"
       fi
     fi
-    log "INFO: PR hat Label area:qodana -> pruefe Code-Scanning Alerts fuer ref=${QUERY_REF:-<unset>}"
+    log "INFO: Qodana-PR erkannt (label=${has_qodana_label}, files=${has_qodana_changes}) -> pruefe Code-Scanning Alerts fuer ref=${QUERY_REF:-<unset>}"
   else
     QUERY_REF="refs/heads/main"
     log "INFO: PR ohne Label area:qodana -> pruefe Code-Scanning Alerts fuer ref=${QUERY_REF}"
