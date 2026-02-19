@@ -104,15 +104,27 @@ else
   log "INFO: Event=${EVENT_NAME:-<unset>} -> pruefe Code-Scanning Alerts fuer ref=${QUERY_REF}"
 fi
 
-# On main push events, code-scanning alert state can lag until the qodana workflow for the same SHA
-# uploads SARIF. Wait fail-closed for that run to complete to avoid preflight race failures.
-if [[ "${EVENT_NAME}" != "pull_request" && "${QUERY_REF}" == "refs/heads/main" && -n "${GITHUB_SHA:-}" ]]; then
+# Alert state can lag until the qodana workflow for the same SHA uploads SARIF.
+# Wait fail-closed in both cases:
+# - main push validation (ref=main),
+# - PR Qodana-cleanup validation (ref=refs/pull/<n>/merge).
+if [[ -n "${GITHUB_SHA:-}" ]]; then
+  should_wait_for_qodana="false"
+  if [[ "${EVENT_NAME}" != "pull_request" && "${QUERY_REF}" == "refs/heads/main" ]]; then
+    should_wait_for_qodana="true"
+  fi
+  if [[ "${QUERY_REF}" != "refs/heads/main" ]]; then
+    should_wait_for_qodana="true"
+  fi
+
+  if [[ "${should_wait_for_qodana}" == "true" ]]; then
   wait_attempt=1
-  wait_max_attempts=36
+  wait_max_attempts=48
   wait_delay=10
+  run_event_filter="${EVENT_NAME:-push}"
   while true; do
     qodana_runs_json="${OUT_DIR}/qodana-runs.json"
-    if ! gh api "repos/${REPO}/actions/runs?head_sha=${GITHUB_SHA}&event=push&per_page=100" > "${qodana_runs_json}" 2>> "${RAW_LOG}"; then
+    if ! gh api "repos/${REPO}/actions/runs?head_sha=${GITHUB_SHA}&event=${run_event_filter}&per_page=100" > "${qodana_runs_json}" 2>> "${RAW_LOG}"; then
       if (( wait_attempt >= wait_max_attempts )); then
         fail "Qodana-Runstatus fuer aktuellen SHA konnte nicht geladen werden"
       fi
@@ -153,6 +165,7 @@ if [[ "${EVENT_NAME}" != "pull_request" && "${QUERY_REF}" == "refs/heads/main" &
     log "INFO: qodana-Run fuer SHA=${GITHUB_SHA} erfolgreich abgeschlossen (${qodana_url:-n/a})"
     break
   done
+  fi
 fi
 
 attempt=1
