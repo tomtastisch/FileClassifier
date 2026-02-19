@@ -79,7 +79,7 @@ if [[ "${EVENT_NAME}" == "pull_request" && -n "${GITHUB_EVENT_PATH:-}" && -f "${
   if [[ -n "${pr_number}" ]]; then
     files_json="${OUT_DIR}/pr-files.json"
     if gh api "repos/${REPO}/pulls/${pr_number}/files?per_page=100" --paginate > "${files_json}" 2>> "${RAW_LOG}"; then
-      if jq -r '.[].filename' "${files_json}" | grep -Eiq '^(\.qodana/|qodana\.ya?ml$|\.github/workflows/qodana\.yml$)'; then
+      if jq -r '.[].filename' "${files_json}" | grep -Eiq '^(\.qodana/|qodana\.ya?ml$|\.github/workflows/qodana\.yml$|tools/ci/check-code-scanning-tools-zero\.sh$|tools/versioning/compute-pr-labels\.js$)'; then
         has_qodana_changes="true"
       fi
     else
