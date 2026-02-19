@@ -129,9 +129,12 @@ Namespace Global.Tomtastisch.FileClassifier
             Try
                 Dim options = New SharpCompress.Readers.ReaderOptions() With {.LeaveStreamOpen = True}
                 Return OpenArchiveFactoryCompat(stream, options)
+            Catch ex As TargetInvocationException When IsExpectedInvocationException(ex)
+                Return Nothing
+            Catch ex As TargetInvocationException
+                Throw
             Catch ex As Exception When _
                 TypeOf ex Is MissingMethodException OrElse
-                TypeOf ex Is System.Reflection.TargetInvocationException OrElse
                 TypeOf ex Is InvalidOperationException OrElse
                 TypeOf ex Is NotSupportedException OrElse
                 TypeOf ex Is ArgumentException
@@ -163,14 +166,28 @@ Namespace Global.Tomtastisch.FileClassifier
             Try
                 Dim options = New SharpCompress.Readers.ReaderOptions() With {.LeaveStreamOpen = True}
                 Return OpenGZipArchiveCompat(stream, options)
+            Catch ex As TargetInvocationException When IsExpectedInvocationException(ex)
+                Return Nothing
+            Catch ex As TargetInvocationException
+                Throw
             Catch ex As Exception When _
                 TypeOf ex Is MissingMethodException OrElse
-                TypeOf ex Is System.Reflection.TargetInvocationException OrElse
                 TypeOf ex Is InvalidOperationException OrElse
                 TypeOf ex Is NotSupportedException OrElse
                 TypeOf ex Is ArgumentException
                 Return Nothing
             End Try
+        End Function
+
+        Private Shared Function IsExpectedInvocationException(ex As TargetInvocationException) As Boolean
+            Dim inner = ex?.InnerException
+            If inner Is Nothing Then Return False
+
+            Return TypeOf inner Is InvalidOperationException OrElse
+                TypeOf inner Is NotSupportedException OrElse
+                TypeOf inner Is ArgumentException OrElse
+                TypeOf inner Is InvalidDataException OrElse
+                TypeOf inner Is IOException
         End Function
 
         Private Shared Function OpenArchiveFactoryCompat(
