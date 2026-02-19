@@ -11,6 +11,8 @@ Option Strict On
 Option Explicit On
 
 Imports System.IO
+Imports System.Reflection
+Imports System.Security
 
 Namespace Global.Tomtastisch.FileClassifier
     ''' <summary>
@@ -191,15 +193,15 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function GetOpenCompatMethod(type As Type) As System.Reflection.MethodInfo
             Dim signature = New Type() {GetType(Stream), GetType(SharpCompress.Readers.ReaderOptions)}
-            Dim method = type.GetMethod("OpenArchive", System.Reflection.BindingFlags.Public Or
-                                                       System.Reflection.BindingFlags.Static,
+            Dim method = type.GetMethod("OpenArchive", BindingFlags.Public Or
+                                                       BindingFlags.Static,
                                         binder:=Nothing,
                                         types:=signature,
                                         modifiers:=Nothing)
             If method IsNot Nothing Then Return method
 
-            method = type.GetMethod("Open", System.Reflection.BindingFlags.Public Or
-                                            System.Reflection.BindingFlags.Static,
+            method = type.GetMethod("Open", BindingFlags.Public Or
+                                            BindingFlags.Static,
                                     binder:=Nothing,
                                     types:=signature,
                                     modifiers:=Nothing)
@@ -228,7 +230,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -268,7 +270,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -283,7 +285,7 @@ Namespace Global.Tomtastisch.FileClassifier
                     StreamGuard.RewindToStart(stream)
                 Catch ex As Exception When _
                     TypeOf ex Is UnauthorizedAccessException OrElse
-                    TypeOf ex Is System.Security.SecurityException OrElse
+                    TypeOf ex Is SecurityException OrElse
                     TypeOf ex Is IOException OrElse
                     TypeOf ex Is NotSupportedException OrElse
                     TypeOf ex Is ArgumentException OrElse
@@ -392,7 +394,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return entries.AsReadOnly()
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                    TypeOf ex Is SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -430,7 +432,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 destinationFull = Path.GetFullPath(destinationDirectory)
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                    TypeOf ex Is SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is PathTooLongException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -466,7 +468,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return True
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -481,7 +483,7 @@ Namespace Global.Tomtastisch.FileClassifier
                         Directory.Delete(stageDir, recursive:=True)
                     Catch ex As Exception When _
                         TypeOf ex Is UnauthorizedAccessException OrElse
-                        TypeOf ex Is System.Security.SecurityException OrElse
+                        TypeOf ex Is SecurityException OrElse
                         TypeOf ex Is IOException OrElse
                         TypeOf ex Is NotSupportedException OrElse
                         TypeOf ex Is ArgumentException
@@ -507,7 +509,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 targetPath = Path.GetFullPath(Path.Combine(destinationPrefix, entryName))
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is PathTooLongException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -550,7 +552,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return True
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -592,7 +594,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return True
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -691,7 +693,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -721,7 +723,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -834,7 +836,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return True
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -924,7 +926,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -984,7 +986,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return True
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
