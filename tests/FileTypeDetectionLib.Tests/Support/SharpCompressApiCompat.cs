@@ -27,13 +27,9 @@ internal static class SharpCompressApiCompat
         var args = new object[] { stream, archiveType, options };
         var signature = new[] { typeof(Stream), typeof(ArchiveType), typeof(WriterOptions) };
 
-        var method = typeof(WriterFactory).GetMethod("OpenWriter", signature);
-        method ??= typeof(WriterFactory).GetMethod("Open", signature);
-
-        if (method is null)
-        {
-            throw new MissingMethodException(typeof(WriterFactory).FullName, "OpenWriter/Open(Stream, ArchiveType, WriterOptions) [compat]");
-        }
+        var method = typeof(WriterFactory).GetMethod("OpenWriter", signature)
+            ?? typeof(WriterFactory).GetMethod("Open", signature)
+            ?? throw new MissingMethodException(typeof(WriterFactory).FullName, "OpenWriter/Open(Stream, ArchiveType, WriterOptions) [compat]");
 
         return (IWriter)method.Invoke(null, args)!;
     }
@@ -43,13 +39,9 @@ internal static class SharpCompressApiCompat
         var args = new object[] { stream, options };
         var signature = new[] { typeof(Stream), typeof(ReaderOptions) };
 
-        var method = type.GetMethod("OpenArchive", signature);
-        method ??= type.GetMethod("Open", signature);
-
-        if (method is null)
-        {
-            throw new MissingMethodException(type.FullName, "OpenArchive/Open(Stream, ReaderOptions)");
-        }
+        var method = type.GetMethod("OpenArchive", signature)
+            ?? type.GetMethod("Open", signature)
+            ?? throw new MissingMethodException(type.FullName, "OpenArchive/Open(Stream, ReaderOptions)");
 
         return method.Invoke(null, args)!;
     }

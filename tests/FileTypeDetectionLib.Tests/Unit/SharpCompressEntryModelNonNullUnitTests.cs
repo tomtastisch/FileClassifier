@@ -1,6 +1,5 @@
 using System.Text;
 using FileTypeDetectionLib.Tests.Support;
-using SharpCompress.Archives;
 using SharpCompress.Common;
 using SharpCompress.Writers;
 using Tomtastisch.FileClassifier;
