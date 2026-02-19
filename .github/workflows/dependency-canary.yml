@@ -20,7 +20,7 @@ permissions:
 jobs:
   canary-sharpcompress:
     if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == 'SharpCompress'
-    uses: ./.github/workflows/_qodana-contract.yml
+    uses: ./.github/workflows/qodana-contract-core.yml
     with:
       pre_command: bash -euo pipefail tools/ci/bin/dependency-canary.sh "SharpCompress" "${{ inputs.version || 'latest' }}"
       artifact_name: canary-SharpCompress
@@ -29,7 +29,7 @@ jobs:
 
   canary-recyclable:
     if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == 'Microsoft.IO.RecyclableMemoryStream'
-    uses: ./.github/workflows/_qodana-contract.yml
+    uses: ./.github/workflows/qodana-contract-core.yml
     with:
       pre_command: bash -euo pipefail tools/ci/bin/dependency-canary.sh "Microsoft.IO.RecyclableMemoryStream" "${{ inputs.version || 'latest' }}"
       artifact_name: canary-Microsoft.IO.RecyclableMemoryStream
@@ -38,7 +38,7 @@ jobs:
 
   canary-system-text-json:
     if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == 'System.Text.Json'
-    uses: ./.github/workflows/_qodana-contract.yml
+    uses: ./.github/workflows/qodana-contract-core.yml
     with:
       pre_command: bash -euo pipefail tools/ci/bin/dependency-canary.sh "System.Text.Json" "${{ inputs.version || 'latest' }}"
       artifact_name: canary-System.Text.Json

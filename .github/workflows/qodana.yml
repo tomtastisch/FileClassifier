@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   qodana:
-    uses: ./.github/workflows/_qodana-contract.yml
+    uses: ./.github/workflows/qodana-contract-core.yml
     with:
       artifact_name: ci-qodana
       upload_sarif: true
