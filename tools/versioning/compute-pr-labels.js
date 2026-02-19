@@ -20,6 +20,7 @@ const AREA_RULES = [
   { prefix: '.github/workflows/', label: 'area:pipeline' },
   { prefix: '.qodana/', label: 'area:qodana' },
   { exact: 'qodana.yaml', label: 'area:qodana' },
+  { exact: '.github/workflows/qodana.yml', label: 'area:qodana' },
   { prefix: 'src/FileTypeDetection/Infrastructure/Archive', label: 'area:archive' },
   { prefix: 'src/FileTypeDetection/ArchiveProcessing', label: 'area:archive' },
   { exact: 'src/FileTypeDetection/EvidenceHashing.vb', label: 'area:hashing' },
