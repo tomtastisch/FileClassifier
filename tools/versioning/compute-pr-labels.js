@@ -22,6 +22,7 @@ const AREA_RULES = [
   { exact: 'qodana.yaml', label: 'area:qodana' },
   { exact: '.github/workflows/qodana.yml', label: 'area:qodana' },
   { exact: 'tools/ci/check-code-scanning-tools-zero.sh', label: 'area:qodana' },
+  { exact: 'tools/versioning/compute-pr-labels.js', label: 'area:qodana' },
   { prefix: 'src/FileTypeDetection/Infrastructure/Archive', label: 'area:archive' },
   { prefix: 'src/FileTypeDetection/ArchiveProcessing', label: 'area:archive' },
   { exact: 'src/FileTypeDetection/EvidenceHashing.vb', label: 'area:hashing' },
