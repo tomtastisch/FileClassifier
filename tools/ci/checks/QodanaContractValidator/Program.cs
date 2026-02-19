@@ -4,7 +4,11 @@ var nonBlockingHighRuleIds = new HashSet<string>(StringComparer.OrdinalIgnoreCas
 {
     // Style/noise findings that are not security/reliability regressions for CI gate purposes.
     "CheckNamespace",
-    "RedundantQualifier"
+    "RedundantQualifier",
+    "RedundantSuppressNullableWarningExpression",
+    "UnusedImportClause",
+    "UnusedMember.Local",
+    "VBWarnings__BC42309"
 };
 
 var argsList = args.ToList();

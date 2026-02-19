@@ -861,11 +861,6 @@ Namespace Global.Tomtastisch.FileClassifier
             Return True
         End Function
 
-        Private Shared Function TryReadEntryPayloadBounded(entry As SharpCompress.Archives.IArchiveEntry, maxBytes As Long,
-                                                            ByRef payload As Byte()) As Boolean
-            Return TryReadEntryPayloadBoundedWithOptions(entry, maxBytes, FileTypeOptions.GetSnapshot(), payload)
-        End Function
-
         Private Shared Function TryReadEntryPayloadBoundedWithOptions(
                                                                        entry As SharpCompress.Archives.IArchiveEntry,
                                                                        maxBytes As Long,
