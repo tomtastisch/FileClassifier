@@ -26,16 +26,10 @@ jobs:
         shell: bash
         run: |
           dep="${{ github.event.inputs.dependency || 'all' }}"
-          case "${dep}" in
-            all|SharpCompress|Microsoft.IO.RecyclableMemoryStream|System.Text.Json)
-              echo "OK: dependency input='${dep}'"
-              ;;
-            *)
-              echo "FAIL: unsupported dependency input='${dep}'" >&2
-              echo "Allowed: all, SharpCompress, Microsoft.IO.RecyclableMemoryStream, System.Text.Json" >&2
-              exit 1
-              ;;
-          esac
+          [[ "${dep}" == "all" || "${dep}" == "SharpCompress" || "${dep}" == "Microsoft.IO.RecyclableMemoryStream" || "${dep}" == "System.Text.Json" ]] && { echo "OK: dependency input='${dep}'"; exit 0; }
+          echo "FAIL: unsupported dependency input='${dep}'" >&2
+          echo "Allowed: all, SharpCompress, Microsoft.IO.RecyclableMemoryStream, System.Text.Json" >&2
+          exit 1
 
   canary:
     needs: [validate-dispatch-inputs]
