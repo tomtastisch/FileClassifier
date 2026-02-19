@@ -79,7 +79,8 @@ if [[ "${EVENT_NAME}" == "pull_request" && -n "${GITHUB_EVENT_PATH:-}" && -f "${
   if [[ -n "${pr_number}" ]]; then
     files_json="${OUT_DIR}/pr-files.json"
     if gh api "repos/${REPO}/pulls/${pr_number}/files?per_page=100" --paginate > "${files_json}" 2>> "${RAW_LOG}"; then
-      if jq -r '.[].filename' "${files_json}" | grep -Eiq '^(\.qodana/|qodana\.ya?ml$|\.github/workflows/qodana\.yml$)'; then
+      if jq -r '.[].filename' "${files_json}" | grep -Eiq '^(\.qodana/|qodana\.ya?ml$|\.github/workflows/qodana\.yml$)' || \
+         jq -r '.[].filename' "${files_json}" | grep -Eq '^(tools/ci/check-code-scanning-tools-zero\.sh$|tools/versioning/compute-pr-labels\.js$)'; then
         has_qodana_changes="true"
       fi
     else
@@ -102,6 +103,117 @@ if [[ "${EVENT_NAME}" == "pull_request" && -n "${GITHUB_EVENT_PATH:-}" && -f "${
 else
   QUERY_REF="${GITHUB_REF:-refs/heads/main}"
   log "INFO: Event=${EVENT_NAME:-<unset>} -> pruefe Code-Scanning Alerts fuer ref=${QUERY_REF}"
+fi
+
+# Alert state can lag until the qodana workflow for the same SHA uploads SARIF.
+# Wait fail-closed in both cases:
+# - main push validation (ref=main),
+# - PR Qodana-cleanup validation (ref=refs/pull/<n>/merge).
+if [[ -n "${GITHUB_SHA:-}" ]]; then
+  should_wait_for_qodana="false"
+  if [[ "${EVENT_NAME}" == "push" && "${QUERY_REF}" == "refs/heads/main" ]]; then
+    should_wait_for_qodana="true"
+  fi
+  if [[ "${QUERY_REF}" != "refs/heads/main" ]]; then
+    should_wait_for_qodana="true"
+  fi
+
+  if [[ "${should_wait_for_qodana}" == "true" ]]; then
+  wait_attempt=1
+  # Qodana can be queued behind runner load; allow an overridable fail-closed window.
+  wait_max_attempts="${QODANA_WAIT_MAX_ATTEMPTS:-120}"
+  wait_delay="${QODANA_WAIT_DELAY_SECONDS:-10}"
+  total_wait_timeout=$((wait_max_attempts * wait_delay))
+  run_event_filter="${EVENT_NAME:-push}"
+  pr_head_sha=""
+  pr_head_ref=""
+  if [[ "${EVENT_NAME}" == "pull_request" && -n "${GITHUB_EVENT_PATH:-}" && -f "${GITHUB_EVENT_PATH:-}" ]]; then
+    pr_head_sha="$(jq -r '.pull_request.head.sha // empty' "${GITHUB_EVENT_PATH}")"
+    pr_head_ref="$(jq -r '.pull_request.head.ref // empty' "${GITHUB_EVENT_PATH}")"
+    if [[ -n "${pr_head_sha}" ]]; then
+      run_event_filter="pull_request"
+    fi
+  fi
+  wait_started_epoch="$(date +%s)"
+  log "INFO: Warte auf qodana-Run (max_wait=${total_wait_timeout}s, attempts=${wait_max_attempts}, delay=${wait_delay}s, event_filter=${run_event_filter})"
+  while true; do
+    qodana_runs_json="${OUT_DIR}/qodana-runs.json"
+    api_path="repos/${REPO}/actions/runs?event=${run_event_filter}&per_page=100"
+    if [[ "${EVENT_NAME}" == "pull_request" && -n "${pr_head_sha}" ]]; then
+      api_path="${api_path}&head_sha=${pr_head_sha}"
+    elif [[ "${EVENT_NAME}" != "pull_request" ]]; then
+      api_path="${api_path}&head_sha=${GITHUB_SHA}"
+    fi
+    if ! gh api "${api_path}" > "${qodana_runs_json}" 2>> "${RAW_LOG}"; then
+      if (( wait_attempt >= wait_max_attempts )); then
+        fail "Qodana-Runstatus fuer aktuellen SHA konnte nicht geladen werden"
+      fi
+      log "WARN: Qodana-Runstatus API-Fehler, retry ${wait_attempt}/${wait_max_attempts}"
+      sleep "${wait_delay}"
+      wait_attempt=$((wait_attempt + 1))
+      continue
+    fi
+
+    if [[ "${EVENT_NAME}" == "pull_request" ]]; then
+      qodana_fields="$(jq -r \
+        --arg pr_head_sha "${pr_head_sha}" \
+        --arg pr_head_ref "${pr_head_ref}" \
+        '.workflow_runs
+         | map(select(.name=="qodana"))
+         | (if $pr_head_sha != "" then
+              map(select(.head_sha == $pr_head_sha))
+            elif $pr_head_ref != "" then
+              map(select(.head_branch == $pr_head_ref))
+            else
+              .
+            end)
+         | sort_by(.created_at)
+         | reverse
+         | .[0]
+         | [(.status // ""), (.conclusion // ""), (.html_url // "")]
+         | @tsv' "${qodana_runs_json}")"
+    else
+      qodana_fields="$(jq -r \
+        '.workflow_runs
+         | map(select(.name=="qodana"))
+         | sort_by(.created_at)
+         | reverse
+         | .[0]
+         | [(.status // ""), (.conclusion // ""), (.html_url // "")]
+         | @tsv' "${qodana_runs_json}")"
+    fi
+    IFS=$'\t' read -r qodana_status qodana_conclusion qodana_url <<< "${qodana_fields:-}"
+
+    if [[ -z "${qodana_status}" ]]; then
+      if (( wait_attempt >= wait_max_attempts )); then
+        waited_seconds=$(( $(date +%s) - wait_started_epoch ))
+        fail "Kein qodana-Run fuer aktuellen Kontext gefunden (sha=${GITHUB_SHA}, pr_head_sha=${pr_head_sha:-n/a}, pr_head_ref=${pr_head_ref:-n/a}, waited=${waited_seconds}s)"
+      fi
+      log "INFO: qodana-Run noch nicht sichtbar (retry ${wait_attempt}/${wait_max_attempts})"
+      sleep "${wait_delay}"
+      wait_attempt=$((wait_attempt + 1))
+      continue
+    fi
+
+    if [[ "${qodana_status}" != "completed" ]]; then
+      if (( wait_attempt >= wait_max_attempts )); then
+        waited_seconds=$(( $(date +%s) - wait_started_epoch ))
+        fail "qodana-Run fuer SHA=${GITHUB_SHA} ist nicht abgeschlossen (status=${qodana_status}, waited=${waited_seconds}s)"
+      fi
+      log "INFO: warte auf qodana-Runabschluss (status=${qodana_status}, retry ${wait_attempt}/${wait_max_attempts})"
+      sleep "${wait_delay}"
+      wait_attempt=$((wait_attempt + 1))
+      continue
+    fi
+
+    if [[ "${qodana_conclusion}" != "success" ]]; then
+      fail "qodana-Run fuer SHA=${GITHUB_SHA} ist fehlgeschlagen (conclusion=${qodana_conclusion:-unknown}, url=${qodana_url:-n/a})"
+    fi
+
+    log "INFO: qodana-Run fuer SHA=${GITHUB_SHA} erfolgreich abgeschlossen (${qodana_url:-n/a})"
+    break
+  done
+  fi
 fi
 
 attempt=1
