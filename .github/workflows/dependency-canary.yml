@@ -1,0 +1,46 @@
+name: dependency-canary
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+    inputs:
+      dependency:
+        description: "Dependency to probe (all or exact package id)"
+        required: false
+        default: "all"
+      version:
+        description: "Target version or 'latest'"
+        required: false
+        default: "latest"
+
+permissions:
+  contents: read
+
+jobs:
+  canary-sharpcompress:
+    if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == 'SharpCompress'
+    uses: ./.github/workflows/_qodana-contract.yml
+    with:
+      pre_command: bash -euo pipefail tools/ci/bin/dependency-canary.sh "SharpCompress" "${{ inputs.version || 'latest' }}"
+      artifact_name: canary-SharpCompress
+      upload_sarif: false
+    secrets: inherit
+
+  canary-recyclable:
+    if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == 'Microsoft.IO.RecyclableMemoryStream'
+    uses: ./.github/workflows/_qodana-contract.yml
+    with:
+      pre_command: bash -euo pipefail tools/ci/bin/dependency-canary.sh "Microsoft.IO.RecyclableMemoryStream" "${{ inputs.version || 'latest' }}"
+      artifact_name: canary-Microsoft.IO.RecyclableMemoryStream
+      upload_sarif: false
+    secrets: inherit
+
+  canary-system-text-json:
+    if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == 'System.Text.Json'
+    uses: ./.github/workflows/_qodana-contract.yml
+    with:
+      pre_command: bash -euo pipefail tools/ci/bin/dependency-canary.sh "System.Text.Json" "${{ inputs.version || 'latest' }}"
+      artifact_name: canary-System.Text.Json
+      upload_sarif: false
+    secrets: inherit

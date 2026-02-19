@@ -126,19 +126,7 @@ resolve_nupkg_path() {
 derive_from_filename() {
   local filename
   filename="$(basename "${NUPKG_PATH}")"
-  python3 - "$filename" <<'PY'
-import re
-import sys
-
-name = sys.argv[1]
-m = re.match(r'^(?P<id>.+)\.(?P<ver>\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?)\.nupkg$', name)
-if not m:
-    print()
-    print()
-    sys.exit(0)
-print(m.group("id"))
-print(m.group("ver"))
-PY
+  python3 tools/ci/bin/verify_nuget_release_helpers.py derive-filename --filename "$filename"
 }
 
 derive_from_nuspec() {
@@ -146,34 +134,7 @@ derive_from_nuspec() {
   nuspec_xml="$(unzip -p "${NUPKG_PATH}" '*.nuspec' 2>/dev/null)" || fail "Unable to read .nuspec from ${NUPKG_PATH}"
 
   local parsed
-  parsed="$(NUSPEC_XML="${nuspec_xml}" python3 - <<'PY'
-import re
-import sys
-import xml.etree.ElementTree as ET
-import os
-
-text = os.environ.get("NUSPEC_XML", "")
-try:
-    root = ET.fromstring(text)
-except ET.ParseError:
-    def by_regex(tag):
-        m = re.search(rf'<{tag}>\s*([^<]+?)\s*</{tag}>', text, flags=re.IGNORECASE)
-        return m.group(1).strip() if m else ""
-    print(by_regex("id"))
-    print(by_regex("version"))
-    sys.exit(0)
-
-def find_first(node, tag_name):
-    for elem in node.iter():
-        local = elem.tag.rsplit('}', 1)[-1]
-        if local == tag_name and elem.text:
-            return elem.text.strip()
-    return ""
-
-print(find_first(root, "id"))
-print(find_first(root, "version"))
-PY
-)"
+  parsed="$(python3 tools/ci/bin/verify_nuget_release_helpers.py derive-nuspec --nuspec-xml "${nuspec_xml}")"
 
   printf '%s\n' "${parsed}"
 }
@@ -186,42 +147,7 @@ query_search() {
   response="$(curl -fsS --compressed --max-time "${TIMEOUT_SECONDS}" "${SEARCH_URL}")" || return 1
 
   local out
-  out="$(SEARCH_RESPONSE="${response}" python3 - "$PKG_ID" "$PKG_VER" <<'PY'
-import json
-import sys
-import os
-
-pkg = sys.argv[1].lower()
-ver = sys.argv[2]
-data = json.loads(os.environ.get("SEARCH_RESPONSE", "{}"))
-registration = ""
-has_id = False
-has_ver = False
-
-for item in data.get("data", []):
-    item_id = str(item.get("id", ""))
-    if item_id.lower() != pkg:
-        continue
-    has_id = True
-    for v in item.get("versions", []):
-        if isinstance(v, dict) and str(v.get("version", "")) == ver:
-            has_ver = True
-            break
-    if item.get("registration"):
-        registration = str(item["registration"])
-
-if not has_id:
-    print("missing_id", file=sys.stderr)
-    sys.exit(2)
-if not has_ver:
-    print("missing_version", file=sys.stderr)
-    sys.exit(3)
-if not registration:
-    print("missing_registration", file=sys.stderr)
-    sys.exit(4)
-print(registration)
-PY
-)" || return 1
+  out="$(python3 tools/ci/bin/verify_nuget_release_helpers.py query-search --response-json "${response}" --pkg-id "$PKG_ID" --pkg-ver "$PKG_VER")" || return 1
 
   REGISTRATION_URL="${out}"
   SEARCH_OK="ok"
@@ -238,33 +164,7 @@ query_registration() {
   local response
   response="$(curl -fsS --compressed --max-time "${TIMEOUT_SECONDS}" "${REGISTRATION_URL}")" || return 1
 
-  REGISTRATION_RESPONSE="${response}" python3 - "$PKG_VER" <<'PY' >/dev/null || return 1
-import json
-import sys
-import os
-
-target = sys.argv[1].lower()
-obj = json.loads(os.environ.get("REGISTRATION_RESPONSE", "{}"))
-found = False
-
-def walk(node):
-    global found
-    if found:
-        return
-    if isinstance(node, dict):
-        for k, v in node.items():
-            if k.lower() == "version" and isinstance(v, str) and v.lower() == target:
-                found = True
-                return
-            walk(v)
-    elif isinstance(node, list):
-        for item in node:
-            walk(item)
-
-walk(obj)
-if not found:
-    sys.exit(2)
-PY
+  python3 tools/ci/bin/verify_nuget_release_helpers.py registration-contains --response-json "${response}" --pkg-ver "$PKG_VER" >/dev/null || return 1
 
   REGISTRATION_OK="ok"
   return 0
@@ -304,26 +204,7 @@ query_v2_download() {
 }
 
 emit_summary_json() {
-  python3 - <<'PY'
-import json
-import os
-
-print(json.dumps({
-    "id": os.environ.get("PKG_ID", ""),
-    "version": os.environ.get("PKG_VER", ""),
-    "expected": os.environ.get("EXPECTED_VERSION", ""),
-    "verify_online": os.environ.get("VERIFY_ONLINE", ""),
-    "require_search": os.environ.get("REQUIRE_SEARCH", ""),
-    "require_registration": os.environ.get("REQUIRE_REGISTRATION", ""),
-    "require_flatcontainer": os.environ.get("REQUIRE_FLATCONTAINER", ""),
-    "require_v2_download": os.environ.get("REQUIRE_V2_DOWNLOAD", ""),
-    "registration": os.environ.get("REGISTRATION_URL", ""),
-    "search": os.environ.get("SEARCH_OK", "skipped"),
-    "registration_check": os.environ.get("REGISTRATION_OK", "skipped"),
-    "flatcontainer": os.environ.get("FLATCONTAINER_OK", "skipped"),
-    "v2_download": os.environ.get("V2_DOWNLOAD_OK", "skipped")
-}, separators=(",", ":")))
-PY
+  python3 tools/ci/bin/verify_nuget_release_helpers.py emit-summary
 }
 
 main() {

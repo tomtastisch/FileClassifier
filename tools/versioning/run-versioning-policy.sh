@@ -18,7 +18,7 @@ files_json="$(python3 tools/ci/bin/github_api.py pr-files --repo "${REPO}" --pr 
 labels_json="[]"
 for _ in {1..12}; do
   labels_json="$(python3 tools/ci/bin/github_api.py issue-labels --repo "${REPO}" --issue "${PR_NUMBER}")"
-  count="$(python3 -c 'import json,sys; labels=json.loads(sys.argv[1]); print(sum(1 for l in labels if isinstance(l, str) and l.startswith("versioning:")))' "${labels_json}")"
+  count="$(python3 tools/versioning/count_prefixed_labels.py --labels-json "${labels_json}" --prefix "versioning:")"
   if [[ "${count}" -eq 1 ]]; then
     break
   fi

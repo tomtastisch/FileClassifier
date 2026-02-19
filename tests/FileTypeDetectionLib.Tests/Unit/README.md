@@ -51,6 +51,7 @@ Direkter Nachweis von API-Korrektheit, Security-Regeln und Determinismus.
 | `ArchiveTypeResolverAdditionalUnitTests.cs`              | Stream/Bytes Branches in ArchiveTypeResolver                                  |
 | `ArchiveTypeResolverExceptionUnitTests.cs`               | Exception-Pfade in ArchiveTypeResolver                                        |
 | `SharpCompressArchiveBackendUnitTests.cs`                | Branches fuer SharpCompress-Backend                                           |
+| `ArchiveSharpCompressCompatUnitTests.cs`                 | Contract-Guards fuer SharpCompress-Kompat-Schicht                             |
 | `SharpCompressEntryModelUnitTests.cs`                    | Null-Entry Defaults im SharpCompressEntryModel                                |
 | `SharpCompressEntryModelNonNullUnitTests.cs`             | Real-Entry Pfade im SharpCompressEntryModel                                   |
 | `FileTypeDetectorAdditionalUnitTests.cs`                 | LoadOptions/ReadFileSafe/Detect Branches                                      |

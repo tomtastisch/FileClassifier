@@ -1,0 +1,19 @@
+{
+  "dependencies": [
+    {
+      "name": "SharpCompress",
+      "risk": "archive-parser",
+      "test_filter": "SharpCompress|ArchiveInternalsNestedBranchUnitTests|CoreAndArchiveInternalsFailClosedUnitTests|ArchiveSharpCompressCompatUnitTests"
+    },
+    {
+      "name": "Microsoft.IO.RecyclableMemoryStream",
+      "risk": "memory-stream-core",
+      "test_filter": "ArchiveStreamEngineUnitTests|ArchiveManagedBackendUnitTests|ArchiveProcessingFacadeUnitTests|FileMaterializerUnitTests"
+    },
+    {
+      "name": "System.Text.Json",
+      "risk": "json-input-parser",
+      "test_filter": "FileTypeOptionsFacadeUnitTests|FileTypeDetectorAdditionalUnitTests|FileTypeDetectorPrivateBranchUnitTests|FixtureManifestCatalogUnitTests"
+    }
+  ]
+}

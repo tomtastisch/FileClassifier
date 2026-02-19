@@ -36,23 +36,7 @@ fi
 
 if [[ -z "${NUGET_API_KEY}" ]]; then
   NUGET_API_KEY="$(
-    python3 - <<'PY' || true
-import subprocess
-import os
-try:
-    user = os.environ.get("USER", "")
-    result = subprocess.run(
-        ["security", "find-generic-password", "-a", user, "-s", "NUGET_API_KEY", "-w"],
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=5,
-    )
-    if result.returncode == 0:
-        print(result.stdout.strip())
-except Exception:
-    pass
-PY
+    python3 "${REPO_ROOT}/tools/ci/bin/keychain_get_secret.py" --service "NUGET_API_KEY" || true
   )"
 fi
 [[ -n "${NUGET_API_KEY}" ]] || fail "No NuGet API key found (env NUGET_API_KEY or macOS keychain service 'NUGET_API_KEY')."
