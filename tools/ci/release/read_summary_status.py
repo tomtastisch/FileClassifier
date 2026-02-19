@@ -8,6 +8,7 @@ from pathlib import Path
 
 
 def main() -> int:
+    # Small dedicated helper to keep bash wrappers free of inline Python blocks.
     parser = argparse.ArgumentParser()
     parser.add_argument("--summary", required=True)
     args = parser.parse_args()
