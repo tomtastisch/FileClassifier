@@ -18,29 +18,65 @@ permissions:
   contents: read
 
 jobs:
-  canary-sharpcompress:
-    if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == 'SharpCompress'
-    uses: ./.github/workflows/qodana-contract-core.yml
-    with:
-      pre_command: bash -euo pipefail tools/ci/bin/dependency-canary.sh "SharpCompress" "${{ inputs.version || 'latest' }}"
-      artifact_name: canary-SharpCompress
-      upload_sarif: false
-    secrets: inherit
+  canary:
+    if: github.event_name != 'pull_request'
+    strategy:
+      fail-fast: false
+      matrix:
+        dependency:
+          - SharpCompress
+          - Microsoft.IO.RecyclableMemoryStream
+          - System.Text.Json
+    runs-on: ubuntu-latest
+    env:
+      QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
 
-  canary-recyclable:
-    if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == 'Microsoft.IO.RecyclableMemoryStream'
-    uses: ./.github/workflows/qodana-contract-core.yml
-    with:
-      pre_command: bash -euo pipefail tools/ci/bin/dependency-canary.sh "Microsoft.IO.RecyclableMemoryStream" "${{ inputs.version || 'latest' }}"
-      artifact_name: canary-Microsoft.IO.RecyclableMemoryStream
-      upload_sarif: false
-    secrets: inherit
+      - name: Setup .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.102
 
-  canary-system-text-json:
-    if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == 'System.Text.Json'
-    uses: ./.github/workflows/qodana-contract-core.yml
-    with:
-      pre_command: bash -euo pipefail tools/ci/bin/dependency-canary.sh "System.Text.Json" "${{ inputs.version || 'latest' }}"
-      artifact_name: canary-System.Text.Json
-      upload_sarif: false
-    secrets: inherit
+      - name: Run dependency canary update + focused tests
+        if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == matrix.dependency
+        shell: bash
+        run: |
+          bash -euo pipefail tools/ci/bin/dependency-canary.sh "${{ matrix.dependency }}" "${{ inputs.version || 'latest' }}"
+
+      - name: Assert QODANA_TOKEN present
+        if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == matrix.dependency
+        shell: bash
+        run: |
+          test -n "${QODANA_TOKEN:-}" || (echo "FAIL: QODANA_TOKEN missing" >&2; exit 1)
+          echo "OK: QODANA_TOKEN present"
+
+      - name: Run Qodana
+        if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == matrix.dependency
+        uses: JetBrains/qodana-action@42dad391966aca8ca344ca2340a7f43a5507e9b2 # v2025.3.1
+        with:
+          args: --linter=jetbrains/qodana-dotnet:2025.3
+          results-dir: artifacts/ci/qodana
+          upload-result: false
+          use-caches: false
+
+      - name: Run Qodana contract validator
+        if: github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == matrix.dependency
+        shell: bash
+        env:
+          CI_DEFER_ARTIFACT_LINK_RESOLUTION: "1"
+        run: bash -euo pipefail tools/ci/bin/run.sh qodana
+
+      - name: Upload canary artifacts
+        if: always() && (github.event_name != 'workflow_dispatch' || inputs.dependency == 'all' || inputs.dependency == matrix.dependency)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: canary-${{ matrix.dependency }}
+          path: |
+            artifacts/ci/qodana/
+          if-no-files-found: error
