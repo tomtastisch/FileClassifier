@@ -112,11 +112,18 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <returns>Unveränderliches Dictionary Gruppenname-&gt;Aliasliste.</returns>
         Private Function BuildAliasGroups() As ImmutableDictionary(Of String, ImmutableArray(Of String))
-            Dim aliasGruppenBuilder = ImmutableDictionary.CreateBuilder(Of String, ImmutableArray(Of String))(StringComparer.OrdinalIgnoreCase)
+            Dim aliasGruppenBuilder = ImmutableDictionary.CreateBuilder _
+                (
+                    Of String,
+                    ImmutableArray(Of String)
+                ) _
+                (
+                    StringComparer.OrdinalIgnoreCase
+                )
 
             ' Wildcard-Semantik (Gruppen):
             ' - ARCHIVE: alle Archive/Container, die über FileKind.Zip normalisiert werden.
-            ' - OFFICE_*: Office/ähnliche Container (Doc/Xls/Ppt), deren Content/Container-Detection separat läuft.
+            ' - DOC/XLS/PPT: Office-/OpenDocument-Container (Doc/Xls/Ppt), deren Content/Container-Detection separat läuft.
 
             aliasGruppenBuilder("JPEG") = A("jpe")
 
@@ -126,18 +133,18 @@ Namespace Global.Tomtastisch.FileClassifier
                 "xz",
                 "7z", "zz", "rar")
 
-            aliasGruppenBuilder("OFFICE_DOC") = A(
+            aliasGruppenBuilder("DOC") = A(
                 "doc", "docx", "docm", "docb",
                 "dot", "dotm", "dotx",
                 "odt", "ott")
 
-            aliasGruppenBuilder("OFFICE_XLS") = A(
+            aliasGruppenBuilder("XLS") = A(
                 "xls", "xlsx", "xlsm", "xlsb",
                 "xlt", "xltm", "xltx", "xltb",
                 "xlam", "xla",
                 "ods", "ots")
 
-            aliasGruppenBuilder("OFFICE_PPT") = A(
+            aliasGruppenBuilder("PPT") = A(
                 "ppt", "pptx", "pptm",
                 "pot", "potm", "potx",
                 "pps", "ppsm", "ppsx",
@@ -155,9 +162,9 @@ Namespace Global.Tomtastisch.FileClassifier
 
             aliasMappingBuilder(FileKind.Jpeg) = GetGroup("JPEG")
             aliasMappingBuilder(FileKind.Zip) = GetGroup("ARCHIVE")
-            aliasMappingBuilder(FileKind.Doc) = GetGroup("OFFICE_DOC")
-            aliasMappingBuilder(FileKind.Xls) = GetGroup("OFFICE_XLS")
-            aliasMappingBuilder(FileKind.Ppt) = GetGroup("OFFICE_PPT")
+            aliasMappingBuilder(FileKind.Doc) = GetGroup("DOC")
+            aliasMappingBuilder(FileKind.Xls) = GetGroup("XLS")
+            aliasMappingBuilder(FileKind.Ppt) = GetGroup("PPT")
 
             Return aliasMappingBuilder.ToImmutable()
         End Function
@@ -198,7 +205,11 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Function BuildMagicPatternCatalog _
             () As ImmutableDictionary(Of FileKind, ImmutableArray(Of FileTypeRegistry.MagicPattern))
 
-            Dim magicPatternBuilder = ImmutableDictionary.CreateBuilder(Of FileKind, ImmutableArray(Of FileTypeRegistry.MagicPattern))()
+            Dim magicPatternBuilder = ImmutableDictionary.CreateBuilder _
+                (
+                    Of FileKind,
+                    ImmutableArray(Of FileTypeRegistry.MagicPattern)
+                )()
 
             magicPatternBuilder(FileKind.Pdf) = ImmutableArray.Create(
                 Pattern(Prefix(0, &H25, &H50, &H44, &H46, &H2D))
