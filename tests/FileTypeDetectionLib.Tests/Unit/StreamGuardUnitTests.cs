@@ -1,5 +1,4 @@
 using FileTypeDetectionLib.Tests.Support;
-using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 

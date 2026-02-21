@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
