@@ -7,6 +7,17 @@
 - GitHub-Resolved-Flag: unresolved=0
 - PR-Konversationskommentare von @tomtastisch: 2
 
+## Wiederumsetzung-Nachweis (Branch `codex/release/pr108-audit-final-6-0-0`)
+
+- PR108-Dateiliste aus GitHub API: `70` Dateien (`mergeCommit=4badf0f002174dd324cd029295f781b5cbb034e3`).
+- Existenzabgleich im aktuellen Branch: `missing_count=0`.
+- Diff gegen den PR108-Merge-Stand (`4badf0f..HEAD`) auf diese 70 Dateien:
+  - ausschließlich Versionierungs-/Dokumentationskonvergenz (`Directory.Build.props`, `FileTypeDetectionLib.vbproj`, `docs/versioning/*`),
+  - keine verlorenen Core-/Hashing-/Registry-/Infrastructure-Refactor-Dateien.
+- Review-Thread-Abgleich PR108:
+  - `threads_total=53`, `threads_resolved=53`, `threads_unresolved=0`,
+  - `threads_with_tomtastisch_comment=44`.
+
 ## Audit-Tabelle (Review-Threads)
 
 | # | Erstkommentar | Autor | Befund (gekürzt) | Status | Evidence | Auflösungsnotiz (gekürzt) |
@@ -71,4 +82,3 @@
 | --- | --- | --- |
 | 1 | [Link](https://github.com/tomtastisch/FileClassifier/pull/108#issuecomment-3939130713) | @codex[agent] review |
 | 2 | [Link](https://github.com/tomtastisch/FileClassifier/pull/108#issuecomment-3939149500) | Prüfung ob unter "Utils/*", beziehungsweise nach Anpassung "Utils/Guards/*" wirklich alle Util-klassen Guard-bezeichnungen korrekt im namen haben oder eine andere Zuordnung sinnvoller wäre |
-
