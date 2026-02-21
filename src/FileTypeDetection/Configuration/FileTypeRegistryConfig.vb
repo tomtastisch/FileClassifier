@@ -99,11 +99,11 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <returns>Unveränderliches Dictionary Kind-&gt;Extension.</returns>
         Private Function BuildExtensionOverrides() As ImmutableDictionary(Of FileKind, String)
-            Dim b = ImmutableDictionary.CreateBuilder(Of FileKind, String)()
+            Dim extensionBuilder = ImmutableDictionary.CreateBuilder(Of FileKind, String)()
 
-            b(FileKind.Jpeg) = ".jpg"
+            extensionBuilder(FileKind.Jpeg) = ".jpg"
 
-            Return b.ToImmutable()
+            Return extensionBuilder.ToImmutable()
         End Function
 
         ''' <summary>
@@ -112,38 +112,38 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <returns>Unveränderliches Dictionary Gruppenname-&gt;Aliasliste.</returns>
         Private Function BuildAliasGroups() As ImmutableDictionary(Of String, ImmutableArray(Of String))
-            Dim b = ImmutableDictionary.CreateBuilder(Of String, ImmutableArray(Of String))(StringComparer.OrdinalIgnoreCase)
+            Dim aliasGruppenBuilder = ImmutableDictionary.CreateBuilder(Of String, ImmutableArray(Of String))(StringComparer.OrdinalIgnoreCase)
 
             ' Wildcard-Semantik (Gruppen):
             ' - ARCHIVE: alle Archive/Container, die über FileKind.Zip normalisiert werden.
             ' - OFFICE_*: Office/ähnliche Container (Doc/Xls/Ppt), deren Content/Container-Detection separat läuft.
 
-            b("JPEG") = A("jpe")
+            aliasGruppenBuilder("JPEG") = A("jpe")
 
-            b("ARCHIVE") = A(
+            aliasGruppenBuilder("ARCHIVE") = A(
                 "tar", "tgz", "gz", "gzip",
                 "bz2", "bzip2",
                 "xz",
                 "7z", "zz", "rar")
 
-            b("OFFICE_DOC") = A(
+            aliasGruppenBuilder("OFFICE_DOC") = A(
                 "doc", "docx", "docm", "docb",
                 "dot", "dotm", "dotx",
                 "odt", "ott")
 
-            b("OFFICE_XLS") = A(
+            aliasGruppenBuilder("OFFICE_XLS") = A(
                 "xls", "xlsx", "xlsm", "xlsb",
                 "xlt", "xltm", "xltx", "xltb",
                 "xlam", "xla",
                 "ods", "ots")
 
-            b("OFFICE_PPT") = A(
+            aliasGruppenBuilder("OFFICE_PPT") = A(
                 "ppt", "pptx", "pptm",
                 "pot", "potm", "potx",
                 "pps", "ppsm", "ppsx",
                 "odp", "otp")
 
-            Return b.ToImmutable()
+            Return aliasGruppenBuilder.ToImmutable()
         End Function
 
         ''' <summary>
@@ -151,15 +151,15 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <returns>Unveränderliches Dictionary Kind-&gt;Aliasliste.</returns>
         Private Function BuildAliasOverrides() As ImmutableDictionary(Of FileKind, ImmutableArray(Of String))
-            Dim b = ImmutableDictionary.CreateBuilder(Of FileKind, ImmutableArray(Of String))()
+            Dim aliasMappingBuilder = ImmutableDictionary.CreateBuilder(Of FileKind, ImmutableArray(Of String))()
 
-            b(FileKind.Jpeg) = GetGroup("JPEG")
-            b(FileKind.Zip) = GetGroup("ARCHIVE")
-            b(FileKind.Doc) = GetGroup("OFFICE_DOC")
-            b(FileKind.Xls) = GetGroup("OFFICE_XLS")
-            b(FileKind.Ppt) = GetGroup("OFFICE_PPT")
+            aliasMappingBuilder(FileKind.Jpeg) = GetGroup("JPEG")
+            aliasMappingBuilder(FileKind.Zip) = GetGroup("ARCHIVE")
+            aliasMappingBuilder(FileKind.Doc) = GetGroup("OFFICE_DOC")
+            aliasMappingBuilder(FileKind.Xls) = GetGroup("OFFICE_XLS")
+            aliasMappingBuilder(FileKind.Ppt) = GetGroup("OFFICE_PPT")
 
-            Return b.ToImmutable()
+            Return aliasMappingBuilder.ToImmutable()
         End Function
 
         ''' <summary>
@@ -198,39 +198,39 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Function BuildMagicPatternCatalog _
             () As ImmutableDictionary(Of FileKind, ImmutableArray(Of FileTypeRegistry.MagicPattern))
 
-            Dim b = ImmutableDictionary.CreateBuilder(Of FileKind, ImmutableArray(Of FileTypeRegistry.MagicPattern))()
+            Dim magicPatternBuilder = ImmutableDictionary.CreateBuilder(Of FileKind, ImmutableArray(Of FileTypeRegistry.MagicPattern))()
 
-            b(FileKind.Pdf) = ImmutableArray.Create(
+            magicPatternBuilder(FileKind.Pdf) = ImmutableArray.Create(
                 Pattern(Prefix(0, &H25, &H50, &H44, &H46, &H2D))
             )
 
-            b(FileKind.Png) = ImmutableArray.Create(
+            magicPatternBuilder(FileKind.Png) = ImmutableArray.Create(
                 Pattern(Prefix(0, &H89, &H50, &H4E, &H47, &HD, &HA, &H1A, &HA))
             )
 
-            b(FileKind.Jpeg) = ImmutableArray.Create(
+            magicPatternBuilder(FileKind.Jpeg) = ImmutableArray.Create(
                 Pattern(Prefix(0, &HFF, &HD8, &HFF))
             )
 
-            b(FileKind.Gif) = ImmutableArray.Create(
+            magicPatternBuilder(FileKind.Gif) = ImmutableArray.Create(
                 Pattern(Prefix(0, &H47, &H49, &H46, &H38, &H37, &H61)),
                 Pattern(Prefix(0, &H47, &H49, &H46, &H38, &H39, &H61))
             )
 
-            b(FileKind.Webp) = ImmutableArray.Create(
+            magicPatternBuilder(FileKind.Webp) = ImmutableArray.Create(
                 Pattern(
                     Prefix(0, &H52, &H49, &H46, &H46),
                         Prefix(8, &H57, &H45, &H42, &H50)
                     )
                 )
 
-            b(FileKind.Zip) = ImmutableArray.Create(
+            magicPatternBuilder(FileKind.Zip) = ImmutableArray.Create(
                 Pattern(Prefix(0, &H50, &H4B, &H3, &H4)),
                 Pattern(Prefix(0, &H50, &H4B, &H5, &H6)),
                 Pattern(Prefix(0, &H50, &H4B, &H7, &H8))
             )
 
-            Return b.ToImmutable()
+            Return magicPatternBuilder.ToImmutable()
         End Function
 
     End Module

@@ -364,7 +364,7 @@ Namespace Global.Tomtastisch.FileClassifier
             As ImmutableDictionary(Of String, FileKind)
             Dim builder As ImmutableDictionary(Of String, FileKind).Builder
             Dim kind As FileKind
-            Dim t As FileType
+            Dim t As FileType = Nothing
 
             If types Is Nothing Then Return ImmutableDictionary(Of String, FileKind).Empty
 

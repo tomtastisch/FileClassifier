@@ -58,6 +58,17 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public ReadOnly Property HasLogicalHash As Boolean
 
+        ''' <summary>
+        '''     Interner Vollkonstruktor zur normalisierten Erstellung eines Digest-Sets.
+        ''' </summary>
+        ''' <param name="physicalSha256">Physischer SHA-256-Digest.</param>
+        ''' <param name="logicalSha256">Logischer SHA-256-Digest.</param>
+        ''' <param name="fastPhysicalXxHash3">Optionaler schneller physischer Digest.</param>
+        ''' <param name="fastLogicalXxHash3">Optionaler schneller logischer Digest.</param>
+        ''' <param name="hmacPhysicalSha256">Optionaler HMAC-SHA256 des physischen Payloads.</param>
+        ''' <param name="hmacLogicalSha256">Optionaler HMAC-SHA256 des logischen Payloads.</param>
+        ''' <param name="hasPhysicalHash">Kennzeichnet das Vorliegen physischer Digests.</param>
+        ''' <param name="hasLogicalHash">Kennzeichnet das Vorliegen logischer Digests.</param>
         Friend Sub New _
             (
                 physicalSha256 As String,
@@ -80,6 +91,9 @@ Namespace Global.Tomtastisch.FileClassifier
             Me.HasLogicalHash = hasLogicalHash
         End Sub
 
+        ''' <summary>
+        '''     Liefert ein leeres, fail-closed Digest-Set ohne berechnete Hashwerte.
+        ''' </summary>
         Friend Shared ReadOnly Property Empty As HashDigestSet
             Get
                 Return New HashDigestSet(
@@ -94,6 +108,11 @@ Namespace Global.Tomtastisch.FileClassifier
             End Get
         End Property
 
+        ''' <summary>
+        '''     Normalisiert Digest-Strings deterministisch (Trim + Invariant-Lowercase).
+        ''' </summary>
+        ''' <param name="value">Eingabedigest.</param>
+        ''' <returns>Normalisierter Digest oder leerer String.</returns>
         Private Shared Function Normalize _
             (
                 value As String
