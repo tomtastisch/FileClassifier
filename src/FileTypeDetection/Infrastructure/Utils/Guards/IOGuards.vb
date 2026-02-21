@@ -1,5 +1,5 @@
 ' ============================================================================
-' FILE: IoGuards.vb
+' FILE: IOGuards.vb
 '
 ' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
 ' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.MD

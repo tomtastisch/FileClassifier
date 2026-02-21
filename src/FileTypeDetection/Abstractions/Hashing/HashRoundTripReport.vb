@@ -117,7 +117,7 @@ Namespace Global.Tomtastisch.FileClassifier
             ' -----------------------------------------------------------------
             ' Guard-Clauses (fail-closed)
             ' -----------------------------------------------------------------
-            GuardUtils.RequireLength(evidences, slotCount, NameOf(evidences))
+            ArgumentGuard.RequireLength(evidences, slotCount, NameOf(evidences))
 
             ' -----------------------------------------------------------------
             ' Snapshot / Assignment (Input)
@@ -176,7 +176,7 @@ Namespace Global.Tomtastisch.FileClassifier
             ' Deklarationsblock
             Dim index As Integer
 
-            GuardUtils.EnumDefined(GetType(HashSlot), slot, NameOf(slot))
+            ArgumentGuard.EnumDefined(GetType(HashSlot), slot, NameOf(slot))
             index = SlotIndex(slot)
 
             Return _evidences(index)
@@ -197,7 +197,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Throw New ArgumentException("Use H2..Hn.", NameOf(otherSlot))
             End If
 
-            GuardUtils.EnumDefined(GetType(HashSlot), otherSlot, NameOf(otherSlot))
+            ArgumentGuard.EnumDefined(GetType(HashSlot), otherSlot, NameOf(otherSlot))
             index = OtherIndex(otherSlot)
 
             Return _logicalEq(index)
@@ -218,7 +218,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Throw New ArgumentException("Use H2..Hn.", NameOf(otherSlot))
             End If
 
-            GuardUtils.EnumDefined(GetType(HashSlot), otherSlot, NameOf(otherSlot))
+            ArgumentGuard.EnumDefined(GetType(HashSlot), otherSlot, NameOf(otherSlot))
             index = OtherIndex(otherSlot)
 
             Return _physicalEq(index)

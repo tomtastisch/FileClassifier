@@ -5,14 +5,14 @@ Dieses Verzeichnis enthaelt die zentrale SSOT-Schicht fuer interne, wiederverwen
 Der Fokus liegt auf deterministischen Guards, sicherer Pfad-/Archive-Validierung, defensiver I/O-Hilfe und policy-konformem Logging.
 
 ## 2. Inhalt
-- `GuardUtils.vb`: Argument-Guards fuer Null-, Enum- und Laengenpruefungen.
-- `EnumUtils.vb`: deterministische Enum-Wertauflistung mit optionaler Sortierung und Range.
-- `IterableUtils.vb`: defensive Array-Kopien fuer sichere Rueckgaben.
-- `IoGuards.vb`: zentrale Stream-/Buffer-Helfer (`StreamGuard`, `StreamBounds`, `InternalIoDefaults`).
-- `ArchiveGuards.vb`: Archive-spezifische Guards und Entry-Pfadnormalisierung.
-- `PathResolutionGuard.vb`: fail-closed FullPath-Aufloesung mit kontrollierter Protokollierung.
-- `DestinationPathGuard.vb`: Zielpfad-Policy fuer Materialisierung und Extraktion.
-- `LogGuard.vb`: defensiver Logger-Schutz ohne Rekursion/Seiteneffekte.
+- `EnumUtils.vb`: deterministische Enum-Wertauflistung mit optionaler Sortierung und Range (kein Guard).
+- `IterableUtils.vb`: defensive Array-Kopien fuer sichere Rueckgaben (kein Guard).
+- `Guards/ArgumentGuard.vb`: Argument-Guards fuer Null-, Enum- und Laengenpruefungen.
+- `Guards/IOGuards.vb`: zentrale Stream-/Buffer-Helfer (`StreamGuard`, `StreamBounds`, `InternalIoDefaults`).
+- `Guards/ArchiveGuards.vb`: Archive-spezifische Guards und Entry-Pfadnormalisierung.
+- `Guards/PathResolutionGuard.vb`: fail-closed FullPath-Aufloesung mit kontrollierter Protokollierung.
+- `Guards/DestinationPathGuard.vb`: Zielpfad-Policy fuer Materialisierung und Extraktion.
+- `Guards/LogGuard.vb`: defensiver Logger-Schutz ohne Rekursion/Seiteneffekte.
 
 ## 3. API und Verhalten
 - Utilities sind stateless und deterministisch.
@@ -34,4 +34,5 @@ flowchart LR
 ## 6. Verweise
 - [Modul-Root](../../README.md)
 - [Infrastructure-Modul](../README.md)
+- [Guards-Cluster](Guards/README.md)
 - [Code-Quality-Policy](../../../../docs/governance/045_CODE_QUALITY_POLICY_DE.MD)

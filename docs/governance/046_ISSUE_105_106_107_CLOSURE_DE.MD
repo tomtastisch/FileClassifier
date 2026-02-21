@@ -64,12 +64,12 @@ Refactor-Matrix (Duplikatquelle -> neue Utility-Stelle):
    - -> `EvidenceHashingIo.vb`
    - Methoden: `TryReadFileBounded`, `SetReadFileError`.
 4. Enum- und Guard-Helfer in mehreren Klassen
-   - -> `EnumUtils.vb`, `GuardUtils.vb`, `IterableUtils.vb`
+   - -> `EnumUtils.vb`, `ArgumentGuard.vb`, `IterableUtils.vb`
    - Einsatz sichtbar in `HashRoundTripReport.vb`.
 
 Evidence-Kommandos:
 - `rg -n "EvidenceHashingCore|EvidenceHashingRoundTrip|EvidenceHashingIo" src tests -S`
-- `rg -n "EnumUtils\\.|GuardUtils\\.|IterableUtils\\." src tests -S`
+- `rg -n "EnumUtils\\.|ArgumentGuard\\.|IterableUtils\\." src tests -S`
 - `dotnet test FileClassifier.sln -v minimal`
 
 ## Entscheidung
