@@ -24,6 +24,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         End Sub
 
         Friend Shared Function HasContent(data As Byte()) As Boolean
+
             Return data IsNot Nothing AndAlso data.Length > 0
         End Function
     End Class
@@ -41,6 +42,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 opt As FileTypeProjectOptions,
                 descriptor As ArchiveDescriptor
             ) As Boolean
+
             If Not ByteArrayGuard.HasContent(data) Then Return False
             If opt Is Nothing Then Return False
             If descriptor Is Nothing OrElse
@@ -50,15 +52,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 Using ms As New MemoryStream(data, writable:=False)
                     Return IsArchiveSafeStream(ms, opt, descriptor, depth:=0)
                 End Using
-            Catch ex As Exception When _
-                TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is Security.SecurityException OrElse
-                TypeOf ex Is IOException OrElse
-                TypeOf ex Is InvalidDataException OrElse
-                TypeOf ex Is NotSupportedException OrElse
-                TypeOf ex Is ArgumentException OrElse
-                TypeOf ex Is InvalidOperationException OrElse
-                TypeOf ex Is ObjectDisposedException
+            Catch ex As Exception When ExceptionFilterGuard.IsArchiveValidationException(ex)
                 LogGuard.Debug(opt.Logger, $"[ArchiveGate] Bytes-Fehler: {ex.Message}")
                 Return False
             End Try
@@ -71,6 +65,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 descriptor As ArchiveDescriptor,
                 depth As Integer
             ) As Boolean
+
             If Not StreamGuard.IsReadable(stream) Then Return False
             If opt Is Nothing Then Return False
             Return ArchiveProcessingEngine.ValidateArchiveStream(stream, opt, depth, descriptor)
@@ -88,6 +83,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             (
                 data As Byte()
             ) As Boolean
+
             If Not ByteArrayGuard.HasContent(data) Then Return False
             Return FileTypeRegistry.DetectByMagic(data) = FileKind.Zip
         End Function
@@ -107,6 +103,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 logPrefix As String,
                 logWhenRejected As Boolean
             ) As Boolean
+
             If opt Is Nothing Then Return True
 
             If opt.RejectArchiveLinks AndAlso Not String.IsNullOrWhiteSpace(linkTarget) Then
@@ -133,6 +130,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 data As Byte(),
                 opt As FileTypeProjectOptions
             ) As Boolean
+
             Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
 
             Return TryDescribeSafeArchivePayload(data, opt, descriptor)
@@ -171,6 +169,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 ByRef normalizedPath As String,
                 ByRef isDirectory As Boolean
             ) As Boolean
+
             Dim safe As String
             Dim trimmed As String
             Dim segments As String()

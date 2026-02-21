@@ -25,6 +25,6 @@ flowchart LR
 
 ## 6. Verweise
 - [Modulübersicht](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md)
-- [Infrastructure.Utils-Submodul](Utils/README.md)
+- [Infrastructure.Utils-Submodul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/Utils/README.md)
 - [Architektur und Flows](https://github.com/tomtastisch/FileClassifier/blob/main/docs/020_ARCH_CORE.MD)
 - [Policy CI](https://github.com/tomtastisch/FileClassifier/blob/main/docs/governance/001_POLICY_CI.MD)
