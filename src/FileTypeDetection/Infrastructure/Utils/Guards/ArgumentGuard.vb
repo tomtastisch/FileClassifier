@@ -1,5 +1,5 @@
 ' ============================================================================
-' FILE: GuardUtils.vb
+' FILE: ArgumentGuard.vb
 '
 ' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
 ' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.MD
@@ -32,7 +32,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
     '''         - Keine stillen Korrekturen, keine Side-Effects.
     '''     </para>
     ''' </remarks>
-    Friend NotInheritable Class GuardUtils
+    Friend NotInheritable Class ArgumentGuard
 
         Private Sub New()
         End Sub

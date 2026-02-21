@@ -37,7 +37,7 @@ Nachweisbare, reproduzierbare Einhaltung der Kernvorgaben aus `045_CODE_QUALITY_
    - `FileTypeDetector` nutzt zentrale Registry-Regel für structured refinement.
    - Alias-Definitionen in `FileTypeRegistry` über Helper vereinheitlicht.
 2. Policy-Header harmonisiert:
-   - `HashRoundTripReport.vb`, `EnumUtils.vb`, `GuardUtils.vb`, `IterableUtils.vb`.
+   - `HashRoundTripReport.vb`, `EnumUtils.vb`, `ArgumentGuard.vb`, `IterableUtils.vb`.
 
 ## Hinweis
 Diese Statusdatei dokumentiert den nachweisbaren Kernumfang der automatisierten 045-Compliance-Prüfung.  
