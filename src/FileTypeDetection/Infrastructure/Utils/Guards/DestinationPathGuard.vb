@@ -63,13 +63,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 Return False
             End If
 
-            If File.Exists(destinationFull) Then
-                If Not overwrite Then Return False
-                File.Delete(destinationFull)
-            ElseIf Directory.Exists(destinationFull) Then
-                If Not overwrite Then Return False
-                Directory.Delete(destinationFull, recursive:=True)
-            End If
+            If Not TryDeleteExistingTarget(destinationFull, overwrite) Then Return False
 
             Return True
         End Function
@@ -122,6 +116,30 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 destinationFull.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
                 rootPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
                 StringComparison.OrdinalIgnoreCase)
+        End Function
+
+        Private Shared Function TryDeleteExistingTarget _
+            (
+                destinationFull As String,
+                overwrite As Boolean
+            ) As Boolean
+
+            Dim existsAsFile As Boolean
+            Dim existsAsDirectory As Boolean
+
+            existsAsFile = File.Exists(destinationFull)
+            existsAsDirectory = Directory.Exists(destinationFull)
+
+            If Not existsAsFile AndAlso Not existsAsDirectory Then Return True
+            If Not overwrite Then Return False
+
+            If existsAsFile Then
+                File.Delete(destinationFull)
+                Return True
+            End If
+
+            Directory.Delete(destinationFull, recursive:=True)
+            Return True
         End Function
     End Class
 
