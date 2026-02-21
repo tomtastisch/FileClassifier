@@ -6,13 +6,13 @@
 
 Diese Tabelle wurde aus der Commit-Historie anhand der Policy in
 `docs/versioning/001_POLICY_VERSIONING.MD` abgeleitet.
-Heuristik fuer die Rueckwirkungs-Zuordnung:
+Heuristik für die Rückwirkungs-Zuordnung:
 - Major-Overrides: `5255724`, `fd03389`
 - `feat:` oder `Add ...` (nicht-Doku) => Minor
 - `docs|test|ci|chore|tooling|refactor|fix` => Patch
 
 Aktueller Entwicklungsstand:
-- Aktuelle Entwicklungslinie enthaelt `6.x` (aktueller Arbeitsstand: `v6.0.1`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
+- Aktuelle Entwicklungslinie enthält `6.x` (aktueller Arbeitsstand: `v6.0.0`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
 
 Hinweis:
 - Die Spalte `Keyword` verwendet den technischen Klassifizierungswert aus der Historie.
@@ -20,8 +20,8 @@ Hinweis:
 
 | Version | Kurzbeschreibung | Commit | Keyword |
 |---|---|---|---|
-| `6.0.1` | Refactor-Haertung: interne SSOT-Utilities nach `Infrastructure/Utils` konsolidiert, Core-Utility-Logik in dedizierte Dateien gesplittet und Duplikat-Guards vereinheitlicht | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v5.2.1...HEAD) | patch |
 | `6.0.0` | Breaking-Release: `FileKind`-Enum und `HashRoundTripReport`-Public-API auf neues Slot-/Methodenmodell umgestellt, Hashing-Interna in Core/RoundTrip/Io ausgelagert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v5.2.1...HEAD) | breaking |
+| `6.0.1` | Refactor-Härtung (nachversioniert): interne SSOT-Utilities nach `Infrastructure/Utils` konsolidiert, Core-Utility-Logik in dedizierte Dateien gesplittet und Duplikat-Guards vereinheitlicht | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v5.2.1...HEAD) | patch |
 | `5.2.1` | SharpCompress-API auf typsichere Aufrufe umgestellt, tar.gz-Verarbeitung fail-closed gehaertet und Qodana-CI-Gate als Pflichtlauf dokumentiert/erzwungen | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v5.2.0...HEAD) | patch |
 | `5.2.0` | netstandard2.0-Compat-Layer eingefuehrt, Provider-Struktur konsolidiert und TFM-Multi-Targeting erweitert | [8d65a52](https://github.com/tomtastisch/FileClassifier/commit/8d65a52) | minor |
 | `5.1.4` | Refactor-Cluster 7C abgeschlossen + Qodana-Alerts auf 0 + Version-Bump fuer Release | [2adeb83](https://github.com/tomtastisch/FileClassifier/commit/2adeb83) | patch |
