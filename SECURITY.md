@@ -16,8 +16,8 @@ Security-Fixes werden nur fuer den aktuell unterstuetzten Major bereitgestellt.
 
 | Version | Security-Support |
 | ------- | ---------------- |
-| 5.x     | Ja               |
-| < 5.0   | Nein             |
+| 6.x     | Ja               |
+| < 6.0   | Nein             |
 
 ## 3. Meldung einer Sicherheitsluecke
 Bitte melde Sicherheitsluecken **nicht** ueber oeffentliche Issues.
