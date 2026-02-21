@@ -27,6 +27,17 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Baut deterministische Evidence aus normalisierbaren Archiveinträgen.
+        ''' </summary>
+        ''' <param name="sourceType">Herkunftskanal des Nachweises.</param>
+        ''' <param name="label">Quelllabel für den Report.</param>
+        ''' <param name="detectedType">Ermittelter Dateitypkontext.</param>
+        ''' <param name="compressedBytes">Optionale komprimierte Originalbytes.</param>
+        ''' <param name="entries">Extrahierte Archiveinträge.</param>
+        ''' <param name="hashOptions">Hash-Konfiguration.</param>
+        ''' <param name="notes">Optionale Basishinweise.</param>
+        ''' <returns>Vollständiges Evidence-Objekt oder fail-closed Fehler-Evidence.</returns>
         Friend Shared Function BuildEvidenceFromEntries _
             (
                 sourceType As HashSourceType,
@@ -134,6 +145,16 @@ Namespace Global.Tomtastisch.FileClassifier
                 notes:=combinedNotes)
         End Function
 
+        ''' <summary>
+        '''     Baut deterministische Evidence aus einem rohen Payload-Bytearray.
+        ''' </summary>
+        ''' <param name="sourceType">Herkunftskanal des Nachweises.</param>
+        ''' <param name="label">Quelllabel für den Report.</param>
+        ''' <param name="detectedType">Ermittelter Dateitypkontext.</param>
+        ''' <param name="payload">Rohpayload; <c>Nothing</c> wird als leeres Array behandelt.</param>
+        ''' <param name="hashOptions">Hash-Konfiguration.</param>
+        ''' <param name="notes">Optionale Basishinweise.</param>
+        ''' <returns>Evidence-Objekt mit physischen und logischen Digests.</returns>
         Friend Shared Function BuildEvidenceFromRawPayload _
             (
                 sourceType As HashSourceType,
@@ -197,6 +218,13 @@ Namespace Global.Tomtastisch.FileClassifier
                 notes:=combinedNotes)
         End Function
 
+        ''' <summary>
+        '''     Normalisiert Entry-Liste deterministisch und validiert sie fail-closed.
+        ''' </summary>
+        ''' <param name="entries">Zu normalisierende Archiveinträge.</param>
+        ''' <param name="normalizedEntries">Ausgabe der sortierten, normalisierten Entries.</param>
+        ''' <param name="errorMessage">Fehlermeldung bei Validierungsfehlern.</param>
+        ''' <returns><c>True</c> bei erfolgreicher Normalisierung, sonst <c>False</c>.</returns>
         Friend Shared Function TryNormalizeEntries _
             (
                 entries As IReadOnlyList(Of ZipExtractedEntry),
@@ -241,6 +269,12 @@ Namespace Global.Tomtastisch.FileClassifier
             Return True
         End Function
 
+        ''' <summary>
+        '''     Normalisiert einen einzelnen Entry-Pfad nach der zentralen Archiv-Path-Policy.
+        ''' </summary>
+        ''' <param name="rawPath">Unverarbeiteter Entry-Pfad.</param>
+        ''' <param name="normalizedPath">Normalisierter relativer Pfad.</param>
+        ''' <returns><c>True</c> bei gültigem Pfad, sonst <c>False</c>.</returns>
         Friend Shared Function TryNormalizeEntryPath _
             (
                 rawPath As String,
@@ -255,6 +289,11 @@ Namespace Global.Tomtastisch.FileClassifier
                 isDirectory)
         End Function
 
+        ''' <summary>
+        '''     Erzeugt das kanonische logische Manifest als Bytefolge.
+        ''' </summary>
+        ''' <param name="entries">Normalisierte und sortierte Entries.</param>
+        ''' <returns>Deterministische Manifestbytes als Hash-Basis.</returns>
         Friend Shared Function BuildLogicalManifestBytes _
             (
                 entries As IReadOnlyList(Of NormalizedEntry)
@@ -286,6 +325,11 @@ Namespace Global.Tomtastisch.FileClassifier
             End Using
         End Function
 
+        ''' <summary>
+        '''     Berechnet SHA-256 als hexadezimale Kleinbuchstabenrepräsentation.
+        ''' </summary>
+        ''' <param name="payload">Eingabedaten; <c>Nothing</c> wird als leeres Array behandelt.</param>
+        ''' <returns>Hex-String des SHA-256-Digests.</returns>
         Friend Shared Function ComputeSha256Hex _
             (
                 payload As Byte()
@@ -295,6 +339,12 @@ Namespace Global.Tomtastisch.FileClassifier
             Return HashPrimitives.Current.Sha256.ComputeHashHex(data)
         End Function
 
+        ''' <summary>
+        '''     Berechnet optional einen schnellen, nicht-kryptografischen Digest.
+        ''' </summary>
+        ''' <param name="payload">Eingabedaten; <c>Nothing</c> wird als leeres Array behandelt.</param>
+        ''' <param name="options">Hash-Optionen; ohne Opt-In wird leerer String geliefert.</param>
+        ''' <returns>Fast-Hash als Hex-String oder leerer String.</returns>
         Friend Shared Function ComputeFastHash _
             (
                 payload As Byte(),
@@ -309,6 +359,12 @@ Namespace Global.Tomtastisch.FileClassifier
             Return HashPrimitives.Current.FastHash64.ComputeHashHex(data)
         End Function
 
+        ''' <summary>
+        '''     Berechnet einen HMAC-SHA256-Digest über die Payload.
+        ''' </summary>
+        ''' <param name="key">HMAC-Key; <c>Nothing</c> wird als leeres Array behandelt.</param>
+        ''' <param name="payload">Eingabedaten; <c>Nothing</c> wird als leeres Array behandelt.</param>
+        ''' <returns>Hex-String des HMAC-SHA256-Digests.</returns>
         Friend Shared Function ComputeHmacSha256Hex _
             (
                 key As Byte(),
@@ -323,6 +379,12 @@ Namespace Global.Tomtastisch.FileClassifier
             End Using
         End Function
 
+        ''' <summary>
+        '''     Liest und validiert den HMAC-Key aus der definierten Environment-Variable.
+        ''' </summary>
+        ''' <param name="key">Ausgabe des dekodierten Keys.</param>
+        ''' <param name="note">Ausgabe eines Hinweistextes bei fehlendem/ungültigem Key.</param>
+        ''' <returns><c>True</c> bei gültigem Key, sonst <c>False</c>.</returns>
         Friend Shared Function TryResolveHmacKey _
             (
                 ByRef key As Byte(),
@@ -358,6 +420,12 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Fügt einen optionalen Hinweistext deterministisch an bestehende Notes an.
+        ''' </summary>
+        ''' <param name="baseNotes">Bereits vorhandene Notes.</param>
+        ''' <param name="toAppend">Optional anzuhängender Hinweis.</param>
+        ''' <returns>Kombinierter, getrimmter Hinweistext.</returns>
         Friend Shared Function AppendNoteIfAny _
             (
                 baseNotes As String,
@@ -372,6 +440,11 @@ Namespace Global.Tomtastisch.FileClassifier
             Return left & " " & right
         End Function
 
+        ''' <summary>
+        '''     Normalisiert ein Label fail-closed auf einen stabilen Standardwert.
+        ''' </summary>
+        ''' <param name="label">Eingabelabel.</param>
+        ''' <returns>Getrimmtes Label oder Standardlabel.</returns>
         Friend Shared Function NormalizeLabel _
             (
                 label As String
@@ -382,6 +455,11 @@ Namespace Global.Tomtastisch.FileClassifier
             Return normalized
         End Function
 
+        ''' <summary>
+        '''     Erstellt eine defensive Bytekopie ohne Seiteneffekte.
+        ''' </summary>
+        ''' <param name="data">Quellarray.</param>
+        ''' <returns>Kopie der Bytes oder leeres Array.</returns>
         Friend Shared Function CopyBytes _
             (
                 data As Byte()
@@ -403,9 +481,21 @@ Namespace Global.Tomtastisch.FileClassifier
         '''     Relative Pfade und Inhalte werden nach Guard-Prüfung unveränderlich für deterministische Sortierung gehalten.
         ''' </remarks>
         Friend NotInheritable Class NormalizedEntry
+            ''' <summary>
+            '''     Normalisierter relativer Entry-Pfad.
+            ''' </summary>
             Friend ReadOnly Property RelativePath As String
+
+            ''' <summary>
+            '''     Normalisierte Entry-Inhaltsbytes.
+            ''' </summary>
             Friend ReadOnly Property Content As Byte()
 
+            ''' <summary>
+            '''     Erstellt eine unveränderliche NormalizedEntry-Instanz.
+            ''' </summary>
+            ''' <param name="relativePath">Normalisierter relativer Pfad.</param>
+            ''' <param name="content">Entry-Inhalt als defensive Nutzdatenrepräsentation.</param>
             Friend Sub New(relativePath As String, content As Byte())
                 Me.RelativePath = If(relativePath, String.Empty)
                 Me.Content = If(content, Array.Empty(Of Byte)())
