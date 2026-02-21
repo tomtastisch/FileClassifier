@@ -9,7 +9,7 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 
 ## [6.0.0]
 - Added:
-  - Neue interne Hashing-Services (`EvidenceHashingCore`, `EvidenceHashingRoundTrip`, `EvidenceHashingIo`) für deterministische Auslagerung ohne neue Dependencies.
+  - Neue interne Hashing-Services (`EvidenceHashingCore`, `EvidenceHashingRoundTrip`, `EvidenceHashingIO`) für deterministische Auslagerung ohne neue Dependencies.
 - Changed:
   - Breaking-Umstellung von `FileKind`-Werten (`Docx`/`Xlsx`/`Pptx` -> `Doc`/`Xls`/`Ppt`).
   - Breaking-Umstellung der `HashRoundTripReport`-Public-API auf Slot-basiertes Zugriffsmodell (`HashSlot`, `Evidence(...)`, `LogicalEquals(...)`, `PhysicalEquals(...)`).
