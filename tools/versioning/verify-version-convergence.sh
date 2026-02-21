@@ -97,6 +97,8 @@ main() {
   if [[ "${REQUIRE_REMOTE}" == "1" ]]; then
     require_cmd curl
     require_cmd gh
+    # Reihenfolge ist bewusst: GH_TOKEN hat Vorrang, danach CI-Standard GITHUB_TOKEN,
+    # danach SECURITY_CLAIMS_TOKEN als expliziter Fallback fuer gleichwertige Repo-Claims.
     export GH_TOKEN="${GH_TOKEN:-${GITHUB_TOKEN:-${SECURITY_CLAIMS_TOKEN:-}}}"
     [[ -n "${GH_TOKEN}" ]] || fail "REQUIRE_REMOTE=1 needs GH_TOKEN/GITHUB_TOKEN/SECURITY_CLAIMS_TOKEN"
 
