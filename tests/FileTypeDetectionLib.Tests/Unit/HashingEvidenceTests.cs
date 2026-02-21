@@ -1122,7 +1122,7 @@ public sealed class HashingEvidenceModelTests
     [Fact]
     public void TryReadFileBounded_ReturnsFalse_ForMissingPathOrOptions()
     {
-        var ioType = HashingEvidenceTestHelpers.GetInternalType("Tomtastisch.FileClassifier.EvidenceHashingIo");
+        var ioType = HashingEvidenceTestHelpers.GetInternalType("Tomtastisch.FileClassifier.EvidenceHashingIO");
         var method = ioType.GetMethod("TryReadFileBounded", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
@@ -1141,7 +1141,7 @@ public sealed class HashingEvidenceModelTests
     [Fact]
     public void TryReadFileBounded_ReturnsFalse_WhenFileTooLarge()
     {
-        var ioType = HashingEvidenceTestHelpers.GetInternalType("Tomtastisch.FileClassifier.EvidenceHashingIo");
+        var ioType = HashingEvidenceTestHelpers.GetInternalType("Tomtastisch.FileClassifier.EvidenceHashingIO");
         var method = ioType.GetMethod("TryReadFileBounded", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 

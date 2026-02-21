@@ -424,7 +424,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then
                 Return emptyResult
-            End if
+            End If
 
             Try
                 StreamGuard.RewindToStart(stream)
@@ -445,7 +445,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                    TypeOf ex Is SecurityException OrElse
+                TypeOf ex Is SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -493,7 +493,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 destinationFull = Path.GetFullPath(destinationDirectory)
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                    TypeOf ex Is SecurityException OrElse
+                TypeOf ex Is SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is PathTooLongException OrElse
                 TypeOf ex Is NotSupportedException OrElse

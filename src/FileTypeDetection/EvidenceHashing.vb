@@ -92,7 +92,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return Failure(HashSourceType.FilePath, path, "Datei nicht gefunden.")
             End If
 
-            If Not EvidenceHashingIo.TryReadFileBounded(path, detectorOptions, fileBytes, readError) Then
+            If Not EvidenceHashingIO.TryReadFileBounded(path, detectorOptions, fileBytes, readError) Then
                 Return Failure(HashSourceType.FilePath, path, readError)
             End If
 

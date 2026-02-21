@@ -1,5 +1,5 @@
 ' ============================================================================
-' FILE: EvidenceHashingIo.vb
+' FILE: EvidenceHashingIO.vb
 '
 ' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
 ' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.MD
@@ -17,7 +17,7 @@ Namespace Global.Tomtastisch.FileClassifier
     ''' <remarks>
     '''     Die Komponente erzwingt MaxBytes-Limits fail-closed und liefert deterministische Fehltexte.
     ''' </remarks>
-    Friend NotInheritable Class EvidenceHashingIo
+    Friend NotInheritable Class EvidenceHashingIO
         Private Sub New()
         End Sub
 

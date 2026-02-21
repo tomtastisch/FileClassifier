@@ -32,7 +32,7 @@ Namespace Global.Tomtastisch.FileClassifier.Utils
     '''         - Keine stillen Korrekturen, keine Side-Effects.
     '''     </para>
     ''' </remarks>
-    Public NotInheritable Class GuardUtils
+    Friend NotInheritable Class GuardUtils
 
         Private Sub New()
         End Sub

@@ -29,7 +29,7 @@ Namespace Global.Tomtastisch.FileClassifier.Utils
     '''         - <c>Nothing</c> bleibt <c>Nothing</c>; es findet keine implizite Erzeugung leerer Arrays statt.
     '''     </para>
     ''' </remarks>
-    Public NotInheritable Class IterableUtils
+    Friend NotInheritable Class IterableUtils
 
         Private Sub New()
         End Sub

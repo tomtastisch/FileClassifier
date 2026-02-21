@@ -1,5 +1,5 @@
 ' ============================================================================
-' FILE: (neue version)HashRoundTripReport.vb
+' FILE: HashRoundTripReport.vb
 '
 ' INTERNE POLICY (DIN-/Norm-orientiert, verbindlich)
 ' - Datei- und Type-Struktur gemäß docs/governance/045_CODE_QUALITY_POLICY_DE.MD
@@ -107,8 +107,10 @@ Namespace Global.Tomtastisch.FileClassifier
             ' Deklarationsblock (Pflicht, spaltenartig)
             Dim slotCount As Integer = RequiredSlots.Length
             Dim i As Integer
+            Dim idx As Integer
             Dim baseEvidence As HashEvidence
             Dim otherEvidence As HashEvidence
+            Dim otherSlot As HashSlot
             Dim eqLogical As Boolean
             Dim consistentLocal As Boolean = True
 
@@ -143,7 +145,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             For idx = 0 To slotCount - 2
 
-                Dim otherSlot = RequiredSlots(idx + 1)
+                otherSlot = RequiredSlots(idx + 1)
                 otherEvidence = _evidences(SlotIndex(otherSlot))
 
                 eqLogical = EqualLogical(baseEvidence, otherEvidence)

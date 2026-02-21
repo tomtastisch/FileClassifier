@@ -30,10 +30,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <summary>
         '''     Unveränderlicher Byteinhalt des Eintrags.
         ''' </summary>
-        Public ReadOnly Property Content As ImmutableArray _
-            (
-                Of Byte
-            )
+        Public ReadOnly Property Content As ImmutableArray(Of Byte)
 
         ''' <summary>
         '''     Größe des Eintragsinhalts in Bytes.

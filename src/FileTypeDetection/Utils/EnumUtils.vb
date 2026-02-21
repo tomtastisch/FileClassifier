@@ -35,7 +35,7 @@ Namespace Global.Tomtastisch.FileClassifier.Utils
     '''         - Keine Reflection-Features außer <c>Enum.GetValues(Type)</c>.
     '''     </para>
     ''' </remarks>
-    Public NotInheritable Class EnumUtils
+    Friend NotInheritable Class EnumUtils
 
         Private Sub New()
         End Sub

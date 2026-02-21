@@ -83,7 +83,7 @@ Namespace Global.Tomtastisch.FileClassifier
                     failed)
             End If
 
-            If Not EvidenceHashingIo.TryReadFileBounded(path, detectorOptions, originalBytes, readError) Then
+            If Not EvidenceHashingIO.TryReadFileBounded(path, detectorOptions, originalBytes, readError) Then
                 failed = HashEvidence.CreateFailure(HashSourceType.Unknown, path, readError)
                 Return New HashRoundTripReport(
                     path,

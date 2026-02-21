@@ -6,7 +6,7 @@ Dieses Verzeichnis enthaelt interne, zustandslose Hashing-Bausteine hinter der o
 ## 2. Inhalt
 - `EvidenceHashingCore.vb`
 - `EvidenceHashingRoundTrip.vb`
-- `EvidenceHashingIo.vb`
+- `EvidenceHashingIO.vb`
 
 ## 3. API und Verhalten
 - Keine Public API in diesem Verzeichnis.
