@@ -56,7 +56,7 @@ Namespace Global.Tomtastisch.FileClassifier
         Zip
 
         ''' <summary>
-        '''     Office Open XML Word-Dokument (DOCX.
+        '''     Office Open XML Word-Dokument (DOC.
         ''' </summary>
         Doc
 
