@@ -19,16 +19,6 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 - Docs/CI/Tooling:
   - Versionskonvergenz aktiv auf `6.0.0` gesetzt (`RepoVersion`, `Version`, `PackageVersion`, Versionshistorie DE/EN).
 
-## [6.0.1]
-- Added:
-  - Neues internes Submodul `src/FileTypeDetection/Infrastructure/Utils/` als SSOT für wiederverwendbare Guard-/I/O-/Pfad-/Logging-Helfer.
-- Changed:
-  - Utility-Klassen aus `CoreInternals.vb` in dedizierte Dateien unter `Infrastructure/Utils` ausgelagert; `CoreInternals.vb` auf Refinement-Logik fokussiert.
-  - Vorhandene Utils von `src/FileTypeDetection/Utils/` nach `src/FileTypeDetection/Infrastructure/Utils/` verschoben und Namespace auf `Tomtastisch.FileClassifier.Infrastructure.Utils` konsolidiert.
-  - Duplizierte Byte-Array-Guard-Checks auf `ByteArrayGuard.HasContent(...)` vereinheitlicht.
-- Docs/CI/Tooling:
-  - Patch-Nachversionierung auf `6.0.1` dokumentiert (deaktiviert, bis Packaging-/SVT-Folgefreigabe erfolgt).
-
 ## [5.2.1]
 - Added:
   - CI-Dokumentation um expliziten Pflicht-Gate-Charakter fuer Qodana erweitert.
