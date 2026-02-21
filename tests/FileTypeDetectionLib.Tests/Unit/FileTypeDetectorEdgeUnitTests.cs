@@ -56,7 +56,7 @@ public sealed class FileTypeDetectorEdgeUnitTests
         var path = TestResources.Resolve("sample.docx");
         var detail = new FileTypeDetector().DetectDetailed(path);
 
-        Assert.Equal(FileKind.Docx, detail.DetectedType.Kind);
+        Assert.Equal(FileKind.Doc, detail.DetectedType.Kind);
         Assert.Equal("ArchiveStructuredRefined", detail.ReasonCode);
         Assert.True(detail.UsedStructuredRefinement);
     }

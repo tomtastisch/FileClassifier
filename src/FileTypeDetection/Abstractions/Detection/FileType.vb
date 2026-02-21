@@ -44,8 +44,15 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public ReadOnly Property Aliases As ImmutableArray(Of String)
 
-        Friend Sub New(kind As FileKind, canonicalExtension As String, mime As String, allowed As Boolean,
-                       aliases As IEnumerable(Of String))
+        Friend Sub New _
+            (
+                kind As FileKind,
+                canonicalExtension As String,
+                mime As String,
+                allowed As Boolean,
+                aliases As IEnumerable(Of String)
+            )
+
             Dim dedup As HashSet(Of String) = New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
             Dim n As String
             Dim orderedAliases As List(Of String)
@@ -76,6 +83,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <returns>String-Repräsentation des Feldes <see cref="Kind"/>.</returns>
         Public Overrides Function ToString() As String
+
             Return Kind.ToString()
         End Function
     End Class

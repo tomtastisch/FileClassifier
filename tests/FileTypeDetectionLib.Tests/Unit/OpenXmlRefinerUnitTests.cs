@@ -25,10 +25,10 @@ public sealed class OpenXmlRefinerUnitTests
     }
 
     [Theory]
-    [InlineData("word/document.xml", FileKind.Docx)]
-    [InlineData("xl/workbook.xml", FileKind.Xlsx)]
-    [InlineData("xl/workbook.bin", FileKind.Xlsx)]
-    [InlineData("ppt/presentation.xml", FileKind.Pptx)]
+    [InlineData("word/document.xml", FileKind.Doc)]
+    [InlineData("xl/workbook.xml", FileKind.Xls)]
+    [InlineData("xl/workbook.bin", FileKind.Xls)]
+    [InlineData("ppt/presentation.xml", FileKind.Ppt)]
     public void TryRefineStream_DetectsOpenXmlKinds(string markerPath, FileKind expected)
     {
         var payload = CreateOpenXmlPackage(markerPath);
@@ -40,12 +40,12 @@ public sealed class OpenXmlRefinerUnitTests
     }
 
     [Theory]
-    [InlineData("application/vnd.oasis.opendocument.text", FileKind.Docx)]
-    [InlineData("application/vnd.oasis.opendocument.text-template", FileKind.Docx)]
-    [InlineData("application/vnd.oasis.opendocument.spreadsheet", FileKind.Xlsx)]
-    [InlineData("application/vnd.oasis.opendocument.spreadsheet-template", FileKind.Xlsx)]
-    [InlineData("application/vnd.oasis.opendocument.presentation", FileKind.Pptx)]
-    [InlineData("application/vnd.oasis.opendocument.presentation-template", FileKind.Pptx)]
+    [InlineData("application/vnd.oasis.opendocument.text", FileKind.Doc)]
+    [InlineData("application/vnd.oasis.opendocument.text-template", FileKind.Doc)]
+    [InlineData("application/vnd.oasis.opendocument.spreadsheet", FileKind.Xls)]
+    [InlineData("application/vnd.oasis.opendocument.spreadsheet-template", FileKind.Xls)]
+    [InlineData("application/vnd.oasis.opendocument.presentation", FileKind.Ppt)]
+    [InlineData("application/vnd.oasis.opendocument.presentation-template", FileKind.Ppt)]
     public void TryRefineStream_DetectsOpenDocumentKinds(string mimeType, FileKind expected)
     {
         var payload = CreateOpenDocumentPackage(mimeType);

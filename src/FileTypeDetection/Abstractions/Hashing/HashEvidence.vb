@@ -69,17 +69,20 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public ReadOnly Property Notes As String
 
-        Friend Sub New(
-                       sourceType As HashSourceType,
-                       label As String,
-                       detectedType As FileType,
-                       entry As ZipExtractedEntry,
-                       compressedBytes As Byte(),
-                       uncompressedBytes As Byte(),
-                       entryCount As Integer,
-                       totalUncompressedBytes As Long,
-                       digests As HashDigestSet,
-                       notes As String)
+        Friend Sub New _
+            (
+                sourceType As HashSourceType,
+                label As String,
+                detectedType As FileType,
+                entry As ZipExtractedEntry,
+                compressedBytes As Byte(),
+                uncompressedBytes As Byte(),
+                entryCount As Integer,
+                totalUncompressedBytes As Long,
+                digests As HashDigestSet,
+                notes As String
+            )
+
             Me.SourceType = sourceType
             Me.Label = If(label, String.Empty)
             Me.DetectedType = If(detectedType, FileTypeRegistry.Resolve(FileKind.Unknown))
@@ -92,8 +95,13 @@ Namespace Global.Tomtastisch.FileClassifier
             Me.UncompressedBytes = ToImmutable(uncompressedBytes)
         End Sub
 
-        Friend Shared Function CreateFailure(sourceType As HashSourceType, label As String, notes As String) _
-            As HashEvidence
+        Friend Shared Function CreateFailure _
+            (
+                sourceType As HashSourceType,
+                label As String,
+                notes As String
+            ) As HashEvidence
+
             Return New HashEvidence(
                 sourceType:=sourceType,
                 label:=label,
@@ -107,10 +115,15 @@ Namespace Global.Tomtastisch.FileClassifier
                 notes:=notes)
         End Function
 
-        Private Shared Function ToImmutable(data As Byte()) As Immutable.ImmutableArray(Of Byte)
+        Private Shared Function ToImmutable _
+            (
+                data As Byte()
+            ) As Immutable.ImmutableArray(Of Byte)
+
             If data Is Nothing OrElse data.Length = 0 Then
                 Return Immutable.ImmutableArray(Of Byte).Empty
             End If
+
             Return Immutable.ImmutableArray.Create(data)
         End Function
     End Class

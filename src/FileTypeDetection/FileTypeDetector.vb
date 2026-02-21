@@ -796,9 +796,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             If refined.Kind <> FileKind.Unknown Then
                 WarnIfNoDirectContentDetection(refined.Kind, opt)
-                trace.UsedStructuredRefinement =
-                    (refined.Kind = FileKind.Docx OrElse refined.Kind = FileKind.Xlsx OrElse
-                     refined.Kind = FileKind.Pptx)
+                trace.UsedStructuredRefinement = FileTypeRegistry.HasStructuredContainerDetection(refined.Kind)
                 trace.ReasonCode =
                     If(trace.UsedStructuredRefinement, ReasonArchiveStructuredRefined, ReasonArchiveRefined)
                 Return refined

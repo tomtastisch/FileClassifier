@@ -371,9 +371,9 @@ Namespace Global.Tomtastisch.FileClassifier
                             Return FileTypeRegistry.Resolve(FileKind.Unknown)
                         End If
 
-                        If hasDocxMarker Then Return FileTypeRegistry.Resolve(FileKind.Docx)
-                        If hasXlsxMarker Then Return FileTypeRegistry.Resolve(FileKind.Xlsx)
-                        If hasPptxMarker Then Return FileTypeRegistry.Resolve(FileKind.Pptx)
+                        If hasDocxMarker Then Return FileTypeRegistry.Resolve(FileKind.Doc)
+                        If hasXlsxMarker Then Return FileTypeRegistry.Resolve(FileKind.Xls)
+                        If hasPptxMarker Then Return FileTypeRegistry.Resolve(FileKind.Ppt)
                     End If
 
                     If hasOpenDocumentConflict Then
@@ -418,12 +418,12 @@ Namespace Global.Tomtastisch.FileClassifier
             If String.IsNullOrWhiteSpace(mimeValue) Then Return FileKind.Unknown
             normalizedMime = mimeValue.Trim().ToLowerInvariant()
 
-            If normalizedMime = "application/vnd.oasis.opendocument.text" Then Return FileKind.Docx
-            If normalizedMime = "application/vnd.oasis.opendocument.text-template" Then Return FileKind.Docx
-            If normalizedMime = "application/vnd.oasis.opendocument.spreadsheet" Then Return FileKind.Xlsx
-            If normalizedMime = "application/vnd.oasis.opendocument.spreadsheet-template" Then Return FileKind.Xlsx
-            If normalizedMime = "application/vnd.oasis.opendocument.presentation" Then Return FileKind.Pptx
-            If normalizedMime = "application/vnd.oasis.opendocument.presentation-template" Then Return FileKind.Pptx
+            If normalizedMime = "application/vnd.oasis.opendocument.text" Then Return FileKind.Doc
+            If normalizedMime = "application/vnd.oasis.opendocument.text-template" Then Return FileKind.Doc
+            If normalizedMime = "application/vnd.oasis.opendocument.spreadsheet" Then Return FileKind.Xls
+            If normalizedMime = "application/vnd.oasis.opendocument.spreadsheet-template" Then Return FileKind.Xls
+            If normalizedMime = "application/vnd.oasis.opendocument.presentation" Then Return FileKind.Ppt
+            If normalizedMime = "application/vnd.oasis.opendocument.presentation-template" Then Return FileKind.Ppt
 
             Return FileKind.Unknown
         End Function
@@ -611,9 +611,9 @@ Namespace Global.Tomtastisch.FileClassifier
             If hasPowerPoint Then markerCount += 1
 
             If markerCount <> 1 Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
-            If hasWord Then Return FileTypeRegistry.Resolve(FileKind.Docx)
-            If hasExcel Then Return FileTypeRegistry.Resolve(FileKind.Xlsx)
-            If hasPowerPoint Then Return FileTypeRegistry.Resolve(FileKind.Pptx)
+            If hasWord Then Return FileTypeRegistry.Resolve(FileKind.Doc)
+            If hasExcel Then Return FileTypeRegistry.Resolve(FileKind.Xls)
+            If hasPowerPoint Then Return FileTypeRegistry.Resolve(FileKind.Ppt)
 
             Return FileTypeRegistry.Resolve(FileKind.Unknown)
         End Function

@@ -9,6 +9,13 @@ public sealed class FileTypeDetectionSteps
 {
     private const string StateKey = "detection_state";
     private const string ResourceColumn = "ressource";
+    private static readonly IReadOnlyDictionary<string, FileKind> LegacyFileKindAliases =
+        new Dictionary<string, FileKind>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Docx"] = FileKind.Doc,
+            ["Xlsx"] = FileKind.Xls,
+            ["Pptx"] = FileKind.Ppt
+        };
     private readonly ScenarioContext _scenarioContext;
 
     public FileTypeDetectionSteps(ScenarioContext scenarioContext)
@@ -276,8 +283,7 @@ public sealed class FileTypeDetectionSteps
     {
         var state = State();
         Assert.NotNull(state.CurrentPayload);
-        Assert.True(
-            Enum.TryParse<FileKind>(expectedKind, true, out var kind),
+        Assert.True(TryParseFileKindLiteral(expectedKind, out var kind),
             $"Unknown FileKind literal in feature: {expectedKind}");
 
         var detector = new FileTypeDetector();
@@ -290,8 +296,7 @@ public sealed class FileTypeDetectionSteps
         var state = State();
         Assert.NotNull(state.LastResult);
 
-        Assert.True(
-            Enum.TryParse<FileKind>(expectedKind, true, out var expected),
+        Assert.True(TryParseFileKindLiteral(expectedKind, out var expected),
             $"Unknown FileKind literal in feature: {expectedKind}");
 
         Assert.Equal(expected, state.LastResult!.Kind);
@@ -420,9 +425,9 @@ public sealed class FileTypeDetectionSteps
         var state = State();
         Assert.NotNull(state.LastRoundTripReport);
         Assert.True(state.LastRoundTripReport!.LogicalConsistent);
-        Assert.True(state.LastRoundTripReport.LogicalH1EqualsH2);
-        Assert.True(state.LastRoundTripReport.LogicalH1EqualsH3);
-        Assert.True(state.LastRoundTripReport.LogicalH1EqualsH4);
+        Assert.True(state.LastRoundTripReport.LogicalEquals(HashRoundTripReport.HashSlot.H2));
+        Assert.True(state.LastRoundTripReport.LogicalEquals(HashRoundTripReport.HashSlot.H3));
+        Assert.True(state.LastRoundTripReport.LogicalEquals(HashRoundTripReport.HashSlot.H4));
     }
 
     [Then("ist der Hashbericht als Archiv klassifiziert {string}")]
@@ -538,6 +543,16 @@ public sealed class FileTypeDetectionSteps
     {
         var path = TestResources.Resolve(name);
         Assert.True(File.Exists(path), $"Test resource missing: {path}");
+    }
+
+    private static bool TryParseFileKindLiteral(string literal, out FileKind kind)
+    {
+        if (Enum.TryParse(literal, true, out kind))
+        {
+            return true;
+        }
+
+        return LegacyFileKindAliases.TryGetValue(literal, out kind);
     }
 
     private static byte[] CreateArchivePayload(string archiveType)

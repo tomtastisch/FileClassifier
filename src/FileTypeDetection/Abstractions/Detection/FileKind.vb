@@ -56,18 +56,18 @@ Namespace Global.Tomtastisch.FileClassifier
         Zip
 
         ''' <summary>
-        '''     Office Open XML Word-Dokument (DOCX).
+        '''     Office-Word-Dokument (DOC).
         ''' </summary>
-        Docx
+        Doc
 
         ''' <summary>
-        '''     Office Open XML Excel-Dokument (XLSX).
+        '''     Office-Excel-Dokument (XLS).
         ''' </summary>
-        Xlsx
+        Xls
 
         ''' <summary>
-        '''     Office Open XML PowerPoint-Dokument (PPTX).
+        '''     Office-PowerPoint-Dokument (PPT).
         ''' </summary>
-        Pptx
+        Ppt
     End Enum
 End Namespace
