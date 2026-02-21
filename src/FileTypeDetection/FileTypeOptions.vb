@@ -204,11 +204,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Return Text.Json.JsonSerializer.Serialize(dto)
         End Function
 
-        Friend Shared Function LoadOptionsFromPath _
-            (
-                path As String
-            ) As Boolean
-
+        Friend Shared Function LoadOptionsFromPath(path As String) As Boolean
             If String.IsNullOrWhiteSpace(path) OrElse Not IO.File.Exists(path) Then Return False
             If Not path.EndsWith(".json", StringComparison.OrdinalIgnoreCase) Then Return False
 
@@ -238,91 +234,60 @@ Namespace Global.Tomtastisch.FileClassifier
             End SyncLock
         End Sub
 
-        Private Shared Function SafeInt _
-            (
-                el As Text.Json.JsonElement,
-                fallback As Integer
-            ) As Integer
-
+        Private Shared Function SafeInt(el As Text.Json.JsonElement, fallback As Integer) As Integer
             Dim v As Integer
             If el.ValueKind = Text.Json.JsonValueKind.Number AndAlso el.TryGetInt32(v) Then Return v
             Return fallback
         End Function
 
-        Private Shared Function SafeLong _
-            (
-                el As Text.Json.JsonElement,
-                fallback As Long
-            ) As Long
-
+        Private Shared Function SafeLong(el As Text.Json.JsonElement, fallback As Long) As Long
             Dim v As Long
             If el.ValueKind = Text.Json.JsonValueKind.Number AndAlso el.TryGetInt64(v) Then Return v
             Return fallback
         End Function
 
-        Private Shared Function ParsePositiveInt _
-            (
-                el As Text.Json.JsonElement,
-                fallback As Integer,
-                name As String,
-                logger As Microsoft.Extensions.Logging.ILogger
-            ) As Integer
-
+        Private Shared Function ParsePositiveInt(el As Text.Json.JsonElement, fallback As Integer,
+                                                 name As String,
+                                                 logger As Microsoft.Extensions.Logging.ILogger) As Integer
             Dim v = SafeInt(el, fallback)
             If v > 0 Then Return v
             LogGuard.Warn(logger, $"[Config] Ungültiger Wert für '{name}', fallback={fallback}.")
             Return fallback
         End Function
 
-        Private Shared Function ParseNonNegativeInt _
-            (
-                el As Text.Json.JsonElement,
-                fallback As Integer,
-                name As String,
-                logger As Microsoft.Extensions.Logging.ILogger
-            ) As Integer
-
+        Private Shared Function ParseNonNegativeInt(el As Text.Json.JsonElement, fallback As Integer,
+                                                    name As String,
+                                                    logger As Microsoft.Extensions.Logging.ILogger) As Integer
             Dim v = SafeInt(el, fallback)
             If v >= 0 Then Return v
             LogGuard.Warn(logger, $"[Config] Ungültiger Wert für '{name}', fallback={fallback}.")
             Return fallback
         End Function
 
-        Private Shared Function ParsePositiveLong _
-            (
-                el As Text.Json.JsonElement,
-                fallback As Long,
-                name As String,
-                logger As Microsoft.Extensions.Logging.ILogger
-            ) As Long
-
+        Private Shared Function ParsePositiveLong(el As Text.Json.JsonElement, fallback As Long,
+                                                  name As String,
+                                                  logger As Microsoft.Extensions.Logging.ILogger) _
+            As Long
             Dim v = SafeLong(el, fallback)
             If v > 0 Then Return v
             LogGuard.Warn(logger, $"[Config] Ungültiger Wert für '{name}', fallback={fallback}.")
             Return fallback
         End Function
 
-        Private Shared Function ParseBoolean _
-            (
-                el As Text.Json.JsonElement,
-                fallback As Boolean,
-                name As String,
-                logger As Microsoft.Extensions.Logging.ILogger
-            ) As Boolean
-
+        Private Shared Function ParseBoolean(el As Text.Json.JsonElement, fallback As Boolean,
+                                             name As String,
+                                             logger As Microsoft.Extensions.Logging.ILogger) _
+            As Boolean
             If el.ValueKind = Text.Json.JsonValueKind.True Then Return True
             If el.ValueKind = Text.Json.JsonValueKind.False Then Return False
             LogGuard.Warn(logger, $"[Config] Ungültiger Wert für '{name}', fallback={fallback}.")
             Return fallback
         End Function
 
-        Private Shared Function ParseString _
-            (
-                el As Text.Json.JsonElement,
-                fallback As String,
-                name As String,
-                logger As Microsoft.Extensions.Logging.ILogger
-            ) As String
+        Private Shared Function ParseString(el As Text.Json.JsonElement, fallback As String,
+                                            name As String,
+                                            logger As Microsoft.Extensions.Logging.ILogger) _
+            As String
 
             Dim value As String
 
@@ -334,8 +299,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Return fallback
         End Function
 
-        Private Shared Sub TryParseHashOptions _
-            (
+        Private Shared Sub TryParseHashOptions(
                 el As Text.Json.JsonElement,
                 ByRef includePayloadCopies As Boolean,
                 ByRef includeFastHash As Boolean,
@@ -386,10 +350,9 @@ Namespace Global.Tomtastisch.FileClassifier
             Next
         End Sub
 
-        Private Shared Function Snapshot _
-            (
+        Private Shared Function Snapshot(
                 opt As FileTypeProjectOptions
-            ) As FileTypeProjectOptions
+             ) As FileTypeProjectOptions
 
             Dim snap As FileTypeProjectOptions
 

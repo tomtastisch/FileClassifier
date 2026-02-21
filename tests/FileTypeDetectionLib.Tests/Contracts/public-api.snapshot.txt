@@ -1,12 +1,12 @@
-F:Tomtastisch.FileClassifier.FileKind.Doc:Tomtastisch.FileClassifier.FileKind
+F:Tomtastisch.FileClassifier.FileKind.Docx:Tomtastisch.FileClassifier.FileKind
 F:Tomtastisch.FileClassifier.FileKind.Gif:Tomtastisch.FileClassifier.FileKind
 F:Tomtastisch.FileClassifier.FileKind.Jpeg:Tomtastisch.FileClassifier.FileKind
 F:Tomtastisch.FileClassifier.FileKind.Pdf:Tomtastisch.FileClassifier.FileKind
 F:Tomtastisch.FileClassifier.FileKind.Png:Tomtastisch.FileClassifier.FileKind
-F:Tomtastisch.FileClassifier.FileKind.Ppt:Tomtastisch.FileClassifier.FileKind
+F:Tomtastisch.FileClassifier.FileKind.Pptx:Tomtastisch.FileClassifier.FileKind
 F:Tomtastisch.FileClassifier.FileKind.Unknown:Tomtastisch.FileClassifier.FileKind
 F:Tomtastisch.FileClassifier.FileKind.Webp:Tomtastisch.FileClassifier.FileKind
-F:Tomtastisch.FileClassifier.FileKind.Xls:Tomtastisch.FileClassifier.FileKind
+F:Tomtastisch.FileClassifier.FileKind.Xlsx:Tomtastisch.FileClassifier.FileKind
 F:Tomtastisch.FileClassifier.FileKind.Zip:Tomtastisch.FileClassifier.FileKind
 F:Tomtastisch.FileClassifier.HashSourceType.ArchiveEntries:Tomtastisch.FileClassifier.HashSourceType
 F:Tomtastisch.FileClassifier.HashSourceType.FilePath:Tomtastisch.FileClassifier.HashSourceType
@@ -48,9 +48,6 @@ M:Tomtastisch.FileClassifier.FileTypeOptions.LoadOptions(System.String):System.B
 M:Tomtastisch.FileClassifier.FileTypeProjectBaseline.ApplyDeterministicDefaults():System.Void
 M:Tomtastisch.FileClassifier.FileTypeProjectOptions..ctor()
 M:Tomtastisch.FileClassifier.HashOptions..ctor()
-M:Tomtastisch.FileClassifier.HashRoundTripReport.Evidence(Tomtastisch.FileClassifier.HashRoundTripReport+HashSlot):Tomtastisch.FileClassifier.HashEvidence
-M:Tomtastisch.FileClassifier.HashRoundTripReport.LogicalEquals(Tomtastisch.FileClassifier.HashRoundTripReport+HashSlot):System.Boolean
-M:Tomtastisch.FileClassifier.HashRoundTripReport.PhysicalEquals(Tomtastisch.FileClassifier.HashRoundTripReport+HashSlot):System.Boolean
 M:Tomtastisch.FileClassifier.ZipExtractedEntry.OpenReadOnlyStream():System.IO.MemoryStream
 P:Tomtastisch.FileClassifier.DetectionDetail.DetectedType:Tomtastisch.FileClassifier.FileType
 P:Tomtastisch.FileClassifier.DetectionDetail.ExtensionVerified:System.Boolean
@@ -97,11 +94,20 @@ P:Tomtastisch.FileClassifier.HashOptions.IncludeFastHash:System.Boolean
 P:Tomtastisch.FileClassifier.HashOptions.IncludePayloadCopies:System.Boolean
 P:Tomtastisch.FileClassifier.HashOptions.IncludeSecureHash:System.Boolean
 P:Tomtastisch.FileClassifier.HashOptions.MaterializedFileName:System.String
+P:Tomtastisch.FileClassifier.HashRoundTripReport.H1:Tomtastisch.FileClassifier.HashEvidence
+P:Tomtastisch.FileClassifier.HashRoundTripReport.H2:Tomtastisch.FileClassifier.HashEvidence
+P:Tomtastisch.FileClassifier.HashRoundTripReport.H3:Tomtastisch.FileClassifier.HashEvidence
+P:Tomtastisch.FileClassifier.HashRoundTripReport.H4:Tomtastisch.FileClassifier.HashEvidence
 P:Tomtastisch.FileClassifier.HashRoundTripReport.InputPath:System.String
 P:Tomtastisch.FileClassifier.HashRoundTripReport.IsArchiveInput:System.Boolean
 P:Tomtastisch.FileClassifier.HashRoundTripReport.LogicalConsistent:System.Boolean
+P:Tomtastisch.FileClassifier.HashRoundTripReport.LogicalH1EqualsH2:System.Boolean
+P:Tomtastisch.FileClassifier.HashRoundTripReport.LogicalH1EqualsH3:System.Boolean
+P:Tomtastisch.FileClassifier.HashRoundTripReport.LogicalH1EqualsH4:System.Boolean
 P:Tomtastisch.FileClassifier.HashRoundTripReport.Notes:System.String
-P:Tomtastisch.FileClassifier.HashRoundTripReport.Slots:Tomtastisch.FileClassifier.HashRoundTripReport+HashSlot[]
+P:Tomtastisch.FileClassifier.HashRoundTripReport.PhysicalH1EqualsH2:System.Boolean
+P:Tomtastisch.FileClassifier.HashRoundTripReport.PhysicalH1EqualsH3:System.Boolean
+P:Tomtastisch.FileClassifier.HashRoundTripReport.PhysicalH1EqualsH4:System.Boolean
 P:Tomtastisch.FileClassifier.ZipExtractedEntry.Content:System.Collections.Immutable.ImmutableArray<System.Byte>
 P:Tomtastisch.FileClassifier.ZipExtractedEntry.RelativePath:System.String
 P:Tomtastisch.FileClassifier.ZipExtractedEntry.Size:System.Int32
@@ -121,15 +127,15 @@ T:class Tomtastisch.FileClassifier.HashRoundTripReport
 T:class Tomtastisch.FileClassifier.ZipExtractedEntry
 T:enum Tomtastisch.FileClassifier.FileKind
 T:enum Tomtastisch.FileClassifier.HashSourceType
-V:Tomtastisch.FileClassifier.FileKind.Doc
+V:Tomtastisch.FileClassifier.FileKind.Docx
 V:Tomtastisch.FileClassifier.FileKind.Gif
 V:Tomtastisch.FileClassifier.FileKind.Jpeg
 V:Tomtastisch.FileClassifier.FileKind.Pdf
 V:Tomtastisch.FileClassifier.FileKind.Png
-V:Tomtastisch.FileClassifier.FileKind.Ppt
+V:Tomtastisch.FileClassifier.FileKind.Pptx
 V:Tomtastisch.FileClassifier.FileKind.Unknown
 V:Tomtastisch.FileClassifier.FileKind.Webp
-V:Tomtastisch.FileClassifier.FileKind.Xls
+V:Tomtastisch.FileClassifier.FileKind.Xlsx
 V:Tomtastisch.FileClassifier.FileKind.Zip
 V:Tomtastisch.FileClassifier.HashSourceType.ArchiveEntries
 V:Tomtastisch.FileClassifier.HashSourceType.FilePath

@@ -21,7 +21,7 @@ public sealed class HeaderOnlyPolicyUnitTests
         var source = TestResources.Resolve("sample.docx");
         var detected = new FileTypeDetector().Detect(source);
 
-        Assert.Equal(FileKind.Doc, detected.Kind);
+        Assert.Equal(FileKind.Docx, detected.Kind);
     }
 
     [Fact]

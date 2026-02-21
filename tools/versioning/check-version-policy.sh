@@ -30,6 +30,8 @@ collect_version_policy_violations() {
   local -a files=()
   local -a violations=()
   local -a patterns=(
+    '<Version>'
+    '<PackageVersion>'
     '<VersionPrefix>'
     '<VersionSuffix>'
     '<InformationalVersion>'
@@ -55,42 +57,15 @@ collect_version_policy_violations() {
 }
 
 run_ci_mode() {
-  local violations repo_version vbproj_version vbproj_package_version
-
-  repo_version="$(sed -n 's/.*<RepoVersion>\([^<]*\)<\/RepoVersion>.*/\1/p' Directory.Build.props | head -n1)"
-  vbproj_version="$(sed -n 's/.*<Version>\([^<]*\)<\/Version>.*/\1/p' src/FileTypeDetection/FileTypeDetectionLib.vbproj | head -n1)"
-  vbproj_package_version="$(sed -n 's/.*<PackageVersion>\([^<]*\)<\/PackageVersion>.*/\1/p' src/FileTypeDetection/FileTypeDetectionLib.vbproj | head -n1)"
-
-  if [[ -z "${repo_version}" ]]; then
-    echo "version-policy: RepoVersion missing in Directory.Build.props" >&2
-    return 1
-  fi
-  if [[ -z "${vbproj_version}" ]]; then
-    echo "version-policy: Version missing in src/FileTypeDetection/FileTypeDetectionLib.vbproj" >&2
-    return 1
-  fi
-  if [[ -z "${vbproj_package_version}" ]]; then
-    echo "version-policy: PackageVersion missing in src/FileTypeDetection/FileTypeDetectionLib.vbproj" >&2
-    return 1
-  fi
-
-  if [[ "${vbproj_version}" != "${repo_version}" ]]; then
-    echo "version-policy: Version (${vbproj_version}) != RepoVersion (${repo_version})" >&2
-    return 1
-  fi
-  if [[ "${vbproj_package_version}" != "${repo_version}" ]]; then
-    echo "version-policy: PackageVersion (${vbproj_package_version}) != RepoVersion (${repo_version})" >&2
-    return 1
-  fi
-
+  local violations
   violations="$(collect_version_policy_violations)"
   if [[ -n "${violations}" ]]; then
-    echo "version-policy: forbidden static assembly/version fields detected." >&2
+    echo "version-policy: static version fields are forbidden (tag is SSOT)." >&2
     echo "${violations}" >&2
     return 1
   fi
 
-  echo "version-policy: convergence fields valid and no forbidden static fields detected."
+  echo "version-policy: no static package/assembly version fields detected."
 }
 
 read_nupkg_version() {

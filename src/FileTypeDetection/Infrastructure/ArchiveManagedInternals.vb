@@ -24,24 +24,17 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
-        Friend Shared Function ValidateArchiveStream _
-            (
-                stream As Stream,
-                opt As FileTypeProjectOptions,
-                depth As Integer
-            ) As Boolean
-
+        Friend Shared Function ValidateArchiveStream(stream As Stream, opt As FileTypeProjectOptions, depth As Integer) _
+            As Boolean
             Return ProcessArchiveStream(stream, opt, depth, Nothing)
         End Function
 
-        Friend Shared Function ProcessArchiveStream _
-            (
-                stream As Stream,
-                opt As FileTypeProjectOptions,
-                depth As Integer,
-                extractEntry As Func(Of ZipArchiveEntry, Boolean)
-            ) As Boolean
-
+        Friend Shared Function ProcessArchiveStream(
+                                                    stream As Stream,
+                                                    opt As FileTypeProjectOptions,
+                                                    depth As Integer,
+                                                    extractEntry As Func(Of ZipArchiveEntry, Boolean)
+                                                    ) As Boolean
             Dim totalUncompressed As Long
             Dim ordered As IEnumerable(Of ZipArchiveEntry)
             Dim u As Long
@@ -81,7 +74,6 @@ Namespace Global.Tomtastisch.FileClassifier
 
                             Try
                                 Using es = e.Open()
-
                                     Using nestedMs = RecyclableStreams.GetStream("ArchiveStreamEngine.Nested")
                                         StreamBounds.CopyBounded(es, nestedMs, opt.MaxZipNestedBytes)
                                         nestedMs.Position = 0
@@ -93,7 +85,7 @@ Namespace Global.Tomtastisch.FileClassifier
                                 End Using
                             Catch ex As Exception When _
                                 TypeOf ex Is UnauthorizedAccessException OrElse
-                                TypeOf ex Is Security.SecurityException OrElse
+                                TypeOf ex Is System.Security.SecurityException OrElse
                                 TypeOf ex Is IOException OrElse
                                 TypeOf ex Is InvalidDataException OrElse
                                 TypeOf ex Is NotSupportedException OrElse
@@ -114,7 +106,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return True
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is Security.SecurityException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -126,12 +118,7 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Private Shared Function IsNestedArchiveEntry _
-            (
-                entry As ZipArchiveEntry,
-                opt As FileTypeProjectOptions
-            ) As Boolean
-
+        Private Shared Function IsNestedArchiveEntry(entry As ZipArchiveEntry, opt As FileTypeProjectOptions) As Boolean
             Dim header(15) As Byte
             Dim read As Integer
             Dim exact As Byte()
@@ -154,7 +141,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is Security.SecurityException OrElse
+                TypeOf ex Is System.Security.SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -186,15 +173,13 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <summary>
         '''     Verarbeitet ZIP-Archive fail-closed über die Managed-Archive-Engine.
         ''' </summary>
-        Public Function Process _
-            (
-                stream As Stream,
-                opt As FileTypeProjectOptions,
-                depth As Integer,
-                containerTypeValue As ArchiveContainerType,
-                extractEntry As Func(Of IArchiveEntryModel, Boolean)
-            ) As Boolean Implements IArchiveBackend.Process
-
+        Public Function Process(
+                                stream As Stream,
+                                opt As FileTypeProjectOptions,
+                                depth As Integer,
+                                containerTypeValue As ArchiveContainerType,
+                                extractEntry As Func(Of IArchiveEntryModel, Boolean)
+                                ) As Boolean Implements IArchiveBackend.Process
             If containerTypeValue <> ArchiveContainerType.Zip Then Return False
 
             If extractEntry Is Nothing Then

@@ -562,7 +562,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Dim trace As DetectionTrace = DetectionTrace.Empty
 
-            If Not ByteArrayGuard.HasContent(data) Then Return UnknownType()
+            If data Is Nothing OrElse data.Length = 0 Then Return UnknownType()
 
             If CLng(data.Length) > opt.MaxBytes Then
                 LogGuard.Warn(opt.Logger, $"[Detect] Daten zu groß ({data.Length} > {opt.MaxBytes}).")
@@ -796,7 +796,9 @@ Namespace Global.Tomtastisch.FileClassifier
 
             If refined.Kind <> FileKind.Unknown Then
                 WarnIfNoDirectContentDetection(refined.Kind, opt)
-                trace.UsedStructuredRefinement = FileTypeRegistry.HasStructuredContainerDetection(refined.Kind)
+                trace.UsedStructuredRefinement =
+                    (refined.Kind = FileKind.Docx OrElse refined.Kind = FileKind.Xlsx OrElse
+                     refined.Kind = FileKind.Pptx)
                 trace.ReasonCode =
                     If(trace.UsedStructuredRefinement, ReasonArchiveStructuredRefined, ReasonArchiveRefined)
                 Return refined

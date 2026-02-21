@@ -43,31 +43,18 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public Property MaterializedFileName As String = "deterministic-roundtrip.bin"
 
-        ''' <summary>
-        '''     Erstellt eine interne, seiteneffektfreie Kopie der Optionen.
-        ''' </summary>
-        ''' <returns>Neue Instanz mit identischen aktuellen Optionswerten.</returns>
         Friend Function Clone() As HashOptions
-
             Return New HashOptions With {
-                    .IncludePayloadCopies = IncludePayloadCopies,
-                    .IncludeFastHash = IncludeFastHash,
-                    .IncludeSecureHash = IncludeSecureHash,
-                    .MaterializedFileName = If(MaterializedFileName, String.Empty)
+                .IncludePayloadCopies = IncludePayloadCopies,
+                .IncludeFastHash = IncludeFastHash,
+                .IncludeSecureHash = IncludeSecureHash,
+                .MaterializedFileName = If(MaterializedFileName, String.Empty)
                 }
         End Function
 
-        ''' <summary>
-        '''     Normalisiert ein Optionsobjekt fail-closed auf sichere Standardwerte.
-        ''' </summary>
-        ''' <param name="options">Zu normalisierende Optionen; <c>Nothing</c> erzeugt Standardoptionen.</param>
-        ''' <returns>Normalisierte Optionskopie mit sicherem Materialisierungsdateinamen.</returns>
-        Friend Shared Function Normalize _
-            (
-                options As HashOptions
-            ) As HashOptions
-
+        Friend Shared Function Normalize(options As HashOptions) As HashOptions
             Dim cloned As HashOptions
+
             If options Is Nothing Then options = New HashOptions()
 
             cloned = options.Clone()
@@ -75,20 +62,8 @@ Namespace Global.Tomtastisch.FileClassifier
             Return cloned
         End Function
 
-        ''' <summary>
-        '''     Validiert und normalisiert den Materialisierungsdateinamen auf einen sicheren, deterministischen Wert.
-        ''' </summary>
-        ''' <param name="candidate">Kandidat aus den Optionen.</param>
-        ''' <returns>
-        '''     Sicherheitsnormalisierter Dateiname. Bei ungültigem Eingabewert wird
-        '''     <c>deterministic-roundtrip.bin</c> zurückgegeben.
-        ''' </returns>
         <SuppressMessage("Usage", "CA2249:Use 'string.Contains' instead of 'string.IndexOf' to improve readability", Justification:="IndexOf bleibt hier für deterministische Zeichenprüfung ohne Semantikänderung bestehen.")>
-        Private Shared Function NormalizeMaterializedFileName _
-            (
-                candidate As String
-            ) As String
-
+        Private Shared Function NormalizeMaterializedFileName(candidate As String) As String
             Dim normalized = If(candidate, String.Empty).Trim()
             If String.IsNullOrWhiteSpace(normalized) Then Return "deterministic-roundtrip.bin"
 
@@ -105,7 +80,6 @@ Namespace Global.Tomtastisch.FileClassifier
 
             If String.IsNullOrWhiteSpace(normalized) Then Return "deterministic-roundtrip.bin"
 
-            ' ReSharper disable once LoopCanBeConvertedToQuery
             For Each invalidChar In IO.Path.GetInvalidFileNameChars()
                 If normalized.IndexOf(invalidChar) >= 0 Then
                     Return "deterministic-roundtrip.bin"

@@ -9,7 +9,7 @@ Mapping of claims in `SECURITY.md` to evidence sources and verification commands
 
 | Claim ID | SECURITY Anchor | Claim Summary | Evidence Source | Verification Command | Pass Criteria | Blocker |
 |---|---|---|---|---|---|---|
-| SEC-CLAIM-001 | 2. Unterstuetzte Versionen | Security support is tied to major 6 | `src/FileTypeDetection/FileTypeDetectionLib.vbproj` | `sed -n 's:.*<Version>\([^<]*\)</Version>.*:\1:p' src/FileTypeDetection/FileTypeDetectionLib.vbproj` | Version major is `6` | yes |
+| SEC-CLAIM-001 | 2. Unterstuetzte Versionen | Security support is tied to major 5 | `src/FileTypeDetection/FileTypeDetectionLib.vbproj` | `sed -n 's:.*<Version>\([^<]*\)</Version>.*:\1:p' src/FileTypeDetection/FileTypeDetectionLib.vbproj` | Version major is `5` | yes |
 | SEC-CLAIM-002 | 3. Meldung | Private vulnerability reporting path exists | GitHub API `private-vulnerability-reporting` | `gh api "repos/$REPO/private-vulnerability-reporting"` | `.enabled == true` | yes |
 | SEC-CLAIM-003 | 9. Nachweisbarkeit | Dependabot security updates enabled | GitHub API (`security_and_analysis` or `automated-security-fixes`) | `gh api "repos/$REPO" --jq '.security_and_analysis.dependabot_security_updates.status' || gh api "repos/$REPO/automated-security-fixes" --jq '.enabled'` | `enabled` or `true` | yes |
 | SEC-CLAIM-004 | 9. Nachweisbarkeit | Secret scanning enabled | GitHub API (`security_and_analysis` or Secret-Scanning-Alerts Endpoint) | `gh api "repos/$REPO" --jq '.security_and_analysis.secret_scanning.status' || gh api "repos/$REPO/secret-scanning/alerts?per_page=1"` | `enabled` or endpoint reachable | yes |

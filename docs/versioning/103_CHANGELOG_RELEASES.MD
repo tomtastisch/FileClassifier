@@ -6,28 +6,6 @@
 
 All changes are documented here in technical terms. The release version itself is the Git tag `vX.Y.Z` (optional `-prerelease`) as SSOT.
 
-## [6.0.1]
-- Added:
-  - New internal submodule `src/FileTypeDetection/Infrastructure/Utils/` as the SSOT for reusable guard/I/O/path/logging helpers.
-- Changed:
-  - Moved utility classes from `CoreInternals.vb` into dedicated files under `Infrastructure/Utils`; narrowed `CoreInternals.vb` to refinement logic.
-  - Relocated existing utils from `src/FileTypeDetection/Utils/` to `src/FileTypeDetection/Infrastructure/Utils/` and consolidated the namespace to `Tomtastisch.FileClassifier.Infrastructure.Utils`.
-  - Unified duplicate byte-array guard checks to `ByteArrayGuard.HasContent(...)`.
-- Docs/CI/Tooling:
-  - Updated version convergence to `6.0.1` (`RepoVersion`, `Version`, `PackageVersion`, version history DE/EN).
-
-## [6.0.0]
-- Added:
-  - New internal hashing services (`EvidenceHashingCore`, `EvidenceHashingRoundTrip`, `EvidenceHashingIo`) for deterministic extraction without adding dependencies.
-- Changed:
-  - Breaking migration of `FileKind` values (`Docx`/`Xlsx`/`Pptx` -> `Doc`/`Xls`/`Ppt`).
-  - Breaking migration of `HashRoundTripReport` public API to a slot-based model (`HashSlot`, `Evidence(...)`, `LogicalEquals(...)`, `PhysicalEquals(...)`).
-  - Reduced `EvidenceHashing` to a facade and moved core logic into internal stateless services.
-- Fixed:
-  - Updated reflection-based unit tests to the new internal hashing types.
-- Docs/CI/Tooling:
-  - Prepared local version convergence to `6.0.0` (`RepoVersion`, `Version`, `PackageVersion`, version history DE/EN).
-
 ## [5.2.1]
 - Added:
   - Extended CI documentation to state Qodana as an explicit mandatory gate.

@@ -47,13 +47,8 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public ReadOnly Property ContainerChain As IReadOnlyList(Of ArchiveContainerType)
 
-        Private Sub New _
-            (
-                logicalKind As FileKind,
-                containerType As ArchiveContainerType,
-                containerChain As ArchiveContainerType()
-            )
-
+        Private Sub New(logicalKind As FileKind, containerType As ArchiveContainerType,
+                        containerChain As ArchiveContainerType())
             Me.LogicalKind = logicalKind
             Me.ContainerType = containerType
             Dim chain = If(containerChain, Array.Empty(Of ArchiveContainerType)())
@@ -61,11 +56,9 @@ Namespace Global.Tomtastisch.FileClassifier
         End Sub
 
         Friend Shared Function UnknownDescriptor() As ArchiveDescriptor
-            Return New ArchiveDescriptor(
-                FileKind.Unknown,
-                ArchiveContainerType.Unknown,
-                Array.Empty(Of ArchiveContainerType)()
-            )
+            Return _
+                New ArchiveDescriptor(FileKind.Unknown, ArchiveContainerType.Unknown,
+                                      Array.Empty(Of ArchiveContainerType)())
         End Function
 
         Friend Shared Function ForContainerType(containerType As ArchiveContainerType) As ArchiveDescriptor
@@ -96,14 +89,13 @@ Namespace Global.Tomtastisch.FileClassifier
     Friend Interface IArchiveBackend
         ReadOnly Property ContainerType As ArchiveContainerType
 
-        Function Process _
-            (
-                stream As Stream,
-                opt As FileTypeProjectOptions,
-                depth As Integer,
-                containerTypeValue As ArchiveContainerType,
-                extractEntry As Func(Of IArchiveEntryModel, Boolean)
-            ) As Boolean
+        Function Process(
+                         stream As Stream,
+                         opt As FileTypeProjectOptions,
+                         depth As Integer,
+                         containerTypeValue As ArchiveContainerType,
+                         extractEntry As Func(Of IArchiveEntryModel, Boolean)
+                         ) As Boolean
     End Interface
 
     ''' <summary>
@@ -116,11 +108,7 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
-        Friend Shared Function Resolve _
-            (
-                containerType As ArchiveContainerType
-            ) As IArchiveBackend
-
+        Friend Shared Function Resolve(containerType As ArchiveContainerType) As IArchiveBackend
             Select Case containerType
                 Case ArchiveContainerType.Zip
                     Return ManagedArchiveBackend
@@ -137,11 +125,7 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
-        Friend Shared Function OpenArchive _
-            (
-                stream As Stream
-            ) As SharpCompress.Archives.IArchive
-
+        Friend Shared Function OpenArchive(stream As Stream) As SharpCompress.Archives.IArchive
             Try
                 Dim options = New SharpCompress.Readers.ReaderOptions() With {.LeaveStreamOpen = True}
                 Return OpenArchiveFactoryCompat(stream, options)
@@ -158,12 +142,9 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Friend Shared Function OpenArchiveForContainer _
-            (
-                stream As Stream,
-                containerTypeValue As ArchiveContainerType
-            ) As SharpCompress.Archives.IArchive
-
+        Friend Shared Function OpenArchiveForContainer(stream As Stream,
+                                                       containerTypeValue As ArchiveContainerType) _
+            As SharpCompress.Archives.IArchive
             If containerTypeValue = ArchiveContainerType.GZip Then
                 Dim gzipArchive = OpenGZipArchive(stream)
                 If gzipArchive IsNot Nothing Then Return gzipArchive
@@ -171,11 +152,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Return OpenArchive(stream)
         End Function
 
-        Friend Shared Function HasGZipMagic _
-            (
-                stream As Stream
-            ) As Boolean
-
+        Friend Shared Function HasGZipMagic(stream As Stream) As Boolean
             If stream Is Nothing OrElse Not stream.CanRead Then Return False
             If Not stream.CanSeek Then Return False
             If stream.Length < 2 Then Return False
@@ -185,11 +162,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Return first = &H1F AndAlso second = &H8B
         End Function
 
-        Private Shared Function OpenGZipArchive _
-            (
-                stream As Stream
-            ) As SharpCompress.Archives.IArchive
-
+        Private Shared Function OpenGZipArchive(stream As Stream) As SharpCompress.Archives.IArchive
             Try
                 Dim options = New SharpCompress.Readers.ReaderOptions() With {.LeaveStreamOpen = True}
                 Return OpenGZipArchiveCompat(stream, options)
@@ -206,11 +179,7 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Private Shared Function IsExpectedInvocationException _
-            (
-                ex As TargetInvocationException
-            ) As Boolean
-
+        Private Shared Function IsExpectedInvocationException(ex As TargetInvocationException) As Boolean
             Dim inner = ex?.InnerException
             If inner Is Nothing Then Return False
 
@@ -221,49 +190,38 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf inner Is IOException
         End Function
 
-        Private Shared Function OpenArchiveFactoryCompat _
-            (
-                stream As Stream,
-                options As SharpCompress.Readers.ReaderOptions
-            ) As SharpCompress.Archives.IArchive
-
+        Private Shared Function OpenArchiveFactoryCompat(
+                                                       stream As Stream,
+                                                       options As SharpCompress.Readers.ReaderOptions
+                                                       ) As SharpCompress.Archives.IArchive
             Dim method = GetOpenCompatMethod(GetType(SharpCompress.Archives.ArchiveFactory))
             Dim opened = method.Invoke(Nothing, New Object() {stream, options})
-
             Return CType(opened, SharpCompress.Archives.IArchive)
         End Function
 
-        Private Shared Function OpenGZipArchiveCompat _
-            (
-                stream As Stream,
-                options As SharpCompress.Readers.ReaderOptions
-            ) As SharpCompress.Archives.IArchive
-
+        Private Shared Function OpenGZipArchiveCompat(
+                                                    stream As Stream,
+                                                    options As SharpCompress.Readers.ReaderOptions
+                                                    ) As SharpCompress.Archives.IArchive
             Dim method = GetOpenCompatMethod(GetType(SharpCompress.Archives.GZip.GZipArchive))
             Dim opened = method.Invoke(Nothing, New Object() {stream, options})
-
             Return CType(opened, SharpCompress.Archives.IArchive)
         End Function
 
-        Private Shared Function GetOpenCompatMethod(type As Type) As MethodInfo
+        Private Shared Function GetOpenCompatMethod(type As Type) As System.Reflection.MethodInfo
             Dim signature = New Type() {GetType(Stream), GetType(SharpCompress.Readers.ReaderOptions)}
-            Dim method = type.GetMethod(
-                "OpenArchive",
-                BindingFlags.Public Or BindingFlags.Static,
-                binder:=Nothing,
-                types:=signature,
-                modifiers:=Nothing
-            )
-
+            Dim method = type.GetMethod("OpenArchive", BindingFlags.Public Or
+                                                       BindingFlags.Static,
+                                        binder:=Nothing,
+                                        types:=signature,
+                                        modifiers:=Nothing)
             If method IsNot Nothing Then Return method
 
-            method = type.GetMethod(
-                "Open",
-                BindingFlags.Public Or BindingFlags.Static,
-                binder:=Nothing,
-                types:=signature,
-                modifiers:=Nothing
-            )
+            method = type.GetMethod("Open", BindingFlags.Public Or
+                                            BindingFlags.Static,
+                                    binder:=Nothing,
+                                    types:=signature,
+                                    modifiers:=Nothing)
             If method IsNot Nothing Then Return method
 
             Throw New MissingMethodException(type.FullName, "OpenArchive/Open(Stream, ReaderOptions)")
@@ -277,15 +235,10 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
-        Friend Shared Function TryDescribeBytes _
-            (
-                data As Byte(),
-                opt As FileTypeProjectOptions,
-                ByRef descriptor As ArchiveDescriptor
-            ) As Boolean
-
+        Friend Shared Function TryDescribeBytes(data As Byte(), opt As FileTypeProjectOptions,
+                                                ByRef descriptor As ArchiveDescriptor) As Boolean
             descriptor = ArchiveDescriptor.UnknownDescriptor()
-            If Not ByteArrayGuard.HasContent(data) Then Return False
+            If data Is Nothing OrElse data.Length = 0 Then Return False
             If opt Is Nothing Then Return False
 
             Try
@@ -307,13 +260,8 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Friend Shared Function TryDescribeStream _
-            (
-                stream As Stream,
-                opt As FileTypeProjectOptions,
-                ByRef descriptor As ArchiveDescriptor
-            ) As Boolean
-
+        Friend Shared Function TryDescribeStream(stream As Stream, opt As FileTypeProjectOptions,
+                                                 ByRef descriptor As ArchiveDescriptor) As Boolean
             Dim mapped As ArchiveContainerType
             Dim gzipWrapped As Boolean
 
@@ -365,11 +313,7 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Friend Shared Function MapArchiveType _
-            (
-                type As SharpCompress.Common.ArchiveType
-            ) As ArchiveContainerType
-
+        Friend Shared Function MapArchiveType(type As SharpCompress.Common.ArchiveType) As ArchiveContainerType
             Select Case type
                 Case SharpCompress.Common.ArchiveType.Zip
                     Return ArchiveContainerType.Zip
@@ -395,26 +339,18 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
-        Friend Shared Function ValidateArchiveStream _
-            (
-                stream As Stream,
-                opt As FileTypeProjectOptions,
-                depth As Integer,
-                descriptor As ArchiveDescriptor
-            ) As Boolean
-
+        Friend Shared Function ValidateArchiveStream(stream As Stream, opt As FileTypeProjectOptions, depth As Integer,
+                                                     descriptor As ArchiveDescriptor) As Boolean
             Return ProcessArchiveStream(stream, opt, depth, descriptor, Nothing)
         End Function
 
-        Friend Shared Function ProcessArchiveStream _
-            (
-                stream As Stream,
-                opt As FileTypeProjectOptions,
-                depth As Integer,
-                descriptor As ArchiveDescriptor,
-                extractEntry As Func(Of IArchiveEntryModel, Boolean)
-            ) As Boolean
-
+        Friend Shared Function ProcessArchiveStream(
+                                                    stream As Stream,
+                                                    opt As FileTypeProjectOptions,
+                                                    depth As Integer,
+                                                    descriptor As ArchiveDescriptor,
+                                                    extractEntry As Func(Of IArchiveEntryModel, Boolean)
+                                                    ) As Boolean
             Dim backend As IArchiveBackend
 
             If Not StreamGuard.IsReadable(stream) Then Return False
@@ -437,36 +373,25 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
-        Friend Shared Function TryExtractArchiveStreamToMemory _
-            (
-                stream As Stream,
-                opt As FileTypeProjectOptions
-            ) As IReadOnlyList(Of ZipExtractedEntry)
-
+        Friend Shared Function TryExtractArchiveStreamToMemory(stream As Stream, opt As FileTypeProjectOptions) _
+            As IReadOnlyList(Of ZipExtractedEntry)
             Dim descriptor As ArchiveDescriptor = Nothing
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             If Not ArchiveTypeResolver.TryDescribeStream(stream, opt, descriptor) Then Return emptyResult
-
             Return TryExtractArchiveStreamToMemory(stream, opt, descriptor)
         End Function
 
-        Friend Shared Function TryExtractArchiveStreamToMemory _
-            (
-                stream As Stream,
-                opt As FileTypeProjectOptions,
-                descriptor As ArchiveDescriptor
-            ) As IReadOnlyList(Of ZipExtractedEntry)
-
+        Friend Shared Function TryExtractArchiveStreamToMemory(stream As Stream, opt As FileTypeProjectOptions,
+                                                               descriptor As ArchiveDescriptor) _
+            As IReadOnlyList(Of ZipExtractedEntry)
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             Dim entries As List(Of ZipExtractedEntry) = New List(Of ZipExtractedEntry)()
             Dim ok As Boolean
 
             If Not StreamGuard.IsReadable(stream) Then Return emptyResult
             If opt Is Nothing Then Return emptyResult
-
-            If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then
+            If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then _
                 Return emptyResult
-            End If
 
             Try
                 StreamGuard.RewindToStart(stream)
@@ -484,10 +409,9 @@ Namespace Global.Tomtastisch.FileClassifier
                 End If
 
                 Return entries.AsReadOnly()
-
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is SecurityException OrElse
+                    TypeOf ex Is SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -500,27 +424,17 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Friend Shared Function TryExtractArchiveStream _
-            (
-                stream As Stream,
-                destinationDirectory As String,
-                opt As FileTypeProjectOptions
-            ) As Boolean
-
+        Friend Shared Function TryExtractArchiveStream(stream As Stream, destinationDirectory As String,
+                                                       opt As FileTypeProjectOptions) As Boolean
             Dim descriptor As ArchiveDescriptor = Nothing
             If Not ArchiveTypeResolver.TryDescribeStream(stream, opt, descriptor) Then Return False
             Return TryExtractArchiveStream(stream, destinationDirectory, opt, descriptor)
         End Function
 
-        Friend Shared Function TryExtractArchiveStream _
-            (
-                stream As Stream,
-                destinationDirectory As String,
-                opt As FileTypeProjectOptions,
-                descriptor As ArchiveDescriptor
-            ) As Boolean
-
-            Dim destinationFull As String = String.Empty
+        Friend Shared Function TryExtractArchiveStream(stream As Stream, destinationDirectory As String,
+                                                       opt As FileTypeProjectOptions, descriptor As ArchiveDescriptor) _
+            As Boolean
+            Dim destinationFull As String
             Dim parent As String
             Dim stageDir As String
             Dim stagePrefix As String
@@ -531,15 +445,18 @@ Namespace Global.Tomtastisch.FileClassifier
             If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then Return False
             If String.IsNullOrWhiteSpace(destinationDirectory) Then Return False
 
-            If Not PathResolutionGuard.TryGetFullPath(
-                    destinationDirectory,
-                    opt,
-                    "[ArchiveExtract] Ungültiger Zielpfad",
-                    warnLevel:=False,
-                    destinationFull
-                ) Then
+            Try
+                destinationFull = Path.GetFullPath(destinationDirectory)
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                    TypeOf ex Is SecurityException OrElse
+                TypeOf ex Is IOException OrElse
+                TypeOf ex Is PathTooLongException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException
+                LogGuard.Debug(opt.Logger, $"[ArchiveExtract] Ungültiger Zielpfad: {ex.Message}")
                 Return False
-            End If
+            End Try
 
             If Not DestinationPathGuard.ValidateNewExtractionTarget(destinationFull, opt) Then Return False
 
@@ -566,7 +483,6 @@ Namespace Global.Tomtastisch.FileClassifier
 
                 Directory.Move(stageDir, destinationFull)
                 Return True
-
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
                 TypeOf ex Is SecurityException OrElse
@@ -578,7 +494,6 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf ex Is ObjectDisposedException
                 LogGuard.Debug(opt.Logger, $"[ArchiveExtract] Fehler: {ex.Message}")
                 Return False
-
             Finally
                 If Directory.Exists(stageDir) Then
                     Try
@@ -595,16 +510,11 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Private Shared Function ExtractEntryToDirectory _
-            (
-                entry As IArchiveEntryModel,
-                destinationPrefix As String,
-                opt As FileTypeProjectOptions
-            ) As Boolean
-
+        Private Shared Function ExtractEntryToDirectory(entry As IArchiveEntryModel, destinationPrefix As String,
+                                                        opt As FileTypeProjectOptions) As Boolean
             Dim entryName As String = Nothing
             Dim isDirectory As Boolean = False
-            Dim targetPath As String = String.Empty
+            Dim targetPath As String
             Dim targetDir As String
 
             If entry Is Nothing Then Return False
@@ -612,15 +522,18 @@ Namespace Global.Tomtastisch.FileClassifier
 
             If Not TryGetSafeEntryName(entry, opt, entryName, isDirectory) Then Return False
 
-            If Not PathResolutionGuard.TryGetFullPath(
-                    Path.Combine(destinationPrefix, entryName),
-                    opt,
-                    "[ArchiveExtract] Zielpfad-Fehler",
-                    warnLevel:=False,
-                    targetPath
-                ) Then
+            Try
+                targetPath = Path.GetFullPath(Path.Combine(destinationPrefix, entryName))
+            Catch ex As Exception When _
+                TypeOf ex Is UnauthorizedAccessException OrElse
+                TypeOf ex Is SecurityException OrElse
+                TypeOf ex Is IOException OrElse
+                TypeOf ex Is PathTooLongException OrElse
+                TypeOf ex Is NotSupportedException OrElse
+                TypeOf ex Is ArgumentException
+                LogGuard.Debug(opt.Logger, $"[ArchiveExtract] Zielpfad-Fehler: {ex.Message}")
                 Return False
-            End If
+            End Try
 
             If Not targetPath.StartsWith(destinationPrefix, StringComparison.Ordinal) Then
                 LogGuard.Warn(opt.Logger, "[ArchiveExtract] Path traversal erkannt.")
@@ -654,7 +567,6 @@ Namespace Global.Tomtastisch.FileClassifier
                     End Using
                 End Using
                 Return True
-
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
                 TypeOf ex Is SecurityException OrElse
@@ -669,13 +581,8 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Private Shared Function ExtractEntryToMemory _
-            (
-                entry As IArchiveEntryModel,
-                entries As List(Of ZipExtractedEntry),
-                opt As FileTypeProjectOptions
-            ) As Boolean
-
+        Private Shared Function ExtractEntryToMemory(entry As IArchiveEntryModel, entries As List(Of ZipExtractedEntry),
+                                                     opt As FileTypeProjectOptions) As Boolean
             Dim entryName As String = Nothing
             Dim isDirectory As Boolean = False
             Dim payload As Byte()
@@ -716,14 +623,9 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Private Shared Function TryGetSafeEntryName _
-            (
-                 entry As IArchiveEntryModel,
-                 opt As FileTypeProjectOptions,
-                 ByRef safeEntryName As String,
-                 ByRef isDirectory As Boolean
-            ) As Boolean
-
+        Private Shared Function TryGetSafeEntryName(entry As IArchiveEntryModel, opt As FileTypeProjectOptions,
+                                                    ByRef safeEntryName As String, ByRef isDirectory As Boolean) _
+            As Boolean
             Dim entryName As String = Nothing
             Dim normalizedDirectoryFlag As Boolean = False
 
@@ -732,32 +634,25 @@ Namespace Global.Tomtastisch.FileClassifier
             If entry Is Nothing Then Return False
             If opt Is Nothing Then Return False
 
-            If ArchiveLinkGuard.IsRejectedLink(opt, entry.LinkTarget, "[ArchiveExtract]", logWhenRejected:=True) Then
+            If opt.RejectArchiveLinks AndAlso Not String.IsNullOrWhiteSpace(entry.LinkTarget) Then
+                LogGuard.Warn(opt.Logger, "[ArchiveExtract] Link-Entry ist nicht erlaubt.")
                 Return False
             End If
 
-            If Not ArchiveEntryPathPolicy.TryNormalizeRelativePath(
-                    entry.RelativePath,
-                    allowDirectoryMarker:=True,
-                    entryName,
-                    normalizedDirectoryFlag
-                ) Then
-
+            If _
+                Not _
+                ArchiveEntryPathPolicy.TryNormalizeRelativePath(entry.RelativePath, allowDirectoryMarker:=True,
+                                                                entryName, normalizedDirectoryFlag) Then
                 Return False
             End If
 
             safeEntryName = entryName
-            isDirectory = entry.IsDirectory OrElse normalizedDirectoryFlag OrElse entryName.EndsWith("/"c)
-
+            isDirectory = entry.IsDirectory OrElse normalizedDirectoryFlag OrElse
+                          entryName.EndsWith("/"c)
             Return True
         End Function
 
-        Private Shared Function ValidateEntrySize _
-            (
-                entry As IArchiveEntryModel,
-                opt As FileTypeProjectOptions
-            ) As Boolean
-
+        Private Shared Function ValidateEntrySize(entry As IArchiveEntryModel, opt As FileTypeProjectOptions) As Boolean
             Dim sizeValue As Long?
 
             If entry Is Nothing OrElse opt Is Nothing Then Return False
@@ -765,7 +660,9 @@ Namespace Global.Tomtastisch.FileClassifier
 
             sizeValue = entry.UncompressedSize
             If sizeValue.HasValue Then
-                If sizeValue.Value < 0 Then Return opt.AllowUnknownArchiveEntrySize
+                If sizeValue.Value < 0 Then
+                    Return opt.AllowUnknownArchiveEntrySize
+                End If
 
                 If sizeValue.Value > opt.MaxZipEntryUncompressedBytes Then Return False
                 Return True
@@ -774,17 +671,12 @@ Namespace Global.Tomtastisch.FileClassifier
             Return opt.AllowUnknownArchiveEntrySize
         End Function
 
-        Private Shared Function EnsureTrailingSeparator _
-            (
-                dirPath As String
-            ) As String
-
+        Private Shared Function EnsureTrailingSeparator(dirPath As String) As String
             If String.IsNullOrEmpty(dirPath) Then Return Path.DirectorySeparatorChar.ToString()
-            If dirPath.EndsWith(Path.DirectorySeparatorChar) _
-               OrElse dirPath.EndsWith(Path.AltDirectorySeparatorChar) Then
+            If dirPath.EndsWith(Path.DirectorySeparatorChar) OrElse dirPath.EndsWith(Path.AltDirectorySeparatorChar) _
+                Then
                 Return dirPath
             End If
-
             Return dirPath & Path.DirectorySeparatorChar
         End Function
     End Class
@@ -796,13 +688,8 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
-        Friend Shared Function TryCollectFromFile _
-            (
-                path As String,
-                opt As FileTypeProjectOptions,
-                ByRef entries As IReadOnlyList(Of ZipExtractedEntry)
-            ) As Boolean
-
+        Friend Shared Function TryCollectFromFile(path As String, opt As FileTypeProjectOptions,
+                                                  ByRef entries As IReadOnlyList(Of ZipExtractedEntry)) As Boolean
             Dim descriptor As ArchiveDescriptor = Nothing
 
             entries = Array.Empty(Of ZipExtractedEntry)()
@@ -810,24 +697,17 @@ Namespace Global.Tomtastisch.FileClassifier
             If opt Is Nothing Then Return False
 
             Try
-                Using fs As New FileStream(
-                        path, FileMode.Open,
-                        FileAccess.Read,
-                        FileShare.Read,
-                        InternalIoDefaults.FileStreamBufferSize,
-                        FileOptions.SequentialScan
-                    )
-
+                Using _
+                    fs As _
+                        New FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read,
+                                       InternalIoDefaults.FileStreamBufferSize, FileOptions.SequentialScan)
                     If Not ArchiveTypeResolver.TryDescribeStream(fs, opt, descriptor) Then Return False
                     StreamGuard.RewindToStart(fs)
-
                     If Not ArchiveSafetyGate.IsArchiveSafeStream(fs, opt, descriptor, depth:=0) Then Return False
                     StreamGuard.RewindToStart(fs)
-
                     entries = ArchiveExtractor.TryExtractArchiveStreamToMemory(fs, opt, descriptor)
                     Return entries IsNot Nothing AndAlso entries.Count > 0
                 End Using
-
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
                 TypeOf ex Is SecurityException OrElse
@@ -839,32 +719,25 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf ex Is ObjectDisposedException
                 LogGuard.Debug(opt.Logger, $"[ArchiveCollect] Datei-Fehler: {ex.Message}")
                 entries = Array.Empty(Of ZipExtractedEntry)()
-
                 Return False
             End Try
         End Function
 
-        Friend Shared Function TryCollectFromBytes _
-            (
-                data As Byte(),
-                opt As FileTypeProjectOptions,
-                ByRef entries As IReadOnlyList(Of ZipExtractedEntry)
-            ) As Boolean
-
+        Friend Shared Function TryCollectFromBytes(data As Byte(), opt As FileTypeProjectOptions,
+                                                   ByRef entries As IReadOnlyList(Of ZipExtractedEntry)) As Boolean
             Dim descriptor As ArchiveDescriptor = Nothing
 
             entries = Array.Empty(Of ZipExtractedEntry)()
-            If Not ByteArrayGuard.HasContent(data) Then Return False
+            If data Is Nothing OrElse data.Length = 0 Then Return False
             If opt Is Nothing Then Return False
 
             Try
-                If Not ArchivePayloadGuard.TryDescribeSafeArchivePayload(data, opt, descriptor) Then Return False
-
+                If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then Return False
+                If Not ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor) Then Return False
                 Using ms As New MemoryStream(data, writable:=False)
                     entries = ArchiveExtractor.TryExtractArchiveStreamToMemory(ms, opt, descriptor)
                     Return entries IsNot Nothing AndAlso entries.Count > 0
                 End Using
-
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
                 TypeOf ex Is SecurityException OrElse
@@ -900,15 +773,13 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <summary>
         '''     Verarbeitet ein Archiv über SharpCompress fail-closed und optionalen Entry-Callback.
         ''' </summary>
-        Public Function Process _
-            (
-                stream As Stream,
-                opt As FileTypeProjectOptions,
-                depth As Integer,
-                containerTypeValue As ArchiveContainerType,
-                extractEntry As Func(Of IArchiveEntryModel, Boolean)
-            ) As Boolean Implements IArchiveBackend.Process
-
+        Public Function Process(
+                                stream As Stream,
+                                opt As FileTypeProjectOptions,
+                                depth As Integer,
+                                containerTypeValue As ArchiveContainerType,
+                                extractEntry As Func(Of IArchiveEntryModel, Boolean)
+                                ) As Boolean Implements IArchiveBackend.Process
             Dim mapped As ArchiveContainerType
             Dim entries As List(Of SharpCompress.Archives.IArchiveEntry)
             Dim nestedResult As Boolean = False
@@ -932,31 +803,19 @@ Namespace Global.Tomtastisch.FileClassifier
                 If containerTypeValue = ArchiveContainerType.GZip AndAlso Not gzipWrapped Then Return False
 
                 Using archive = OpenArchiveForContainerCompat(stream, containerTypeValue)
-
                     If archive Is Nothing Then Return False
-
                     mapped = ArchiveTypeResolver.MapArchiveType(archive.Type)
-
-                    gzipWrappedTar = gzipWrapped AndAlso containerTypeValue = ArchiveContainerType.GZip _
-                                     AndAlso mapped = ArchiveContainerType.Tar
-
+                    gzipWrappedTar = gzipWrapped AndAlso containerTypeValue = ArchiveContainerType.GZip AndAlso _
+                                     mapped = ArchiveContainerType.Tar
                     If mapped <> containerTypeValue AndAlso Not gzipWrappedTar Then Return False
 
-                    entries = archive.Entries.OrderBy(
-                        Function(e) If(e.Key, String.Empty),
-                        StringComparer.Ordinal
-                    ).ToList()
+                    entries = archive.Entries.
+                            OrderBy(Function(e) If(e.Key, String.Empty), StringComparer.Ordinal).
+                            ToList()
 
                     If Not gzipWrappedTar Then
-                        nestedHandled = TryProcessNestedGArchive(
-                            entries,
-                            opt,
-                            depth,
-                            containerTypeValue,
-                            extractEntry,
-                            nestedResult
-                        )
-
+                        nestedHandled = TryProcessNestedGArchive(entries, opt, depth, containerTypeValue, extractEntry,
+                                                                 nestedResult)
                         If nestedHandled Then Return nestedResult
                     End If
 
@@ -969,18 +828,17 @@ Namespace Global.Tomtastisch.FileClassifier
 
                         model = New SharpCompressEntryModel(entry)
 
-                        If ArchiveLinkGuard.IsRejectedLink(opt, model.LinkTarget, "[ArchiveGate]", logWhenRejected:=True) Then
+                        If opt.RejectArchiveLinks AndAlso Not String.IsNullOrWhiteSpace(model.LinkTarget) Then
+                            LogGuard.Warn(opt.Logger, "[ArchiveGate] Link-Entry ist nicht erlaubt.")
                             Return False
                         End If
 
                         If Not model.IsDirectory Then
                             knownSize = 0
                             requireKnownForTotal = (extractEntry Is Nothing) OrElse depth > 0
-
                             If gzipWrappedTar Then
                                 requireKnownForTotal = False
                             End If
-
                             If Not TryGetValidatedSize(model, opt, knownSize, requireKnownForTotal) Then Return False
                             totalUncompressed += knownSize
                             If totalUncompressed > opt.MaxZipTotalUncompressedBytes Then Return False
@@ -1007,24 +865,20 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Private Shared Function OpenArchiveForContainerCompat _
-            (
-                stream As Stream,
-                containerTypeValue As ArchiveContainerType
-            ) As SharpCompress.Archives.IArchive
-
+        Private Shared Function OpenArchiveForContainerCompat(stream As Stream,
+                                                              containerTypeValue As ArchiveContainerType) _
+            As SharpCompress.Archives.IArchive
             Return ArchiveSharpCompressCompat.OpenArchiveForContainer(stream, containerTypeValue)
         End Function
 
         Private Shared Function TryProcessNestedGArchive(
-                entries As List(Of SharpCompress.Archives.IArchiveEntry),
-                opt As FileTypeProjectOptions,
-                depth As Integer,
-                containerType As ArchiveContainerType,
-                extractEntry As Func(Of IArchiveEntryModel, Boolean),
-                ByRef nestedResult As Boolean
-            ) As Boolean
-
+                                                         entries As List(Of SharpCompress.Archives.IArchiveEntry),
+                                                         opt As FileTypeProjectOptions,
+                                                         depth As Integer,
+                                                         containerType As ArchiveContainerType,
+                                                         extractEntry As Func(Of IArchiveEntryModel, Boolean),
+                                                         ByRef nestedResult As Boolean
+                                                         ) As Boolean
             Dim onlyEntry As SharpCompress.Archives.IArchiveEntry
             Dim model As IArchiveEntryModel
             Dim payload As Byte() = Nothing
@@ -1038,7 +892,7 @@ Namespace Global.Tomtastisch.FileClassifier
             If onlyEntry Is Nothing OrElse onlyEntry.IsDirectory Then Return False
 
             model = New SharpCompressEntryModel(onlyEntry)
-            If ArchiveLinkGuard.IsRejectedLink(opt, model.LinkTarget, "[ArchiveGate]", logWhenRejected:=False) Then
+            If opt.RejectArchiveLinks AndAlso Not String.IsNullOrWhiteSpace(model.LinkTarget) Then
                 nestedResult = False
                 Return True
             End If
@@ -1061,42 +915,32 @@ Namespace Global.Tomtastisch.FileClassifier
             End If
 
             Using nestedMs As New MemoryStream(payload, writable:=False)
-                nestedResult = ArchiveProcessingEngine.ProcessArchiveStream(
-                    nestedMs,
-                    opt,
-                    depth + 1,
-                    nestedDescriptor,
-                    extractEntry
-                )
+                nestedResult = ArchiveProcessingEngine.ProcessArchiveStream(nestedMs, opt, depth + 1, nestedDescriptor,
+                                                                            extractEntry)
             End Using
             Return True
         End Function
 
-        Private Shared Function TryReadEntryPayloadBoundedWithOptions _
-            (
-                entry As SharpCompress.Archives.IArchiveEntry,
-                maxBytes As Long,
-                opt As FileTypeProjectOptions,
-                ByRef payload As Byte()
-            ) As Boolean
-
+        Private Shared Function TryReadEntryPayloadBoundedWithOptions(
+                                                                       entry As SharpCompress.Archives.IArchiveEntry,
+                                                                       maxBytes As Long,
+                                                                       opt As FileTypeProjectOptions,
+                                                                       ByRef payload As Byte()
+                                                                       ) As Boolean
             payload = Array.Empty(Of Byte)()
             If entry Is Nothing Then Return False
             If maxBytes <= 0 Then Return False
             If opt Is Nothing Then Return False
 
             Try
-
                 Using source = entry.OpenEntryStream()
                     If source Is Nothing OrElse Not source.CanRead Then Return False
-
                     Using ms As New MemoryStream()
                         StreamBounds.CopyBounded(source, ms, maxBytes)
                         payload = ms.ToArray()
                         Return True
                     End Using
                 End Using
-
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
                 TypeOf ex Is SecurityException OrElse
@@ -1112,14 +956,8 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
-        Private Shared Function TryGetValidatedSize _
-            (
-                entry As IArchiveEntryModel,
-                opt As FileTypeProjectOptions,
-                ByRef knownSize As Long,
-                requireKnownForTotal As Boolean
-            ) As Boolean
-
+        Private Shared Function TryGetValidatedSize(entry As IArchiveEntryModel, opt As FileTypeProjectOptions,
+                                                    ByRef knownSize As Long, requireKnownForTotal As Boolean) As Boolean
             Dim value As Long?
 
             knownSize = 0
@@ -1142,13 +980,8 @@ Namespace Global.Tomtastisch.FileClassifier
             Return TryMeasureEntrySize(entry, opt, knownSize)
         End Function
 
-        Private Shared Function TryMeasureEntrySize _
-            (
-                entry As IArchiveEntryModel,
-                opt As FileTypeProjectOptions,
-                ByRef measured As Long
-            ) As Boolean
-
+        Private Shared Function TryMeasureEntrySize(entry As IArchiveEntryModel, opt As FileTypeProjectOptions,
+                                                    ByRef measured As Long) As Boolean
             Dim buf(InternalIoDefaults.CopyBufferSize - 1) As Byte
             Dim n As Integer
 
@@ -1160,7 +993,6 @@ Namespace Global.Tomtastisch.FileClassifier
             Try
                 Using source = entry.OpenStream()
                     If source Is Nothing OrElse Not source.CanRead Then Return False
-
                     While True
                         n = source.Read(buf, 0, buf.Length)
                         If n <= 0 Then Exit While
@@ -1168,9 +1000,7 @@ Namespace Global.Tomtastisch.FileClassifier
                         If measured > opt.MaxZipEntryUncompressedBytes Then Return False
                     End While
                 End Using
-
                 Return True
-
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
                 TypeOf ex Is SecurityException OrElse

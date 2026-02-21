@@ -20,7 +20,7 @@ public sealed class HeaderDetectionWarningUnitTests
         var source = TestResources.Resolve("sample.docx");
         var detected = new FileTypeDetector().Detect(source);
 
-        Assert.Equal(FileKind.Doc, detected.Kind);
+        Assert.Equal(FileKind.Docx, detected.Kind);
         Assert.DoesNotContain(logger.Messages,
             m => m.Contains("Keine direkte Content-Erkennung", StringComparison.Ordinal));
     }

@@ -5,9 +5,9 @@ namespace FileTypeDetectionLib.Tests.Unit;
 public sealed class LegacyOfficeBinaryRefinerUnitTests
 {
     [Theory]
-    [InlineData("WordDocument", FileKind.Doc)]
-    [InlineData("Workbook", FileKind.Xls)]
-    [InlineData("PowerPoint Document", FileKind.Ppt)]
+    [InlineData("WordDocument", FileKind.Docx)]
+    [InlineData("Workbook", FileKind.Xlsx)]
+    [InlineData("PowerPoint Document", FileKind.Pptx)]
     public void TryRefineBytes_DetectsLegacyOfficeMarkers(string marker, FileKind expected)
     {
         var payload = CreateOleLikePayload(marker);

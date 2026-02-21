@@ -79,21 +79,6 @@ Blöcke werden sichtbar getrennt (Leerzeile + Kommentartrenner):
 - Fallback
 - I/O Helpers separat
 
-### 5.4 Methodenkopf- und Umbruchschema (verbindlich)
-- Für neue oder in einem Ticket angepasste Signaturen sind mehrzeilige Signaturen Pflicht, wenn mindestens einer der Punkte zutrifft:
-  - mehr als ein Parameter
-  - Signatur würde in eine lange Zeile kippen (Richtwert: > 100 Zeichen)
-- Format für mehrzeilige Signaturen:
-  - Membername mit Zeilenfortsetzung (`_`)
-  - öffnende Klammer in eigener Zeile
-  - genau ein Parameter pro Zeile
-  - schließende Klammer und Rückgabetyp gemeinsam in einer Zeile
-- Nach jeder Methodensignatur (einzeilig oder mehrzeilig) folgt genau eine Leerzeile,
-  bevor Deklarationsblock oder erste ausführbare Anweisung beginnt.
-- Das Schema gilt einheitlich für `Sub`/`Function`/Konstruktoren/Interface-Member.
-- Lange Aufrufe werden analog umgebrochen (ein Argument pro Zeile, klar ausgerichtet).
-- Keine Trailing-Whitespace-Zeichen und keine „leeren“ Zeilen mit Spaces/Tabs.
-
 ## 6. Variablenregel (Pflicht)
 - Alle lokalen Variablen werden im „Deklarationsblock“ am Anfang der Funktion definiert.
 - Platzierung:

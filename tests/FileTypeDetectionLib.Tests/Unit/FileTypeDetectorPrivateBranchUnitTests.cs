@@ -173,10 +173,10 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
         var trace = Activator.CreateInstance(traceType!);
         var opt = FileTypeProjectOptions.DefaultOptions();
 
-        var refined = FileTypeRegistry.Resolve(FileKind.Doc);
+        var refined = FileTypeRegistry.Resolve(FileKind.Docx);
         var result = TestGuard.NotNull(method.Invoke(null, new[] { refined, opt, trace! }) as FileType);
 
-        Assert.Equal(FileKind.Doc, result.Kind);
+        Assert.Equal(FileKind.Docx, result.Kind);
     }
 
     [Fact]
@@ -207,19 +207,19 @@ public sealed class FileTypeDetectorPrivateBranchUnitTests
     }
 
     [Theory]
-    [InlineData("file.doc", FileKind.Doc)]
-    [InlineData("file.docm", FileKind.Doc)]
-    [InlineData("file.docx", FileKind.Doc)]
-    [InlineData("file.odt", FileKind.Doc)]
-    [InlineData("file.xls", FileKind.Xls)]
-    [InlineData("file.xlsm", FileKind.Xls)]
-    [InlineData("file.xlsx", FileKind.Xls)]
-    [InlineData("file.xlsb", FileKind.Xls)]
-    [InlineData("file.ods", FileKind.Xls)]
-    [InlineData("file.ppt", FileKind.Ppt)]
-    [InlineData("file.pptm", FileKind.Ppt)]
-    [InlineData("file.pptx", FileKind.Ppt)]
-    [InlineData("file.odp", FileKind.Ppt)]
+    [InlineData("file.doc", FileKind.Docx)]
+    [InlineData("file.docm", FileKind.Docx)]
+    [InlineData("file.docx", FileKind.Docx)]
+    [InlineData("file.odt", FileKind.Docx)]
+    [InlineData("file.xls", FileKind.Xlsx)]
+    [InlineData("file.xlsm", FileKind.Xlsx)]
+    [InlineData("file.xlsx", FileKind.Xlsx)]
+    [InlineData("file.xlsb", FileKind.Xlsx)]
+    [InlineData("file.ods", FileKind.Xlsx)]
+    [InlineData("file.ppt", FileKind.Pptx)]
+    [InlineData("file.pptm", FileKind.Pptx)]
+    [InlineData("file.pptx", FileKind.Pptx)]
+    [InlineData("file.odp", FileKind.Pptx)]
     public void ExtensionMatchesKind_AcceptsOfficeVariantAliases(string path, FileKind expectedKind)
     {
         var method =

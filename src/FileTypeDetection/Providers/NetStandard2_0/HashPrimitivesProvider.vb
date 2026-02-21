@@ -65,11 +65,7 @@ Namespace Global.Tomtastisch.FileClassifier
             ''' </summary>
             ''' <param name="data">Zu kodierende Eingabedaten; <c>Nothing</c> wird als leeres Array behandelt.</param>
             ''' <returns>Hex-String in Kleinbuchstaben ohne Trennzeichen.</returns>
-            Public Function EncodeLowerHex _
-                (
-                    data As Byte()
-                ) As String Implements IHexCodec.EncodeLowerHex
-
+            Public Function EncodeLowerHex(data As Byte()) As String Implements IHexCodec.EncodeLowerHex
                 Dim safeData = If(data, Array.Empty(Of Byte)())
                 Dim chars As Char()
                 Dim index As Integer = 0
@@ -111,11 +107,7 @@ Namespace Global.Tomtastisch.FileClassifier
             ''' </summary>
             ''' <param name="data">Eingabedaten; <c>Nothing</c> wird als leeres Array behandelt.</param>
             ''' <returns>SHA256-Digest als Byte-Array.</returns>
-            Public Function ComputeHash _
-                (
-                    data As Byte()
-                ) As Byte() Implements ISha256Primitives.ComputeHash
-
+            Public Function ComputeHash(data As Byte()) As Byte() Implements ISha256Primitives.ComputeHash
                 Dim safeData = If(data, Array.Empty(Of Byte)())
                 Using sha As Security.Cryptography.SHA256 = Security.Cryptography.SHA256.Create()
                     Return sha.ComputeHash(safeData)
@@ -127,11 +119,7 @@ Namespace Global.Tomtastisch.FileClassifier
             ''' </summary>
             ''' <param name="data">Eingabedaten; <c>Nothing</c> wird als leeres Array behandelt.</param>
             ''' <returns>SHA256-Digest als Hex-String in Kleinbuchstaben.</returns>
-            Public Function ComputeHashHex _
-                (
-                    data As Byte()
-                ) As String Implements ISha256Primitives.ComputeHashHex
-
+            Public Function ComputeHashHex(data As Byte()) As String Implements ISha256Primitives.ComputeHashHex
                 Return _codec.EncodeLowerHex(ComputeHash(data))
             End Function
         End Class
@@ -150,11 +138,7 @@ Namespace Global.Tomtastisch.FileClassifier
             ''' </summary>
             ''' <param name="data">Eingabedaten; <c>Nothing</c> wird als leeres Array behandelt.</param>
             ''' <returns>Fasthash als <see cref="ULong"/>.</returns>
-            Public Function ComputeHashUInt64 _
-                (
-                    data As Byte()
-                ) As ULong Implements IFastHash64.ComputeHashUInt64
-
+            Public Function ComputeHashUInt64(data As Byte()) As ULong Implements IFastHash64.ComputeHashUInt64
                 Dim safeData = If(data, Array.Empty(Of Byte)())
                 Return IO.Hashing.XxHash3.HashToUInt64(safeData)
             End Function
@@ -164,11 +148,7 @@ Namespace Global.Tomtastisch.FileClassifier
             ''' </summary>
             ''' <param name="data">Eingabedaten; <c>Nothing</c> wird als leeres Array behandelt.</param>
             ''' <returns>16-stelliger Hex-String in Kleinbuchstaben.</returns>
-            Public Function ComputeHashHex _
-                (
-                    data As Byte()
-                ) As String Implements IFastHash64.ComputeHashHex
-
+            Public Function ComputeHashHex(data As Byte()) As String Implements IFastHash64.ComputeHashHex
                 Return ComputeHashUInt64(data).ToString("x16", CultureInfo.InvariantCulture)
             End Function
         End Class

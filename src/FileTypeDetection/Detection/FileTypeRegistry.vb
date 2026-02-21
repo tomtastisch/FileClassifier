@@ -25,58 +25,74 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Sub New()
         End Sub
 
-        ''' <summary>
-        '''     SSOT: Ordnet jedem <see cref="FileKind"/> den zugehörigen <see cref="FileType"/> zu.
-        '''     Der Eintrag <see cref="FileKind.Unknown"/> ist immer vorhanden (fail-closed).
-        ''' </summary>
         Friend Shared ReadOnly TypesByKind As ImmutableDictionary(Of FileKind, FileType)
-
-        ''' <summary>
-        '''     Alias-Index: Ordnet normalisierte Aliaswerte (z.B. Endungen ohne Punkt) einem <see cref="FileKind"/> zu.
-        '''     Die Normalisierung erfolgt über <see cref="NormalizeAlias"/>.
-        ''' </summary>
         Friend Shared ReadOnly KindByAlias As ImmutableDictionary(Of String, FileKind)
 
-
-        ''' <summary>
-        '''     Canonical-Extension Overrides (SSOT). Wird für einzelne Typen genutzt,
-        '''     wenn der Enumname nicht der gewünschten Canonical-Extension entspricht.
-        ''' </summary>
         Private Shared ReadOnly ExtensionOverrides As ImmutableDictionary(Of FileKind, String) =
-            FileTypeRegistryConfig.ExtensionOverrides
+                                    ImmutableDictionary.CreateRange(Of FileKind, String)(
+                                        {New KeyValuePair(Of FileKind, String)(FileKind.Jpeg, ".jpg")})
 
-        ''' <summary>
-        '''     Zusätzliche Aliaswerte pro <see cref="FileKind"/> (SSOT). Diese Werte ergänzen die automatisch
-        '''     abgeleiteten Aliases (Enumname + Canonical-Extension) und werden deterministisch normalisiert.
-        ''' </summary>
         Private Shared ReadOnly AliasOverrides As ImmutableDictionary(Of FileKind, ImmutableArray(Of String)) =
-            FileTypeRegistryConfig.AliasOverrides
+                                    ImmutableDictionary.CreateRange(Of FileKind, ImmutableArray(Of String))(
+                                        { _
+                                            New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Jpeg,
+                                                                                                     ImmutableArray.
+                                                                                                        Create("jpe")),
+                                            New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Zip,
+                                                                                                     ImmutableArray.
+                                                                                                        Create("tar",
+                                                                                                               "tgz",
+                                                                                                               "gz",
+                                                                                                               "gzip",
+                                                                                                               "bz2",
+                                                                                                               "bzip2",
+                                                                                                               "xz",
+                                                                                                               "7z",
+                                                                                                               "zz",
+                                                                                                               "rar")),
+                                            New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Docx,
+                                                                                                     ImmutableArray.
+                                                                                                        Create("doc",
+                                                                                                               "docm",
+                                                                                                               "docb",
+                                                                                                               "dot",
+                                                                                                               "dotm",
+                                                                                                               "dotx",
+                                                                                                               "odt",
+                                                                                                               "ott")),
+                                            New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Xlsx,
+                                                                                                     ImmutableArray.
+                                                                                                        Create("xls",
+                                                                                                               "xlsm",
+                                                                                                               "xlsb",
+                                                                                                               "xlt",
+                                                                                                               "xltm",
+                                                                                                               "xltx",
+                                                                                                               "xltb",
+                                                                                                               "xlam",
+                                                                                                               "xla",
+                                                                                                               "ods",
+                                                                                                               "ots")),
+                                            New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Pptx,
+                                                                                                     ImmutableArray.
+                                                                                                        Create("ppt",
+                                                                                                               "pptm",
+                                                                                                               "pot",
+                                                                                                               "potm",
+                                                                                                               "potx",
+                                                                                                               "pps",
+                                                                                                               "ppsm",
+                                                                                                               "ppsx",
+                                                                                                               "odp",
+                                                                                                               "otp"))
+                                        })
 
-        ''' <summary>
-        '''     Cache der deterministisch sortierten Enumwerte (<see cref="FileKind"/>).
-        '''     Vermeidet wiederholte Reflection/Sortierung in Hotpaths.
-        ''' </summary>
-        Private Shared ReadOnly OrderedKindsCache As ImmutableArray(Of FileKind) = BuildOrderedKinds()
-
-        ''' <summary>
-        '''     Katalog von Magic-Patterns pro <see cref="FileKind"/>.
-        '''     Die Datenquelle ist die zentrale Konfiguration <c>FileTypeRegistryConfig</c>.
-        ''' </summary>
         Private Shared ReadOnly _
             MagicPatternCatalog As ImmutableDictionary(Of FileKind, ImmutableArray(Of MagicPattern)) =
-                FileTypeRegistryConfig.MagicPatternCatalog
+                BuildMagicPatternCatalog()
 
-        ''' <summary>
-        '''     Aus <see cref="FileTypeDefinition"/> abgeleitete Regeln für die Magic-Erkennung.
-        '''     Enthält ausschließlich Einträge mit mindestens einem Magic-Pattern.
-        ''' </summary>
         Private Shared ReadOnly MagicRules As ImmutableArray(Of MagicRule)
 
-
-        ''' <summary>
-        '''     Initialisiert die Registry deterministisch aus <see cref="FileKind"/> und den zentralen Overrides.
-        '''     Reihenfolge: Definitionen bauen, Typen ableiten, Aliasindex erzeugen, Magic-Regeln ableiten.
-        ''' </summary>
         Shared Sub New()
             Dim definitions = BuildDefinitionsFromEnum()
             TypesByKind = BuildTypes(definitions)
@@ -84,18 +100,13 @@ Namespace Global.Tomtastisch.FileClassifier
             MagicRules = BuildMagicRules(definitions)
         End Sub
 
-        ''' <summary>
-        '''     Erzeugt die vollständige Menge an <see cref="FileTypeDefinition"/> aus der Enumquelle.
-        '''     <see cref="FileKind.Unknown"/> wird bewusst ausgeschlossen, da Unknown als separater fail-closed Typ geführt wird.
-        ''' </summary>
-        ''' <returns>Unveränderliche Liste aller Definitionsobjekte (ohne Unknown).</returns>
         Private Shared Function BuildDefinitionsFromEnum() As ImmutableArray(Of FileTypeDefinition)
             Dim b = ImmutableArray.CreateBuilder(Of FileTypeDefinition)()
             Dim canonicalExtension As String
             Dim aliases As String()
             Dim magicPatterns As ImmutableArray(Of MagicPattern)
 
-            For Each kind In OrderedKindsCache
+            For Each kind In OrderedKinds()
                 If kind = FileKind.Unknown Then Continue For
 
                 canonicalExtension = GetCanonicalExtension(kind)
@@ -108,31 +119,13 @@ Namespace Global.Tomtastisch.FileClassifier
             Return b.ToImmutable()
         End Function
 
-        ''' <summary>
-        '''     Liefert die deterministisch sortierten Enumwerte (<see cref="FileKind"/>) aus dem Cache.
-        ''' </summary>
-        ''' <returns>Sortierte Liste aller Enumwerte.</returns>
         Private Shared Function OrderedKinds() As ImmutableArray(Of FileKind)
-            Return OrderedKindsCache
-        End Function
-
-        ''' <summary>
-        '''     Baut den Cache der sortierten Enumwerte (<see cref="FileKind"/>) einmalig über Reflection.
-        ''' </summary>
-        ''' <returns>Sortierte Liste aller Enumwerte.</returns>
-        Private Shared Function BuildOrderedKinds() As ImmutableArray(Of FileKind)
             Dim values = [Enum].GetValues(GetType(FileKind)).Cast(Of FileKind)()
             Return values.
                 OrderBy(Function(kind) CInt(kind)).
                 ToImmutableArray()
         End Function
 
-        ''' <summary>
-        '''     Bestimmt die Canonical-Extension für einen Typ.
-        '''     Priorität: Override &gt; Enumname (normalisiert) als <c>"." + alias</c>.
-        ''' </summary>
-        ''' <param name="kind">Enumwert des Typs.</param>
-        ''' <returns>Canonical-Extension inklusive führendem Punkt.</returns>
         Private Shared Function GetCanonicalExtension(kind As FileKind) As String
             Dim overrideExt As String = Nothing
             If ExtensionOverrides.TryGetValue(kind, overrideExt) Then
@@ -142,14 +135,6 @@ Namespace Global.Tomtastisch.FileClassifier
             Return "." & NormalizeAlias(kind.ToString())
         End Function
 
-        ''' <summary>
-        '''     Baut die vollständige Aliasliste für einen Typ.
-        '''     Enthält Canonical-Extension, Enumalias sowie zusätzliche Overrides.
-        '''     Ergebnis ist deterministisch sortiert und ohne Duplikate.
-        ''' </summary>
-        ''' <param name="kind">Enumwert des Typs.</param>
-        ''' <param name="canonicalExtension">Canonical-Extension inklusive führendem Punkt.</param>
-        ''' <returns>Sortierte Aliasliste (ohne führende Punkte, kleingeschrieben).</returns>
         Private Shared Function BuildAliases(kind As FileKind, canonicalExtension As String) As String()
             Dim aliases As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
             Dim extAlias As String
@@ -164,10 +149,11 @@ Namespace Global.Tomtastisch.FileClassifier
             If enumAlias.Length > 0 Then aliases.Add(enumAlias)
 
             If AliasOverrides.TryGetValue(kind, additional) Then
-                For Each rawAlias In additional
-                    Dim normalized = NormalizeAlias(rawAlias)
-                    If normalized.Length > 0 Then aliases.Add(normalized)
-                Next
+                additional.
+                    Select(Function(item) NormalizeAlias(item)).
+                    Where(Function(normalized) normalized.Length > 0).
+                    ToList().
+                    ForEach(Sub(normalized) aliases.Add(normalized))
             End If
 
             orderedAliases = aliases.ToList()
@@ -175,11 +161,6 @@ Namespace Global.Tomtastisch.FileClassifier
             Return orderedAliases.ToArray()
         End Function
 
-        ''' <summary>
-        '''     Liefert die Magic-Patterns für einen Typ aus dem Katalog.
-        ''' </summary>
-        ''' <param name="kind">Enumwert des Typs.</param>
-        ''' <returns>Magic-Patterns oder ein leeres Array.</returns>
         Private Shared Function GetMagicPatterns(kind As FileKind) As ImmutableArray(Of MagicPattern)
             Dim patterns As ImmutableArray(Of MagicPattern) = ImmutableArray(Of MagicPattern).Empty
             If MagicPatternCatalog.TryGetValue(kind, patterns) Then
@@ -189,62 +170,34 @@ Namespace Global.Tomtastisch.FileClassifier
             Return ImmutableArray(Of MagicPattern).Empty
         End Function
 
-        ''' <summary>
-        '''     Erzeugt die Typ-Registry (<see cref="TypesByKind"/>) aus den Definitionsobjekten.
-        '''     Unknown wird als eigener, fail-closed Eintrag hinzugefügt.
-        ''' </summary>
-        ''' <param name="definitions">Definitionsobjekte (ohne Unknown).</param>
-        ''' <returns>Unveränderliches Dictionary mit Einträgen für alle Typen inklusive Unknown.</returns>
         Private Shared Function BuildTypes(definitions As ImmutableArray(Of FileTypeDefinition)) _
             As ImmutableDictionary(Of FileKind, FileType)
             Dim b = ImmutableDictionary.CreateBuilder(Of FileKind, FileType)()
 
-            b(FileKind.Unknown) = CreateUnknownType()
+            b(FileKind.Unknown) = New FileType(FileKind.Unknown, Nothing, Nothing, False,
+                                               ImmutableArray(Of String).Empty)
 
             For Each d In definitions
-                b(d.Kind) = New FileType(
-                    d.Kind,
-                    d.CanonicalExtension,
-                    MimeProvider.GetMime(d.CanonicalExtension),
-                    True,
-                    d.Aliases
-                )
+                b(d.Kind) = New FileType(d.Kind, d.CanonicalExtension, MimeProvider.GetMime(d.CanonicalExtension), True,
+                                         d.Aliases)
             Next
 
             Return b.ToImmutable()
         End Function
 
-        ''' <summary>
-        '''     Erzeugt den fail-closed <see cref="FileType"/> für <see cref="FileKind.Unknown"/>.
-        ''' </summary>
-        ''' <returns>Unknown-Typ ohne Extension und ohne MIME.</returns>
-        Private Shared Function CreateUnknownType() As FileType
-            Return New FileType(FileKind.Unknown,
-                                Nothing,
-                                Nothing,
-                                False,
-                                ImmutableArray(Of String).Empty)
-        End Function
-
-
-        ''' <summary>
-        '''     Bestimmt den Typ anhand von Magic-Patterns in einem Header-Bytearray.
-        '''     Die Auswertung erfolgt deterministisch in Regelreihenfolge; erster Treffer gewinnt.
-        ''' </summary>
-        ''' <param name="header">Dateiheader (mindestens so lang wie die benötigten Segmente).</param>
-        ''' <returns>Erkannter <see cref="FileKind"/> oder <see cref="FileKind.Unknown"/>.</returns>
         Friend Shared Function DetectByMagic(header As Byte()) As FileKind
             Dim rule As MagicRule
             Dim patterns As ImmutableArray(Of MagicPattern)
+            Dim segments As ImmutableArray(Of MagicSegment)
 
             If header Is Nothing OrElse header.Length = 0 Then Return FileKind.Unknown
 
             For i = 0 To MagicRules.Length - 1
                 rule = MagicRules(i)
                 patterns = rule.Patterns
-
                 For j = 0 To patterns.Length - 1
-                    If MatchesPattern(header, patterns(j)) Then
+                    segments = patterns(j).Segments
+                    If segments.All(Function(segment) HasSegment(header, segment)) Then
                         Return rule.Kind
                     End If
                 Next
@@ -253,29 +206,6 @@ Namespace Global.Tomtastisch.FileClassifier
             Return FileKind.Unknown
         End Function
 
-        ''' <summary>
-        '''     Prüft, ob ein Magic-Pattern vollständig gegen den Header matcht.
-        ''' </summary>
-        ''' <param name="header">Headerdaten.</param>
-        ''' <param name="pattern">Pattern mit Segmenten.</param>
-        ''' <returns><c>True</c>, wenn alle Segmente matchen.</returns>
-        Private Shared Function MatchesPattern(header As Byte(), pattern As MagicPattern) As Boolean
-            Dim segments As ImmutableArray(Of MagicSegment) = pattern.Segments
-
-            If segments.IsDefaultOrEmpty Then Return False
-
-            For i = 0 To segments.Length - 1
-                If Not HasSegment(header, segments(i)) Then Return False
-            Next
-
-            Return True
-        End Function
-
-        ''' <summary>
-        '''     Prüft, ob für einen Typ mindestens ein Magic-Pattern für direkte Header-Erkennung hinterlegt ist.
-        ''' </summary>
-        ''' <param name="kind">Enumwert des Typs.</param>
-        ''' <returns><c>True</c> bei vorhandenem Patternkatalogeintrag.</returns>
         Friend Shared Function HasDirectHeaderDetection(kind As FileKind) As Boolean
             Dim patterns As ImmutableArray(Of MagicPattern) = ImmutableArray(Of MagicPattern).Empty
 
@@ -283,33 +213,16 @@ Namespace Global.Tomtastisch.FileClassifier
             Return MagicPatternCatalog.TryGetValue(kind, patterns) AndAlso Not patterns.IsDefaultOrEmpty
         End Function
 
-        ''' <summary>
-        '''     Prüft, ob ein Typ zusätzlich über strukturierte Container-Erkennung klassifiziert wird.
-        '''     Diese Klassifikation ist unabhängig von direkten Header-Signaturen.
-        ''' </summary>
-        ''' <param name="kind">Enumwert des Typs.</param>
-        ''' <returns><c>True</c>, wenn strukturierte Container-Erkennung aktiv ist.</returns>
         Friend Shared Function HasStructuredContainerDetection(kind As FileKind) As Boolean
-            Return kind = FileKind.Doc OrElse
-                   kind = FileKind.Xls OrElse
-                   kind = FileKind.Ppt
+            Return kind = FileKind.Docx OrElse
+                   kind = FileKind.Xlsx OrElse
+                   kind = FileKind.Pptx
         End Function
 
-        ''' <summary>
-        '''     Prüft, ob der Typ eine direkte Inhalts-/Header-Erkennung besitzt
-        '''     (Magic-Header oder strukturierte Container-Erkennung).
-        ''' </summary>
-        ''' <param name="kind">Enumwert des Typs.</param>
-        ''' <returns><c>True</c>, wenn Content-Detection verfügbar ist.</returns>
         Friend Shared Function HasDirectContentDetection(kind As FileKind) As Boolean
             Return HasDirectHeaderDetection(kind) OrElse HasStructuredContainerDetection(kind)
         End Function
 
-        ''' <summary>
-        '''     Liefert alle Typen, die keine direkte Content-Detection besitzen.
-        '''     Unknown ist ausgeschlossen.
-        ''' </summary>
-        ''' <returns>Liste der Typen ohne direkte Content-Detection.</returns>
         Friend Shared Function KindsWithoutDirectContentDetection() As ImmutableArray(Of FileKind)
             Return OrderedKinds().
                 Where(Function(kind) kind <> FileKind.Unknown).
@@ -317,12 +230,6 @@ Namespace Global.Tomtastisch.FileClassifier
                 ToImmutableArray()
         End Function
 
-        ''' <summary>
-        '''     Baut die Magic-Regeln aus den Definitionsobjekten.
-        '''     Es werden ausschließlich Definitionsobjekte mit mindestens einem Magic-Pattern berücksichtigt.
-        ''' </summary>
-        ''' <param name="definitions">Definitionsobjekte (ohne Unknown).</param>
-        ''' <returns>Unveränderliche Liste der Magic-Regeln.</returns>
         Private Shared Function BuildMagicRules(definitions As ImmutableArray(Of FileTypeDefinition)) _
             As ImmutableArray(Of MagicRule)
             Return definitions.
@@ -331,13 +238,42 @@ Namespace Global.Tomtastisch.FileClassifier
                 ToImmutableArray()
         End Function
 
-        ''' <summary>
-        '''     Prüft, ob ein einzelnes Segment am angegebenen Offset innerhalb der Daten exakt matcht.
-        '''     Fail-closed: Bei ungültigen Parametern oder zu kurzen Daten wird <c>False</c> geliefert.
-        ''' </summary>
-        ''' <param name="data">Headerdaten.</param>
-        ''' <param name="segment">Segmentdefinition.</param>
-        ''' <returns><c>True</c> bei exaktem Match.</returns>
+        Private Shared Function BuildMagicPatternCatalog() _
+            As ImmutableDictionary(Of FileKind, ImmutableArray(Of MagicPattern))
+            Dim b = ImmutableDictionary.CreateBuilder(Of FileKind, ImmutableArray(Of MagicPattern))()
+
+            b(FileKind.Pdf) = ImmutableArray.Create(
+                Pattern(Prefix(0, &H25, &H50, &H44, &H46, &H2D)))
+
+            b(FileKind.Png) = ImmutableArray.Create(
+                Pattern(Prefix(0, &H89, &H50, &H4E, &H47, &HD, &HA, &H1A, &HA)))
+
+            b(FileKind.Jpeg) = ImmutableArray.Create(
+                Pattern(Prefix(0, &HFF, &HD8, &HFF)))
+
+            b(FileKind.Gif) = ImmutableArray.Create(
+                Pattern(Prefix(0, &H47, &H49, &H46, &H38, &H37, &H61)),
+                Pattern(Prefix(0, &H47, &H49, &H46, &H38, &H39, &H61)))
+
+            b(FileKind.Webp) = ImmutableArray.Create(
+                Pattern(Prefix(0, &H52, &H49, &H46, &H46), Prefix(8, &H57, &H45, &H42, &H50)))
+
+            b(FileKind.Zip) = ImmutableArray.Create(
+                Pattern(Prefix(0, &H50, &H4B, &H3, &H4)),
+                Pattern(Prefix(0, &H50, &H4B, &H5, &H6)),
+                Pattern(Prefix(0, &H50, &H4B, &H7, &H8)))
+
+            Return b.ToImmutable()
+        End Function
+
+        Private Shared Function Pattern(ParamArray segments As MagicSegment()) As MagicPattern
+            Return New MagicPattern(ImmutableArray.Create(segments))
+        End Function
+
+        Private Shared Function Prefix(offset As Integer, ParamArray bytesValue As Byte()) As MagicSegment
+            Return New MagicSegment(offset, ImmutableArray.Create(bytesValue))
+        End Function
+
         Private Shared Function HasSegment(data As Byte(), segment As MagicSegment) As Boolean
             Dim endPos As Integer
 
@@ -354,50 +290,32 @@ Namespace Global.Tomtastisch.FileClassifier
             Return True
         End Function
 
-        ''' <summary>
-        '''     Erzeugt den Aliasindex (<see cref="KindByAlias"/>) aus der Typ-Registry.
-        '''     Aliases werden normalisiert; spätere Einträge überschreiben frühere deterministisch.
-        ''' </summary>
-        ''' <param name="types">Typ-Registry.</param>
-        ''' <returns>Unveränderliches Dictionary Alias-&gt;Kind.</returns>
         Private Shared Function BuildAliasMap(types As ImmutableDictionary(Of FileKind, FileType)) _
             As ImmutableDictionary(Of String, FileKind)
-            Dim builder As ImmutableDictionary(Of String, FileKind).Builder
-            Dim kind As FileKind
-            Dim t As FileType = Nothing
+            Dim entries As List(Of Tuple(Of FileKind, String))
 
             If types Is Nothing Then Return ImmutableDictionary(Of String, FileKind).Empty
 
-            builder = ImmutableDictionary.CreateBuilder(Of String, FileKind)(StringComparer.OrdinalIgnoreCase)
+            entries = types.
+                Where(Function(kv) kv.Value IsNot Nothing).
+                Where(Function(kv) Not kv.Value.Aliases.IsDefault AndAlso kv.Value.Aliases.Length > 0).
+                SelectMany(Function(kv) kv.Value.Aliases.
+                    Select(Function(aliasValue) Tuple.Create(kv.Key, NormalizeAlias(aliasValue)))).
+                Where(Function(item) item.Item2.Length > 0).
+                ToList()
 
-            For Each kind In OrderedKindsCache
-                If Not types.TryGetValue(kind, t) Then Continue For
-                If t Is Nothing Then Continue For
-                If t.Aliases.IsDefaultOrEmpty Then Continue For
-
-                For i = 0 To t.Aliases.Length - 1
-                    Dim aliasKey = NormalizeAlias(t.Aliases(i))
-                    If aliasKey.Length = 0 Then Continue For
-
-                    builder(aliasKey) = kind
-                Next
-            Next
-
-            Return builder.ToImmutable()
+            Return entries.
+                Aggregate(ImmutableDictionary.CreateBuilder(Of String, FileKind)(StringComparer.OrdinalIgnoreCase),
+                          Function(builder, entry)
+                              builder(entry.Item2) = entry.Item1
+                              Return builder
+                          End Function).
+                ToImmutable()
         End Function
 
-        ''' <summary>
-        '''     Normalisiert einen Aliaswert deterministisch.
-        '''     Entfernt führende Punkte, trimmt Whitespace und wandelt in Kleinbuchstaben (Invariant) um.
-        ''' </summary>
-        ''' <param name="raw">Rohwert, z.B. ".PDF" oder " pdf ".</param>
-        ''' <returns>Normalisierter Alias ohne Punkt oder leerer String.</returns>
         Friend Shared Function NormalizeAlias(raw As String) As String
-            Dim s As String = If(raw, String.Empty).Trim()
-
-            If s.Length = 0 Then Return String.Empty
-            If s(0) = "."c Then s = s.Substring(1)
-
+            Dim s = If(raw, String.Empty).Trim()
+            If s.StartsWith("."c) Then s = s.Substring(1)
             Return s.ToLowerInvariant()
         End Function
 
@@ -428,7 +346,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <summary>
         '''     Interner, unveränderlicher Datenträger <c>FileTypeDefinition</c> für strukturierte Verarbeitungsschritte.
         ''' </summary>
-        Friend Structure FileTypeDefinition
+        Private Structure FileTypeDefinition
             Friend ReadOnly Kind As FileKind
             Friend ReadOnly CanonicalExtension As String
             Friend ReadOnly Aliases As String()
@@ -446,7 +364,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <summary>
         '''     Interner, unveränderlicher Datenträger <c>MagicRule</c> für strukturierte Verarbeitungsschritte.
         ''' </summary>
-        Friend Structure MagicRule
+        Private Structure MagicRule
             Friend ReadOnly Kind As FileKind
             Friend ReadOnly Patterns As ImmutableArray(Of MagicPattern)
 
@@ -459,7 +377,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <summary>
         '''     Interner, unveränderlicher Datenträger <c>MagicPattern</c> für strukturierte Verarbeitungsschritte.
         ''' </summary>
-        Friend Structure MagicPattern
+        Private Structure MagicPattern
             Friend ReadOnly Segments As ImmutableArray(Of MagicSegment)
 
             Friend Sub New(segments As ImmutableArray(Of MagicSegment))
@@ -470,7 +388,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <summary>
         '''     Interner, unveränderlicher Datenträger <c>MagicSegment</c> für strukturierte Verarbeitungsschritte.
         ''' </summary>
-        Friend Structure MagicSegment
+        Private Structure MagicSegment
             Friend ReadOnly Offset As Integer
             Friend ReadOnly Bytes As ImmutableArray(Of Byte)
 
