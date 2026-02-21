@@ -60,6 +60,13 @@ internal static class HashingEvidenceTestHelpers
         using var hmac = new HMACSHA256(key);
         return Convert.ToHexString(hmac.ComputeHash(payload)).ToLowerInvariant();
     }
+
+    internal static Type GetInternalType(string fullName)
+    {
+        var type = typeof(EvidenceHashing).Assembly.GetType(fullName, throwOnError: false);
+        Assert.NotNull(type);
+        return type!;
+    }
 }
 
 // Section 1: SHA256 physical vs logical behavior
@@ -400,7 +407,8 @@ public sealed class HashingEvidenceXxHash3Tests
     [Fact]
     public void ComputeFastHash_ReturnsEmpty_WhenOptionDisabled()
     {
-        var method = typeof(EvidenceHashing).GetMethod("ComputeFastHash", BindingFlags.NonPublic | BindingFlags.Static)!;
+        var coreType = HashingEvidenceTestHelpers.GetInternalType("Tomtastisch.FileClassifier.EvidenceHashingCore");
+        var method = coreType.GetMethod("ComputeFastHash", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var options = new HashOptions { IncludeFastHash = false };
@@ -634,9 +642,9 @@ public sealed class HashingEvidenceRoundTripTests
 
         Assert.Equal(expectedArchive, report.IsArchiveInput);
         Assert.True(report.LogicalConsistent);
-        Assert.True(report.LogicalH1EqualsH2);
-        Assert.True(report.LogicalH1EqualsH3);
-        Assert.True(report.LogicalH1EqualsH4);
+        Assert.True(report.LogicalEquals(HashRoundTripReport.HashSlot.H2));
+        Assert.True(report.LogicalEquals(HashRoundTripReport.HashSlot.H3));
+        Assert.True(report.LogicalEquals(HashRoundTripReport.HashSlot.H4));
     }
 
     [Theory]
@@ -784,7 +792,7 @@ public sealed class HashingEvidenceRoundTripTests
         var path = TestResources.Resolve("sample.pdf");
         var report = EvidenceHashing.VerifyRoundTrip(path);
 
-        Assert.False(report.H1.Digests.HasLogicalHash);
+        Assert.False(report.Evidence(HashRoundTripReport.HashSlot.H1).Digests.HasLogicalHash);
         Assert.Contains("h1", report.Notes, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -955,7 +963,8 @@ public sealed class HashingEvidenceModelTests
     [Fact]
     public void NormalizedEntry_Defaults_WhenConstructedWithNulls()
     {
-        var type = typeof(EvidenceHashing).GetNestedTypes(BindingFlags.NonPublic)
+        var coreType = HashingEvidenceTestHelpers.GetInternalType("Tomtastisch.FileClassifier.EvidenceHashingCore");
+        var type = coreType.GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
             .First(t => t.Name == "NormalizedEntry");
 
         var ctor = type.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)
@@ -963,9 +972,11 @@ public sealed class HashingEvidenceModelTests
 
         var instance = ctor.Invoke(new object?[] { null, null });
         var relativePath =
-            (string)type.GetProperty("RelativePath", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(instance)!;
+            (string)type.GetProperty("RelativePath", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)!
+                .GetValue(instance)!;
         var content =
-            (byte[])type.GetProperty("Content", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(instance)!;
+            (byte[])type.GetProperty("Content", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)!
+                .GetValue(instance)!;
 
         Assert.Equal(string.Empty, relativePath);
         Assert.NotNull(content);
@@ -975,16 +986,16 @@ public sealed class HashingEvidenceModelTests
     [Fact]
     public void HashRoundTripReport_Constructor_DefaultsToFailureEvidence_WhenInputsNull()
     {
-        var report = new HashRoundTripReport("", isArchiveInput: false, h1: null, h2: null, h3: null,
-            h4: null, notes: null);
+        var report = new HashRoundTripReport("", isArchiveInput: false, notes: null, null, null, null,
+            null);
 
         Assert.False(report.LogicalConsistent);
-        Assert.False(report.LogicalH1EqualsH2);
-        Assert.False(report.LogicalH1EqualsH3);
-        Assert.False(report.LogicalH1EqualsH4);
-        Assert.False(report.PhysicalH1EqualsH2);
-        Assert.False(report.PhysicalH1EqualsH3);
-        Assert.False(report.PhysicalH1EqualsH4);
+        Assert.False(report.LogicalEquals(HashRoundTripReport.HashSlot.H2));
+        Assert.False(report.LogicalEquals(HashRoundTripReport.HashSlot.H3));
+        Assert.False(report.LogicalEquals(HashRoundTripReport.HashSlot.H4));
+        Assert.False(report.PhysicalEquals(HashRoundTripReport.HashSlot.H2));
+        Assert.False(report.PhysicalEquals(HashRoundTripReport.HashSlot.H3));
+        Assert.False(report.PhysicalEquals(HashRoundTripReport.HashSlot.H4));
     }
 
     [Fact]
@@ -1012,16 +1023,16 @@ public sealed class HashingEvidenceModelTests
             digests: digest,
             notes: "ok");
 
-        var report = new HashRoundTripReport("x", isArchiveInput: false, h1: evidence, h2: evidence,
-            h3: evidence, h4: evidence, notes: "ok");
+        var report = new HashRoundTripReport("x", isArchiveInput: false, notes: "ok", evidence, evidence,
+            evidence, evidence);
 
         Assert.True(report.LogicalConsistent);
-        Assert.True(report.LogicalH1EqualsH2);
-        Assert.True(report.LogicalH1EqualsH3);
-        Assert.True(report.LogicalH1EqualsH4);
-        Assert.True(report.PhysicalH1EqualsH2);
-        Assert.True(report.PhysicalH1EqualsH3);
-        Assert.True(report.PhysicalH1EqualsH4);
+        Assert.True(report.LogicalEquals(HashRoundTripReport.HashSlot.H2));
+        Assert.True(report.LogicalEquals(HashRoundTripReport.HashSlot.H3));
+        Assert.True(report.LogicalEquals(HashRoundTripReport.HashSlot.H4));
+        Assert.True(report.PhysicalEquals(HashRoundTripReport.HashSlot.H2));
+        Assert.True(report.PhysicalEquals(HashRoundTripReport.HashSlot.H3));
+        Assert.True(report.PhysicalEquals(HashRoundTripReport.HashSlot.H4));
     }
 
     [Fact]
@@ -1049,11 +1060,11 @@ public sealed class HashingEvidenceModelTests
             digests: digest,
             notes: "ok");
 
-        var report = new HashRoundTripReport("x", isArchiveInput: false, h1: evidence, h2: evidence,
-            h3: evidence, h4: evidence, notes: "ok");
+        var report = new HashRoundTripReport("x", isArchiveInput: false, notes: "ok", evidence, evidence,
+            evidence, evidence);
 
-        Assert.False(report.LogicalH1EqualsH2);
-        Assert.True(report.PhysicalH1EqualsH2);
+        Assert.False(report.LogicalEquals(HashRoundTripReport.HashSlot.H2));
+        Assert.True(report.PhysicalEquals(HashRoundTripReport.HashSlot.H2));
     }
 
     [Fact]
@@ -1083,7 +1094,8 @@ public sealed class HashingEvidenceModelTests
     [Fact]
     public void NormalizeLabel_FallsBack_ForNullOrWhitespace()
     {
-        var method = typeof(EvidenceHashing).GetMethod("NormalizeLabel", BindingFlags.NonPublic | BindingFlags.Static)!;
+        var coreType = HashingEvidenceTestHelpers.GetInternalType("Tomtastisch.FileClassifier.EvidenceHashingCore");
+        var method = coreType.GetMethod("NormalizeLabel", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var label1 = TestGuard.NotNull(method.Invoke(null, new object?[] { null }) as string);
@@ -1096,7 +1108,8 @@ public sealed class HashingEvidenceModelTests
     [Fact]
     public void CopyBytes_ReturnsEmpty_ForNullOrEmpty()
     {
-        var method = typeof(EvidenceHashing).GetMethod("CopyBytes", BindingFlags.NonPublic | BindingFlags.Static)!;
+        var coreType = HashingEvidenceTestHelpers.GetInternalType("Tomtastisch.FileClassifier.EvidenceHashingCore");
+        var method = coreType.GetMethod("CopyBytes", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var empty1 = TestGuard.NotNull(method.Invoke(null, new object?[] { null }) as byte[]);
@@ -1109,7 +1122,8 @@ public sealed class HashingEvidenceModelTests
     [Fact]
     public void TryReadFileBounded_ReturnsFalse_ForMissingPathOrOptions()
     {
-        var method = typeof(EvidenceHashing).GetMethod("TryReadFileBounded", BindingFlags.NonPublic | BindingFlags.Static)!;
+        var ioType = HashingEvidenceTestHelpers.GetInternalType("Tomtastisch.FileClassifier.EvidenceHashingIo");
+        var method = ioType.GetMethod("TryReadFileBounded", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         var bytes = Array.Empty<byte>();
@@ -1127,7 +1141,8 @@ public sealed class HashingEvidenceModelTests
     [Fact]
     public void TryReadFileBounded_ReturnsFalse_WhenFileTooLarge()
     {
-        var method = typeof(EvidenceHashing).GetMethod("TryReadFileBounded", BindingFlags.NonPublic | BindingFlags.Static)!;
+        var ioType = HashingEvidenceTestHelpers.GetInternalType("Tomtastisch.FileClassifier.EvidenceHashingIo");
+        var method = ioType.GetMethod("TryReadFileBounded", BindingFlags.NonPublic | BindingFlags.Static)!;
         Assert.NotNull(method);
 
         using var scope = TestTempPaths.CreateScope("ftd-hash-read");

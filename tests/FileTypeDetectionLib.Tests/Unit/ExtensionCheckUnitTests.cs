@@ -72,7 +72,7 @@ public sealed class ExtensionCheckUnitTests
             var detectedWithoutExtensionPolicy = detector.Detect(path);
             var detectedWithExtensionPolicy = detector.Detect(path, true);
 
-            Assert.Equal(FileKind.Docx, detectedWithoutExtensionPolicy.Kind);
+            Assert.Equal(FileKind.Doc, detectedWithoutExtensionPolicy.Kind);
             Assert.Equal(FileKind.Unknown, detectedWithExtensionPolicy.Kind);
         }
         finally
@@ -91,7 +91,7 @@ public sealed class ExtensionCheckUnitTests
         try
         {
             var detected = detector.Detect(path, true);
-            Assert.Equal(FileKind.Xlsx, detected.Kind);
+            Assert.Equal(FileKind.Xls, detected.Kind);
         }
         finally
         {
@@ -109,7 +109,7 @@ public sealed class ExtensionCheckUnitTests
         try
         {
             var detected = detector.Detect(path, true);
-            Assert.Equal(FileKind.Xlsx, detected.Kind);
+            Assert.Equal(FileKind.Xls, detected.Kind);
         }
         finally
         {
@@ -127,7 +127,7 @@ public sealed class ExtensionCheckUnitTests
         try
         {
             var detected = detector.Detect(path, true);
-            Assert.Equal(FileKind.Xlsx, detected.Kind);
+            Assert.Equal(FileKind.Xls, detected.Kind);
         }
         finally
         {
@@ -145,7 +145,7 @@ public sealed class ExtensionCheckUnitTests
         try
         {
             var detected = detector.Detect(path, true);
-            Assert.Equal(FileKind.Docx, detected.Kind);
+            Assert.Equal(FileKind.Doc, detected.Kind);
         }
         finally
         {

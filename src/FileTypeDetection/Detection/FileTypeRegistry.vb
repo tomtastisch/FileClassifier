@@ -36,55 +36,53 @@ Namespace Global.Tomtastisch.FileClassifier
                                     ImmutableDictionary.CreateRange(Of FileKind, ImmutableArray(Of String))(
                                         { _
                                             New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Jpeg,
-                                                                                                     ImmutableArray.
-                                                                                                        Create("jpe")),
+                                                                                                     Aliases("jpe")),
                                             New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Zip,
-                                                                                                     ImmutableArray.
-                                                                                                        Create("tar",
-                                                                                                               "tgz",
-                                                                                                               "gz",
-                                                                                                               "gzip",
-                                                                                                               "bz2",
-                                                                                                               "bzip2",
-                                                                                                               "xz",
-                                                                                                               "7z",
-                                                                                                               "zz",
-                                                                                                               "rar")),
-                                            New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Docx,
-                                                                                                     ImmutableArray.
-                                                                                                        Create("doc",
-                                                                                                               "docm",
-                                                                                                               "docb",
-                                                                                                               "dot",
-                                                                                                               "dotm",
-                                                                                                               "dotx",
-                                                                                                               "odt",
-                                                                                                               "ott")),
-                                            New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Xlsx,
-                                                                                                     ImmutableArray.
-                                                                                                        Create("xls",
-                                                                                                               "xlsm",
-                                                                                                               "xlsb",
-                                                                                                               "xlt",
-                                                                                                               "xltm",
-                                                                                                               "xltx",
-                                                                                                               "xltb",
-                                                                                                               "xlam",
-                                                                                                               "xla",
-                                                                                                               "ods",
-                                                                                                               "ots")),
-                                            New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Pptx,
-                                                                                                     ImmutableArray.
-                                                                                                        Create("ppt",
-                                                                                                               "pptm",
-                                                                                                               "pot",
-                                                                                                               "potm",
-                                                                                                               "potx",
-                                                                                                               "pps",
-                                                                                                               "ppsm",
-                                                                                                               "ppsx",
-                                                                                                               "odp",
-                                                                                                               "otp"))
+                                                                                                     Aliases("tar",
+                                                                                                             "tgz",
+                                                                                                             "gz",
+                                                                                                             "gzip",
+                                                                                                             "bz2",
+                                                                                                             "bzip2",
+                                                                                                             "xz",
+                                                                                                             "7z",
+                                                                                                             "zz",
+                                                                                                             "rar")),
+                                            New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Doc,
+                                                                                                     Aliases("doc",
+                                                                                                             "docx",
+                                                                                                             "docm",
+                                                                                                             "docb",
+                                                                                                             "dot",
+                                                                                                             "dotm",
+                                                                                                             "dotx",
+                                                                                                             "odt",
+                                                                                                             "ott")),
+                                            New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Xls,
+                                                                                                     Aliases("xls",
+                                                                                                             "xlsx",
+                                                                                                             "xlsm",
+                                                                                                             "xlsb",
+                                                                                                             "xlt",
+                                                                                                             "xltm",
+                                                                                                             "xltx",
+                                                                                                             "xltb",
+                                                                                                             "xlam",
+                                                                                                             "xla",
+                                                                                                             "ods",
+                                                                                                             "ots")),
+                                            New KeyValuePair(Of FileKind, ImmutableArray(Of String))(FileKind.Ppt,
+                                                                                                     Aliases("ppt",
+                                                                                                             "pptx",
+                                                                                                             "pptm",
+                                                                                                             "pot",
+                                                                                                             "potm",
+                                                                                                             "potx",
+                                                                                                             "pps",
+                                                                                                             "ppsm",
+                                                                                                             "ppsx",
+                                                                                                             "odp",
+                                                                                                             "otp"))
                                         })
 
         Private Shared ReadOnly _
@@ -92,6 +90,10 @@ Namespace Global.Tomtastisch.FileClassifier
                 BuildMagicPatternCatalog()
 
         Private Shared ReadOnly MagicRules As ImmutableArray(Of MagicRule)
+
+        Private Shared Function Aliases(ParamArray values As String()) As ImmutableArray(Of String)
+            Return ImmutableArray.Create(values)
+        End Function
 
         Shared Sub New()
             Dim definitions = BuildDefinitionsFromEnum()
@@ -214,9 +216,9 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Friend Shared Function HasStructuredContainerDetection(kind As FileKind) As Boolean
-            Return kind = FileKind.Docx OrElse
-                   kind = FileKind.Xlsx OrElse
-                   kind = FileKind.Pptx
+            Return kind = FileKind.Doc OrElse
+                   kind = FileKind.Xls OrElse
+                   kind = FileKind.Ppt
         End Function
 
         Friend Shared Function HasDirectContentDetection(kind As FileKind) As Boolean
