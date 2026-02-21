@@ -31,6 +31,21 @@
     - Code-/Test-/Dokuaenderung im PR mit nachvollziehbarer Evidence.
     - begruendete Widerlegung als `ASSUMPTION` + Verifikationsnachweis, warum keine Aenderung noetig ist.
   - Unzulaessig: Threads ohne Bearbeitung nur aus Prozessgruenden zu resolven.
+- Verbindlicher Einzelkommentar-Workflow (ab sofort):
+  - Jeder Review-Kommentar/Thread wird einzeln und iterativ bearbeitet (keine Sammelabarbeitung mehr).
+  - Fuer jeden bearbeiteten Kommentar gilt: genau ein dedizierter Commit fuer die konkrete Umsetzung.
+  - Vor `resolved` ist im Thread immer ein Nachweis-Kommentar zu hinterlassen:
+    - entweder Commit-/Push-Link als Evidence der Umsetzung,
+    - oder nachvollziehbare Gegenargumentation als `ASSUMPTION` inkl. Verifikationsnachweis.
+  - Erst danach darf genau dieser Thread auf `resolved` gesetzt werden.
+  - Bei CI-Nacharbeiten gilt dieselbe Regel:
+    - pro verursachender Reparatur genau ein Commit,
+    - eigener Review-Nachweis-Kommentar mit Ursache und Evidence,
+    - danach erst `resolved`.
+  - Push-Green-Regel:
+    - lokale Einzelabarbeitung aller offenen Kommentare gemaess obiger Regeln,
+    - danach Push und Pflicht-Checks auf gruen,
+    - Merge erst bei gruenen Checks und ohne offene Threads.
 - Merge nur wenn:
   - required checks gruener Status,
   - keine offenen Review-Threads,
