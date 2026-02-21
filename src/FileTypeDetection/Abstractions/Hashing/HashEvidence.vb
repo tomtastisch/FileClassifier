@@ -69,6 +69,19 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public ReadOnly Property Notes As String
 
+        ''' <summary>
+        '''     Interner Vollkonstruktor zur deterministischen Erzeugung eines Evidence-Snapshots.
+        ''' </summary>
+        ''' <param name="sourceType">Herkunftskanal der Hashquelle.</param>
+        ''' <param name="label">Fachliches Quelllabel.</param>
+        ''' <param name="detectedType">Ermittelter Dateitypkontext.</param>
+        ''' <param name="entry">Optionaler Archiveintrag.</param>
+        ''' <param name="compressedBytes">Optionale komprimierte Bytes als Quelle für defensive Kopie.</param>
+        ''' <param name="uncompressedBytes">Optionale unkomprimierte/logische Bytes als Quelle für defensive Kopie.</param>
+        ''' <param name="entryCount">Anzahl berücksichtigter Entries (wird auf >= 0 normalisiert).</param>
+        ''' <param name="totalUncompressedBytes">Gesamtgröße der Nutzdaten in Bytes (wird auf >= 0 normalisiert).</param>
+        ''' <param name="digests">Deterministischer Digest-Satz.</param>
+        ''' <param name="notes">Ergänzende Hinweise.</param>
         Friend Sub New _
             (
                 sourceType As HashSourceType,
@@ -95,6 +108,13 @@ Namespace Global.Tomtastisch.FileClassifier
             Me.UncompressedBytes = ToImmutable(uncompressedBytes)
         End Sub
 
+        ''' <summary>
+        '''     Erzeugt einen fail-closed Evidence-Snapshot für Fehlerpfade.
+        ''' </summary>
+        ''' <param name="sourceType">Herkunftskanal der Hashquelle.</param>
+        ''' <param name="label">Fachliches Quelllabel.</param>
+        ''' <param name="notes">Fehler-/Hinweistext.</param>
+        ''' <returns>Evidence mit leerem Digest-Satz und Unknown-Typkontext.</returns>
         Friend Shared Function CreateFailure _
             (
                 sourceType As HashSourceType,
@@ -115,6 +135,11 @@ Namespace Global.Tomtastisch.FileClassifier
                 notes:=notes)
         End Function
 
+        ''' <summary>
+        '''     Erstellt aus einem Bytearray eine unveränderliche Kopie.
+        ''' </summary>
+        ''' <param name="data">Quellbytes oder <c>Nothing</c>.</param>
+        ''' <returns>Leeres ImmutableArray bei fehlendem Inhalt, sonst defensive Kopie.</returns>
         Private Shared Function ToImmutable _
             (
                 data As Byte()

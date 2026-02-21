@@ -43,6 +43,10 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public Property MaterializedFileName As String = "deterministic-roundtrip.bin"
 
+        ''' <summary>
+        '''     Erstellt eine interne, seiteneffektfreie Kopie der Optionen.
+        ''' </summary>
+        ''' <returns>Neue Instanz mit identischen aktuellen Optionswerten.</returns>
         Friend Function Clone() As HashOptions
 
             Return New HashOptions With {
@@ -53,6 +57,11 @@ Namespace Global.Tomtastisch.FileClassifier
                 }
         End Function
 
+        ''' <summary>
+        '''     Normalisiert ein Optionsobjekt fail-closed auf sichere Standardwerte.
+        ''' </summary>
+        ''' <param name="options">Zu normalisierende Optionen; <c>Nothing</c> erzeugt Standardoptionen.</param>
+        ''' <returns>Normalisierte Optionskopie mit sicherem Materialisierungsdateinamen.</returns>
         Friend Shared Function Normalize _
             (
                 options As HashOptions
@@ -66,6 +75,14 @@ Namespace Global.Tomtastisch.FileClassifier
             Return cloned
         End Function
 
+        ''' <summary>
+        '''     Validiert und normalisiert den Materialisierungsdateinamen auf einen sicheren, deterministischen Wert.
+        ''' </summary>
+        ''' <param name="candidate">Kandidat aus den Optionen.</param>
+        ''' <returns>
+        '''     Sicherheitsnormalisierter Dateiname. Bei ungültigem Eingabewert wird
+        '''     <c>deterministic-roundtrip.bin</c> zurückgegeben.
+        ''' </returns>
         <SuppressMessage("Usage", "CA2249:Use 'string.Contains' instead of 'string.IndexOf' to improve readability", Justification:="IndexOf bleibt hier für deterministische Zeichenprüfung ohne Semantikänderung bestehen.")>
         Private Shared Function NormalizeMaterializedFileName _
             (
