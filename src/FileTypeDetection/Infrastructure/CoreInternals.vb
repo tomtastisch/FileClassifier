@@ -13,260 +13,9 @@ Option Explicit On
 Imports System.IO
 Imports System.IO.Compression
 Imports System.Text
-Imports Microsoft.Extensions.Logging
+Imports Tomtastisch.FileClassifier.Infrastructure.Utils
 
 Namespace Global.Tomtastisch.FileClassifier
-    ''' <summary>
-    '''     Interne Hilfsklasse <c>InternalIoDefaults</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
-    ''' </summary>
-    Friend NotInheritable Class InternalIoDefaults
-        Friend Const CopyBufferSize As Integer = 8192
-        Friend Const FileStreamBufferSize As Integer = 81920
-        Friend Const DefaultSniffBytes As Integer = 4096
-
-        Private Sub New()
-        End Sub
-    End Class
-
-    ''' <summary>
-    '''     Zentrale IO-Helfer für harte Grenzen.
-    '''     SSOT-Regel: bounded copy wird nur hier gepflegt.
-    ''' </summary>
-    Friend NotInheritable Class StreamBounds
-        Private Sub New()
-        End Sub
-
-        Friend Shared Sub CopyBounded(input As Stream, output As Stream, maxBytes As Long)
-            Dim buf(InternalIoDefaults.CopyBufferSize - 1) As Byte
-            Dim total As Long = 0
-            Dim n As Integer
-
-            While True
-                n = input.Read(buf, 0, buf.Length)
-                If n <= 0 Then Exit While
-
-                total += n
-                If total > maxBytes Then Throw New InvalidOperationException("bounded copy exceeded")
-                output.Write(buf, 0, n)
-            End While
-        End Sub
-    End Class
-
-    ''' <summary>
-    '''     Kleine, zentrale Stream-Guards, um duplizierte Pattern-Checks in Archivroutinen zu reduzieren.
-    '''     Keine Semantik: reine Abfrage/Positionierung.
-    ''' </summary>
-    Friend NotInheritable Class StreamGuard
-        Private Sub New()
-        End Sub
-
-        Friend Shared Function IsReadable(stream As Stream) As Boolean
-            Return stream IsNot Nothing AndAlso stream.CanRead
-        End Function
-
-        Friend Shared Sub RewindToStart(stream As Stream)
-            If stream Is Nothing Then Return
-            If stream.CanSeek Then stream.Position = 0
-        End Sub
-    End Class
-
-    ''' <summary>
-    '''     Sicherheits-Gate für Archive-Container.
-    ''' </summary>
-    Friend NotInheritable Class ArchiveSafetyGate
-        Private Sub New()
-        End Sub
-
-        Friend Shared Function IsArchiveSafeBytes(data As Byte(), opt As FileTypeProjectOptions,
-                                                  descriptor As ArchiveDescriptor) As Boolean
-            If data Is Nothing OrElse data.Length = 0 Then Return False
-            If opt Is Nothing Then Return False
-            If descriptor Is Nothing OrElse descriptor.ContainerType = ArchiveContainerType.Unknown Then Return False
-
-            Try
-                Using ms As New MemoryStream(data, writable:=False)
-                    Return IsArchiveSafeStream(ms, opt, descriptor, depth:=0)
-                End Using
-            Catch ex As Exception When _
-                TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
-                TypeOf ex Is IOException OrElse
-                TypeOf ex Is InvalidDataException OrElse
-                TypeOf ex Is NotSupportedException OrElse
-                TypeOf ex Is ArgumentException OrElse
-                TypeOf ex Is InvalidOperationException OrElse
-                TypeOf ex Is ObjectDisposedException
-                LogGuard.Debug(opt.Logger, $"[ArchiveGate] Bytes-Fehler: {ex.Message}")
-                Return False
-            End Try
-        End Function
-
-        Friend Shared Function IsArchiveSafeStream(stream As Stream, opt As FileTypeProjectOptions,
-                                                   descriptor As ArchiveDescriptor, depth As Integer) As Boolean
-            If Not StreamGuard.IsReadable(stream) Then Return False
-            If opt Is Nothing Then Return False
-            Return ArchiveProcessingEngine.ValidateArchiveStream(stream, opt, depth, descriptor)
-        End Function
-    End Class
-
-    ''' <summary>
-    '''     Gemeinsame Guards für signaturbasierte Archiv-Byte-Payloads.
-    ''' </summary>
-    Friend NotInheritable Class ArchiveSignaturePayloadGuard
-        Private Sub New()
-        End Sub
-
-        Friend Shared Function IsArchiveSignatureCandidate(data As Byte()) As Boolean
-            If data Is Nothing OrElse data.Length = 0 Then Return False
-            Return FileTypeRegistry.DetectByMagic(data) = FileKind.Zip
-        End Function
-    End Class
-
-    ''' <summary>
-    '''     Gemeinsame Guards für beliebige Archive-Byte-Payloads.
-    ''' </summary>
-    Friend NotInheritable Class ArchivePayloadGuard
-        Private Sub New()
-        End Sub
-
-        Friend Shared Function IsSafeArchivePayload(data As Byte(), opt As FileTypeProjectOptions) As Boolean
-            Dim descriptor As ArchiveDescriptor = Nothing
-
-            If data Is Nothing OrElse data.Length = 0 Then Return False
-            If opt Is Nothing Then Return False
-            If CLng(data.Length) > opt.MaxBytes Then Return False
-
-            If Not ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then Return False
-            Return ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor)
-        End Function
-    End Class
-
-    ''' <summary>
-    '''     Gemeinsame Zielpfad-Policy für Materialisierung und Archiv-Extraktion.
-    ''' </summary>
-    Friend NotInheritable Class DestinationPathGuard
-        Private Sub New()
-        End Sub
-
-        Friend Shared Function PrepareMaterializationTarget(destinationFull As String, overwrite As Boolean,
-                                                            opt As FileTypeProjectOptions) As Boolean
-            If IsRootPath(destinationFull) Then
-                LogGuard.Warn(opt.Logger, "[PathGuard] Ziel darf kein Root-Verzeichnis sein.")
-                Return False
-            End If
-
-            If File.Exists(destinationFull) Then
-                If Not overwrite Then Return False
-                File.Delete(destinationFull)
-            ElseIf Directory.Exists(destinationFull) Then
-                If Not overwrite Then Return False
-                Directory.Delete(destinationFull, recursive:=True)
-            End If
-
-            Return True
-        End Function
-
-        Friend Shared Function ValidateNewExtractionTarget(destinationFull As String, opt As FileTypeProjectOptions) _
-            As Boolean
-            Dim parent As String
-
-            If IsRootPath(destinationFull) Then
-                LogGuard.Warn(opt.Logger, "[PathGuard] Ziel darf kein Root-Verzeichnis sein.")
-                Return False
-            End If
-
-            If File.Exists(destinationFull) OrElse Directory.Exists(destinationFull) Then
-                LogGuard.Warn(opt.Logger, "[PathGuard] Ziel existiert bereits.")
-                Return False
-            End If
-
-            parent = Path.GetDirectoryName(destinationFull)
-            If String.IsNullOrWhiteSpace(parent) Then
-                LogGuard.Warn(opt.Logger, "[PathGuard] Ziel ohne gültigen Parent.")
-                Return False
-            End If
-
-            Return True
-        End Function
-
-        Friend Shared Function IsRootPath(destinationFull As String) As Boolean
-            Dim rootPath As String
-
-            If String.IsNullOrWhiteSpace(destinationFull) Then Return False
-
-            Try
-                rootPath = Path.GetPathRoot(destinationFull)
-            Catch ex As Exception When _
-                TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
-                TypeOf ex Is IOException OrElse
-                TypeOf ex Is NotSupportedException OrElse
-                TypeOf ex Is ArgumentException
-                Return False
-            End Try
-
-            If String.IsNullOrWhiteSpace(rootPath) Then Return False
-
-            Return String.Equals(
-                destinationFull.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
-                rootPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
-                StringComparison.OrdinalIgnoreCase)
-        End Function
-    End Class
-
-    ''' <summary>
-    '''     Gemeinsame Normalisierung für relative Archiv-Entry-Pfade.
-    ''' </summary>
-    Friend NotInheritable Class ArchiveEntryPathPolicy
-        Private Sub New()
-        End Sub
-
-        Friend Shared Function TryNormalizeRelativePath(
-                                                        rawPath As String,
-                                                        allowDirectoryMarker As Boolean,
-                                                        ByRef normalizedPath As String,
-                                                        ByRef isDirectory As Boolean
-                                                        ) As Boolean
-            Dim safe As String
-            Dim trimmed As String
-            Dim segments As String()
-
-            normalizedPath = String.Empty
-            isDirectory = False
-
-            safe = If(rawPath, String.Empty).Trim()
-            If safe.Length = 0 Then Return False
-            If safe.Contains(ChrW(0)) Then Return False
-
-            safe = safe.Replace("\"c, "/"c)
-            If Path.IsPathRooted(safe) Then Return False
-            safe = safe.TrimStart("/"c)
-            If safe.Length = 0 Then Return False
-
-            trimmed = safe.TrimEnd("/"c)
-            If trimmed.Length = 0 Then
-                If Not allowDirectoryMarker Then Return False
-                normalizedPath = safe
-                isDirectory = True
-                Return True
-            End If
-
-            segments = trimmed.Split("/"c)
-            For Each seg In segments
-                If seg.Length = 0 Then Return False
-                If seg = "." OrElse seg = ".." Then Return False
-            Next
-
-            If safe.Length <> trimmed.Length AndAlso Not allowDirectoryMarker Then
-                Return False
-            End If
-
-            normalizedPath = If(allowDirectoryMarker, safe, trimmed)
-            isDirectory = allowDirectoryMarker AndAlso safe.Length <> trimmed.Length
-            Return True
-        End Function
-    End Class
-
     ''' <summary>
     '''     Verfeinert ZIP-basierte Office-Container zu Dokumenttypen anhand kanonischer Paketmarker.
     '''     Implementationsprinzip:
@@ -440,7 +189,11 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="entry">ZIP-Entry, der gelesen werden soll.</param>
         ''' <param name="maxBytes">Maximal erlaubte Größe in Byte.</param>
         ''' <returns>ASCII-Textinhalt oder leerer String bei Guard-/Fehlerpfad.</returns>
-        Private Shared Function ReadZipEntryText(entry As ZipArchiveEntry, maxBytes As Integer) As String
+        Private Shared Function ReadZipEntryText _
+            (
+                entry As ZipArchiveEntry,
+                maxBytes As Integer
+            ) As String
             Dim buffer As Byte()
             Dim readTotal As Integer
             Dim readCount As Integer
@@ -522,7 +275,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="data">Kompletter oder teilweiser OLE-Payload.</param>
         ''' <returns>Gemappter Office-Typ oder <see cref="FileKind.Unknown"/>.</returns>
         Friend Shared Function TryRefineBytes(data As Byte()) As FileType
-            If data Is Nothing OrElse data.Length = 0 Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
+            If Not ByteArrayGuard.HasContent(data) Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
 
             Try
                 Return RefineByMarkers(data)
@@ -545,7 +298,11 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="stream">Lesbarer Quellstream.</param>
         ''' <param name="maxProbeBytes">Maximale Probegröße; wird intern defensiv gekappt.</param>
         ''' <returns>Gemappter Office-Typ oder <see cref="FileKind.Unknown"/>.</returns>
-        Friend Shared Function TryRefineStream(stream As Stream, maxProbeBytes As Integer) As FileType
+        Friend Shared Function TryRefineStream _
+            (
+                stream As Stream,
+                maxProbeBytes As Integer
+            ) As FileType
             Dim probeLimit As Integer
             Dim chunk(4095) As Byte
             Dim readTotal As Integer
@@ -624,7 +381,11 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="data">Quellpuffer.</param>
         ''' <param name="marker">Gesuchte Marker-Bytefolge.</param>
         ''' <returns><c>True</c> bei Treffer, sonst <c>False</c>.</returns>
-        Private Shared Function ContainsMarker(data As Byte(), marker As Byte()) As Boolean
+        Private Shared Function ContainsMarker _
+            (
+                data As Byte(),
+                marker As Byte()
+            ) As Boolean
             Dim i As Integer
             Dim j As Integer
 
@@ -644,54 +405,4 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
     End Class
 
-    ''' <summary>
-    '''     Defensiver Logger-Schutz.
-    '''     Logging darf niemals zu Erkennungsfehlern oder Exceptions führen.
-    ''' </summary>
-    Friend NotInheritable Class LogGuard
-        Private Sub New()
-        End Sub
-
-        Friend Shared Sub Debug(logger As ILogger, message As String)
-            If logger Is Nothing Then Return
-            If Not logger.IsEnabled(LogLevel.Debug) Then Return
-            Try
-                logger.LogDebug("{Message}", message)
-            Catch ex As Exception When _
-                TypeOf ex Is InvalidOperationException OrElse
-                TypeOf ex Is ObjectDisposedException OrElse
-                TypeOf ex Is FormatException OrElse
-                TypeOf ex Is ArgumentException
-                ' Keine Rekursion im Logger-Schutz: Logging-Fehler werden bewusst fail-closed unterdrückt.
-            End Try
-        End Sub
-
-        Friend Shared Sub Warn(logger As ILogger, message As String)
-            If logger Is Nothing Then Return
-            If Not logger.IsEnabled(LogLevel.Warning) Then Return
-            Try
-                logger.LogWarning("{Message}", message)
-            Catch ex As Exception When _
-                TypeOf ex Is InvalidOperationException OrElse
-                TypeOf ex Is ObjectDisposedException OrElse
-                TypeOf ex Is FormatException OrElse
-                TypeOf ex Is ArgumentException
-                ' Keine Rekursion im Logger-Schutz: Logging-Fehler werden bewusst fail-closed unterdrückt.
-            End Try
-        End Sub
-
-        Friend Shared Sub [Error](logger As ILogger, message As String, ex As Exception)
-            If logger Is Nothing Then Return
-            If Not logger.IsEnabled(LogLevel.Error) Then Return
-            Try
-                logger.LogError(ex, "{Message}", message)
-            Catch logEx As Exception When _
-                TypeOf logEx Is InvalidOperationException OrElse
-                TypeOf logEx Is ObjectDisposedException OrElse
-                TypeOf logEx Is FormatException OrElse
-                TypeOf logEx Is ArgumentException
-                ' Keine Rekursion im Logger-Schutz: Logging-Fehler werden bewusst fail-closed unterdrückt.
-            End Try
-        End Sub
-    End Class
 End Namespace

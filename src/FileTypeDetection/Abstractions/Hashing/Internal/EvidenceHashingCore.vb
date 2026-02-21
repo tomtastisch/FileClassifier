@@ -389,7 +389,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Dim copy As Byte()
 
-            If data Is Nothing OrElse data.Length = 0 Then Return Array.Empty(Of Byte)()
+            If Not ByteArrayGuard.HasContent(data) Then Return Array.Empty(Of Byte)()
             copy = New Byte(data.Length - 1) {}
             Buffer.BlockCopy(data, 0, copy, 0, data.Length)
 

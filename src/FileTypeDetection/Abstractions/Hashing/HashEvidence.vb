@@ -120,7 +120,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 data As Byte()
             ) As Immutable.ImmutableArray(Of Byte)
 
-            If data Is Nothing OrElse data.Length = 0 Then
+            If Not ByteArrayGuard.HasContent(data) Then
                 Return Immutable.ImmutableArray(Of Byte).Empty
             End If
 

@@ -13,7 +13,7 @@
 Option Strict On
 Option Explicit On
 
-Namespace Global.Tomtastisch.FileClassifier.Utils
+Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
 
     ''' <summary>
     '''     Utility-Funktionen für defensive Kopien (Array-basierte Rückgaben).
@@ -57,7 +57,10 @@ Namespace Global.Tomtastisch.FileClassifier.Utils
         ''' <typeparam name="T">Elementtyp.</typeparam>
         ''' <param name="source">Quelle; <c>Nothing</c> bleibt <c>Nothing</c>.</param>
         ''' <returns>Defensive Kopie oder <c>Nothing</c>.</returns>
-        Public Shared Function CloneArray(Of T)(source As T()) As T()
+        Public Shared Function CloneArray(Of T) _
+            (
+                source As T()
+            ) As T()
 
             ' Deklarationsblock
             Dim copy() As T

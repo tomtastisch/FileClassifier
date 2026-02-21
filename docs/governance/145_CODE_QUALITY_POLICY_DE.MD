@@ -68,6 +68,19 @@ Use visible block separation (empty line + block comment markers):
 - fallback
 - I/O helpers separated
 
+### 5.4 Method Header and Wrapping Scheme (binding)
+- For new or ticket-touched signatures, multiline signatures are mandatory when at least one applies:
+  - more than one parameter
+  - signature would become a long line (guideline: > 100 characters)
+- Format for multiline signatures:
+  - member name followed by line continuation (`_`)
+  - opening parenthesis on its own line
+  - exactly one parameter per line
+  - closing parenthesis and return type on one line
+- This applies consistently to `Sub`/`Function`/constructors/interface members.
+- Long invocations are wrapped analogously (one argument per line, aligned clearly).
+- No trailing whitespace and no visually empty lines containing spaces/tabs.
+
 ## 6. Variable Rule
 - All local variables are declared in a declaration block at the start of the function.
 - Placement:
