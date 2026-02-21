@@ -34,9 +34,9 @@ Namespace Global.Tomtastisch.FileClassifier
                 extWithDot As String
             ) As String
 
-            Dim ext As String = extWithDot
+            Dim ext As String = If(String.IsNullOrWhiteSpace(extWithDot), String.Empty, extWithDot)
 
-            If String.IsNullOrWhiteSpace(extWithDot) Then Return String.Empty
+            If ext.Length = 0 Then Return String.Empty
 
             If Not ext.StartsWith("."c) Then ext = "." & ext
 
