@@ -151,7 +151,10 @@ if [[ -z "${REPO_FULL}" ]]; then
   add_violation "CI-SEC-CLAIM-001" "fail" "Unable to determine GitHub repository slug" "SECURITY.md"
 fi
 
-# Claim: 6.x supported and <6.0 unsupported maps to current package major = 6
+# Claim-Bindung an SECURITY.md:
+# - Security-Support gilt nur fuer den aktuellen Major 6.x.
+# - Ein Major-Wechsel erfordert immer synchrones Update von SECURITY.md,
+#   Versionierungsdokumenten und dieser Claim-Pruefung.
 pkg_ver="$(sed -n 's:.*<Version>\([^<]*\)</Version>.*:\1:p' "${ROOT_DIR}/src/FileTypeDetection/FileTypeDetectionLib.vbproj" | head -n1)"
 if [[ -z "${pkg_ver}" ]]; then
   add_violation "CI-SEC-CLAIM-002" "fail" "Package version not found" "src/FileTypeDetection/FileTypeDetectionLib.vbproj"
