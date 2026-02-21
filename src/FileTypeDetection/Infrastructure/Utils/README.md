@@ -32,6 +32,6 @@ flowchart LR
 ```
 
 ## 6. Verweise
-- [Modul-Root](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md)
-- [Infrastructure-Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md)
-- [Code-Quality-Policy](https://github.com/tomtastisch/FileClassifier/blob/main/docs/governance/045_CODE_QUALITY_POLICY_DE.MD)
+- [Modul-Root](../../README.md)
+- [Infrastructure-Modul](../README.md)
+- [Code-Quality-Policy](../../../../docs/governance/045_CODE_QUALITY_POLICY_DE.MD)

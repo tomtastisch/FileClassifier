@@ -20,7 +20,7 @@ Hinweis:
 
 | Version | Kurzbeschreibung | Commit | Keyword |
 |---|---|---|---|
-| `6.0.1` | Refactor-Haertung: interne SSOT-Utilities nach `Infrastructure/Utils` konsolidiert, Core-Utility-Logik in dedizierte Dateien gesplittet und Duplikat-Guards vereinheitlicht | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v6.0.0...HEAD) | patch |
+| `6.0.1` | Refactor-Haertung: interne SSOT-Utilities nach `Infrastructure/Utils` konsolidiert, Core-Utility-Logik in dedizierte Dateien gesplittet und Duplikat-Guards vereinheitlicht | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v5.2.1...HEAD) | patch |
 | `6.0.0` | Breaking-Release: `FileKind`-Enum und `HashRoundTripReport`-Public-API auf neues Slot-/Methodenmodell umgestellt, Hashing-Interna in Core/RoundTrip/Io ausgelagert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v5.2.1...HEAD) | breaking |
 | `5.2.1` | SharpCompress-API auf typsichere Aufrufe umgestellt, tar.gz-Verarbeitung fail-closed gehaertet und Qodana-CI-Gate als Pflichtlauf dokumentiert/erzwungen | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v5.2.0...HEAD) | patch |
 | `5.2.0` | netstandard2.0-Compat-Layer eingefuehrt, Provider-Struktur konsolidiert und TFM-Multi-Targeting erweitert | [8d65a52](https://github.com/tomtastisch/FileClassifier/commit/8d65a52) | minor |
