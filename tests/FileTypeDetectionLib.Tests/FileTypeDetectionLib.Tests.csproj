@@ -25,6 +25,7 @@
 
     <ItemGroup>
         <Using Include="Xunit"/>
+        <Using Include="Tomtastisch.FileClassifier.Infrastructure.Utils"/>
     </ItemGroup>
 
     <ItemGroup>

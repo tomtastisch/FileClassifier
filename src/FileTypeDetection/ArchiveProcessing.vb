@@ -44,6 +44,7 @@ Namespace Global.Tomtastisch.FileClassifier
             (
                 path As String
             ) As Boolean
+
             Return FileTypeDetector.TryValidateArchive(path)
         End Function
 
@@ -59,6 +60,7 @@ Namespace Global.Tomtastisch.FileClassifier
             (
                 data As Byte()
             ) As Boolean
+
             Dim opt = FileTypeOptions.GetSnapshot()
             Return ArchivePayloadGuard.IsSafeArchivePayload(data, opt)
         End Function
@@ -79,8 +81,8 @@ Namespace Global.Tomtastisch.FileClassifier
             (
                 path As String,
                 verifyBeforeExtract As Boolean
-            ) _
-            As IReadOnlyList(Of ZipExtractedEntry)
+            ) As IReadOnlyList(Of ZipExtractedEntry)
+
             Return New FileTypeDetector().ExtractArchiveSafeToMemory(path, verifyBeforeExtract)
         End Function
 
@@ -97,11 +99,12 @@ Namespace Global.Tomtastisch.FileClassifier
             (
                 data As Byte()
             ) As IReadOnlyList(Of ZipExtractedEntry)
+
             Dim opt As FileTypeProjectOptions = FileTypeOptions.GetSnapshot()
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             Dim entries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
 
-            If data Is Nothing OrElse data.Length = 0 Then Return emptyResult
+            If Not ByteArrayGuard.HasContent(data) Then Return emptyResult
 
             If Not ArchiveEntryCollector.TryCollectFromBytes(data, opt, entries) Then Return emptyResult
             Return entries

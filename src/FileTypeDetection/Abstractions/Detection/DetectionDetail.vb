@@ -44,12 +44,14 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public ReadOnly Property ExtensionVerified As Boolean
 
-        Friend Sub New(
-                       detectedType As FileType,
-                       reasonCode As String,
-                       usedZipContentCheck As Boolean,
-                       usedStructuredRefinement As Boolean,
-                       extensionVerified As Boolean)
+        Friend Sub New _
+            (
+                detectedType As FileType,
+                reasonCode As String,
+                usedZipContentCheck As Boolean,
+                usedStructuredRefinement As Boolean,
+                extensionVerified As Boolean
+            )
 
             Me.DetectedType = If(detectedType, FileTypeRegistry.Resolve(FileKind.Unknown))
             Me.ReasonCode = If(reasonCode, String.Empty)

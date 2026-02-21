@@ -69,17 +69,33 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public ReadOnly Property Notes As String
 
-        Friend Sub New(
-                       sourceType As HashSourceType,
-                       label As String,
-                       detectedType As FileType,
-                       entry As ZipExtractedEntry,
-                       compressedBytes As Byte(),
-                       uncompressedBytes As Byte(),
-                       entryCount As Integer,
-                       totalUncompressedBytes As Long,
-                       digests As HashDigestSet,
-                       notes As String)
+        ''' <summary>
+        '''     Interner Vollkonstruktor zur deterministischen Erzeugung eines Evidence-Snapshots.
+        ''' </summary>
+        ''' <param name="sourceType">Herkunftskanal der Hashquelle.</param>
+        ''' <param name="label">Fachliches Quelllabel.</param>
+        ''' <param name="detectedType">Ermittelter Dateitypkontext.</param>
+        ''' <param name="entry">Optionaler Archiveintrag.</param>
+        ''' <param name="compressedBytes">Optionale komprimierte Bytes als Quelle für defensive Kopie.</param>
+        ''' <param name="uncompressedBytes">Optionale unkomprimierte/logische Bytes als Quelle für defensive Kopie.</param>
+        ''' <param name="entryCount">Anzahl berücksichtigter Entries (wird auf >= 0 normalisiert).</param>
+        ''' <param name="totalUncompressedBytes">Gesamtgröße der Nutzdaten in Bytes (wird auf >= 0 normalisiert).</param>
+        ''' <param name="digests">Deterministischer Digest-Satz.</param>
+        ''' <param name="notes">Ergänzende Hinweise.</param>
+        Friend Sub New _
+            (
+                sourceType As HashSourceType,
+                label As String,
+                detectedType As FileType,
+                entry As ZipExtractedEntry,
+                compressedBytes As Byte(),
+                uncompressedBytes As Byte(),
+                entryCount As Integer,
+                totalUncompressedBytes As Long,
+                digests As HashDigestSet,
+                notes As String
+            )
+
             Me.SourceType = sourceType
             Me.Label = If(label, String.Empty)
             Me.DetectedType = If(detectedType, FileTypeRegistry.Resolve(FileKind.Unknown))
@@ -92,8 +108,20 @@ Namespace Global.Tomtastisch.FileClassifier
             Me.UncompressedBytes = ToImmutable(uncompressedBytes)
         End Sub
 
-        Friend Shared Function CreateFailure(sourceType As HashSourceType, label As String, notes As String) _
-            As HashEvidence
+        ''' <summary>
+        '''     Erzeugt einen fail-closed Evidence-Snapshot für Fehlerpfade.
+        ''' </summary>
+        ''' <param name="sourceType">Herkunftskanal der Hashquelle.</param>
+        ''' <param name="label">Fachliches Quelllabel.</param>
+        ''' <param name="notes">Fehler-/Hinweistext.</param>
+        ''' <returns>Evidence mit leerem Digest-Satz und Unknown-Typkontext.</returns>
+        Friend Shared Function CreateFailure _
+            (
+                sourceType As HashSourceType,
+                label As String,
+                notes As String
+            ) As HashEvidence
+
             Return New HashEvidence(
                 sourceType:=sourceType,
                 label:=label,
@@ -107,10 +135,20 @@ Namespace Global.Tomtastisch.FileClassifier
                 notes:=notes)
         End Function
 
-        Private Shared Function ToImmutable(data As Byte()) As Immutable.ImmutableArray(Of Byte)
-            If data Is Nothing OrElse data.Length = 0 Then
+        ''' <summary>
+        '''     Erstellt aus einem Bytearray eine unveränderliche Kopie.
+        ''' </summary>
+        ''' <param name="data">Quellbytes oder <c>Nothing</c>.</param>
+        ''' <returns>Leeres ImmutableArray bei fehlendem Inhalt, sonst defensive Kopie.</returns>
+        Private Shared Function ToImmutable _
+            (
+                data As Byte()
+            ) As Immutable.ImmutableArray(Of Byte)
+
+            If Not ByteArrayGuard.HasContent(data) Then
                 Return Immutable.ImmutableArray(Of Byte).Empty
             End If
+
             Return Immutable.ImmutableArray.Create(data)
         End Function
     End Class

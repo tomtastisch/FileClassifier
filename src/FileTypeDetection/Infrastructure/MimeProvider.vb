@@ -29,10 +29,14 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <param name="extWithDot">Dateiendung mit oder ohne führenden Punkt.</param>
         ''' <returns>Kanonischer MIME-Typ oder leerer String.</returns>
-        Friend Shared Function GetMime(extWithDot As String) As String
-            Dim ext As String = extWithDot
+        Friend Shared Function GetMime _
+            (
+                extWithDot As String
+            ) As String
 
-            If String.IsNullOrWhiteSpace(extWithDot) Then Return String.Empty
+            Dim ext As String = If(String.IsNullOrWhiteSpace(extWithDot), String.Empty, extWithDot)
+
+            If ext.Length = 0 Then Return String.Empty
 
             If Not ext.StartsWith("."c) Then ext = "." & ext
 
