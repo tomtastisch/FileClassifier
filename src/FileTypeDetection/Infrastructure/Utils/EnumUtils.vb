@@ -16,7 +16,7 @@ Option Explicit On
 
 Imports System
 
-Namespace Global.Tomtastisch.FileClassifier.Utils
+Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
 
     ''' <summary>
     '''     Utility-Funktionen für Enum-Typen (values()).
@@ -85,8 +85,9 @@ Namespace Global.Tomtastisch.FileClassifier.Utils
         ''' </example>
         Public Shared Function GetValues(Of TEnum As Structure)() As TEnum()
 
-            Return GetValues(Of TEnum)(EnumSortOrder.None, fromIndex:=Nothing, toIndex:=Nothing)
-
+            Return GetValues(Of TEnum)(
+                EnumSortOrder.None, fromIndex:=Nothing, toIndex:=Nothing
+            )
         End Function
 
 

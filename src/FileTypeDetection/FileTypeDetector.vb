@@ -562,7 +562,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             Dim trace As DetectionTrace = DetectionTrace.Empty
 
-            If data Is Nothing OrElse data.Length = 0 Then Return UnknownType()
+            If Not ByteArrayGuard.HasContent(data) Then Return UnknownType()
 
             If CLng(data.Length) > opt.MaxBytes Then
                 LogGuard.Warn(opt.Logger, $"[Detect] Daten zu groß ({data.Length} > {opt.MaxBytes}).")

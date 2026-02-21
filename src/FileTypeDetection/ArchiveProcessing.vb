@@ -104,7 +104,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             Dim entries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
 
-            If data Is Nothing OrElse data.Length = 0 Then Return emptyResult
+            If Not ByteArrayGuard.HasContent(data) Then Return emptyResult
 
             If Not ArchiveEntryCollector.TryCollectFromBytes(data, opt, entries) Then Return emptyResult
             Return entries

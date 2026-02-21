@@ -19,7 +19,7 @@ Option Strict On
 Option Explicit On
 
 Imports System
-Imports Tomtastisch.FileClassifier.Utils
+Imports Tomtastisch.FileClassifier.Infrastructure.Utils
 
 Namespace Global.Tomtastisch.FileClassifier
 

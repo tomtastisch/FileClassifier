@@ -6,6 +6,16 @@
 
 All changes are documented here in technical terms. The release version itself is the Git tag `vX.Y.Z` (optional `-prerelease`) as SSOT.
 
+## [6.0.1]
+- Added:
+  - New internal submodule `src/FileTypeDetection/Infrastructure/Utils/` as the SSOT for reusable guard/I/O/path/logging helpers.
+- Changed:
+  - Moved utility classes from `CoreInternals.vb` into dedicated files under `Infrastructure/Utils`; narrowed `CoreInternals.vb` to refinement logic.
+  - Relocated existing utils from `src/FileTypeDetection/Utils/` to `src/FileTypeDetection/Infrastructure/Utils/` and consolidated the namespace to `Tomtastisch.FileClassifier.Infrastructure.Utils`.
+  - Unified duplicate byte-array guard checks to `ByteArrayGuard.HasContent(...)`.
+- Docs/CI/Tooling:
+  - Updated version convergence to `6.0.1` (`RepoVersion`, `Version`, `PackageVersion`, version history DE/EN).
+
 ## [6.0.0]
 - Added:
   - New internal hashing services (`EvidenceHashingCore`, `EvidenceHashingRoundTrip`, `EvidenceHashingIo`) for deterministic extraction without adding dependencies.

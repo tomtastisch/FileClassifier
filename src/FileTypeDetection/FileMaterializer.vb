@@ -105,7 +105,8 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="data">Zu materialisierende Nutzdaten.</param>
         ''' <param name="destinationPath">Datei- oder Verzeichnisziel abhängig vom Verarbeitungspfad.</param>
         ''' <param name="overwrite"><c>True</c>, um ein vorhandenes Ziel gemäß Zielpfad-Policy zu ersetzen.</param>
-        ''' <param name="secureExtract"><c>True</c>, um Archivpayloads sicher zu validieren und zu extrahieren; sonst Rohpersistenz.</param>
+        ''' <param name="secureExtract"><c>True</c>, um Archivpayloads sicher validieren und
+        ''' extrahieren zu können; sonst Rohpersistenz.</param>
         ''' <returns><c>True</c> bei erfolgreicher Materialisierung; andernfalls <c>False</c>.</returns>
         Public Shared Function Persist _
             (
@@ -116,7 +117,7 @@ Namespace Global.Tomtastisch.FileClassifier
             ) As Boolean
 
             Dim opt As FileTypeProjectOptions = FileTypeOptions.GetSnapshot()
-            Dim destinationFull As String
+            Dim destinationFull As String = String.Empty
             Dim descriptor As ArchiveDescriptor = Nothing
 
             ' Guard-Clauses: Null-, Größen- und Zielpfadprüfung.
@@ -130,20 +131,15 @@ Namespace Global.Tomtastisch.FileClassifier
             If String.IsNullOrWhiteSpace(destinationPath) Then Return False
 
             ' Pfadnormalisierung: Absoluten Zielpfad auflösen.
-            Try
-                destinationFull = Path.GetFullPath(destinationPath)
-
-            Catch ex As Exception When _
-                TypeOf ex Is ArgumentException OrElse
-                TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is Security.SecurityException OrElse
-                TypeOf ex Is NotSupportedException OrElse
-                TypeOf ex Is PathTooLongException OrElse
-                TypeOf ex Is IOException
-
-                LogGuard.Warn(opt.Logger, $"[Materialize] Ungültiger Zielpfad: {ex.Message}")
+            If Not PathResolutionGuard.TryGetFullPath(
+                    destinationPath,
+                    opt,
+                    "[Materialize] Ungültiger Zielpfad",
+                    warnLevel:=True,
+                    destinationFull
+                ) Then
                 Return False
-            End Try
+            End If
 
             ' Secure-Extract-Branch: describe -> safety gate -> extract.
             If secureExtract Then

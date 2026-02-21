@@ -152,6 +152,7 @@ jobs:
         # during the normal sequence merge -> tag/release -> registry propagation.
         env:
           REQUIRE_REMOTE: "0"
+          SECURITY_CLAIMS_TOKEN: ${{ secrets.SECURITY_CLAIMS_TOKEN }}
         run: bash -euo pipefail tools/ci/bin/run.sh version-convergence
       - name: Upload Artifact
         if: always()

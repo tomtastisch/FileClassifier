@@ -15,7 +15,7 @@ Option Explicit On
 
 Imports System
 
-Namespace Global.Tomtastisch.FileClassifier.Utils
+Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
 
     ''' <summary>
     '''     Utility-Funktionen für Guard-Clauses (Argumentprüfung).
@@ -56,7 +56,11 @@ Namespace Global.Tomtastisch.FileClassifier.Utils
         ''' <param name="value">Zu prüfender Wert.</param>
         ''' <param name="paramName">Parametername für Exception-Metadaten.</param>
         ''' <exception cref="ArgumentNullException">Wird ausgelöst, wenn <paramref name="value"/> <c>Nothing</c> ist.</exception>
-        Public Shared Sub NotNothing(Of T)(value As T, paramName As String)
+        Public Shared Sub NotNothing(Of T) _
+            (
+                value As T,
+                paramName As String
+            )
 
             ' Deklarationsblock
             Dim isNull As Boolean
@@ -84,7 +88,12 @@ Namespace Global.Tomtastisch.FileClassifier.Utils
         ''' <param name="paramName">Parametername für Exception-Metadaten.</param>
         ''' <exception cref="ArgumentNullException">Wird ausgelöst, wenn <paramref name="value"/> <c>Nothing</c> ist.</exception>
         ''' <exception cref="ArgumentException">Wird ausgelöst, wenn die Länge nicht <paramref name="expectedLength"/> entspricht.</exception>
-        Public Shared Sub RequireLength(value As Array, expectedLength As Integer, paramName As String)
+        Public Shared Sub RequireLength _
+            (
+                value As Array,
+                expectedLength As Integer,
+                paramName As String
+            )
 
             ' Deklarationsblock
             Dim actualLength As Integer
@@ -124,7 +133,12 @@ Namespace Global.Tomtastisch.FileClassifier.Utils
         ''' <exception cref="ArgumentNullException">Wird ausgelöst, wenn <paramref name="enumType"/> <c>Nothing</c> ist.</exception>
         ''' <exception cref="ArgumentException">Wird ausgelöst, wenn <paramref name="enumType"/> kein Enum ist.</exception>
         ''' <exception cref="ArgumentOutOfRangeException">Wird ausgelöst, wenn <paramref name="value"/> nicht definiert ist.</exception>
-        Public Shared Sub EnumDefined(enumType As Type, value As Object, paramName As String)
+        Public Shared Sub EnumDefined _
+            (
+                enumType As Type,
+                value As Object,
+                paramName As String
+            )
 
             ' Deklarationsblock
             Dim isOk As Boolean
