@@ -56,8 +56,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 destinationFull As String,
                 overwrite As Boolean,
                 opt As FileTypeProjectOptions
-            ) As Boolean _
-            Implements IDestinationPathPolicy.PrepareMaterializationTarget
+            ) As Boolean Implements IDestinationPathPolicy.PrepareMaterializationTarget
 
             If IsRootPath(destinationFull) Then
                 LogGuard.Warn(opt.Logger, "[PathGuard] Ziel darf kein Root-Verzeichnis sein.")
@@ -79,8 +78,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             (
                 destinationFull As String,
                 opt As FileTypeProjectOptions
-            ) _
-            As Boolean Implements IDestinationPathPolicy.ValidateNewExtractionTarget
+            ) As Boolean Implements IDestinationPathPolicy.ValidateNewExtractionTarget
 
             Dim parent As String
 
@@ -106,8 +104,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         Public Function IsRootPath _
             (
                 destinationFull As String
-            ) As Boolean _
-            Implements IDestinationPathPolicy.IsRootPath
+            ) As Boolean Implements IDestinationPathPolicy.IsRootPath
 
             Dim rootPath As String
 

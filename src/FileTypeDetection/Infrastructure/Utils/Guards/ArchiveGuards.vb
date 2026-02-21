@@ -170,21 +170,13 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 ByRef isDirectory As Boolean
             ) As Boolean
 
-            Dim safe As String
+            Dim safe As String = String.Empty
             Dim trimmed As String
-            Dim segments As String()
 
             normalizedPath = String.Empty
             isDirectory = False
 
-            safe = If(rawPath, String.Empty).Trim()
-            If safe.Length = 0 Then Return False
-            If safe.Contains(ChrW(0)) Then Return False
-
-            safe = safe.Replace("\"c, "/"c)
-            If Path.IsPathRooted(safe) Then Return False
-            safe = safe.TrimStart("/"c)
-            If safe.Length = 0 Then Return False
+            If Not TryPrepareRelativePath(rawPath, safe) Then Return False
 
             trimmed = safe.TrimEnd("/"c)
             If trimmed.Length = 0 Then
@@ -194,11 +186,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 Return True
             End If
 
-            segments = trimmed.Split("/"c)
-            For Each seg In segments
-                If seg.Length = 0 Then Return False
-                If seg = "." OrElse seg = ".." Then Return False
-            Next
+            If Not HasOnlyAllowedPathSegments(trimmed) Then Return False
 
             If safe.Length <> trimmed.Length AndAlso Not allowDirectoryMarker Then
                 Return False
@@ -206,6 +194,36 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
 
             normalizedPath = If(allowDirectoryMarker, safe, trimmed)
             isDirectory = allowDirectoryMarker AndAlso safe.Length <> trimmed.Length
+            Return True
+        End Function
+
+        Private Shared Function TryPrepareRelativePath _
+            (
+                rawPath As String,
+                ByRef preparedPath As String
+            ) As Boolean
+
+            preparedPath = If(rawPath, String.Empty).Trim()
+            If preparedPath.Length = 0 Then Return False
+            If preparedPath.Contains(ChrW(0)) Then Return False
+            If Path.IsPathRooted(preparedPath) Then Return False
+
+            preparedPath = preparedPath.Replace("\"c, "/"c).TrimStart("/"c)
+            If preparedPath.Length = 0 Then Return False
+
+            Return True
+        End Function
+
+        Private Shared Function HasOnlyAllowedPathSegments(pathValue As String) As Boolean
+
+            Dim segments As String()
+
+            segments = pathValue.Split("/"c)
+            For Each seg In segments
+                If seg.Length = 0 Then Return False
+                If seg = "." OrElse seg = ".." Then Return False
+            Next
+
             Return True
         End Function
     End Class

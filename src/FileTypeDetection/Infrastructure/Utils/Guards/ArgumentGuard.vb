@@ -141,7 +141,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             )
 
             ' Deklarationsblock
-            Dim isOk As Boolean
+            Dim isEnumValueDefined As Boolean
 
             If enumType Is Nothing Then
                 Throw New ArgumentNullException(NameOf(enumType))
@@ -151,8 +151,8 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 Throw New ArgumentException("enumType muss ein Enum-Typ sein.", NameOf(enumType))
             End If
 
-            isOk = [Enum].IsDefined(enumType, value)
-            If Not isOk Then
+            isEnumValueDefined = [Enum].IsDefined(enumType, value)
+            If Not isEnumValueDefined Then
                 Throw New ArgumentOutOfRangeException(paramName)
             End If
 
