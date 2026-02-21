@@ -58,6 +58,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 opt As FileTypeProjectOptions
             ) As Boolean _
             Implements IDestinationPathPolicy.PrepareMaterializationTarget
+
             If IsRootPath(destinationFull) Then
                 LogGuard.Warn(opt.Logger, "[PathGuard] Ziel darf kein Root-Verzeichnis sein.")
                 Return False
@@ -80,6 +81,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 opt As FileTypeProjectOptions
             ) _
             As Boolean Implements IDestinationPathPolicy.ValidateNewExtractionTarget
+
             Dim parent As String
 
             If IsRootPath(destinationFull) Then
@@ -106,18 +108,14 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 destinationFull As String
             ) As Boolean _
             Implements IDestinationPathPolicy.IsRootPath
+
             Dim rootPath As String
 
             If String.IsNullOrWhiteSpace(destinationFull) Then Return False
 
             Try
                 rootPath = Path.GetPathRoot(destinationFull)
-            Catch ex As Exception When _
-                TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is Security.SecurityException OrElse
-                TypeOf ex Is IOException OrElse
-                TypeOf ex Is NotSupportedException OrElse
-                TypeOf ex Is ArgumentException
+            Catch ex As Exception When ExceptionFilterGuard.IsPathNormalizationException(ex)
                 Return False
             End Try
 
@@ -143,6 +141,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 overwrite As Boolean,
                 opt As FileTypeProjectOptions
             ) As Boolean
+
             Return Policy.PrepareMaterializationTarget(destinationFull, overwrite, opt)
         End Function
 
@@ -152,6 +151,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 opt As FileTypeProjectOptions
             ) _
             As Boolean
+
             Return Policy.ValidateNewExtractionTarget(destinationFull, opt)
         End Function
 
@@ -159,6 +159,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             (
                 destinationFull As String
             ) As Boolean
+
             Return Policy.IsRootPath(destinationFull)
         End Function
     End Class

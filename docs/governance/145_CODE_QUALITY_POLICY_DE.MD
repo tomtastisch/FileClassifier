@@ -77,6 +77,8 @@ Use visible block separation (empty line + block comment markers):
   - opening parenthesis on its own line
   - exactly one parameter per line
   - closing parenthesis and return type on one line
+- After every method signature (single-line or multiline), include exactly one blank line
+  before the declaration block or first executable statement.
 - This applies consistently to `Sub`/`Function`/constructors/interface members.
 - Long invocations are wrapped analogously (one argument per line, aligned clearly).
 - No trailing whitespace and no visually empty lines containing spaces/tabs.

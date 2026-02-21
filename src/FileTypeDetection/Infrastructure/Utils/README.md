@@ -13,6 +13,7 @@ Der Fokus liegt auf deterministischen Guards, sicherer Pfad-/Archive-Validierung
 - `Guards/PathResolutionGuard.vb`: fail-closed FullPath-Aufloesung mit kontrollierter Protokollierung.
 - `Guards/DestinationPathGuard.vb`: Zielpfad-Policy fuer Materialisierung und Extraktion.
 - `Guards/LogGuard.vb`: defensiver Logger-Schutz ohne Rekursion/Seiteneffekte.
+- `Guards/ExceptionFilterGuard.vb`: zentrale Catch-Filter-SSOT fuer wiederkehrende Exception-Mengen.
 
 ## 3. API und Verhalten
 - Utilities sind stateless und deterministisch.
@@ -32,7 +33,7 @@ flowchart LR
 ```
 
 ## 6. Verweise
-- [Modul-Root](../../README.md)
-- [Infrastructure-Modul](../README.md)
-- [Guards-Cluster](Guards/README.md)
-- [Code-Quality-Policy](../../../../docs/governance/045_CODE_QUALITY_POLICY_DE.MD)
+- [Modul-Root](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md)
+- [Infrastructure-Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md)
+- [Guards-Cluster](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/Utils/Guards/README.md)
+- [Code-Quality-Policy](https://github.com/tomtastisch/FileClassifier/blob/main/docs/governance/045_CODE_QUALITY_POLICY_DE.MD)

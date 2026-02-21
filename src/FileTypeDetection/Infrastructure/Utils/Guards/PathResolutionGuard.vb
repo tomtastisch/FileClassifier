@@ -39,13 +39,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             Try
                 fullPath = Path.GetFullPath(rawPath)
                 Return True
-            Catch ex As Exception When _
-                TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is Security.SecurityException OrElse
-                TypeOf ex Is IOException OrElse
-                TypeOf ex Is PathTooLongException OrElse
-                TypeOf ex Is NotSupportedException OrElse
-                TypeOf ex Is ArgumentException
+            Catch ex As Exception When ExceptionFilterGuard.IsPathResolutionException(ex)
 
                 If opt IsNot Nothing Then
                     message = $"{logPrefix}: {ex.Message}"

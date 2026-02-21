@@ -28,15 +28,12 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 logger As ILogger,
                 message As String
             )
+
             If logger Is Nothing Then Return
             If Not logger.IsEnabled(LogLevel.Debug) Then Return
             Try
                 logger.LogDebug("{Message}", message)
-            Catch ex As Exception When _
-                TypeOf ex Is InvalidOperationException OrElse
-                TypeOf ex Is ObjectDisposedException OrElse
-                TypeOf ex Is FormatException OrElse
-                TypeOf ex Is ArgumentException
+            Catch ex As Exception When ExceptionFilterGuard.IsLoggerWriteException(ex)
                 ' Keine Rekursion im Logger-Schutz: Logging-Fehler werden bewusst fail-closed unterdrückt.
             End Try
         End Sub
@@ -46,15 +43,12 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 logger As ILogger,
                 message As String
             )
+
             If logger Is Nothing Then Return
             If Not logger.IsEnabled(LogLevel.Warning) Then Return
             Try
                 logger.LogWarning("{Message}", message)
-            Catch ex As Exception When _
-                TypeOf ex Is InvalidOperationException OrElse
-                TypeOf ex Is ObjectDisposedException OrElse
-                TypeOf ex Is FormatException OrElse
-                TypeOf ex Is ArgumentException
+            Catch ex As Exception When ExceptionFilterGuard.IsLoggerWriteException(ex)
                 ' Keine Rekursion im Logger-Schutz: Logging-Fehler werden bewusst fail-closed unterdrückt.
             End Try
         End Sub
@@ -65,15 +59,12 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 message As String,
                 ex As Exception
             )
+
             If logger Is Nothing Then Return
             If Not logger.IsEnabled(LogLevel.Error) Then Return
             Try
                 logger.LogError(ex, "{Message}", message)
-            Catch logEx As Exception When _
-                TypeOf logEx Is InvalidOperationException OrElse
-                TypeOf logEx Is ObjectDisposedException OrElse
-                TypeOf logEx Is FormatException OrElse
-                TypeOf logEx Is ArgumentException
+            Catch logEx As Exception When ExceptionFilterGuard.IsLoggerWriteException(logEx)
                 ' Keine Rekursion im Logger-Schutz: Logging-Fehler werden bewusst fail-closed unterdrückt.
             End Try
         End Sub

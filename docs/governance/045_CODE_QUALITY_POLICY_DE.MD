@@ -88,6 +88,8 @@ Blöcke werden sichtbar getrennt (Leerzeile + Kommentartrenner):
   - öffnende Klammer in eigener Zeile
   - genau ein Parameter pro Zeile
   - schließende Klammer und Rückgabetyp gemeinsam in einer Zeile
+- Nach jeder Methodensignatur (einzeilig oder mehrzeilig) folgt genau eine Leerzeile,
+  bevor Deklarationsblock oder erste ausführbare Anweisung beginnt.
 - Das Schema gilt einheitlich für `Sub`/`Function`/Konstruktoren/Interface-Member.
 - Lange Aufrufe werden analog umgebrochen (ein Argument pro Zeile, klar ausgerichtet).
 - Keine Trailing-Whitespace-Zeichen und keine „leeren“ Zeilen mit Spaces/Tabs.

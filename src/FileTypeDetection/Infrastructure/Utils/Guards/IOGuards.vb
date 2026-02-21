@@ -40,6 +40,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 output As Stream,
                 maxBytes As Long
             )
+
             Dim buf(InternalIoDefaults.CopyBufferSize - 1) As Byte
             Dim total As Long = 0
             Dim n As Integer
@@ -67,6 +68,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             (
                 stream As Stream
             ) As Boolean
+
             Return stream IsNot Nothing AndAlso stream.CanRead
         End Function
 
@@ -74,6 +76,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             (
                 stream As Stream
             )
+
             If stream Is Nothing Then Return
             If stream.CanSeek Then stream.Position = 0
         End Sub
