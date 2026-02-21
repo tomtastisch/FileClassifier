@@ -60,10 +60,9 @@ Namespace Global.Tomtastisch.FileClassifier
 
             If String.IsNullOrWhiteSpace(path) OrElse Not IO.File.Exists(path) Then
                 failed = HashEvidence.CreateFailure(HashSourceType.FilePath, path, "Datei nicht gefunden.")
-                Return New HashRoundTripReport(
+                Return CreateFailureReport(
                     path,
-                    isArchiveInput:=False,
-                    notes:="Input file missing.",
+                    "Input file missing.",
                     failed,
                     failed,
                     failed,
@@ -73,10 +72,9 @@ Namespace Global.Tomtastisch.FileClassifier
             h1 = EvidenceHashing.HashFile(path, normalizedOptions)
             If Not h1.Digests.HasLogicalHash Then
                 failed = HashEvidence.CreateFailure(HashSourceType.Unknown, path, "h1 konnte nicht berechnet werden.")
-                Return New HashRoundTripReport(
+                Return CreateFailureReport(
                     path,
-                    isArchiveInput:=False,
-                    notes:="h1 missing logical digest.",
+                    "h1 missing logical digest.",
                     h1,
                     failed,
                     failed,
@@ -85,10 +83,9 @@ Namespace Global.Tomtastisch.FileClassifier
 
             If Not EvidenceHashingIO.TryReadFileBounded(path, detectorOptions, originalBytes, readError) Then
                 failed = HashEvidence.CreateFailure(HashSourceType.Unknown, path, readError)
-                Return New HashRoundTripReport(
+                Return CreateFailureReport(
                     path,
-                    isArchiveInput:=False,
-                    notes:=readError,
+                    readError,
                     h1,
                     failed,
                     failed,
@@ -153,6 +150,26 @@ Namespace Global.Tomtastisch.FileClassifier
                 path,
                 isArchiveInput,
                 notes,
+                h1,
+                h2,
+                h3,
+                h4)
+        End Function
+
+        Private Shared Function CreateFailureReport _
+            (
+                path As String,
+                notes As String,
+                h1 As HashEvidence,
+                h2 As HashEvidence,
+                h3 As HashEvidence,
+                h4 As HashEvidence
+            ) As HashRoundTripReport
+
+            Return New HashRoundTripReport(
+                path,
+                isArchiveInput:=False,
+                notes:=notes,
                 h1,
                 h2,
                 h3,

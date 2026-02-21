@@ -363,15 +363,15 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Shared Function BuildAliasMap(types As ImmutableDictionary(Of FileKind, FileType)) _
             As ImmutableDictionary(Of String, FileKind)
             Dim builder As ImmutableDictionary(Of String, FileKind).Builder
+            Dim kind As FileKind
+            Dim t As FileType
 
             If types Is Nothing Then Return ImmutableDictionary(Of String, FileKind).Empty
 
             builder = ImmutableDictionary.CreateBuilder(Of String, FileKind)(StringComparer.OrdinalIgnoreCase)
 
-            For Each kv In types
-                Dim kind = kv.Key
-                Dim t = kv.Value
-
+            For Each kind In OrderedKindsCache
+                If Not types.TryGetValue(kind, t) Then Continue For
                 If t Is Nothing Then Continue For
                 If t.Aliases.IsDefaultOrEmpty Then Continue For
 
