@@ -58,7 +58,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public ReadOnly Property HasLogicalHash As Boolean
 
-        Friend Sub New _ 
+        Friend Sub New _
             (
                 physicalSha256 As String,
                 logicalSha256 As String,
@@ -69,7 +69,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 hasPhysicalHash As Boolean,
                 hasLogicalHash As Boolean
             )
-            
+
             Me.PhysicalSha256 = Normalize(physicalSha256)
             Me.LogicalSha256 = Normalize(logicalSha256)
             Me.FastPhysicalXxHash3 = Normalize(fastPhysicalXxHash3)
@@ -98,7 +98,7 @@ Namespace Global.Tomtastisch.FileClassifier
             (
                 value As String
             ) As String
-            
+
             Return If(value, String.Empty).Trim().ToLowerInvariant()
         End Function
     End Class

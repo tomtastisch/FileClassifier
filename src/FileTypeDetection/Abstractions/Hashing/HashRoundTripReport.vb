@@ -53,11 +53,11 @@ Namespace Global.Tomtastisch.FileClassifier
             H4 = 4
         End Enum
 
-        Private Shared ReadOnly RequiredSlots As HashSlot() = _ 
+        Private Shared ReadOnly RequiredSlots As HashSlot() = _
                                     EnumUtils.GetValues(Of HashSlot)(
                                         sortOrder:=EnumUtils.EnumSortOrder.Ascending
                                     )
-        
+
         ' =====================================================================
         ' Felder / Properties (Typzustand)
         ' =====================================================================
@@ -66,9 +66,9 @@ Namespace Global.Tomtastisch.FileClassifier
         Public ReadOnly Property IsArchiveInput As Boolean
         Public ReadOnly Property Notes As String
 
-        Private ReadOnly _evidences           As HashEvidence()   ' index = slot-1
-        Private ReadOnly _logicalEq           As Boolean()        ' index 0..n-2 entspricht H2 bis Hn
-        Private ReadOnly _physicalEq          As Boolean()        ' index 0..n-2 entspricht H2 bis Hn
+        Private ReadOnly _evidences As HashEvidence()   ' index = slot-1
+        Private ReadOnly _logicalEq As Boolean()        ' index 0..n-2 entspricht H2 bis Hn
+        Private ReadOnly _physicalEq As Boolean()        ' index 0..n-2 entspricht H2 bis Hn
 
         Public ReadOnly Property LogicalConsistent As Boolean
 
@@ -80,7 +80,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Get
                 Return IterableUtils.CloneArray(RequiredSlots)
             End Get
-            
+
         End Property
 
 
@@ -105,18 +105,18 @@ Namespace Global.Tomtastisch.FileClassifier
             )
 
             ' Deklarationsblock (Pflicht, spaltenartig)
-            Dim slotCount            As Integer     = RequiredSlots.Length
-            Dim i                    As Integer
-            Dim baseEvidence         As HashEvidence
-            Dim otherEvidence        As HashEvidence
-            Dim eqLogical            As Boolean
-            Dim consistentLocal      As Boolean     = True
-            
+            Dim slotCount As Integer = RequiredSlots.Length
+            Dim i As Integer
+            Dim baseEvidence As HashEvidence
+            Dim otherEvidence As HashEvidence
+            Dim eqLogical As Boolean
+            Dim consistentLocal As Boolean = True
+
             ' -----------------------------------------------------------------
             ' Guard-Clauses (fail-closed)
             ' -----------------------------------------------------------------
             GuardUtils.RequireLength(evidences, slotCount, NameOf(evidences))
-            
+
             ' -----------------------------------------------------------------
             ' Snapshot / Assignment (Input)
             ' -----------------------------------------------------------------
@@ -135,7 +135,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Dim slot As HashSlot = RequiredSlots(i)
                 _evidences(SlotIndex(slot)) = EnsureEvidence(evidences(i), slot)
             Next
-            
+
             ' -----------------------------------------------------------------
             ' Branches (Vergleiche: H1 gegen H2..Hn)
             ' -----------------------------------------------------------------
@@ -230,10 +230,10 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function EnsureEvidence(evidence As HashEvidence, slot As HashSlot) As HashEvidence
             If evidence IsNot Nothing Then Return evidence
-            
+
             Return HashEvidence.CreateFailure(
-                HashSourceType.Unknown, 
-                SlotLabel(slot), 
+                HashSourceType.Unknown,
+                SlotLabel(slot),
                 "missing"
             )
         End Function
@@ -255,10 +255,10 @@ Namespace Global.Tomtastisch.FileClassifier
             If leftEvidence Is Nothing OrElse rightEvidence Is Nothing Then Return False
             If leftEvidence.Digests Is Nothing OrElse rightEvidence.Digests Is Nothing Then Return False
             If Not leftEvidence.Digests.HasLogicalHash OrElse Not rightEvidence.Digests.HasLogicalHash Then Return False
-            
+
             Return String.Equals(
-                leftEvidence.Digests.LogicalSha256, 
-                rightEvidence.Digests.LogicalSha256, 
+                leftEvidence.Digests.LogicalSha256,
+                rightEvidence.Digests.LogicalSha256,
                 StringComparison.Ordinal
             )
         End Function
@@ -267,10 +267,10 @@ Namespace Global.Tomtastisch.FileClassifier
             If leftEvidence Is Nothing OrElse rightEvidence Is Nothing Then Return False
             If leftEvidence.Digests Is Nothing OrElse rightEvidence.Digests Is Nothing Then Return False
             If Not leftEvidence.Digests.HasPhysicalHash OrElse Not rightEvidence.Digests.HasPhysicalHash Then Return False
-            
+
             Return String.Equals(
-                leftEvidence.Digests.PhysicalSha256, 
-                rightEvidence.Digests.PhysicalSha256, 
+                leftEvidence.Digests.PhysicalSha256,
+                rightEvidence.Digests.PhysicalSha256,
                 StringComparison.Ordinal
             )
         End Function

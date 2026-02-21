@@ -44,7 +44,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public ReadOnly Property ExtensionVerified As Boolean
 
-        Friend Sub New _ 
+        Friend Sub New _
             (
                 detectedType As FileType,
                 reasonCode As String,

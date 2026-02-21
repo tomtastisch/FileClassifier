@@ -42,10 +42,10 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Friend Sub New _
             (
-                entryPath As String, 
+                entryPath As String,
                 payload As Byte()
             )
-            
+
             RelativePath = If(entryPath, String.Empty)
             If payload Is Nothing OrElse payload.Length = 0 Then
                 Content = ImmutableArray(Of Byte).Empty
@@ -64,7 +64,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </remarks>
         ''' <returns>Schreibgeschützter <see cref="MemoryStream"/> mit dem Entry-Inhalt.</returns>
         Public Function OpenReadOnlyStream() As MemoryStream
-            
+
             Dim data = If(Content.IsDefaultOrEmpty, Array.Empty(Of Byte)(), Content.ToArray())
             Return New MemoryStream(data, writable:=False)
         End Function

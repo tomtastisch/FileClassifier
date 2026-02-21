@@ -26,11 +26,11 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Friend Shared Function ValidateArchiveStream _
             (
-                stream As Stream, 
-                opt As FileTypeProjectOptions, 
+                stream As Stream,
+                opt As FileTypeProjectOptions,
                 depth As Integer
             ) As Boolean
-            
+
             Return ProcessArchiveStream(stream, opt, depth, Nothing)
         End Function
 
@@ -41,7 +41,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 depth As Integer,
                 extractEntry As Func(Of ZipArchiveEntry, Boolean)
             ) As Boolean
-            
+
             Dim totalUncompressed As Long
             Dim ordered As IEnumerable(Of ZipArchiveEntry)
             Dim u As Long
@@ -81,7 +81,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
                             Try
                                 Using es = e.Open()
-                                    
+
                                     Using nestedMs = RecyclableStreams.GetStream("ArchiveStreamEngine.Nested")
                                         StreamBounds.CopyBounded(es, nestedMs, opt.MaxZipNestedBytes)
                                         nestedMs.Position = 0
@@ -128,10 +128,10 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function IsNestedArchiveEntry _
             (
-                entry As ZipArchiveEntry, 
+                entry As ZipArchiveEntry,
                 opt As FileTypeProjectOptions
             ) As Boolean
-            
+
             Dim header(15) As Byte
             Dim read As Integer
             Dim exact As Byte()
@@ -194,7 +194,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 containerTypeValue As ArchiveContainerType,
                 extractEntry As Func(Of IArchiveEntryModel, Boolean)
             ) As Boolean Implements IArchiveBackend.Process
-            
+
             If containerTypeValue <> ArchiveContainerType.Zip Then Return False
 
             If extractEntry Is Nothing Then

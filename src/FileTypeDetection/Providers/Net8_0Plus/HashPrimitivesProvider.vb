@@ -67,7 +67,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 (
                     data As Byte()
                 ) As String Implements IHexCodec.EncodeLowerHex
-                
+
                 Dim safeData = If(data, Array.Empty(Of Byte)())
                 Return Convert.ToHexString(safeData).ToLowerInvariant()
             End Function
@@ -101,7 +101,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 (
                     data As Byte()
                 ) As Byte() Implements ISha256Primitives.ComputeHash
-                
+
                 Dim safeData = If(data, Array.Empty(Of Byte)())
                 Return Security.Cryptography.SHA256.HashData(safeData)
             End Function
@@ -115,7 +115,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 (
                     data As Byte()
                 ) As String Implements ISha256Primitives.ComputeHashHex
-                
+
                 Return _codec.EncodeLowerHex(ComputeHash(data))
             End Function
         End Class
@@ -138,7 +138,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 (
                     data As Byte()
                 ) As ULong Implements IFastHash64.ComputeHashUInt64
-                
+
                 Dim safeData = If(data, Array.Empty(Of Byte)())
                 Return IO.Hashing.XxHash3.HashToUInt64(safeData)
             End Function
@@ -152,7 +152,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 (
                     data As Byte()
                 ) As String Implements IFastHash64.ComputeHashHex
-                
+
                 Return ComputeHashUInt64(data).ToString("x16", CultureInfo.InvariantCulture)
             End Function
         End Class

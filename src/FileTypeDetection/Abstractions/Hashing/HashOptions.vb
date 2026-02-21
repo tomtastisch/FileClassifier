@@ -44,7 +44,7 @@ Namespace Global.Tomtastisch.FileClassifier
         Public Property MaterializedFileName As String = "deterministic-roundtrip.bin"
 
         Friend Function Clone() As HashOptions
-            
+
             Return New HashOptions With {
                     .IncludePayloadCopies = IncludePayloadCopies,
                     .IncludeFastHash = IncludeFastHash,
@@ -53,11 +53,11 @@ Namespace Global.Tomtastisch.FileClassifier
                 }
         End Function
 
-        Friend Shared Function Normalize _ 
+        Friend Shared Function Normalize _
             (
                 options As HashOptions
             ) As HashOptions
-            
+
             Dim cloned As HashOptions
             If options Is Nothing Then options = New HashOptions()
 
@@ -67,11 +67,11 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         <SuppressMessage("Usage", "CA2249:Use 'string.Contains' instead of 'string.IndexOf' to improve readability", Justification:="IndexOf bleibt hier für deterministische Zeichenprüfung ohne Semantikänderung bestehen.")>
-        Private Shared Function NormalizeMaterializedFileName _ 
+        Private Shared Function NormalizeMaterializedFileName _
             (
                 candidate As String
             ) As String
-            
+
             Dim normalized = If(candidate, String.Empty).Trim()
             If String.IsNullOrWhiteSpace(normalized) Then Return "deterministic-roundtrip.bin"
 

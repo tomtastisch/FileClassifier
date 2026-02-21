@@ -33,7 +33,7 @@ Namespace Global.Tomtastisch.FileClassifier
             (
                 extWithDot As String
             ) As String
-            
+
             Dim ext As String = extWithDot
 
             If String.IsNullOrWhiteSpace(extWithDot) Then Return String.Empty

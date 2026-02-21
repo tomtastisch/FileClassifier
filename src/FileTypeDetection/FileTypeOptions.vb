@@ -208,7 +208,7 @@ Namespace Global.Tomtastisch.FileClassifier
             (
                 path As String
             ) As Boolean
-            
+
             If String.IsNullOrWhiteSpace(path) OrElse Not IO.File.Exists(path) Then Return False
             If Not path.EndsWith(".json", StringComparison.OrdinalIgnoreCase) Then Return False
 
@@ -240,10 +240,10 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function SafeInt _
             (
-                el As Text.Json.JsonElement, 
+                el As Text.Json.JsonElement,
                 fallback As Integer
             ) As Integer
-            
+
             Dim v As Integer
             If el.ValueKind = Text.Json.JsonValueKind.Number AndAlso el.TryGetInt32(v) Then Return v
             Return fallback
@@ -251,10 +251,10 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function SafeLong _
             (
-                el As Text.Json.JsonElement, 
+                el As Text.Json.JsonElement,
                 fallback As Long
             ) As Long
-            
+
             Dim v As Long
             If el.ValueKind = Text.Json.JsonValueKind.Number AndAlso el.TryGetInt64(v) Then Return v
             Return fallback
@@ -262,12 +262,12 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function ParsePositiveInt _
             (
-                el As Text.Json.JsonElement, 
+                el As Text.Json.JsonElement,
                 fallback As Integer,
                 name As String,
                 logger As Microsoft.Extensions.Logging.ILogger
             ) As Integer
-            
+
             Dim v = SafeInt(el, fallback)
             If v > 0 Then Return v
             LogGuard.Warn(logger, $"[Config] Ungültiger Wert für '{name}', fallback={fallback}.")
@@ -276,12 +276,12 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function ParseNonNegativeInt _
             (
-                el As Text.Json.JsonElement, 
+                el As Text.Json.JsonElement,
                 fallback As Integer,
                 name As String,
                 logger As Microsoft.Extensions.Logging.ILogger
             ) As Integer
-            
+
             Dim v = SafeInt(el, fallback)
             If v >= 0 Then Return v
             LogGuard.Warn(logger, $"[Config] Ungültiger Wert für '{name}', fallback={fallback}.")
@@ -290,12 +290,12 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function ParsePositiveLong _
             (
-                el As Text.Json.JsonElement, 
+                el As Text.Json.JsonElement,
                 fallback As Long,
                 name As String,
                 logger As Microsoft.Extensions.Logging.ILogger
             ) As Long
-            
+
             Dim v = SafeLong(el, fallback)
             If v > 0 Then Return v
             LogGuard.Warn(logger, $"[Config] Ungültiger Wert für '{name}', fallback={fallback}.")
@@ -304,12 +304,12 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function ParseBoolean _
             (
-                el As Text.Json.JsonElement, 
+                el As Text.Json.JsonElement,
                 fallback As Boolean,
                 name As String,
                 logger As Microsoft.Extensions.Logging.ILogger
             ) As Boolean
-            
+
             If el.ValueKind = Text.Json.JsonValueKind.True Then Return True
             If el.ValueKind = Text.Json.JsonValueKind.False Then Return False
             LogGuard.Warn(logger, $"[Config] Ungültiger Wert für '{name}', fallback={fallback}.")
@@ -318,7 +318,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function ParseString _
             (
-                el As Text.Json.JsonElement, 
+                el As Text.Json.JsonElement,
                 fallback As String,
                 name As String,
                 logger As Microsoft.Extensions.Logging.ILogger

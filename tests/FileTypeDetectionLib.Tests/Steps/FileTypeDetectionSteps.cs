@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using FileTypeDetectionLib.Tests.Support;
 using Reqnroll;
 using Tomtastisch.FileClassifier;
-using System.Collections.Generic;
 
 namespace FileTypeDetectionLib.Tests.Steps;
 

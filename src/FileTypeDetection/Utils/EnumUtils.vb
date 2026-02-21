@@ -159,22 +159,22 @@ Namespace Global.Tomtastisch.FileClassifier.Utils
             ) As TEnum()
 
             ' Deklarationsblock
-            Dim enumType            As Type      = GetType(TEnum)
-            Dim raw                 As Array     = Nothing
+            Dim enumType As Type = GetType(TEnum)
+            Dim raw As Array = Nothing
 
-            Dim values()            As TEnum     = Nothing
-            Dim keys()              As Long      = Nothing
+            Dim values() As TEnum = Nothing
+            Dim keys() As Long = Nothing
 
-            Dim i                   As Integer
-            Dim count               As Integer   = 0
-            Dim maxIndex            As Integer   = 0
+            Dim i As Integer
+            Dim count As Integer = 0
+            Dim maxIndex As Integer = 0
 
-            Dim effectiveTo         As Integer   = 0
-            Dim effectiveMaxFrom    As Integer   = 0
-            Dim effectiveFrom       As Integer   = 0
+            Dim effectiveTo As Integer = 0
+            Dim effectiveMaxFrom As Integer = 0
+            Dim effectiveFrom As Integer = 0
 
-            Dim length              As Integer   = 0
-            Dim result()            As TEnum     = Nothing
+            Dim length As Integer = 0
+            Dim result() As TEnum = Nothing
 
 
             ' -----------------------------------------------------------------
