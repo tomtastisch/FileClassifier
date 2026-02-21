@@ -110,7 +110,7 @@ Namespace Global.Tomtastisch.FileClassifier.Utils
         '''     <para>
         '''         Ablaufstruktur:
         '''         1) Prüft <paramref name="enumType"/> auf <c>Nothing</c> und Enum-Typ,
-        '''         2) prüft Definition via <see cref="System.Enum.IsDefined(Type, Object)"/>,
+        '''         2) prüft Definition via <c>Enum.IsDefined(enumType, value)</c>,
         '''         3) bei Verstoß: <see cref="ArgumentOutOfRangeException"/>.
         '''     </para>
         '''     <para>

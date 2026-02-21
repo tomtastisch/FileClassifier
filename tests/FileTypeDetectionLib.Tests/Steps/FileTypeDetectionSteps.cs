@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using FileTypeDetectionLib.Tests.Support;
 using Reqnroll;
 using Tomtastisch.FileClassifier;
@@ -548,7 +547,7 @@ public sealed class FileTypeDetectionSteps
 
     private static bool TryParseFileKindLiteral(string literal, out FileKind kind)
     {
-        if (Enum.TryParse<FileKind>(literal, true, out kind))
+        if (Enum.TryParse(literal, true, out kind))
         {
             return true;
         }

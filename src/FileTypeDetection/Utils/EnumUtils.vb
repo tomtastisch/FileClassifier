@@ -32,7 +32,7 @@ Namespace Global.Tomtastisch.FileClassifier.Utils
     '''         Nicht-Ziele:
     '''         - Keine zustandsbehaftete Logik.
     '''         - Keine Abhängigkeiten auf Projektdienste (I/O, Logger, Policy-Engine).
-    '''         - Keine Reflection-Features außer <see cref="System.Enum.GetValues(Type)"/>.
+    '''         - Keine Reflection-Features außer <c>Enum.GetValues(Type)</c>.
     '''     </para>
     ''' </remarks>
     Public NotInheritable Class EnumUtils
@@ -62,7 +62,7 @@ Namespace Global.Tomtastisch.FileClassifier.Utils
         ''' <remarks>
         '''     <para>
         '''         Ablaufstruktur:
-        '''         1) Werte werden über <see cref="System.Enum.GetValues(Type)"/> geladen,
+        '''         1) Werte werden über <c>Enum.GetValues(Type)</c> geladen,
         '''         2) Ausgabe erfolgt als typisiertes Array <c>TEnum()</c>.
         '''     </para>
         '''     <para>
@@ -100,10 +100,10 @@ Namespace Global.Tomtastisch.FileClassifier.Utils
         ''' <remarks>
         '''     <para>
         '''         Ablaufstruktur:
-        '''         1) Werte werden über <see cref="System.Enum.GetValues(Type)"/> geladen,
+        '''         1) Werte werden über <c>Enum.GetValues(Type)</c> geladen,
         '''         2) optional: Sortierung nach numerischem Enum-Wert,
         '''         3) Range wird deterministisch geklemmt,
-        '''         4) Ausgabe erfolgt als Slice über <see cref="System.Array.Copy(System.Array, Integer, System.Array, Integer, Integer)"/>.
+        '''         4) Ausgabe erfolgt als Slice über <c>Array.Copy(values, from, result, 0, length)</c>.
         '''     </para>
         '''     <para>
         '''         Range-Semantik (0-basiert, inklusive):
@@ -133,7 +133,7 @@ Namespace Global.Tomtastisch.FileClassifier.Utils
         ''' <typeparam name="TEnum">Enum-Typ.</typeparam>
         ''' <param name="sortOrder">
         '''     Sortierreihenfolge:
-        '''     - <see cref="EnumSortOrder.None"/>: keine Sortierung (Originalreihenfolge von <see cref="System.Enum.GetValues(Type)"/>).
+        '''     - <see cref="EnumSortOrder.None"/>: keine Sortierung (Originalreihenfolge von <c>Enum.GetValues(Type)</c>).
         '''     - <see cref="EnumSortOrder.Ascending"/>: aufsteigend nach numerischem Enum-Wert.
         '''     - <see cref="EnumSortOrder.Descending"/>: absteigend nach numerischem Enum-Wert.
         ''' </param>
@@ -160,21 +160,21 @@ Namespace Global.Tomtastisch.FileClassifier.Utils
 
             ' Deklarationsblock
             Dim enumType As Type = GetType(TEnum)
-            Dim raw As Array = Nothing
+            Dim raw As Array
 
-            Dim values() As TEnum = Nothing
-            Dim keys() As Long = Nothing
+            Dim values() As TEnum
+            Dim keys() As Long
 
             Dim i As Integer
-            Dim count As Integer = 0
-            Dim maxIndex As Integer = 0
+            Dim count As Integer
+            Dim maxIndex As Integer
 
-            Dim effectiveTo As Integer = 0
-            Dim effectiveMaxFrom As Integer = 0
-            Dim effectiveFrom As Integer = 0
+            Dim effectiveTo As Integer
+            Dim effectiveMaxFrom As Integer
+            Dim effectiveFrom As Integer
 
-            Dim length As Integer = 0
-            Dim result() As TEnum = Nothing
+            Dim length As Integer
+            Dim result() As TEnum
 
 
             ' -----------------------------------------------------------------

@@ -79,14 +79,6 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         ''' <summary>
-        '''     Liefert ein leeres Aliasarray.
-        ''' </summary>
-        ''' <returns>Leeres <see cref="ImmutableArray(Of String)"/>.</returns>
-        Private Function EmptyAliases() As ImmutableArray(Of String)
-            Return ImmutableArray(Of String).Empty
-        End Function
-
-        ''' <summary>
         '''     Liefert die Aliasgruppe für einen Gruppennamen.
         '''     Fail-closed: Unbekannte Gruppen liefern ein leeres Array.
         ''' </summary>

@@ -331,26 +331,6 @@ Namespace Global.Tomtastisch.FileClassifier
                 ToImmutableArray()
         End Function
 
-
-        ''' <summary>
-        '''     Erstellt ein <see cref="MagicPattern"/> aus Segmenten.
-        ''' </summary>
-        ''' <param name="segments">Segmente, die gemeinsam matchen müssen.</param>
-        ''' <returns>Magic-Pattern.</returns>
-        Private Shared Function Pattern(ParamArray segments As MagicSegment()) As MagicPattern
-            Return New MagicPattern(ImmutableArray.Create(segments))
-        End Function
-
-        ''' <summary>
-        '''     Erstellt ein Segment, das eine Bytefolge ab einem festen Offset im Header erwartet.
-        ''' </summary>
-        ''' <param name="offset">Startoffset im Header.</param>
-        ''' <param name="bytesValue">Erwartete Bytefolge.</param>
-        ''' <returns>Magic-Segment.</returns>
-        Private Shared Function Prefix(offset As Integer, ParamArray bytesValue As Byte()) As MagicSegment
-            Return New MagicSegment(offset, ImmutableArray.Create(bytesValue))
-        End Function
-
         ''' <summary>
         '''     Prüft, ob ein einzelnes Segment am angegebenen Offset innerhalb der Daten exakt matcht.
         '''     Fail-closed: Bei ungültigen Parametern oder zu kurzen Daten wird <c>False</c> geliefert.

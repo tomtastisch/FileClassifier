@@ -1,4 +1,3 @@
-using System.Reflection;
 using Tomtastisch.FileClassifier;
 
 namespace FileTypeDetectionLib.Tests.Contracts;

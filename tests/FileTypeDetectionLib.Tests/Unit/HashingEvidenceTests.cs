@@ -1123,7 +1123,7 @@ public sealed class HashingEvidenceModelTests
     public void TryReadFileBounded_ReturnsFalse_ForMissingPathOrOptions()
     {
         var ioType = HashingEvidenceTestHelpers.GetInternalType("Tomtastisch.FileClassifier.EvidenceHashingIo");
-        var method = ioType.GetMethod("TryReadFileBounded", BindingFlags.NonPublic | BindingFlags.Static)!;
+        var method = ioType.GetMethod("TryReadFileBounded", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
 
         var bytes = Array.Empty<byte>();
