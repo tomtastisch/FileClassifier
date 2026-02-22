@@ -214,6 +214,7 @@ run_build() {
 
 run_api_contract() {
   run_or_fail "CI-CONTRACT-001" "Restore test project (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj" -v minimal
+  run_or_fail "CI-CONTRACT-001" "Restore CSCore bridge project (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/src/FileClassifier.CSCore/FileClassifier.CSCore.csproj" -v minimal
   run_or_fail "CI-CONTRACT-001" "Run API contract tests" dotnet test "${ROOT_DIR}/tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj" -c Release --no-restore --filter "Category=ApiContract" -v minimal
   ci_result_append_summary "API contract checks completed."
 }
@@ -380,6 +381,7 @@ run_tests_bdd_coverage() {
   coverage_include="[${coverage_assembly}]*"
 
   run_or_fail "CI-TEST-001" "Restore solution (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/FileClassifier.sln" -v minimal
+  run_or_fail "CI-TEST-001" "Restore CSCore bridge project (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/src/FileClassifier.CSCore/FileClassifier.CSCore.csproj" -v minimal
   run_or_fail "CI-TEST-001" "BDD tests + coverage" env TEST_BDD_OUTPUT_DIR="$tests_dir" bash "${ROOT_DIR}/tools/test-bdd-readable.sh" -- /p:CollectCoverage=true /p:Include="${coverage_include}" /p:CoverletOutputFormat=cobertura /p:CoverletOutput="${coverage_dir}/coverage" /p:Threshold=85%2c69 /p:ThresholdType=line%2cbranch /p:ThresholdStat=total
   ci_result_append_summary "BDD coverage checks completed."
 }
