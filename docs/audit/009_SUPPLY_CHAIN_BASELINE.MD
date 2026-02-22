@@ -61,3 +61,17 @@ gh run list --workflow dependency-canary.yml --limit 5
 ## 6. Grenzen und Limits
 - Diese Basislinie liefert Assurance-Nachweise, keine formale Third-Party-Zertifizierung.
 - Downstream Runtime-Hardening bleibt Verantwortung von Deployern/Operatoren.
+
+## 7. Dependency-Strategie fuer netstandard2.0-Transitives
+- D1 Kontrollierte Pinning-Strategie:
+  - `System.Text.Encoding.CodePages` wird explizit als direkte Abhaengigkeit gepinnt (SSOT: `Directory.Packages.props`), damit SharpCompress-bezogene Encoding-Pfade nicht von impliziten Transitives abhaengen.
+- D2 Dokumentierte Ausnahme (Meta-Paket):
+  - `Microsoft.NETCore.Platforms` bleibt als `netstandard2.0`-Transitiv aus `NETStandard.Library` sichtbar.
+  - Diese Abweichung wird aktuell akzeptiert, da sie aus dem TFM-Meta-Paket stammt und nicht als eigenstaendiger Runtime-Upgrade-Pfad fuer das Produkt genutzt wird.
+  - Security-Gate bleibt fail-closed: jede neue High/Critical-Vulnerability in diesem Pfad bleibt blocker.
+
+Verifikationskommandos:
+```bash
+dotnet list FileClassifier.sln package --outdated --include-transitive
+dotnet list FileClassifier.sln package --vulnerable --include-transitive
+```

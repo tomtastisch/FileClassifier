@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](003_NETSTANDARD2_COMPAT_EVIDENCE.MD) | [EN](103_NETSTANDARD2_COMPAT_EVIDENCE.MD)
+<!-- LANG_SWITCH:END -->
+
 # Evidence Report: netstandard2 Compat
 
 ## 1. Zweck

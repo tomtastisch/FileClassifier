@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](002_NETSTANDARD2_INVENTORY.MD) | [EN](102_NETSTANDARD2_INVENTORY.MD)
+<!-- LANG_SWITCH:END -->
+
 # Inventory: netstandard2 Compat Baseline
 
 ## 1. Zweck

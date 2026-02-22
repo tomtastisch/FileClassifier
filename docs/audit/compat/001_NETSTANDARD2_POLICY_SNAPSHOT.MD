@@ -1,3 +1,7 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](001_NETSTANDARD2_POLICY_SNAPSHOT.MD) | [EN](101_NETSTANDARD2_POLICY_SNAPSHOT.MD)
+<!-- LANG_SWITCH:END -->
+
 # Policy Snapshot: netstandard2 Compat Refactor
 
 ## 1. Zweck

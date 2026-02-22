@@ -12,13 +12,28 @@ Heuristics for retroactive classification:
 - `docs|test|ci|chore|tooling|refactor|fix` => patch
 
 Current state:
-- Current release line contains `6.x` (current working state: `v6.0.0`; details in `docs/versioning/103_CHANGELOG_RELEASES.MD`).
+- Current release line contains `6.x` (current working state: `v6.1.12`; details in `docs/versioning/103_CHANGELOG_RELEASES.MD`).
 
 Note:
 - The \"short description\" column follows the original commit/PR intent text for deterministic traceability and is not normalized to a single language.
 
 | Version | Short description | Commit | Keyword |
 |---|---|---|---|
+| `6.1.12` | FC-0015 completed: introduced canonical bilingual docs grid under `docs/0_de` and `docs/1_en` with identical file sets and mandatory language-switch headers; hardened sync tooling fail-closed (parity/switch checks + stale file pruning) and expanded PR-scope allowlist for the new structure | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.11` | FC-0014 completed: centralized archive/path policy core logic (archive-relative-path normalization and root-path policy) in CSCore (`ArchivePathPolicyUtility`) and enabled productive bridge usage in `ArchiveEntryPathPolicy`/`DestinationPathGuard`; telemetry and package-contract coverage extended | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.10` | FC-0013 completed: centralized hash evidence policy (label/notes/HMAC env key) in CSCore (`EvidencePolicyUtility`), enabled productive bridge delegation in `EvidenceHashingCore`, and extended contracts/telemetry accordingly | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.9` | FC-0012 completed: moved OpenXML/OpenDocument and legacy Office decision logic further into CSCore (`OfficePolicyUtility`) and enabled productive bridge usage in `CoreInternals`; telemetry/regression tests and references updated | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.8` | FC-0011 completed: moved DetectDetailed extension and reason-code policy further into CSCore (including productive usage of `DetectionSignal`/`DetectionSummary` via Mapperly), extended bridge telemetry, and completed CSCore module docs (root/model/mapping/utilities) | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.7` | FC-0010 completed: analyzer major upgrade (`Meziantou 3.0.12`, `NetAnalyzers 10.0.103`), netstandard2.0 dependency strategy via direct CodePages pin plus documented Microsoft.NETCore.Platforms meta exception, and green end-to-end `run.sh` verification | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.6` | FC-0009 completed: introduced PolySharp-based `IsExternalInit` polyfill, upgraded `DotNet.ReproducibleBuilds` to `2.0.2`, and extended fail-closed banned API gate to VB core including unsafe ZIP extraction APIs | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.5` | FC-0008 completed: introduced reproducible build baseline as a central package to harden build/provenance auditability across the repository | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.4` | FC-0007 completed: extended analyzer/banned API baseline to all relevant C# projects and centralized options normalization via CSCore record and Mapperly utility | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.3` | FC-0006 completed: moved hashing/materializer logic further into CSCore (including fail-closed telemetry/audit snapshots and deterministic decision-matrix regression tests) | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.2` | FC-0005 started: CSCore utility offloading for enum/iterable/argument and exception-filter gates via fail-closed runtime bridge and package-backed contract hardening | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.1` | FC-0004 completed: records/Mapperly pilot in CSCore with fail-closed CI/governance evidence and netstandard compatibility (`IsExternalInit`) | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.0` | FC-0003 completed: single-package integration of CSCore with packaging/consumer gates and transitive runtime verification | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | minor |
+| `6.0.2` | FC-0002 completed: defined and documented CSCore TFM/SDK compatibility and verified via fail-closed build checks | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.0.1` | FC-0001 completed: introduced CSCore subproject and set deterministic build baseline for cross-language single-package delivery | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.0.0` | Breaking release: migrated `FileKind` enum and `HashRoundTripReport` public API to the new slot/method model and split hashing internals into core/roundtrip/io services | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v5.2.1...HEAD) | breaking |
 | `5.2.1` | Switched SharpCompress calls to type-safe APIs, hardened tar.gz fail-closed handling, and enforced/documented Qodana CI as a mandatory gate | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v5.2.0...HEAD) | patch |
 | `5.2.0` | Introduce netstandard2.0 compatibility layer, consolidate provider structure, and extend TFM multi-targeting | [8d65a52](https://github.com/tomtastisch/FileClassifier/commit/8d65a52) | minor |
