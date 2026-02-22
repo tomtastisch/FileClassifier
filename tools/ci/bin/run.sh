@@ -74,7 +74,23 @@ log_contains_high_or_critical() {
 
 find_pack_nupkg() {
   local pack_dir="$1"
-  find "${pack_dir}" -maxdepth 1 -type f -name '*.nupkg' ! -name '*.snupkg' | head -n1
+  python3 - "${pack_dir}" <<'PY'
+import glob
+import os
+import sys
+
+pack_dir = sys.argv[1]
+candidates = [
+    path for path in glob.glob(os.path.join(pack_dir, "*.nupkg"))
+    if not path.endswith(".snupkg")
+]
+if not candidates:
+    sys.exit(1)
+
+# Deterministic: prefer the most recently written package artifact.
+candidates.sort(key=lambda path: os.path.getmtime(path), reverse=True)
+print(candidates[0])
+PY
 }
 
 read_nupkg_metadata() {
@@ -169,6 +185,7 @@ run_preflight() {
   run_or_fail "CI-CODEQL-001" "CodeQL default setup must be not-configured" bash "${ROOT_DIR}/tools/ci/check-codeql-default-setup.sh"
   run_or_fail "CI-PREFLIGHT-001" "Doc consistency drift guard" python3 "${ROOT_DIR}/tools/check-doc-consistency.py"
   run_or_fail "CI-PREFLIGHT-001" "Doc shell compatibility guard" python3 "${ROOT_DIR}/tools/check-doc-shell-compat.py"
+  run_or_fail "CI-PREFLIGHT-001" "PR scope guard" python3 "${ROOT_DIR}/tools/ci/check-pr-scope.py" --repo-root "${ROOT_DIR}" --manifest "${ROOT_DIR}/tools/ci/policies/data/pr_scope_allowlist.txt" --base-ref "${PR_SCOPE_BASE_REF:-origin/main}" --mode combined --out "${ROOT_DIR}/${OUT_DIR}/pr-scope-summary.json"
   run_or_fail "CI-PREFLIGHT-001" "Docs checker unit tests" python3 -m unittest discover -s "${ROOT_DIR}/tools/tests" -p "test_*.py" -v
   run_or_fail "CI-PREFLIGHT-001" "Policy/RoC bijection" python3 "${ROOT_DIR}/tools/check-policy-roc.py" --out "${ROOT_DIR}/artifacts/policy_roc_matrix.tsv"
   run_or_fail "CI-PREFLIGHT-001" "VB Dim alignment check" python3 "${ROOT_DIR}/tools/ci/check-vb-dim-alignment.py" --root "${ROOT_DIR}/src/FileTypeDetection"
@@ -232,6 +249,11 @@ run_pack() {
 
   if [[ "${package_id}" != "${expected_package_id}" ]]; then
     ci_result_add_violation "CI-PACK-001" "fail" "Unexpected package id '${package_id}' (expected '${expected_package_id}')." "${nupkg_path}"
+    return 1
+  fi
+
+  if ! unzip -l "${nupkg_path}" | rg -q "lib/.*/FileClassifier\\.CSCore\\.dll"; then
+    ci_result_add_violation "CI-PACK-001" "fail" "Single-package contract violated: FileClassifier.CSCore.dll missing in nupkg." "${nupkg_path}"
     return 1
   fi
 
