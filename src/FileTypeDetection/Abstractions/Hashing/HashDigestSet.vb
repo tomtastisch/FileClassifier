@@ -18,6 +18,8 @@ Namespace Global.Tomtastisch.FileClassifier
     '''     Enthält logische und physische Hashwerte (inklusive optionaler Fast- und HMAC-Digests) in normalisierter Form.
     ''' </remarks>
     Public NotInheritable Class HashDigestSet
+        Private Const EmptyDigestPartCount As Integer = 6
+
         ''' <summary>
         '''     Physischer SHA-256-Digest des Quellpayloads.
         ''' </summary>
@@ -96,6 +98,22 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Friend Shared ReadOnly Property Empty As HashDigestSet
             Get
+                Dim parts() As String = Nothing
+
+                If CsCoreRuntimeBridge.TryGetEmptyDigestParts(parts) AndAlso
+                    parts IsNot Nothing AndAlso
+                    parts.Length = EmptyDigestPartCount Then
+                    Return New HashDigestSet(
+                        physicalSha256:=parts(0),
+                        logicalSha256:=parts(1),
+                        fastPhysicalXxHash3:=parts(2),
+                        fastLogicalXxHash3:=parts(3),
+                        hmacPhysicalSha256:=parts(4),
+                        hmacLogicalSha256:=parts(5),
+                        hasPhysicalHash:=False,
+                        hasLogicalHash:=False)
+                End If
+
                 Return New HashDigestSet(
                     physicalSha256:=String.Empty,
                     logicalSha256:=String.Empty,
@@ -117,6 +135,12 @@ Namespace Global.Tomtastisch.FileClassifier
             (
                 value As String
             ) As String
+
+            Dim normalized As String = Nothing
+
+            If CsCoreRuntimeBridge.TryNormalizeDigest(value, normalized) Then
+                Return normalized
+            End If
 
             Return If(value, String.Empty).Trim().ToLowerInvariant()
         End Function

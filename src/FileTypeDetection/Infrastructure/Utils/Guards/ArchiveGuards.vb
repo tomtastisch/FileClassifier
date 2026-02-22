@@ -242,11 +242,26 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 ByRef isDirectory As Boolean
             ) As Boolean
 
-            Dim safe    As String = String.Empty
-            Dim trimmed As String
+            Dim safe                  As String  = String.Empty
+            Dim trimmed               As String
+            Dim isValidFromCsCore     As Boolean = False
+            Dim normalizedFromCsCore  As String  = String.Empty
+            Dim isDirectoryFromCsCore As Boolean = False
 
             normalizedPath = String.Empty
             isDirectory = False
+
+            If CsCoreRuntimeBridge.TryNormalizeArchiveRelativePath(
+                    rawPath:=rawPath,
+                    allowDirectoryMarker:=allowDirectoryMarker,
+                    isValid:=isValidFromCsCore,
+                    normalizedPath:=normalizedFromCsCore,
+                    isDirectory:=isDirectoryFromCsCore
+                ) Then
+                normalizedPath = normalizedFromCsCore
+                isDirectory = isDirectoryFromCsCore
+                Return isValidFromCsCore
+            End If
 
             If Not TryPrepareRelativePath(rawPath, safe) Then Return False
 

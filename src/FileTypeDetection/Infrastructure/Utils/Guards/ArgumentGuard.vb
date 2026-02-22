@@ -68,6 +68,10 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             ' Deklarationsblock
             Dim isNull As Boolean
 
+            If CsCoreRuntimeBridge.TryNotNull(value, paramName) Then
+                Return
+            End If
+
             isNull = (value Is Nothing)
             If isNull Then
                 Throw New ArgumentNullException(paramName)
@@ -104,6 +108,10 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
 
             ' Deklarationsblock
             Dim actualLength As Integer
+
+            If CsCoreRuntimeBridge.TryRequireLength(value, expectedLength, paramName) Then
+                Return
+            End If
 
             If value Is Nothing Then
                 Throw New ArgumentNullException(paramName)
@@ -155,6 +163,10 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
 
             ' Deklarationsblock
             Dim isEnumValueDefined As Boolean
+
+            If CsCoreRuntimeBridge.TryRequireEnumDefined(enumType, value, paramName) Then
+                Return
+            End If
 
             If enumType Is Nothing Then
                 Throw New ArgumentNullException(NameOf(enumType))

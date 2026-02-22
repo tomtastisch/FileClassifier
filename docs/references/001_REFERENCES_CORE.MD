@@ -24,7 +24,7 @@ Dieses Dokument sammelt die statischen Referenzen zur API: interne Dateipfade, e
 | Hashing | `src/FileTypeDetection/Abstractions/Hashing/README.md` | `src/FileTypeDetection/Abstractions/Hashing/HashSourceType.vb`, `src/FileTypeDetection/Abstractions/Hashing/HashDigestSet.vb`, `src/FileTypeDetection/Abstractions/Hashing/HashEvidence.vb`, `src/FileTypeDetection/Abstractions/Hashing/HashRoundTripReport.vb`, `src/FileTypeDetection/Abstractions/Hashing/HashOptions.vb` |
 
 ## 3. ReasonCode-Referenz (DetectDetailed)
-Quelle: `FileTypeDetector.vb`.
+Quelle: `FileTypeDetector.vb` (Fallback) und `src/FileClassifier.CSCore/Utilities/DetectionPolicyUtility.cs` (delegierter CSCore-Pfad).
 
 | ReasonCode | Bedeutung |
 |---|---|
@@ -56,6 +56,11 @@ Quelle: `FileTypeDetector.vb`.
 | Managed archive internals | `Infrastructure/ArchiveManagedInternals.vb` | archivbasierte Iteration und Managed-Backend-Adapter (inkl. ZIP) | [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md) |
 | Archive internals | `Infrastructure/ArchiveInternals.vb` | Archiv-Dispatch, Entry-Adapter, Generic Extractor | [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md) |
 | MIME Auflösung | `Infrastructure/MimeProvider.vb` | MIME-Mapping | [Infrastructure Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md) |
+| CSCore Runtime-Bridge | `Infrastructure/Utils/CsCoreRuntimeBridge.vb` | deterministische Delegation auf C#-Utilities mit VB-Fallback | CSCore Modul (ausserhalb dieses PR-Blocks) |
+| CSCore Detection Policy | `src/FileClassifier.CSCore/Utilities/DetectionPolicyUtility.cs` | Endungs-Policy, Reason-Code-Mapping, Summary-Projektion | CSCore Utilities (ausserhalb dieses PR-Blocks) |
+| CSCore Office Policy | `src/FileClassifier.CSCore/Utilities/OfficePolicyUtility.cs` | OpenXML/OpenDocument/Legacy-Office-Entscheidungslogik (kind-key-basiert) | CSCore Utilities (ausserhalb dieses PR-Blocks) |
+| CSCore Evidence Policy | `src/FileClassifier.CSCore/Utilities/EvidencePolicyUtility.cs` | Label-/Notes-Policy und HMAC-Env-Key-Resolution für Hash-Evidence | CSCore Utilities (ausserhalb dieses PR-Blocks) |
+| CSCore Archive/Path Policy | `src/FileClassifier.CSCore/Utilities/ArchivePathPolicyUtility.cs` | Relative-Archivpfad-Normalisierung und Root-Path-Policy für Zielpfade | CSCore Utilities (ausserhalb dieses PR-Blocks) |
 
 ## 5. Externe Abhängigkeiten
 ### 5.1 Diagramm
@@ -84,7 +89,9 @@ flowchart LR
 | `Mime` | `Infrastructure/MimeProvider.vb` | MIME-Auflösung aus Extension |
 | `Microsoft.IO.RecyclableMemoryStream` | `Infrastructure/ArchiveManagedInternals.vb` | kontrollierte Memory-Streams |
 | `SharpCompress` | `Infrastructure/ArchiveInternals.vb`, `FileMaterializer.vb` | Archive-Type-Erkennung, generische Archiv-Iteration, defensiver Lesbarkeits-Check |
-| `Microsoft.Extensions.Logging.Abstractions` | `Configuration/FileTypeProjectOptions.vb`, `FileTypeOptions.vb`, `Infrastructure/CoreInternals.vb` | Logging-Interfaces fuer optionale Diagnostik ohne ASP.NET-FrameworkReference |
+| `Microsoft.Extensions.Logging.Abstractions` | `Configuration/FileTypeProjectOptions.vb`, `FileTypeOptions.vb`, `Infrastructure/CoreInternals.vb` | Logging-Interfaces für optionale Diagnostik ohne ASP.NET-FrameworkReference |
+| `Riok.Mapperly` | `src/FileClassifier.CSCore/Mapping/*.cs` | compile-time Mapping-Generator für C#-Modelprojektionen |
+| `PolySharp` | `src/FileClassifier.CSCore/FileClassifier.CSCore.csproj` | C# Sprach-/TFM-Kompatibilität für moderne Features |
 
 ## 6. Referenz-Index (wo finde ich was?)
 | Thema | Primardokument |
@@ -93,7 +100,7 @@ flowchart LR
 | E2E-Architektur + Sequenzen | `docs/020_ARCH_CORE.MD` |
 | Normative Anforderungen | `docs/specs/001_SPEC_DIN.MD` |
 | Modul-Übersicht | [Modul-README: FileTypeDetection](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md) |
-| Unterordner-Details | [Detection README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Detection/README.md), [Infrastructure README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md), [Configuration README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/README.md), [Abstractions README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md), [Abstractions: Detection README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Detection/README.md), [Abstractions: Archive README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Archive/README.md), [Abstractions: Hashing README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Hashing/README.md), [CLI README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileClassifier.App/README.md) |
+| Unterordner-Details | [Detection README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Detection/README.md), [Infrastructure README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Infrastructure/README.md), [Configuration README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Configuration/README.md), [Abstractions README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/README.md), [Abstractions: Detection README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Detection/README.md), [Abstractions: Archive README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Archive/README.md), [Abstractions: Hashing README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/Abstractions/Hashing/README.md), CSCore README (ausserhalb dieses PR-Blocks), [CLI README](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileClassifier.App/README.md) |
 
 ## 6.1 Change Playbooks
 | Thema | Guide |

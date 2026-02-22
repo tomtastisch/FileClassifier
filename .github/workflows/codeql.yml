@@ -59,6 +59,7 @@ jobs:
       - name: Build (CodeQL traced)
         run: |
           dotnet restore --locked-mode -v minimal FileClassifier.sln
+          dotnet restore --locked-mode -v minimal src/FileClassifier.CSCore/FileClassifier.CSCore.csproj
           dotnet build -c Release --no-restore -v minimal FileClassifier.sln
 
       - name: Perform CodeQL Analysis

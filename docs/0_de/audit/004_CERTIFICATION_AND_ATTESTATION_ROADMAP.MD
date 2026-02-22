@@ -1,0 +1,63 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](004_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD) | [EN](../../1_en/audit/004_CERTIFICATION_AND_ATTESTATION_ROADMAP.MD)
+<!-- LANG_SWITCH:END -->
+
+# Roadmap: Zertifizierung und Attestationen
+
+## 1. Positionierung
+Dieses Projekt unterscheidet:
+- Assurance/Attestation-Evidence (technisch, reproduzierbar)
+- Formale Third-Party-Zertifizierung (externer Audit, ausserhalb des aktuellen Scopes)
+
+Dieses Repository macht keinen formalen Zertifizierungs-Claim.
+
+## 2. Minimum Set (Wave 1)
+1. OpenSSF Scorecard (kostenlos, extern, GitHub-nativ)
+2. GitHub Artifact Attestations für Release-Artefakte
+3. Dokumentierte Verifikationskommandos für Provenance/Attestationen
+
+## 3. Optional Set
+- OpenSSF Best Practices Badge (Self-Attested Programm, extern sichtbar)
+
+## 4. NuGet-relevante Evidence
+Alle Kommandos sind für Ausführung im Repository-Root gedacht.
+- Paket-Signaturen verifizieren:
+```bash
+NUPKG="$(find artifacts/nuget -maxdepth 1 -type f -name '*.nupkg' | head -n 1)"
+test -n "$NUPKG"
+dotnet nuget verify "$NUPKG"
+```
+- Build-Provenance Attestation verifizieren:
+```bash
+NUPKG="$(find artifacts/nuget -maxdepth 1 -type f -name '*.nupkg' | head -n 1)"
+test -n "$NUPKG"
+gh attestation verify "$NUPKG" --repo tomtastisch/FileClassifier
+```
+
+## 5. Akzeptanzkriterien
+- Scorecard-Workflow läuft und speichert Artefakte.
+- Release-Workflow emittiert Attestationen für nupkg-Artefakte.
+- Verifikationskommandos sind dokumentiert und reproduzierbar.
+
+## 6. Code-Scanning-Mode-Constraint
+Dieses Repository nutzt GitHub Code Scanning Advanced Setup (workflow-basierte CodeQL Analyse) und erfordert,
+dass GitHub Code Scanning Default Setup deaktiviert bleibt (state: `not-configured`).
+Wenn Default Setup aktiv ist, können Advanced-CodeQL SARIF Uploads von GitHub abgelehnt werden.
+
+Operative Regeln für dieses Repo:
+- Default Setup für CodeQL deaktiviert halten (siehe `docs/security/010_CODEQL_DEFAULT_SETUP_GUARDRAIL.MD`).
+- Default-Setup-Drift als fail-closed Blocker behandeln und vor Merge/Release beheben.
+- Nicht-CodeQL SARIF Uploads (z. B. OpenSSF Scorecard SARIF) sind zulässig.
+
+## 7. OpenSSF-Scorecard-Constraint für Third-Party GitHub Actions
+- Score-Werte, die z. B. `actions/dependency-review-action` für wiederverwendete GitHub Actions zeigt, werden aus den Upstream-Action-Repositories berechnet (nicht aus diesem Repository).
+- Dieses Repository kann SHA-Pinning durchsetzen und Actions auswählen, aber nicht direkt Upstream-Scorecard-Werte erhöhen.
+
+Operatives Handling:
+- PR-Kommentare enthalten keine OpenSSF Scorecard Tabelle (`show-openssf-scorecard: false`).
+- Warning-Threshold bleibt definiert (`warn-on-openssf-scorecard-level: 9`) als machine-readable Policy-Intent.
+
+Repro-Kommando für Upstream-Scores:
+```bash
+curl -fsSL "https://api.securityscorecards.dev/projects/github.com/actions/checkout" | jq -r '.date,.score,.repo.name'
+```

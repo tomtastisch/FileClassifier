@@ -1,7 +1,11 @@
+<!-- LANG_SWITCH:BEGIN -->
+[DE](003_NETSTANDARD2_COMPAT_EVIDENCE.MD) | [EN](103_NETSTANDARD2_COMPAT_EVIDENCE.MD)
+<!-- LANG_SWITCH:END -->
+
 # Evidence Report: netstandard2 Compat
 
 ## 1. Zweck
-Dieser Report dokumentiert die technische Umsetzung und Verifikation fuer die net48-Kompatibilitaet ueber `netstandard2.0` inklusive fail-closed Office-/Archiv-Refinement.
+Dieser Report dokumentiert die technische Umsetzung und Verifikation für die net48-Kompatibilität über `netstandard2.0` inklusive fail-closed Office-/Archiv-Refinement.
 
 ## 2. Geltungsbereich
 - Library: `src/FileTypeDetection/FileTypeDetectionLib.vbproj`
@@ -42,10 +46,10 @@ MSBuild-Conditionen in `src/FileTypeDetection/FileTypeDetectionLib.vbproj`:
 - `net8.0|net10.0`: `<Compile Include="Providers/Net8_0Plus/**/*.vb"/>`
 
 ### 3.5 Office-/Archiv-Semantik (fail-closed)
-- Office/OpenDocument-Endungen werden alias-basiert auf gruppierte Typen aufgeloest (`Docx`, `Xlsx`, `Pptx`).
-- Legacy-OLE2 (`.doc/.xls/.ppt`) wird ueber `LegacyOfficeBinaryRefiner` markerbasiert fail-closed verfeinert.
+- Office/OpenDocument-Endungen werden alias-basiert auf gruppierte Typen aufgelöst (`Docx`, `Xlsx`, `Pptx`).
+- Legacy-OLE2 (`.doc/.xls/.ppt`) wird über `LegacyOfficeBinaryRefiner` markerbasiert fail-closed verfeinert.
 - `TryValidateArchive` und Extraktion akzeptieren nur echte extrahierbare Archiv-Container (`Zip`); Office-Container werden nicht als extrahierbares Archiv behandelt.
-- Endungspruefung bleibt nachgelagerte Policy und wird nur bei explizitem Verify-Flag als Fehlerpfad erzwungen.
+- Endungsprüfung bleibt nachgelagerte Policy und wird nur bei explizitem Verify-Flag als Fehlerpfad erzwungen.
 
 ## 4. Verifikation/Nachweise
 ### 4.1 Befehle und Exit-Codes
@@ -53,7 +57,7 @@ MSBuild-Conditionen in `src/FileTypeDetection/FileTypeDetectionLib.vbproj`:
 2. `dotnet restore FileClassifier.sln -v minimal` -> `0`
 3. `dotnet restore --locked-mode FileClassifier.sln -v minimal` -> `0`
 4. `dotnet build FileClassifier.sln -c Release --no-restore -warnaserror -v minimal` -> `0`
-5. `dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --no-build -v minimal` -> `0` (`544` Tests gruen)
+5. `dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --no-build -v minimal` -> `0` (`544` Tests grün)
 6. `dotnet pack src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release --no-build -o artifacts/ci/netstandard2-compat/nuget -v minimal` -> `0`
 7. `dotnet build src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -f netstandard2.0 -v diag > artifacts/ci/netstandard2-compat/build-netstandard2.0.log` -> `0`
 8. `dotnet build src/FileTypeDetection/FileTypeDetectionLib.vbproj -c Release -f net8.0 -v diag > artifacts/ci/netstandard2-compat/build-net8.0.log` -> `0`
@@ -110,20 +114,20 @@ Ergebnis:
 - `artifacts/versioning_report.json` -> `status: pass`, `expected_version: 5.2.0-rc.6`
 - `artifacts/ci/versioning-svt/versioning-svt-summary.json` -> `status: pass`
 - `artifacts/ci/version-convergence/summary.json` -> `status: pass`, `repo_version=5.2.0`, `vbproj_version=5.2.0`, `docs_latest_version=5.2.0`
-- RC-PreRelease-NUPKG fuer SVT-Probe: `artifacts/nuget/Tomtastisch.FileClassifier.5.2.0-rc.6.nupkg`
+- RC-PreRelease-NUPKG für SVT-Probe: `artifacts/nuget/Tomtastisch.FileClassifier.5.2.0-rc.6.nupkg`
 
 ### 4.7 Policy/Konvergenz-Notiz
-Ambiguitaet zwischen:
-- `docs/versioning/001_POLICY_VERSIONING.MD` (Tag `vX.Y.Z[-prerelease]` als SSOT fuer Publish), und
+Ambiguität zwischen:
+- `docs/versioning/001_POLICY_VERSIONING.MD` (Tag `vX.Y.Z[-prerelease]` als SSOT für Publish), und
 - Repo-Konvergenzregeln (`RepoVersion`/`Version`/`PackageVersion` bleiben Kernversion `X.Y.Z`).
 
-Entscheidung fuer diesen Scope:
+Entscheidung für diesen Scope:
 - fail-closed nach bestehendem CI/Repo-Vertrag: Kernversionen bleiben auf `5.2.0` konvergent.
-- Pre-Release wird ueber Tag/NUPKG-Version `v5.2.0-rc.6` abgebildet und via SVT geprueft.
+- Pre-Release wird über Tag/NUPKG-Version `v5.2.0-rc.6` abgebildet und via SVT geprüft.
 
 ## 5. Grenzen/Nicht-Ziele
-- Keine oeffentliche API-Signatur geaendert.
-- Keine Runtime-Provider-Umschaltung eingefuehrt.
+- Keine öffentliche API-Signatur geändert.
+- Keine Runtime-Provider-Umschaltung eingeführt.
 - Keine Blocker-Datei notwendig (`999_NETSTANDARD2_BLOCKERS.MD` nicht erstellt).
 
 ## 6. Verlinkte SSOT-Quellen

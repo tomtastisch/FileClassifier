@@ -14,15 +14,15 @@
       },
       "Tomtastisch.FileClassifier": {
         "type": "Direct",
-        "requested": "[5.2.0, )",
-        "resolved": "5.2.0",
-        "contentHash": "L5Xn2AkR4S/+2uqqtkzxqucEEhTMvtnN6yQ3x86W4DDgg+ePurchdJ5BQSssTJIG8zOu6s27AGmoPlBcXCBKLg==",
+        "requested": "[6.1.13, )",
+        "resolved": "6.1.13",
+        "contentHash": "igHjt4AfqU6UwTkbkGDRN86d+tuWdBRS/m13h9fmcEWw+jeJjrg17EOhP9EGxqYDsYTgJUxBFQWa80f8tNezwQ==",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "10.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.3",
           "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
           "Mime": "3.8.0",
-          "SharpCompress": "0.39.0",
-          "System.IO.Hashing": "10.0.2"
+          "SharpCompress": "0.46.2",
+          "System.IO.Hashing": "10.0.3"
         }
       },
       "xunit.runner.visualstudio": {
@@ -57,15 +57,15 @@
       },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.0",
-        "contentHash": "L3AdmZ1WOK4XXT5YFPEwyt0ep6l8lGIPs7F5OOBZc77Zqeo01Of7XXICy47628sdVl0v/owxYJTe86DTgFwKCA=="
+        "resolved": "10.0.3",
+        "contentHash": "bwGMrRcAMWx2s/RDgja97p27rxSz2pEQW0+rX5cWAUWVETVJ/eyxGfjAl8vuG5a+lckWmPIE+vcuaZNVB5YDdw=="
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.0",
-        "contentHash": "FU/IfjDfwaMuKr414SSQNTIti/69bHEMb+QKrskRb26oVqpx3lNFXMjs/RC9ZUuhBhcwDM2BwOgoMw+PZ+beqQ==",
+        "resolved": "10.0.3",
+        "contentHash": "lxl0WLk7ROgBFAsjcOYjQ8/DVK+VMszxGBzUhgtQmAsTNldLL5pk9NG/cWTsXHq0lUhUEAtZkEE7jOGOA8bGKQ==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.0"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.3"
         }
       },
       "Microsoft.IO.RecyclableMemoryStream": {
@@ -142,16 +142,13 @@
       },
       "SharpCompress": {
         "type": "Transitive",
-        "resolved": "0.39.0",
-        "contentHash": "0esqIUDlg68Z7+Weuge4QzEvNtawUO4obTJFL7xuf4DBHMxVRr+wbNgiX9arMrj3kGXQSvLe0zbZG3oxpkwJOA==",
-        "dependencies": {
-          "ZstdSharp.Port": "0.8.4"
-        }
+        "resolved": "0.46.2",
+        "contentHash": "qLiVQXsKa1R0lc+StVpHLOLnMR7x0kFJrdfKoSRKJC8rPH0vtPTkYM13InEKgbhvHZ6HqJmA/iQVq/zmQ/5wxg=="
       },
       "System.IO.Hashing": {
         "type": "Transitive",
-        "resolved": "10.0.2",
-        "contentHash": "AKJknIFi9O3+rGExxTry188JPvUoZAPcCtS2qdqyFhIzsxQ1Ap94BeGDG0VzVEHakhmRxmJtVih6TsHoghIt/g=="
+        "resolved": "10.0.3",
+        "contentHash": "La6ICwsdTKhVX+LKN+pvFjQRR3LhLwq3uKdi2knjLzRyPYBSydF4cjXidYxIiTcDD6XVYdsBWQEI8ZxiZ/OdIg=="
       },
       "xunit.analyzers": {
         "type": "Transitive",
@@ -219,11 +216,6 @@
           "xunit.v3.extensibility.core": "[3.2.2]",
           "xunit.v3.runner.common": "[3.2.2]"
         }
-      },
-      "ZstdSharp.Port": {
-        "type": "Transitive",
-        "resolved": "0.8.4",
-        "contentHash": "eieSXq3kakCUXbgdxkKaRqWS6hF0KBJcqok9LlDCs60GOyrynLvPOcQ0pRw7shdPF7lh/VepJ9cP9n9HHc759g=="
       }
     }
   }

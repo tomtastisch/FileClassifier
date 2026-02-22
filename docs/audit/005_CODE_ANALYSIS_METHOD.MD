@@ -5,7 +5,7 @@
 # Code-Analyse-Methode
 
 ## 1. Ziel
-Reproduzierbare File-Level- und Line-Level-Analyseartefakte erzeugen, ohne die public API zu aendern.
+Reproduzierbare File-Level- und Line-Level-Analyseartefakte erzeugen, ohne die public API zu ändern.
 
 ## 2. Machine Outputs (nur JSON)
 Erzeugt durch `tools/audit/generate-code-analysis-json.sh`:

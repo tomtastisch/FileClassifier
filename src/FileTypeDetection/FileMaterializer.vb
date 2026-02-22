@@ -38,6 +38,10 @@ Namespace Global.Tomtastisch.FileClassifier
     ''' </remarks>
     Public NotInheritable Class FileMaterializer
 
+        Private Const MaterializationModeReject As Integer = 0
+        Private Const MaterializationModePersistRaw As Integer = 1
+        Private Const MaterializationModeExtractArchive As Integer = 2
+
         Private Sub New()
         End Sub
 
@@ -116,16 +120,29 @@ Namespace Global.Tomtastisch.FileClassifier
                 secureExtract As Boolean
             ) As Boolean
 
-            Dim opt             As FileTypeProjectOptions = FileTypeOptions.GetSnapshot()
-            Dim destinationFull As String                 = String.Empty
-            Dim descriptor      As ArchiveDescriptor      = Nothing
+            Dim opt                          As FileTypeProjectOptions = FileTypeOptions.GetSnapshot()
+            Dim destinationFull              As String                 = String.Empty
+            Dim descriptor                   As ArchiveDescriptor      = Nothing
+            Dim isPayloadWithinLimit         As Boolean                = False
+            Dim archiveDescribeSucceeded     As Boolean                = False
+            Dim archiveSafetyPassed          As Boolean                = False
+            Dim archiveSignatureCandidate    As Boolean                = False
+            Dim delegatedMaterializationMode As Integer                = MaterializationModePersistRaw
+            Dim materializationMode          As Integer
 
             ' Guard-Clauses: Null-, Größen- und Zielpfadprüfung.
             If data Is Nothing Then Return False
 
-            If CLng(data.Length) > opt.MaxBytes Then
-                LogGuard.Warn(opt.Logger, $"[Materialize] Daten zu groß ({data.Length} > {opt.MaxBytes}).")
-                Return False
+            If CsCoreRuntimeBridge.TryIsPayloadWithinMaxBytes(data.Length, opt.MaxBytes, isPayloadWithinLimit) Then
+                If Not isPayloadWithinLimit Then
+                    LogGuard.Warn(opt.Logger, $"[Materialize] Daten zu groß ({data.Length} > {opt.MaxBytes}).")
+                    Return False
+                End If
+            Else
+                If CLng(data.Length) > opt.MaxBytes Then
+                    LogGuard.Warn(opt.Logger, $"[Materialize] Daten zu groß ({data.Length} > {opt.MaxBytes}).")
+                    Return False
+                End If
             End If
 
             If String.IsNullOrWhiteSpace(destinationPath) Then Return False
@@ -143,24 +160,126 @@ Namespace Global.Tomtastisch.FileClassifier
 
             ' Secure-Extract-Branch: describe -> safety gate -> extract.
             If secureExtract Then
-                If ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor) Then
-                    If Not ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor) Then
+                archiveDescribeSucceeded = ArchiveTypeResolver.TryDescribeBytes(data, opt, descriptor)
+                If archiveDescribeSucceeded Then
+                    archiveSafetyPassed = ArchiveSafetyGate.IsArchiveSafeBytes(data, opt, descriptor)
+                Else
+                    archiveSignatureCandidate = ArchiveSignaturePayloadGuard.IsArchiveSignatureCandidate(data)
+                End If
+            End If
+
+            materializationMode = ComputeLocalMaterializationMode(
+                secureExtract:=secureExtract,
+                archiveDescribeSucceeded:=archiveDescribeSucceeded,
+                archiveSafetyPassed:=archiveSafetyPassed,
+                archiveSignatureCandidate:=archiveSignatureCandidate
+            )
+
+            If CsCoreRuntimeBridge.TryDecideMaterializationMode(
+                secureExtract:=secureExtract,
+                archiveDescribeSucceeded:=archiveDescribeSucceeded,
+                archiveSafetyPassed:=archiveSafetyPassed,
+                archiveSignatureCandidate:=archiveSignatureCandidate,
+                mode:=delegatedMaterializationMode
+            ) Then
+                If delegatedMaterializationMode <> materializationMode Then
+                    LogGuard.Warn(
+                        opt.Logger,
+                        $"[Materialize] CSCore-Modusabweichung ({delegatedMaterializationMode} != {materializationMode}); lokaler Fail-Closed-Modus aktiv."
+                    )
+                Else
+                    materializationMode = delegatedMaterializationMode
+                End If
+            End If
+
+            Return MaterializeByMode(
+                mode:=materializationMode,
+                data:=data,
+                destinationFull:=destinationFull,
+                overwrite:=overwrite,
+                opt:=opt,
+                descriptor:=descriptor,
+                archiveDescribeSucceeded:=archiveDescribeSucceeded,
+                archiveSafetyPassed:=archiveSafetyPassed,
+                archiveSignatureCandidate:=archiveSignatureCandidate
+            )
+        End Function
+
+        Private Shared Function ComputeLocalMaterializationMode _
+            (
+                secureExtract As Boolean,
+                archiveDescribeSucceeded As Boolean,
+                archiveSafetyPassed As Boolean,
+                archiveSignatureCandidate As Boolean
+            ) As Integer
+
+            If Not secureExtract Then
+                Return MaterializationModePersistRaw
+            End If
+
+            If archiveDescribeSucceeded Then
+                If archiveSafetyPassed Then
+                    Return MaterializationModeExtractArchive
+                End If
+
+                Return MaterializationModeReject
+            End If
+
+            If archiveSignatureCandidate Then
+                Return MaterializationModeReject
+            End If
+
+            Return MaterializationModePersistRaw
+        End Function
+
+        Private Shared Function MaterializeByMode _
+            (
+                mode As Integer,
+                data As Byte(),
+                destinationFull As String,
+                overwrite As Boolean,
+                opt As FileTypeProjectOptions,
+                descriptor As ArchiveDescriptor,
+                archiveDescribeSucceeded As Boolean,
+                archiveSafetyPassed As Boolean,
+                archiveSignatureCandidate As Boolean
+            ) As Boolean
+
+            Select Case mode
+                Case MaterializationModeExtractArchive
+                    If Not archiveDescribeSucceeded OrElse descriptor Is Nothing Then
+                        LogGuard.Warn(opt.Logger, "[Materialize] Archivbeschreibung fehlt.")
+                        Return False
+                    End If
+
+                    If Not archiveSafetyPassed Then
                         LogGuard.Warn(opt.Logger, "[Materialize] Archiv-Validierung fehlgeschlagen.")
                         Return False
                     End If
 
                     Return MaterializeArchiveBytes(data, destinationFull, overwrite, opt, descriptor)
-                End If
 
-                ' Unlesbares Archiv trotz Signaturhinweis wird fail-closed abgelehnt.
-                If ArchiveSignaturePayloadGuard.IsArchiveSignatureCandidate(data) Then
-                    LogGuard.Warn(opt.Logger, "[Materialize] Archiv kann nicht gelesen werden.")
+                Case MaterializationModeReject
+                    If archiveDescribeSucceeded AndAlso Not archiveSafetyPassed Then
+                        LogGuard.Warn(opt.Logger, "[Materialize] Archiv-Validierung fehlgeschlagen.")
+                        Return False
+                    End If
+
+                    If Not archiveDescribeSucceeded AndAlso archiveSignatureCandidate Then
+                        LogGuard.Warn(opt.Logger, "[Materialize] Archiv kann nicht gelesen werden.")
+                        Return False
+                    End If
+
+                    LogGuard.Warn(opt.Logger, "[Materialize] Materialisierungsmodus wurde fail-closed abgelehnt.")
                     Return False
-                End If
-            End If
 
-            ' Raw-Fallback: Persistenz als Datei, wenn keine sichere Extraktion erfolgt.
-            Return MaterializeRawBytes(data, destinationFull, overwrite, opt)
+                Case MaterializationModePersistRaw
+                    Return MaterializeRawBytes(data, destinationFull, overwrite, opt)
+
+                Case Else
+                    LogGuard.Warn(opt.Logger, $"[Materialize] Unbekannter Materialisierungsmodus: {mode}.")
+                    Return False
+            End Select
         End Function
 
         Private Shared Function MaterializeRawBytes _

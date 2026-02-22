@@ -773,3 +773,18 @@ Diese Policy ist in der CI-RoC-Matrix auf folgende Regeldateien gemappt:
 - `tools/ci/policies/rules/naming_snt.yaml`
 - `tools/ci/policies/rules/shell_safety.yaml`
 - `tools/ci/policies/rules/versioning_svt.yaml`
+
+## 12. Cross-Language CSCore-Regeln (Single-Package)
+- Abhängigkeitsrichtung ist strikt einseitig:
+  - `FileTypeDetectionLib` (VB) darf `FileClassifier.CSCore` (C#) referenzieren.
+  - `FileClassifier.CSCore` darf niemals zurück auf VB referenzieren.
+- `FileClassifier.CSCore` ist `IsPackable=false`; externes Consumer-Paket bleibt `Tomtastisch.FileClassifier`.
+- Beim Packen muss `FileClassifier.CSCore.dll` im finalen nupkg unter `lib/<TFM>/` enthalten sein (Single-Package-Contract).
+- C#-Datenmodelle in CSCore verwenden `record` + Auto-Properties mit `init` für konsistente Value-Semantik.
+- Compile-time Codegen ist verpflichtend für Mapping-Plumbing in CSCore (`Riok.Mapperly`), keine handgeschriebenen 1:1-Mapper.
+- Für `netstandard2.0` + `record` ist ein `IsExternalInit`-Polyfill verpflichtend (z. B. via `PolySharp` oder äquivalente compile-time Erzeugung).
+- Analyzer-Baseline für CSCore:
+  - `Microsoft.CodeAnalysis.NetAnalyzers`
+  - `Microsoft.CodeAnalysis.BannedApiAnalyzers` (fail-closed über `BannedSymbols.txt`)
+  - `Meziantou.Analyzer`
+- Für `FileTypeDetectionLib` ist mindestens `Microsoft.CodeAnalysis.BannedApiAnalyzers` mit derselben zentralen Banlist (`tools/analyzers/BannedSymbols.txt`) verpflichtend.

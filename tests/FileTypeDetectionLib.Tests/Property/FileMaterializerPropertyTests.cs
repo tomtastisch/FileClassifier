@@ -137,4 +137,52 @@ public sealed class FileMaterializerPropertyTests
 
         Assert.False(ok);
     }
+
+    [Fact]
+    public void Persist_SecureExtractDecisionMatrix_IsDeterministic_ForPayloadKinds()
+    {
+        var random = new Random(20260222);
+        var validZip = ArchivePayloadFactory.CreateZipWithSingleEntry("inner/note.txt", "matrix");
+        var malformedArchiveSignature = new byte[] { 0x50, 0x4B, 0x03, 0x04, 0xAA, 0xBB, 0xCC, 0xDD };
+        var plainPayload = new byte[] { 0x01, 0x23, 0x45, 0x67 };
+
+        using var tempScope = TestTempPaths.CreateScope("ftd-materializer-matrix");
+
+        for (var i = 0; i < 60; i++)
+        {
+            var secureExtract = random.Next(0, 2) == 1;
+            var payloadKind = random.Next(0, 3); // 0=plain, 1=valid-zip, 2=malformed-signature
+
+            var payload = payloadKind switch
+            {
+                1 => validZip,
+                2 => malformedArchiveSignature,
+                _ => plainPayload
+            };
+
+            var destination = secureExtract && payloadKind == 1
+                ? Path.Combine(tempScope.RootPath, $"extract-{i}")
+                : Path.Combine(tempScope.RootPath, $"persist-{i}.bin");
+
+            var ok = FileMaterializer.Persist(payload, destination, overwrite: false, secureExtract: secureExtract);
+            var expected = !(secureExtract && payloadKind == 2);
+
+            Assert.Equal(expected, ok);
+
+            if (expected && secureExtract && payloadKind == 1)
+            {
+                Assert.True(File.Exists(Path.Combine(destination, "inner", "note.txt")));
+            }
+
+            if (expected && (!secureExtract || payloadKind != 1))
+            {
+                Assert.True(File.Exists(destination));
+            }
+
+            if (!expected)
+            {
+                Assert.False(File.Exists(destination));
+            }
+        }
+    }
 }

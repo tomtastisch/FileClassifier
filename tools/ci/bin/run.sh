@@ -74,7 +74,23 @@ log_contains_high_or_critical() {
 
 find_pack_nupkg() {
   local pack_dir="$1"
-  find "${pack_dir}" -maxdepth 1 -type f -name '*.nupkg' ! -name '*.snupkg' | head -n1
+  python3 - "${pack_dir}" <<'PY'
+import glob
+import os
+import sys
+
+pack_dir = sys.argv[1]
+candidates = [
+    path for path in glob.glob(os.path.join(pack_dir, "*.nupkg"))
+    if not path.endswith(".snupkg")
+]
+if not candidates:
+    sys.exit(1)
+
+# Deterministic: prefer the most recently written package artifact.
+candidates.sort(key=lambda path: os.path.getmtime(path), reverse=True)
+print(candidates[0])
+PY
 }
 
 read_nupkg_metadata() {
@@ -169,6 +185,7 @@ run_preflight() {
   run_or_fail "CI-CODEQL-001" "CodeQL default setup must be not-configured" bash "${ROOT_DIR}/tools/ci/check-codeql-default-setup.sh"
   run_or_fail "CI-PREFLIGHT-001" "Doc consistency drift guard" python3 "${ROOT_DIR}/tools/check-doc-consistency.py"
   run_or_fail "CI-PREFLIGHT-001" "Doc shell compatibility guard" python3 "${ROOT_DIR}/tools/check-doc-shell-compat.py"
+  run_or_fail "CI-PREFLIGHT-001" "PR scope guard" python3 "${ROOT_DIR}/tools/ci/check-pr-scope.py" --repo-root "${ROOT_DIR}" --manifest "${ROOT_DIR}/tools/ci/policies/data/pr_scope_allowlist.txt" --base-ref "${PR_SCOPE_BASE_REF:-origin/main}" --mode combined --out "${ROOT_DIR}/${OUT_DIR}/pr-scope-summary.json"
   run_or_fail "CI-PREFLIGHT-001" "Docs checker unit tests" python3 -m unittest discover -s "${ROOT_DIR}/tools/tests" -p "test_*.py" -v
   run_or_fail "CI-PREFLIGHT-001" "Policy/RoC bijection" python3 "${ROOT_DIR}/tools/check-policy-roc.py" --out "${ROOT_DIR}/artifacts/policy_roc_matrix.tsv"
   run_or_fail "CI-PREFLIGHT-001" "VB Dim alignment check" python3 "${ROOT_DIR}/tools/ci/check-vb-dim-alignment.py" --root "${ROOT_DIR}/src/FileTypeDetection"
@@ -190,12 +207,14 @@ run_docs_links_full() {
 
 run_build() {
   run_or_fail "CI-BUILD-001" "Restore solution (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/FileClassifier.sln" -v minimal
+  run_or_fail "CI-BUILD-001" "Restore CSCore bridge project (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/src/FileClassifier.CSCore/FileClassifier.CSCore.csproj" -v minimal
   run_or_fail "CI-BUILD-001" "Build solution" dotnet build "${ROOT_DIR}/FileClassifier.sln" --no-restore -warnaserror -v minimal
   ci_result_append_summary "Build completed."
 }
 
 run_api_contract() {
   run_or_fail "CI-CONTRACT-001" "Restore test project (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj" -v minimal
+  run_or_fail "CI-CONTRACT-001" "Restore CSCore bridge project (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/src/FileClassifier.CSCore/FileClassifier.CSCore.csproj" -v minimal
   run_or_fail "CI-CONTRACT-001" "Run API contract tests" dotnet test "${ROOT_DIR}/tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj" -c Release --no-restore --filter "Category=ApiContract" -v minimal
   ci_result_append_summary "API contract checks completed."
 }
@@ -212,6 +231,7 @@ run_pack() {
 
   mkdir -p "${pack_output_dir}"
   run_or_fail "CI-PACK-001" "Restore package project (locked mode)" dotnet restore --locked-mode "${package_project}" -v minimal
+  run_or_fail "CI-PACK-001" "Restore CSCore bridge project (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/src/FileClassifier.CSCore/FileClassifier.CSCore.csproj" -v minimal
   run_or_fail "CI-PACK-001" "Build package project" dotnet build "${package_project}" -c Release --no-restore -warnaserror -v minimal
   run_or_fail "CI-PACK-001" "Pack package project" dotnet pack "${package_project}" -c Release --no-build -o "${pack_output_dir}" -v minimal
 
@@ -361,6 +381,7 @@ run_tests_bdd_coverage() {
   coverage_include="[${coverage_assembly}]*"
 
   run_or_fail "CI-TEST-001" "Restore solution (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/FileClassifier.sln" -v minimal
+  run_or_fail "CI-TEST-001" "Restore CSCore bridge project (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/src/FileClassifier.CSCore/FileClassifier.CSCore.csproj" -v minimal
   run_or_fail "CI-TEST-001" "BDD tests + coverage" env TEST_BDD_OUTPUT_DIR="$tests_dir" bash "${ROOT_DIR}/tools/test-bdd-readable.sh" -- /p:CollectCoverage=true /p:Include="${coverage_include}" /p:CoverletOutputFormat=cobertura /p:CoverletOutput="${coverage_dir}/coverage" /p:Threshold=85%2c69 /p:ThresholdType=line%2cbranch /p:ThresholdStat=total
   ci_result_append_summary "BDD coverage checks completed."
 }

@@ -1,0 +1,45 @@
+# Deterministic PR scope allowlist (glob patterns, repository-relative).
+# Keep this list narrowly aligned to intended issue blocks.
+
+Directory.Build.props
+Directory.Packages.props
+
+src/FileClassifier.CSCore/**
+src/FileTypeDetection/**
+src/FileClassifier.App/packages.lock.json
+src/README.md
+
+samples/PortableConsumer/**
+
+tests/FileTypeDetectionLib.Tests/**
+tests/PackageBacked.Tests/**
+
+tools/ci/**
+tools/tests/**
+.github/workflows/codeql.yml
+
+# active documentation scope for the CSCore migration chain
+
+docs/references/**
+docs/versioning/**
+docs/governance/**
+docs/audit/**
+docs/0_de/**
+docs/1_en/**
+docs/lang_switch_report.md
+docs/lang_switch_report.json
+
+# FC-0016: Sprachvereinheitlichung/Umlaute in kanonischen Root-Dokumenten
+docs/001_INDEX_CORE.MD
+docs/ci/001_PIPELINE_CI.MD
+docs/ci/002_NUGET_TRUSTED_PUBLISHING.MD
+docs/contracts/001_CONTRACT_HASHING.MD
+docs/guides/003_GUIDE_PORTABLE.MD
+docs/guides/004_GUIDE_MIGRATE_LEGACY_NUGET.MD
+docs/migrations/001_HASHING_RENAME.MD
+docs/secure/001_HMAC_KEY_SETUP.MD
+docs/security/010_CODEQL_DEFAULT_SETUP_GUARDRAIL.MD
+docs/verification/001_INDEX_TESTS.MD
+docs/verification/002_FLOW_BDD.MD
+docs/verification/003_CATALOG_BDD.MD
+docs/verification/103_CATALOG_BDD.MD

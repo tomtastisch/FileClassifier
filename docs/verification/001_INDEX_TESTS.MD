@@ -5,7 +5,7 @@
 # Testdokumentation (BDD)
 
 ## 1. Zweck
-Diese Seite ist der Einstieg fuer die testbezogene SSOT-Dokumentation im Bereich BDD/Reqnroll.
+Diese Seite ist der Einstieg für die testbezogene SSOT-Dokumentation im Bereich BDD/Reqnroll.
 
 ## 2. Geltungsbereich
 - `tests/FileTypeDetectionLib.Tests/Features/*.feature`
@@ -15,7 +15,7 @@ Diese Seite ist der Einstieg fuer die testbezogene SSOT-Dokumentation im Bereich
 
 ## 3. Dokumente
 1. [BDD-Satzkatalog (Deutsch, kanonisch)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/003_CATALOG_BDD.MD)
-2. [BDD-Ausfuehrung und Gherkin-Flow](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/002_FLOW_BDD.MD)
+2. [BDD-Ausführung und Gherkin-Flow](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/002_FLOW_BDD.MD)
 
 ## 4. Verifikation
 ```bash
