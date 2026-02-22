@@ -7,6 +7,14 @@
 Alle Änderungen werden hier technisch dokumentiert. Die Release-Version selbst ist
 der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 
+## [6.1.15]
+- Changed:
+  - Governance-Mapping für `CodeReviewID` auf den verifizierten Branch-Protection-Iststand harmonisiert (`required_approving_review_count = 0`, `require_code_owner_reviews = false`, `require_last_push_approval = false`).
+  - Aussagen „Merge ohne Review nicht möglich“ entfernt und durch prozessuale Pflichtkontrollen (Required Checks + Review-Thread-Evidence gemäß `AGENTS.md`) ersetzt.
+- Docs/CI/Tooling:
+  - Scorecard-Governance-Alert-Mappings in Root und DE/EN-Spiegeln konsolidiert.
+  - Versionskonvergenz aktiv auf `6.1.15` gesetzt (`RepoVersion`, `Version`, `PackageVersion`, Versionshistorie DE/EN).
+
 ## [6.1.14]
 - Added:
   - Release-Metadaten-Artefaktpfad eingeführt (`write_release_meta_artifact.sh`) und asynchrone Auflösung für `workflow_dispatch` ergänzt.
