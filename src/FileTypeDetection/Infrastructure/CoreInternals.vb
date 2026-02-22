@@ -84,14 +84,14 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="stream">Zu analysierender ZIP-Stream.</param>
         ''' <returns>Gemappter Dokumenttyp oder <see cref="FileKind.Unknown"/>.</returns>
         Private Shared Function DetectKindFromArchivePackage(stream As Stream) As FileType
-            Dim hasContentTypes As Boolean = False
-            Dim hasDocxMarker As Boolean = False
-            Dim hasXlsxMarker As Boolean = False
-            Dim hasPptxMarker As Boolean = False
-            Dim openDocumentKind As FileKind = FileKind.Unknown
-            Dim hasOpenDocumentConflict As Boolean = False
-            Dim structuredMarkerCount As Integer
-            Dim name As String
+            Dim hasContentTypes           As Boolean     = False
+            Dim hasDocxMarker             As Boolean     = False
+            Dim hasXlsxMarker             As Boolean     = False
+            Dim hasPptxMarker             As Boolean     = False
+            Dim openDocumentKind          As FileKind    = FileKind.Unknown
+            Dim hasOpenDocumentConflict   As Boolean     = False
+            Dim structuredMarkerCount     As Integer
+            Dim name                      As String
             Dim candidateOpenDocumentKind As FileKind
 
             Try
@@ -179,7 +179,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="entry">ZIP-Entry, der den ODF-MIME-Inhalt enthalten kann.</param>
         ''' <returns>Gemappter Office-Typ oder <see cref="FileKind.Unknown"/>.</returns>
         Private Shared Function TryDetectOpenDocumentKind(entry As ZipArchiveEntry) As FileKind
-            Dim mimeValue As String
+            Dim mimeValue      As String
             Dim normalizedMime As String
 
             If entry Is Nothing Then Return FileKind.Unknown
@@ -216,7 +216,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 entry As ZipArchiveEntry,
                 maxBytes As Integer
             ) As String
-            Dim buffer As Byte()
+            Dim buffer    As Byte()
             Dim readTotal As Integer
             Dim readCount As Integer
 
@@ -328,12 +328,12 @@ Namespace Global.Tomtastisch.FileClassifier
                 stream As Stream,
                 maxProbeBytes As Integer
             ) As FileType
-            Dim probeLimit As Integer
-            Dim chunk(4095) As Byte
-            Dim readTotal As Integer
-            Dim readCount As Integer
+            Dim probeLimit   As Integer
+            Dim chunk(4095)  As Byte
+            Dim readTotal    As Integer
+            Dim readCount    As Integer
             Dim targetStream As MemoryStream
-            Dim buffer As Byte()
+            Dim buffer       As Byte()
 
             If Not StreamGuard.IsReadable(stream) Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
 
@@ -376,10 +376,10 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="data">OLE-Bytepuffer.</param>
         ''' <returns>Gruppierter Office-Typ oder <see cref="FileKind.Unknown"/>.</returns>
         Private Shared Function RefineByMarkers(data As Byte()) As FileType
-            Dim hasWord As Boolean
-            Dim hasExcel As Boolean
+            Dim hasWord       As Boolean
+            Dim hasExcel      As Boolean
             Dim hasPowerPoint As Boolean
-            Dim markerCount As Integer
+            Dim markerCount   As Integer
 
             If Not IsOleCompoundHeader(data) Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
 
