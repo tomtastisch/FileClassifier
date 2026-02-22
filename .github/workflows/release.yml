@@ -78,6 +78,9 @@ jobs:
       - name: Restore (locked mode)
         run: dotnet restore --locked-mode FileClassifier.sln -v minimal
 
+      - name: Restore CSCore (out-of-solution)
+        run: dotnet restore --locked-mode src/FileClassifier.CSCore/FileClassifier.CSCore.csproj -v minimal
+
       - name: Build
         run: dotnet build FileClassifier.sln -c Release --no-restore -warnaserror -v minimal
 
