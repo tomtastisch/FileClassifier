@@ -49,6 +49,20 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <returns>Neue Instanz mit identischen aktuellen Optionswerten.</returns>
         Friend Function Clone() As HashOptions
 
+            Dim coalescedMaterializedFileName As String = Nothing
+
+            If CsCoreRuntimeBridge.TryCoalesceMaterializedFileName(
+                MaterializedFileName,
+                coalescedMaterializedFileName
+            ) Then
+                Return New HashOptions With {
+                        .IncludePayloadCopies = IncludePayloadCopies,
+                        .IncludeFastHash = IncludeFastHash,
+                        .IncludeSecureHash = IncludeSecureHash,
+                        .MaterializedFileName = coalescedMaterializedFileName
+                    }
+            End If
+
             Return New HashOptions With {
                     .IncludePayloadCopies = IncludePayloadCopies,
                     .IncludeFastHash = IncludeFastHash,
@@ -89,7 +103,13 @@ Namespace Global.Tomtastisch.FileClassifier
                 candidate As String
             ) As String
 
+            Dim normalizedFromCsCore As String = Nothing
             Dim normalized = If(candidate, String.Empty).Trim()
+
+            If CsCoreRuntimeBridge.TryNormalizeMaterializedFileName(candidate, normalizedFromCsCore) Then
+                Return normalizedFromCsCore
+            End If
+
             If String.IsNullOrWhiteSpace(normalized) Then Return "deterministic-roundtrip.bin"
 
             Try

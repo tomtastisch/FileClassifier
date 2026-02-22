@@ -391,10 +391,20 @@ Namespace Global.Tomtastisch.FileClassifier
                 ByRef note As String
             ) As Boolean
 
-            Dim b64 As String
+            Dim b64              As String
+            Dim resolvedByCsCore As Boolean = False
 
             key = Array.Empty(Of Byte)()
             note = String.Empty
+
+            If CsCoreRuntimeBridge.TryResolveHmacKeyFromEnvironment(
+                    EvidenceHashing.HmacKeyEnvVarB64Core(),
+                    resolvedByCsCore,
+                    key,
+                    note
+                ) Then
+                Return resolvedByCsCore
+            End If
 
             b64 = Environment.GetEnvironmentVariable(EvidenceHashing.HmacKeyEnvVarB64Core())
             If String.IsNullOrWhiteSpace(b64) Then
@@ -432,8 +442,13 @@ Namespace Global.Tomtastisch.FileClassifier
                 toAppend As String
             ) As String
 
-            Dim left  As String = If(baseNotes, String.Empty).Trim()
-            Dim right As String = If(toAppend, String.Empty).Trim()
+            Dim combinedByCsCore As String = Nothing
+            Dim left             As String = If(baseNotes, String.Empty).Trim()
+            Dim right            As String = If(toAppend, String.Empty).Trim()
+
+            If CsCoreRuntimeBridge.TryAppendNoteIfAny(baseNotes, toAppend, combinedByCsCore) Then
+                Return combinedByCsCore
+            End If
 
             If right.Length = 0 Then Return left
             If left.Length = 0 Then Return right
@@ -450,7 +465,17 @@ Namespace Global.Tomtastisch.FileClassifier
                 label As String
             ) As String
 
-            Dim normalized As String = If(label, String.Empty).Trim()
+            Dim normalized       As String = If(label, String.Empty).Trim()
+            Dim normalizedByCore As String = Nothing
+
+            If CsCoreRuntimeBridge.TryNormalizeEvidenceLabel(
+                    label,
+                    EvidenceHashing.DefaultPayloadLabelCore(),
+                    normalizedByCore
+                ) Then
+                Return normalizedByCore
+            End If
+
             If normalized.Length = 0 Then Return EvidenceHashing.DefaultPayloadLabelCore()
             Return normalized
         End Function

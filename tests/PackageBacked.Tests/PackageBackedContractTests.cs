@@ -35,4 +35,34 @@ public sealed class PackageBackedContractTests
         Assert.True(File.Exists(outputPath));
         Assert.Equal(payload, File.ReadAllBytes(outputPath));
     }
+
+    [Fact]
+    public void PackageContains_CsCoreAssembly_ForCrossLanguageRuntimeContract()
+    {
+        var csCoreAssembly = System.Reflection.Assembly.Load("FileClassifier.CSCore");
+        Assert.Equal("FileClassifier.CSCore", csCoreAssembly.GetName().Name);
+
+        var mapperType = csCoreAssembly.GetType("Tomtastisch.FileClassifier.CSCore.Mapping.FileDetectionMapper");
+        Assert.NotNull(mapperType);
+
+        var enumUtilityType = csCoreAssembly.GetType("Tomtastisch.FileClassifier.CSCore.Utilities.EnumUtility");
+        var guardUtilityType = csCoreAssembly.GetType("Tomtastisch.FileClassifier.CSCore.Utilities.GuardUtility");
+        var hashNormalizationUtilityType =
+            csCoreAssembly.GetType("Tomtastisch.FileClassifier.CSCore.Utilities.HashNormalizationUtility");
+        var materializationUtilityType =
+            csCoreAssembly.GetType("Tomtastisch.FileClassifier.CSCore.Utilities.MaterializationUtility");
+        var projectOptionsUtilityType =
+            csCoreAssembly.GetType("Tomtastisch.FileClassifier.CSCore.Utilities.ProjectOptionsUtility");
+        var evidencePolicyUtilityType =
+            csCoreAssembly.GetType("Tomtastisch.FileClassifier.CSCore.Utilities.EvidencePolicyUtility");
+        var archivePathPolicyUtilityType =
+            csCoreAssembly.GetType("Tomtastisch.FileClassifier.CSCore.Utilities.ArchivePathPolicyUtility");
+        Assert.NotNull(enumUtilityType);
+        Assert.NotNull(guardUtilityType);
+        Assert.NotNull(hashNormalizationUtilityType);
+        Assert.NotNull(materializationUtilityType);
+        Assert.NotNull(projectOptionsUtilityType);
+        Assert.NotNull(evidencePolicyUtilityType);
+        Assert.NotNull(archivePathPolicyUtilityType);
+    }
 }

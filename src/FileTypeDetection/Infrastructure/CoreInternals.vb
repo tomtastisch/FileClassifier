@@ -90,7 +90,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim hasPptxMarker             As Boolean  = False
             Dim openDocumentKind          As FileKind = FileKind.Unknown
             Dim hasOpenDocumentConflict   As Boolean  = False
-            Dim structuredMarkerCount     As Integer
+            Dim resolvedKind              As FileKind = FileKind.Unknown
             Dim name                      As String
             Dim candidateOpenDocumentKind As FileKind
 
@@ -124,35 +124,15 @@ Namespace Global.Tomtastisch.FileClassifier
 
                     Next
 
-                    If hasContentTypes Then
-                        ' OpenXML-Fall:
-                        ' Es muss genau ein strukturierter Marker eindeutig sein. Mehrdeutigkeit oder
-                        ' gleichzeitige ODF-Marker führen deterministisch zu UNKNOWN (fail-closed).
-                        structuredMarkerCount = 0
-                        If hasDocxMarker Then structuredMarkerCount += 1
-                        If hasXlsxMarker Then structuredMarkerCount += 1
-                        If hasPptxMarker Then structuredMarkerCount += 1
-
-                        If structuredMarkerCount > 1 Then
-                            Return FileTypeRegistry.Resolve(FileKind.Unknown)
-                        End If
-
-                        If openDocumentKind <> FileKind.Unknown Then
-                            Return FileTypeRegistry.Resolve(FileKind.Unknown)
-                        End If
-
-                        If hasDocxMarker Then Return FileTypeRegistry.Resolve(FileKind.Doc)
-                        If hasXlsxMarker Then Return FileTypeRegistry.Resolve(FileKind.Xls)
-                        If hasPptxMarker Then Return FileTypeRegistry.Resolve(FileKind.Ppt)
-                    End If
-
-                    If hasOpenDocumentConflict Then
-                        Return FileTypeRegistry.Resolve(FileKind.Unknown)
-                    End If
-
-                    If openDocumentKind <> FileKind.Unknown Then
-                        Return FileTypeRegistry.Resolve(openDocumentKind)
-                    End If
+                    resolvedKind = ResolveArchivePackageKind(
+                        hasContentTypes,
+                        hasDocxMarker,
+                        hasXlsxMarker,
+                        hasPptxMarker,
+                        openDocumentKind,
+                        hasOpenDocumentConflict
+                    )
+                    Return FileTypeRegistry.Resolve(resolvedKind)
                 End Using
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
@@ -167,6 +147,48 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
 
             Return FileTypeRegistry.Resolve(FileKind.Unknown)
+        End Function
+
+        Private Shared Function ResolveArchivePackageKind(
+                hasContentTypes As Boolean,
+                hasDocxMarker As Boolean,
+                hasXlsxMarker As Boolean,
+                hasPptxMarker As Boolean,
+                openDocumentKind As FileKind,
+                hasOpenDocumentConflict As Boolean
+            ) As FileKind
+
+            Dim kindKeyFromCsCore     As String  = Nothing
+            Dim structuredMarkerCount As Integer
+
+            If CsCoreRuntimeBridge.TryResolveArchivePackageKindKey(
+                    hasContentTypes:=hasContentTypes,
+                    hasDocxMarker:=hasDocxMarker,
+                    hasXlsxMarker:=hasXlsxMarker,
+                    hasPptxMarker:=hasPptxMarker,
+                    openDocumentKindKey:=FileKindToKindKey(openDocumentKind),
+                    hasOpenDocumentConflict:=hasOpenDocumentConflict,
+                    kindKey:=kindKeyFromCsCore
+                ) Then
+                Return KindKeyToFileKind(kindKeyFromCsCore)
+            End If
+
+            If hasContentTypes Then
+                structuredMarkerCount = 0
+                If hasDocxMarker Then structuredMarkerCount += 1
+                If hasXlsxMarker Then structuredMarkerCount += 1
+                If hasPptxMarker Then structuredMarkerCount += 1
+
+                If structuredMarkerCount > 1 Then Return FileKind.Unknown
+                If openDocumentKind <> FileKind.Unknown Then Return FileKind.Unknown
+                If hasDocxMarker Then Return FileKind.Doc
+                If hasXlsxMarker Then Return FileKind.Xls
+                If hasPptxMarker Then Return FileKind.Ppt
+            End If
+
+            If hasOpenDocumentConflict Then Return FileKind.Unknown
+            If openDocumentKind <> FileKind.Unknown Then Return openDocumentKind
+            Return FileKind.Unknown
         End Function
 
         ''' <summary>
@@ -188,6 +210,11 @@ Namespace Global.Tomtastisch.FileClassifier
             mimeValue = ReadZipEntryText(entry, maxBytes:=256)
             If String.IsNullOrWhiteSpace(mimeValue) Then Return FileKind.Unknown
             normalizedMime = mimeValue.Trim().ToLowerInvariant()
+
+            Dim kindKeyFromCsCore As String = Nothing
+            If CsCoreRuntimeBridge.TryResolveOpenDocumentMimeKindKey(normalizedMime, kindKeyFromCsCore) Then
+                Return KindKeyToFileKind(kindKeyFromCsCore)
+            End If
 
             If normalizedMime = "application/vnd.oasis.opendocument.text" Then Return FileKind.Doc
             If normalizedMime = "application/vnd.oasis.opendocument.text-template" Then Return FileKind.Doc
@@ -248,6 +275,20 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf ex Is ObjectDisposedException
                 Return String.Empty
             End Try
+        End Function
+
+        Private Shared Function KindKeyToFileKind(kindKey As String) As FileKind
+            If String.Equals(kindKey, "Doc", StringComparison.OrdinalIgnoreCase) Then Return FileKind.Doc
+            If String.Equals(kindKey, "Xls", StringComparison.OrdinalIgnoreCase) Then Return FileKind.Xls
+            If String.Equals(kindKey, "Ppt", StringComparison.OrdinalIgnoreCase) Then Return FileKind.Ppt
+            Return FileKind.Unknown
+        End Function
+
+        Private Shared Function FileKindToKindKey(kind As FileKind) As String
+            If kind = FileKind.Doc Then Return "Doc"
+            If kind = FileKind.Xls Then Return "Xls"
+            If kind = FileKind.Ppt Then Return "Ppt"
+            Return "Unknown"
         End Function
     End Class
 
@@ -379,7 +420,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim hasWord       As Boolean
             Dim hasExcel      As Boolean
             Dim hasPowerPoint As Boolean
-            Dim markerCount   As Integer
+            Dim resolvedKind  As FileKind = FileKind.Unknown
 
             If Not IsOleCompoundHeader(data) Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
 
@@ -387,17 +428,45 @@ Namespace Global.Tomtastisch.FileClassifier
             hasExcel = ContainsMarker(data, ExcelWorkbookMarker) OrElse ContainsMarker(data, ExcelBookMarker)
             hasPowerPoint = ContainsMarker(data, PowerPointMarker)
 
+            resolvedKind = ResolveLegacyMarkerKind(hasWord, hasExcel, hasPowerPoint)
+            Return FileTypeRegistry.Resolve(resolvedKind)
+        End Function
+
+        Private Shared Function ResolveLegacyMarkerKind(
+                hasWord As Boolean,
+                hasExcel As Boolean,
+                hasPowerPoint As Boolean
+            ) As FileKind
+
+            Dim markerCount       As Integer
+            Dim kindKeyFromCsCore As String  = Nothing
+
+            If CsCoreRuntimeBridge.TryResolveLegacyMarkerKindKey(
+                    hasWord:=hasWord,
+                    hasExcel:=hasExcel,
+                    hasPowerPoint:=hasPowerPoint,
+                    kindKey:=kindKeyFromCsCore
+                ) Then
+                Return KindKeyToFileKind(kindKeyFromCsCore)
+            End If
+
             markerCount = 0
             If hasWord Then markerCount += 1
             If hasExcel Then markerCount += 1
             If hasPowerPoint Then markerCount += 1
 
-            If markerCount <> 1 Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
-            If hasWord Then Return FileTypeRegistry.Resolve(FileKind.Doc)
-            If hasExcel Then Return FileTypeRegistry.Resolve(FileKind.Xls)
-            If hasPowerPoint Then Return FileTypeRegistry.Resolve(FileKind.Ppt)
+            If markerCount <> 1 Then Return FileKind.Unknown
+            If hasWord Then Return FileKind.Doc
+            If hasExcel Then Return FileKind.Xls
+            If hasPowerPoint Then Return FileKind.Ppt
+            Return FileKind.Unknown
+        End Function
 
-            Return FileTypeRegistry.Resolve(FileKind.Unknown)
+        Private Shared Function KindKeyToFileKind(kindKey As String) As FileKind
+            If String.Equals(kindKey, "Doc", StringComparison.OrdinalIgnoreCase) Then Return FileKind.Doc
+            If String.Equals(kindKey, "Xls", StringComparison.OrdinalIgnoreCase) Then Return FileKind.Xls
+            If String.Equals(kindKey, "Ppt", StringComparison.OrdinalIgnoreCase) Then Return FileKind.Ppt
+            Return FileKind.Unknown
         End Function
 
         ''' <summary>

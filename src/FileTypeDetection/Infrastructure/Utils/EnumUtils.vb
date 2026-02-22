@@ -166,8 +166,9 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             Dim enumType As Type  = GetType(TEnum)
             Dim raw      As Array
 
-            Dim values() As TEnum
-            Dim keys()   As Long
+            Dim values()          As TEnum
+            Dim delegatedValues() As TEnum = Nothing
+            Dim keys()            As Long
 
             Dim i        As Integer
             Dim count    As Integer
@@ -186,6 +187,15 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             ' -----------------------------------------------------------------
             If Not enumType.IsEnum Then
                 Throw New ArgumentException("TEnum muss ein Enum-Typ sein.", NameOf(TEnum))
+            End If
+
+            If CsCoreRuntimeBridge.TryGetEnumValues(
+                sortOrder:=CInt(sortOrder),
+                fromIndex:=fromIndex,
+                toIndex:=toIndex,
+                values:=delegatedValues
+            ) Then
+                Return delegatedValues
             End If
 
 

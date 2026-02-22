@@ -127,9 +127,14 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 destinationFull As String
             ) As Boolean Implements IDestinationPathPolicy.IsRootPath
 
-            Dim rootPath As String
+            Dim rootPath         As String
+            Dim isRootFromCsCore As Boolean = False
 
             If String.IsNullOrWhiteSpace(destinationFull) Then Return False
+
+            If CsCoreRuntimeBridge.TryIsRootPath(destinationFull, isRootFromCsCore) Then
+                Return isRootFromCsCore
+            End If
 
             Try
                 rootPath = Path.GetPathRoot(destinationFull)

@@ -29,9 +29,9 @@ Namespace Global.Tomtastisch.FileClassifier
     '''     </para>
     ''' </remarks>
     Public NotInheritable Class EvidenceHashing
-        Private Const LogicalManifestVersion As String = "FTD-LOGICAL-HASH-V1"
-        Private Const DefaultPayloadLabel As String = "payload.bin"
-        Private Const HmacKeyEnvVarB64 As String = "FILECLASSIFIER_HMAC_KEY_B64"
+        Private Const LogicalManifestVersion As String  = "FTD-LOGICAL-HASH-V1"
+        Private Const DefaultPayloadLabel As String     = "payload.bin"
+        Private Const HmacKeyEnvVarB64 As String        = "FILECLASSIFIER_HMAC_KEY_B64"
 
         Private Sub New()
         End Sub
@@ -85,8 +85,8 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim normalizedOptions As HashOptions                         = ResolveHashOptions(detectorOptions, options)
             Dim fileBytes         As Byte()                              = Array.Empty(Of Byte)()
             Dim readError         As String                              = String.Empty
-            Dim detectedType      As FileType
             Dim entries           As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
+            Dim detectedType      As FileType
 
             If String.IsNullOrWhiteSpace(path) OrElse Not IO.File.Exists(path) Then
                 Return Failure(HashSourceType.FilePath, path, "Datei nicht gefunden.")
@@ -142,8 +142,8 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <remarks>
         '''     <para>
-        '''         Ablauf:
-        '''         1) Delegation auf die Überladung mit expliziten Optionen,
+        '''         Ablauf: <br/>
+        '''         1) Delegation auf die Überladung mit expliziten Optionen, <br/>
         '''         2) Label-Normalisierung im Zielpfad.
         '''     </para>
         ''' </remarks>
@@ -164,15 +164,15 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <remarks>
         '''     <para>
-        '''         Ablauf:
-        '''         1) Snapshot und Normalisierung der Hashoptionen,
-        '''         2) Guard-Validierung (null/MaxBytes),
-        '''         3) Typdetektion,
-        '''         4) Archivzweig mit kanonischem Manifest oder Rohpayload-Zweig,
+        '''         Ablauf: <br/>
+        '''         1) Snapshot und Normalisierung der Hashoptionen,<br/>
+        '''         2) Guard-Validierung (null/MaxBytes),<br/>
+        '''         3) Typdetektion,<br/>
+        '''         4) Archivzweig mit kanonischem Manifest oder Rohpayload-Zweig,<br/>
         '''         5) Rückgabe als deterministisches <c>HashEvidence</c>.
         '''     </para>
         '''     <para>
-        '''         Fail-Closed: Bei Guard-Verletzung wird eine Failure-Evidence mit unverändertem Fehltext erzeugt.
+        '''         <b>Fail-Closed:</b> Bei Guard-Verletzung wird eine Failure-Evidence mit unverändertem Fehltext erzeugt.
         '''     </para>
         ''' </remarks>
         ''' <param name="data">Zu hashende Rohbytes.</param>
@@ -225,8 +225,8 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <remarks>
         '''     <para>
-        '''         Ablauf:
-        '''         1) Delegation auf die Überladung mit Label und Optionen,
+        '''         Ablauf:<br/>
+        '''         1) Delegation auf die Überladung mit Label und Optionen,<br/>
         '''         2) Verwendung des stabilen Labels <c>archive-entries</c>.
         '''     </para>
         ''' </remarks>
@@ -245,8 +245,8 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <remarks>
         '''     <para>
-        '''         Ablauf:
-        '''         1) Delegation auf die Überladung mit expliziten Optionen,
+        '''         Ablauf:<br/>
+        '''         1) Delegation auf die Überladung mit expliziten Optionen,<br/>
         '''         2) Label-Normalisierung im Zielpfad.
         '''     </para>
         ''' </remarks>
@@ -267,14 +267,14 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <remarks>
         '''     <para>
-        '''         Ablauf:
-        '''         1) Snapshot und Normalisierung der Hashoptionen,
-        '''         2) Deterministische Entry-Normalisierung (Pfad, Deduplizierung, Sortierung),
-        '''         3) Manifestbildung und Digest-Berechnung,
+        '''         Ablauf:<br/>
+        '''         1) Snapshot und Normalisierung der Hashoptionen,<br/>
+        '''         2) Deterministische Entry-Normalisierung (Pfad, Deduplizierung, Sortierung),<br/>
+        '''         3) Manifestbildung und Digest-Berechnung,<br/>
         '''         4) Rückgabe als <c>HashEvidence</c>.
         '''     </para>
         '''     <para>
-        '''         Fail-Closed: Null-Entries, ungültige Pfade oder Duplikate nach Normalisierung führen zu Failure-Evidence.
+        '''         <b>Fail-Closed:</b> Null-Entries, ungültige Pfade oder Duplikate nach Normalisierung führen zu Failure-Evidence.
         '''     </para>
         ''' </remarks>
         ''' <param name="entries">Read-only Liste normalisierbarer Archiveinträge.</param>
@@ -306,8 +306,8 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <remarks>
         '''     <para>
-        '''         Ablauf:
-        '''         1) Delegation auf die Überladung mit expliziten Optionen,
+        '''         Ablauf:<br/>
+        '''         1) Delegation auf die Überladung mit expliziten Optionen,<br/>
         '''         2) Anwendung der Snapshot-Defaults aus <c>FileTypeOptions</c>.
         '''     </para>
         ''' </remarks>
@@ -326,18 +326,18 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <remarks>
         '''     <para>
-        '''         Ablauf:
-        '''         1) h1: Hash des Eingabeobjekts,
-        '''         2) h2: Hash der kanonischen Archivsicht bzw. der Originalbytes,
-        '''         3) h3: Hash der logisch kanonisierten Bytes,
+        '''         Ablauf:<br/>
+        '''         1) h1: Hash des Eingabeobjekts,<br/>
+        '''         2) h2: Hash der kanonischen Archivsicht bzw. der Originalbytes,<br/>
+        '''         3) h3: Hash der logisch kanonisierten Bytes,<br/>
         '''         4) h4: Hash nach Materialisierung der kanonischen Bytes.
         '''     </para>
         '''     <para>
-        '''         Side-Effects: Die Materialisierung erzeugt temporär ein Dateiziel im System-Temp-Pfad und entfernt
+        '''         <b>Side-Effects:</b> Die Materialisierung erzeugt temporär ein Dateiziel im System-Temp-Pfad und entfernt
         '''         den Temp-Ordner anschließend best-effort mit Catch-Filter-Handling.
         '''     </para>
         '''     <para>
-        '''         Fail-Closed: Fehlerpfade liefern einen vollständigen Bericht mit Failure-Evidences.
+        '''         <b>Fail-Closed:</b> Fehlerpfade liefern einen vollständigen Bericht mit Failure-Evidences.
         '''     </para>
         ''' </remarks>
         ''' <param name="path">Pfad zur Eingabedatei.</param>

@@ -7,6 +7,7 @@ Einstiegspunkt für die Source-Variante des Moduls.
 - [Program](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileClassifier.App/Program.cs)
 - [Fileclassifier.app](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileClassifier.App/FileClassifier.App.csproj)
 - [Anwendungsmodul Index](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileClassifier.App/README.md)
+- [CSCore Modul Index](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileClassifier.CSCore/README.md)
 - [Bibliotheksmodul Index](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md)
 - [Dokumentationsindex](https://github.com/tomtastisch/FileClassifier/blob/main/docs/001_INDEX_CORE.MD)
 - [01 - Funktionen](https://github.com/tomtastisch/FileClassifier/blob/main/docs/010_API_CORE.MD)

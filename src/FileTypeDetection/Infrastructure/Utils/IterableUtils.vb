@@ -66,7 +66,11 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             ) As T()
 
             ' Deklarationsblock
-            Dim copy() As T
+            Dim copy() As T = Nothing
+
+            If CsCoreRuntimeBridge.TryCloneArray(source, copy) Then
+                Return copy
+            End If
 
             If source Is Nothing Then Return Nothing
 

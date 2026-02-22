@@ -35,6 +35,11 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         ''' <param name="ex">Zu prüfende Exception.</param>
         Friend Shared Function IsArchiveValidationException(ex As Exception) As Boolean
 
+            Dim isMatch As Boolean = False
+            If CsCoreRuntimeBridge.TryIsArchiveValidationException(ex, isMatch) Then
+                Return isMatch
+            End If
+
             Return TypeOf ex Is UnauthorizedAccessException OrElse
                 TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is IOException OrElse
@@ -51,6 +56,11 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         ''' <param name="ex">Zu prüfende Exception.</param>
         Friend Shared Function IsPathNormalizationException(ex As Exception) As Boolean
 
+            Dim isMatch As Boolean = False
+            If CsCoreRuntimeBridge.TryIsPathNormalizationException(ex, isMatch) Then
+                Return isMatch
+            End If
+
             Return TypeOf ex Is UnauthorizedAccessException OrElse
                 TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is IOException OrElse
@@ -64,6 +74,11 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         ''' <param name="ex">Zu prüfende Exception.</param>
         Friend Shared Function IsPathResolutionException(ex As Exception) As Boolean
 
+            Dim isMatch As Boolean = False
+            If CsCoreRuntimeBridge.TryIsPathResolutionException(ex, isMatch) Then
+                Return isMatch
+            End If
+
             Return IsPathNormalizationException(ex) OrElse
                 TypeOf ex Is PathTooLongException
         End Function
@@ -73,6 +88,11 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         ''' </summary>
         ''' <param name="ex">Zu prüfende Exception.</param>
         Friend Shared Function IsLoggerWriteException(ex As Exception) As Boolean
+
+            Dim isMatch As Boolean = False
+            If CsCoreRuntimeBridge.TryIsLoggerWriteException(ex, isMatch) Then
+                Return isMatch
+            End If
 
             Return TypeOf ex Is InvalidOperationException OrElse
                 TypeOf ex Is ObjectDisposedException OrElse
