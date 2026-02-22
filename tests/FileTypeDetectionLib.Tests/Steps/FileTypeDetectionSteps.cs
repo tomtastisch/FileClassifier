@@ -12,6 +12,7 @@ public sealed class FileTypeDetectionSteps
     private static readonly IReadOnlyDictionary<string, FileKind> LegacyFileKindAliases =
         new Dictionary<string, FileKind>(StringComparer.OrdinalIgnoreCase)
         {
+            ["Jpg"] = FileKind.Jpeg,
             ["Docx"] = FileKind.Doc,
             ["Xlsx"] = FileKind.Xls,
             ["Pptx"] = FileKind.Ppt

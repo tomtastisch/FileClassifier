@@ -4,7 +4,28 @@
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
+  <ItemGroup Condition="'$(MSBuildProjectName)' != 'PortableConsumer' And '$(ManagePackageVersionsCentrally)' == 'true'">
+    <PackageReference Include="DotNet.ReproducibleBuilds" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup Condition="
+      '$(MSBuildProjectName)' == 'FileClassifier.CSCore' Or
+      '$(MSBuildProjectName)' == 'FileClassifier.App' Or
+      '$(MSBuildProjectName)' == 'PolicyRunner' Or
+      '$(MSBuildProjectName)' == 'ResultSchemaValidator' Or
+      '$(MSBuildProjectName)' == 'CiGraphValidator' Or
+      '$(MSBuildProjectName)' == 'QodanaContractValidator'">
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" PrivateAssets="all" />
+    <PackageReference Include="Meziantou.Analyzer" PrivateAssets="all" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)tools/analyzers/BannedSymbols.txt"
+                     Condition="Exists('$(MSBuildThisFileDirectory)tools/analyzers/BannedSymbols.txt')" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'FileTypeDetectionLib'">
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" PrivateAssets="all" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)tools/analyzers/BannedSymbols.txt"
+                     Condition="Exists('$(MSBuildThisFileDirectory)tools/analyzers/BannedSymbols.txt')" />
+  </ItemGroup>
   <PropertyGroup>
-    <RepoVersion>6.1.12</RepoVersion>
+    <RepoVersion>6.1.13</RepoVersion>
   </PropertyGroup>
 </Project>

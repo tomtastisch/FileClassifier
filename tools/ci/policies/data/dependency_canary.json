@@ -14,6 +14,11 @@
       "name": "System.Text.Json",
       "risk": "json-input-parser",
       "test_filter": "FileTypeOptionsFacadeUnitTests|FileTypeDetectorAdditionalUnitTests|FileTypeDetectorPrivateBranchUnitTests|FixtureManifestCatalogUnitTests"
+    },
+    {
+      "name": "System.Text.Encoding.CodePages",
+      "risk": "archive-text-encoding",
+      "test_filter": "ArchiveInternalsNestedBranchUnitTests|ArchiveSharpCompressCompatUnitTests|CoreAndArchiveInternalsFailClosedUnitTests"
     }
   ]
 }

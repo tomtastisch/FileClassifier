@@ -4,14 +4,28 @@
     "net10.0": {
       "Tomtastisch.FileClassifier": {
         "type": "Direct",
-        "requested": "[4.4.0, )",
-        "resolved": "4.4.0",
-        "contentHash": "USMirK3EvVGy71q2lCxBkkKNB4R/Eu8oUrj5SIM39sZne9IMb1/YsernZDVQ3Uk/bcBRt9nF0+kBY4cV91GzCA==",
+        "requested": "[6.1.13, )",
+        "resolved": "6.1.13",
+        "contentHash": "igHjt4AfqU6UwTkbkGDRN86d+tuWdBRS/m13h9fmcEWw+jeJjrg17EOhP9EGxqYDsYTgJUxBFQWa80f8tNezwQ==",
         "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.3",
           "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
           "Mime": "3.8.0",
-          "SharpCompress": "0.39.0",
-          "System.IO.Hashing": "10.0.2"
+          "SharpCompress": "0.46.2",
+          "System.IO.Hashing": "10.0.3"
+        }
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions": {
+        "type": "Transitive",
+        "resolved": "10.0.3",
+        "contentHash": "bwGMrRcAMWx2s/RDgja97p27rxSz2pEQW0+rX5cWAUWVETVJ/eyxGfjAl8vuG5a+lckWmPIE+vcuaZNVB5YDdw=="
+      },
+      "Microsoft.Extensions.Logging.Abstractions": {
+        "type": "Transitive",
+        "resolved": "10.0.3",
+        "contentHash": "lxl0WLk7ROgBFAsjcOYjQ8/DVK+VMszxGBzUhgtQmAsTNldLL5pk9NG/cWTsXHq0lUhUEAtZkEE7jOGOA8bGKQ==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.3"
         }
       },
       "Microsoft.IO.RecyclableMemoryStream": {
@@ -34,34 +48,41 @@
       },
       "SharpCompress": {
         "type": "Transitive",
-        "resolved": "0.39.0",
-        "contentHash": "0esqIUDlg68Z7+Weuge4QzEvNtawUO4obTJFL7xuf4DBHMxVRr+wbNgiX9arMrj3kGXQSvLe0zbZG3oxpkwJOA==",
-        "dependencies": {
-          "ZstdSharp.Port": "0.8.4"
-        }
+        "resolved": "0.46.2",
+        "contentHash": "qLiVQXsKa1R0lc+StVpHLOLnMR7x0kFJrdfKoSRKJC8rPH0vtPTkYM13InEKgbhvHZ6HqJmA/iQVq/zmQ/5wxg=="
       },
       "System.IO.Hashing": {
         "type": "Transitive",
-        "resolved": "10.0.2",
-        "contentHash": "AKJknIFi9O3+rGExxTry188JPvUoZAPcCtS2qdqyFhIzsxQ1Ap94BeGDG0VzVEHakhmRxmJtVih6TsHoghIt/g=="
-      },
-      "ZstdSharp.Port": {
-        "type": "Transitive",
-        "resolved": "0.8.4",
-        "contentHash": "eieSXq3kakCUXbgdxkKaRqWS6hF0KBJcqok9LlDCs60GOyrynLvPOcQ0pRw7shdPF7lh/VepJ9cP9n9HHc759g=="
+        "resolved": "10.0.3",
+        "contentHash": "La6ICwsdTKhVX+LKN+pvFjQRR3LhLwq3uKdi2knjLzRyPYBSydF4cjXidYxIiTcDD6XVYdsBWQEI8ZxiZ/OdIg=="
       }
     },
     "net8.0": {
       "Tomtastisch.FileClassifier": {
         "type": "Direct",
-        "requested": "[4.4.0, )",
-        "resolved": "4.4.0",
-        "contentHash": "USMirK3EvVGy71q2lCxBkkKNB4R/Eu8oUrj5SIM39sZne9IMb1/YsernZDVQ3Uk/bcBRt9nF0+kBY4cV91GzCA==",
+        "requested": "[6.1.13, )",
+        "resolved": "6.1.13",
+        "contentHash": "igHjt4AfqU6UwTkbkGDRN86d+tuWdBRS/m13h9fmcEWw+jeJjrg17EOhP9EGxqYDsYTgJUxBFQWa80f8tNezwQ==",
         "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.3",
           "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
           "Mime": "3.8.0",
-          "SharpCompress": "0.39.0",
-          "System.IO.Hashing": "10.0.2"
+          "SharpCompress": "0.46.2",
+          "System.IO.Hashing": "10.0.3"
+        }
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions": {
+        "type": "Transitive",
+        "resolved": "10.0.3",
+        "contentHash": "bwGMrRcAMWx2s/RDgja97p27rxSz2pEQW0+rX5cWAUWVETVJ/eyxGfjAl8vuG5a+lckWmPIE+vcuaZNVB5YDdw=="
+      },
+      "Microsoft.Extensions.Logging.Abstractions": {
+        "type": "Transitive",
+        "resolved": "10.0.3",
+        "contentHash": "lxl0WLk7ROgBFAsjcOYjQ8/DVK+VMszxGBzUhgtQmAsTNldLL5pk9NG/cWTsXHq0lUhUEAtZkEE7jOGOA8bGKQ==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.3",
+          "System.Diagnostics.DiagnosticSource": "10.0.3"
         }
       },
       "Microsoft.IO.RecyclableMemoryStream": {
@@ -84,21 +105,18 @@
       },
       "SharpCompress": {
         "type": "Transitive",
-        "resolved": "0.39.0",
-        "contentHash": "0esqIUDlg68Z7+Weuge4QzEvNtawUO4obTJFL7xuf4DBHMxVRr+wbNgiX9arMrj3kGXQSvLe0zbZG3oxpkwJOA==",
-        "dependencies": {
-          "ZstdSharp.Port": "0.8.4"
-        }
+        "resolved": "0.46.2",
+        "contentHash": "qLiVQXsKa1R0lc+StVpHLOLnMR7x0kFJrdfKoSRKJC8rPH0vtPTkYM13InEKgbhvHZ6HqJmA/iQVq/zmQ/5wxg=="
+      },
+      "System.Diagnostics.DiagnosticSource": {
+        "type": "Transitive",
+        "resolved": "10.0.3",
+        "contentHash": "IuZXyF3K5X+mCsBKIQ87Cn/V4Nyb39vyCbzfH/AkoneSWNV/ExGQ/I0m4CEaVAeFh9fW6kp2NVObkmevd1Ys7A=="
       },
       "System.IO.Hashing": {
         "type": "Transitive",
-        "resolved": "10.0.2",
-        "contentHash": "AKJknIFi9O3+rGExxTry188JPvUoZAPcCtS2qdqyFhIzsxQ1Ap94BeGDG0VzVEHakhmRxmJtVih6TsHoghIt/g=="
-      },
-      "ZstdSharp.Port": {
-        "type": "Transitive",
-        "resolved": "0.8.4",
-        "contentHash": "eieSXq3kakCUXbgdxkKaRqWS6hF0KBJcqok9LlDCs60GOyrynLvPOcQ0pRw7shdPF7lh/VepJ9cP9n9HHc759g=="
+        "resolved": "10.0.3",
+        "contentHash": "La6ICwsdTKhVX+LKN+pvFjQRR3LhLwq3uKdi2knjLzRyPYBSydF4cjXidYxIiTcDD6XVYdsBWQEI8ZxiZ/OdIg=="
       }
     }
   }
