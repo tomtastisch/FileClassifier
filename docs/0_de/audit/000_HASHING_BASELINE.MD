@@ -13,12 +13,12 @@ Rename-Commit (Deterministic* -> Evidence/Hash*):
 - `7c6e94dad37b440c32386719e796d0bb6100c741`
 
 ## Zweck und Scope
-Dieses Dokument ist historische Evidence fuer das Verhalten der Hashing-Fassade und des Evidence-Modells **vor** dem public Rename:
+Dieses Dokument ist historische Evidence für das Verhalten der Hashing-Fassade und des Evidence-Modells **vor** dem public Rename:
 - `DeterministicHashing` -> `EvidenceHashing`
 - `DeterministicHash*` -> `Hash*`
 
-Es darf nicht als Beschreibung der aktuellen API-Oberflaeche auf `main` verwendet werden.
-SSOT fuer den aktuellen Stand:
+Es darf nicht als Beschreibung der aktuellen API-Oberfläche auf `main` verwendet werden.
+SSOT für den aktuellen Stand:
 - API-Surface: `docs/010_API_CORE.MD`
 - Contract: `docs/contracts/001_CONTRACT_HASHING.MD`
 - Implementation: `src/FileTypeDetection/EvidenceHashing.vb`
@@ -42,7 +42,7 @@ git show "$BASE":src/FileTypeDetection/Abstractions/Hashing/DeterministicHashSou
 Pinned File (Baseline-Commit):
 - `src/FileTypeDetection/DeterministicHashing.vb` @ `373146f0`
 
-Ausgewaehlte public Entrypoints (Baseline):
+Ausgewählte public Entrypoints (Baseline):
 - `HashFile(path)` / `HashFile(path, options)`
 - `HashBytes(data)` / `HashBytes(data, label, options)`
 - `HashEntries(entries, label, options)`
@@ -60,7 +60,7 @@ Archive/Entries-Mode (`BuildEvidenceFromEntries`):
 - Physical Bytes sind die Original-Archive-Bytes nur dann, wenn `compressedBytes` vorhanden und nicht leer ist.
 
 Kanonische Manifest-Struktur:
-- Enthaelt `LogicalManifestVersion` Header und Entry-Count.
+- Enthält `LogicalManifestVersion` Header und Entry-Count.
 - Pro Entry: schreibt Path-Bytes + Content-Length + SHA-256(content) Bytes.
 
 Formatierung:
@@ -90,4 +90,4 @@ Historisches Kommando (Baseline):
 - `dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -v minimal`
 
 Hinweis:
-- Die aktuelle Test-Suite-Groesse und exakte Counts koennen von der Baseline abweichen; der autoritative Check ist der CI-Job `tests-bdd-coverage` und lokal `dotnet test` auf `main`.
+- Die aktuelle Test-Suite-Größe und exakte Counts können von der Baseline abweichen; der autoritative Check ist der CI-Job `tests-bdd-coverage` und lokal `dotnet test` auf `main`.

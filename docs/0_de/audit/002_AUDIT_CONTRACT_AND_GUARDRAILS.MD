@@ -5,11 +5,11 @@
 # Audit-Vertrag und Guardrails
 
 ## 1. Zweck
-Deterministische Evidence-Regeln fuer die Verifikation von Claims in `SECURITY.md`.
+Deterministische Evidence-Regeln für die Verifikation von Claims in `SECURITY.md`.
 
 ## 2. Statusmodell
 Statuswerte im Result-Contract:
-- `pass`: keine blockierenden Verstoesse.
+- `pass`: keine blockierenden Verstöße.
 - `fail`: mindestens ein blockierender Verstoss.
 - `warn`: report-only Findings.
 
@@ -19,13 +19,13 @@ Operationales Tri-State-Mapping (Claim-Engine):
 - `unknown` -> schema `warn` with explicit reason code in `rule_violations[].message`
 
 ## 3. Blocking-Policy
-Blockierende Checks sind nur zulaessig, wenn sie deterministisch sind.
+Blockierende Checks sind nur zulässig, wenn sie deterministisch sind.
 Live GitHub API Checks sind blocker-eligible mit strikten Anti-Flake-Kontrollen:
 - 3 retries
 - exponential backoff (2s, 4s, 8s)
 - current implementation emits generic API failure messages after retries
 
-Wenn alle Retries erschoepft sind:
+Wenn alle Retries erschöpft sind:
 - Blocker-Claims failen mit Reason-Code
 - Report-only Claims emittieren `warn`
 
@@ -36,6 +36,6 @@ Erforderliche Artefakte pro Check:
 - `result.json` (muss `tools/ci/schema/result.schema.json` matchen)
 
 ## 5. Drift-Handling
-- Policy-Drift ist fail-closed fuer Blocker-Claims.
+- Policy-Drift ist fail-closed für Blocker-Claims.
 - Unknown-States werden nie stillschweigend ignoriert.
 - Jeder Failure muss einen Evidence-Pfad und ein reproduzierbares Kommando enthalten.

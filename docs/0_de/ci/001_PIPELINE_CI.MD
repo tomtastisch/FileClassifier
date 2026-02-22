@@ -5,18 +5,18 @@
 # CI-Pipeline (SSOT)
 
 ## Zweck und Geltungsbereich
-Dieses Dokument beschreibt die ausfuehrbare CI-Topologie und den Artefaktvertrag.
+Dieses Dokument beschreibt die ausführbare CI-Topologie und den Artefaktvertrag.
 Normative Policy-Schwellenwerte und Regelparameter liegen in `tools/ci/policies/rules/` und `docs/governance/001_POLICY_CI.MD`.
 
 ## Erforderliche Status-Contexts
 Die Branch-Protection auf `main` verlangt exakt diese Contexts (`strict: true`): `preflight`, `version-policy`, `build`, `api-contract`, `pack`, `consumer-smoke`, `package-backed-tests`, `security-nuget`, `tests-bdd-coverage`.
 Nachweis: Branch-Protection-API-Ausgabe (`required_status_checks.contexts`), `.github/workflows/ci.yml:59-347` und `.github/workflows/ruleset-placeholders.yml` (Context `version-policy`).
-Hinweis: Die normative Versionierungsentscheidung (RaC) wird zusaetzlich durch `.github/workflows/version-policy.yml` als Check `versioning-policy` ausgewertet (nicht Teil der Branch-Protection-Contexts).
+Hinweis: Die normative Versionierungsentscheidung (RaC) wird zusätzlich durch `.github/workflows/version-policy.yml` als Check `versioning-policy` ausgewertet (nicht Teil der Branch-Protection-Contexts).
 
 ## Workflow-Topologie
-- `pr-labeling` laeuft nur auf `pull_request` und ist getrennt vom erforderlichen technischen Gate-Pfad (`.github/workflows/ci.yml:22-58`).
-- Der technische Gate-Pfad startet bei `preflight` und faechert in Downstream-Jobs ueber `needs` auf (`.github/workflows/ci.yml:89-427`).
-- `summary` aggregiert Downstream-Artefakte und fuehrt Contract-Checks aus (`.github/workflows/ci.yml:349-427`, `tools/ci/bin/run.sh:446`).
+- `pr-labeling` läuft nur auf `pull_request` und ist getrennt vom erforderlichen technischen Gate-Pfad (`.github/workflows/ci.yml:22-58`).
+- Der technische Gate-Pfad startet bei `preflight` und fächert in Downstream-Jobs über `needs` auf (`.github/workflows/ci.yml:89-427`).
+- `summary` aggregiert Downstream-Artefakte und führt Contract-Checks aus (`.github/workflows/ci.yml:349-427`, `tools/ci/bin/run.sh:446`).
 
 ```mermaid
 flowchart TD
@@ -99,8 +99,8 @@ Nachweis:
 - Workflow-Token-Quelle: `GH_TOKEN: ${{ github.token }}` (`.github/workflows/ci.yml:46-50`).
 
 ## Qodana: Vertragsposition
-Qodana laeuft in einem separaten Workflow und wird durch `run.sh qodana` validiert:
-- Qodana-Action-Ausfuehrung und SARIF-Ausgabepfad (`.github/workflows/qodana.yml:34-40`, `.github/workflows/qodana.yml:59`).
+Qodana läuft in einem separaten Workflow und wird durch `run.sh qodana` validiert:
+- Qodana-Action-Ausführung und SARIF-Ausgabepfad (`.github/workflows/qodana.yml:34-40`, `.github/workflows/qodana.yml:59`).
 - Vertragscheck-Aufruf (`.github/workflows/qodana.yml:47-48`, `tools/ci/bin/run.sh:402-422`).
 - Qodana-Artefakt-Upload (`.github/workflows/qodana.yml:54-60`).
-- Fail-closed Pflicht-Gate in trusted Kontexten: fuer `push` und interne PRs wird `QODANA_TOKEN` erzwungen; untrusted PR-Kontexte (Fork/Dependabot) werden explizit ausgenommen (`.github/workflows/qodana.yml:14-33`).
+- Fail-closed Pflicht-Gate in trusted Kontexten: für `push` und interne PRs wird `QODANA_TOKEN` erzwungen; untrusted PR-Kontexte (Fork/Dependabot) werden explizit ausgenommen (`.github/workflows/qodana.yml:14-33`).

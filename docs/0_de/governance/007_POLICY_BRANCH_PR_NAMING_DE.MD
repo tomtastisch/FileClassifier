@@ -5,13 +5,13 @@
 # Policy Branch/PR Naming (DE)
 
 ## 1. Zweck
-Diese Policy definiert ein einheitliches, professionelles und maschinenpruefbares Naming fuer Branches und Pull Requests.
+Diese Policy definiert ein einheitliches, professionelles und maschinenprüfbares Naming für Branches und Pull Requests.
 
 ## 2. Verbindliche Konventionen
 
 ### 2.1 Branches
 - Muss-Format: `codex/<tag>/<kurztext-kebab>`
-- Uebergang (legacy, befristet): `codex/<tag>-<kurztext-kebab>` wird fuer bestehende Branches akzeptiert.
+- Übergang (legacy, befristet): `codex/<tag>-<kurztext-kebab>` wird für bestehende Branches akzeptiert.
 - Erlaubte `<tag>`:
   - `fix`
   - `release`
@@ -35,8 +35,8 @@ Diese Policy definiert ein einheitliches, professionelles und maschinenpruefbare
   - optional, aber empfohlen.
 - Kurzbeschreibung:
   - Deutsch,
-  - praezise, kein Platzhaltertext,
-  - Ergebnis-/Aenderungsbezug.
+  - präzise, kein Platzhaltertext,
+  - Ergebnis-/Änderungsbezug.
 
 ### 2.3 PR-Beschreibung
 - Muss auf Deutsch sein.
@@ -44,7 +44,7 @@ Diese Policy definiert ein einheitliches, professionelles und maschinenpruefbare
 - Muss Checklisten und DoD-Matrix enthalten.
 
 ## 3. Verbotene Muster
-- Unpraezise Titel wie `update`, `changes`, `misc`.
+- Unpräzise Titel wie `update`, `changes`, `misc`.
 - Branches ohne Tag-Segment.
 - PRs ohne Checklistenpflege nach Nachbesserungen.
 
@@ -56,7 +56,7 @@ Diese Policy definiert ein einheitliches, professionelles und maschinenpruefbare
 - Fail-closed: Verstoss blockiert Merge.
 
 ## 5. DoD
-- DoD A: `pr-governance` laeuft erfolgreich fuer die PR.
+- DoD A: `pr-governance` läuft erfolgreich für die PR.
 - DoD B: Branch- und PR-Name entsprechen exakt der Konvention.
 
 ## 6. Rule Mapping

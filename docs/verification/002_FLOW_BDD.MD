@@ -2,15 +2,15 @@
 [DE](002_FLOW_BDD.MD) | [EN](102_FLOW_BDD.MD)
 <!-- LANG_SWITCH:END -->
 
-# BDD-Ausfuehrung und Gherkin-Flow
+# BDD-Ausführung und Gherkin-Flow
 
 ## 1. Zweck
-Dieses Dokument beschreibt den End-to-End-Ablauf der BDD-Tests: vom Gherkin-Satz ueber Step-Binding bis zur ausgefuehrten Fachmethode.
+Dieses Dokument beschreibt den End-to-End-Ablauf der BDD-Tests: vom Gherkin-Satz über Step-Binding bis zur ausgeführten Fachmethode.
 
 ## 2. Geltungsbereich
-- Feature-Saetze unter `tests/FileTypeDetectionLib.Tests/Features/`
+- Feature-Sätze unter `tests/FileTypeDetectionLib.Tests/Features/`
 - Step-Bindings in `tests/FileTypeDetectionLib.Tests/Steps/FileTypeDetectionSteps.cs`
-- Ausfuehrung ueber `tools/test-bdd-readable.sh`
+- Ausführung über `tools/test-bdd-readable.sh`
 
 ## 3. Ablaufmodell
 ```mermaid
@@ -45,14 +45,14 @@ sequenceDiagram
 | Satzart | Verantwortungsziel | Typischer Inhalt |
 |---|---|---|
 | `Given` | Startzustand herstellen | Ressource laden, Temp-Verzeichnis anlegen, Limits setzen |
-| `When` | Fachaktion ausfuehren | Detect, Validate, Extract, Persist, Hashing |
+| `When` | Fachaktion ausführen | Detect, Validate, Extract, Persist, Hashing |
 | `Then` | Ergebnis verifizieren | Typ, Bool-Ergebnis, Dateiexistenz, Hash-Konsistenz |
 
 ## 6. Warum der Ansatz deterministisch ist
-- Feature-Saetze sind kanonisch und eindeutig.
+- Feature-Sätze sind kanonisch und eindeutig.
 - Jeder Satz mappt auf genau eine Binding-Methode.
 - Ergebniszustand wird zentral in `DetectionScenarioState` gehalten.
-- Assertions pruefen nur diesen Zustand und nicht implizite Nebeneffekte.
+- Assertions prüfen nur diesen Zustand und nicht implizite Nebeneffekte.
 
 ## 7. CI-Integration
 ```mermaid

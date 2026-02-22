@@ -8,8 +8,8 @@
 Wave-1 Baseline-Findings aus JSON-Analyseartefakten.
 
 ## Aktueller Stand
-Package A (Cluster 7C) hat generische Entry-Point-Catches fuer die gescopten Files entfernt (merged 2026-02-15).
-Package B (Cluster 7C) reduziert duplizierte Archive/Stream-Guard-Fragmente in `Infrastructure/*` bei unveraendertem Verhalten.
+Package A (Cluster 7C) hat generische Entry-Point-Catches für die gescopten Files entfernt (merged 2026-02-15).
+Package B (Cluster 7C) reduziert duplizierte Archive/Stream-Guard-Fragmente in `Infrastructure/*` bei unverändertem Verhalten.
 Evidence-backed Kandidaten werden getrackt in:
 - `artifacts/audit/dead_code_candidates.json`
 - `artifacts/audit/redundancy_candidates.json`
@@ -18,7 +18,7 @@ Evidence-backed Kandidaten werden getrackt in:
 
 ## Baseline-Findings (Wave 1)
 1. Generische `Catch ex As Exception` Nutzung wurde aus den Package-A Entry-Point-Files entfernt (`FileTypeDetector`, `FileMaterializer`, `EvidenceHashing`).
-   Verbleibende broad catches benoetigen Follow-up in Infrastructure-Internals (Package B/C Scope).
+   Verbleibende broad catches benötigen Follow-up in Infrastructure-Internals (Package B/C Scope).
    - Beispiele:
      - `src/FileTypeDetection/Infrastructure/CoreInternals.vb:58`
      - `src/FileTypeDetection/Infrastructure/ArchiveManagedInternals.vb:70`
@@ -38,12 +38,12 @@ Evidence-backed Kandidaten werden getrackt in:
 3. Dead-Code-Kandidaten-Scan lieferte unter der implementierten Heuristik aktuell keine low-reference Source-Declarations in `src/`.
    - Evidence: `artifacts/audit/dead_code_candidates.json`
 
-4. `DetectDetailed(...).ReasonCode` nutzte einen generischen Bucket `"Exception"` fuer unterschiedliche Exception-Klassen (IO, Security, Argument, etc.).
+4. `DetectDetailed(...).ReasonCode` nutzte einen generischen Bucket `"Exception"` für unterschiedliche Exception-Klassen (IO, Security, Argument, etc.).
    - Impact: reduzierte Auditierbarkeit von fail-closed Pfaden (Root-Causes waren im Ergebnis nicht unterscheidbar).
    - Status: Package C mappt File-Access-Exceptions auf deterministische, typisierte Reason-Codes.
 
 ## Repro-Evidence-Kommandos
-Alle Kommandos sind fuer Ausfuehrung im Repository-Root gedacht.
+Alle Kommandos sind für Ausführung im Repository-Root gedacht.
 ```bash
 bash tools/audit/verify-code-analysis-evidence.sh
 jq '.candidates | length' artifacts/audit/hardening_candidates.json
@@ -53,7 +53,7 @@ rg -n "If\\s+stream\\s+Is\\s+Nothing\\s+OrElse\\s+Not\\s+stream\\.CanRead" src/F
 rg -n "If\\s+stream\\.CanSeek\\s+Then\\s+stream\\.Position\\s*=\\s*0" src/FileTypeDetection/Infrastructure/ArchiveManagedInternals.vb src/FileTypeDetection/Infrastructure/ArchiveInternals.vb
 ```
 
-## Findings-Format (fuer die naechsten PRs)
+## Findings-Format (für die nächsten PRs)
 - ID
 - file + line
 - reproduzierbares Evidence-Kommando
@@ -61,7 +61,7 @@ rg -n "If\\s+stream\\.CanSeek\\s+Then\\s+stream\\.Position\\s*=\\s*0" src/FileTy
 - proposed change
 - required regression tests
 
-## Prioritaets-Policy
+## Prioritäts-Policy
 - P1: Security-Korrektheit oder Behavioral-Risk
 - P2: wahrscheinlich dead/redundant code mit mittlerer Confidence
 - P3: Readability/Perf Opportunities mit geringem Risiko

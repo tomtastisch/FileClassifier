@@ -5,15 +5,15 @@
 # Evidence Report — Issue #67 (Full Refactor & Production-Readiness Hardening)
 
 ## 1. Ziel / Scope
-Dieser Report ist das zentrale, reproduzierbare Evidence-Dokument fuer Issue #67.
+Dieser Report ist das zentrale, reproduzierbare Evidence-Dokument für Issue #67.
 Er umfasst:
-- Baseline Snapshot (Repo-Status, Tool-Versionen, ausgefuehrte Checks)
+- Baseline Snapshot (Repo-Status, Tool-Versionen, ausgeführte Checks)
 - Inventory (Module/Dateien als machine-readable JSON)
 - Findings (priorisiert, zitierbar, mit Evidence-Quelle)
 - PR-Mapping (geplante/umgesetzte PR-Pakete)
 
 Nicht enthalten (Non-Goals):
-- Keine Aenderung von `SECURITY.md` (eingefroren).
+- Keine Änderung von `SECURITY.md` (eingefroren).
 - Keine Commit-basierten Artefakte unter `artifacts/` (werden reproduzierbar erzeugt und sind `.gitignore`d).
 
 ## 2. Baseline Snapshot (Phase 0)
@@ -31,16 +31,16 @@ Tooling (lokal, Baseline):
 - gh: `2.86.0`
 
 ASSUMPTION:
-- Tool-Versionen koennen sich lokal/CI unterscheiden (GitHub Actions verwendet `ubuntu-latest` + `actions/setup-*`).
-  Verifikation: Baseline wird in CI ueber die PR-Checks erzwungen (`.github/workflows/ci.yml`).
+- Tool-Versionen können sich lokal/CI unterscheiden (GitHub Actions verwendet `ubuntu-latest` + `actions/setup-*`).
+  Verifikation: Baseline wird in CI über die PR-Checks erzwungen (`.github/workflows/ci.yml`).
 
 ## 3. Baseline Checks (Phase 0)
-Alle Kommandos sind vom Repo-Root aus ausfuehrbar. Artefakte werden unter `artifacts/ci/<check_id>/` erzeugt.
+Alle Kommandos sind vom Repo-Root aus ausführbar. Artefakte werden unter `artifacts/ci/<check_id>/` erzeugt.
 
 Hinweis (CI-Governance):
 - PR-Beschreibungen werden fail-closed validiert (Pflichtsektionen/Checklisten) via `tools/ci/check-pr-governance.sh`.
 
-Ausgefuehrte Checks (lokal) + Evidence-Pfade:
+Ausgeführte Checks (lokal) + Evidence-Pfade:
 ```bash
 bash tools/ci/bin/run.sh preflight
 bash tools/ci/bin/run.sh docs-links-full
@@ -56,7 +56,7 @@ bash tools/ci/bin/run.sh versioning-svt
 bash tools/ci/bin/run.sh version-convergence
 ```
 
-Ergebnis (Baseline, lokal): PASS fuer alle oben genannten Checks.
+Ergebnis (Baseline, lokal): PASS für alle oben genannten Checks.
 Evidence:
 - `artifacts/ci/<check_id>/summary.md`
 - `artifacts/ci/<check_id>/result.json`
@@ -113,12 +113,12 @@ Status (Baseline):
   - `src/FileTypeDetection/Infrastructure/CoreInternals.vb` (1)
 
 Risiko/Impact:
-- Catch-all kann unerwartete/programmatische Fehler maskieren; gleichzeitig wird fail-closed Verhalten benoetigt.
+- Catch-all kann unerwartete/programmatische Fehler maskieren; gleichzeitig wird fail-closed Verhalten benötigt.
 
 Fix-Strategie (Package A):
-- Catch-Scopes minimieren / differenzieren (wo deterministisch moeglich).
+- Catch-Scopes minimieren / differenzieren (wo deterministisch möglich).
 - Catch-All nur als "non-fatal" Guard (fatal exceptions nicht schlucken) und mit klarer, stabiler Reason-Logik.
-- Regression-Tests fuer fail-closed Branches/Reason-Codes.
+- Regression-Tests für fail-closed Branches/Reason-Codes.
 
 ### Finding B (P2, maintainability): Guard/Path Handling Duplication
 Evidence:
@@ -129,7 +129,7 @@ Status (Baseline):
 
 Fix-Strategie (Package B):
 - Duplikate nur konsolidieren, wenn Outputs byte-for-byte identisch bleiben.
-- Edge-Case Regression-Tests fuer Guards (Traversal, Root, invalid path, staging cleanup).
+- Edge-Case Regression-Tests für Guards (Traversal, Root, invalid path, staging cleanup).
 
 ### Finding C (P3, report-only): Dead-Code Candidates
 Evidence:
@@ -144,8 +144,8 @@ Geplante/iterative PR-Pakete (aus `docs/audit/010_REFACTOR_BACKLOG.MD`):
 2. Package B (P2) - Archive/path guard duplication reduction
 3. Package C (P3) - Exception reason code normalization
 
-Dieses Dokument ist PR-uebergreifend; pro Package wird die Findings-/Status-Sektion aktualisiert.
+Dieses Dokument ist PR-übergreifend; pro Package wird die Findings-/Status-Sektion aktualisiert.
 
 ## 7. Decision Log
-- 2026-02-15: Baseline Evidence wird ausschliesslich ueber reproduzierbare Kommandos + `artifacts/` erzeugt (nicht committen).
+- 2026-02-15: Baseline Evidence wird ausschliesslich über reproduzierbare Kommandos + `artifacts/` erzeugt (nicht committen).
 - 2026-02-15: Findings-Quelle ist initial JSON-Heuristik (`tools/audit/generate-code-analysis-json.sh`), nachfolgend durch zielgerichtete Tests/Evidence zu erharten.

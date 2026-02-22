@@ -22,7 +22,7 @@ Verglichene Repositories:
 - `NLog/NLog`
 
 ## 2. Methodik (nur faktenbasiert)
-Erhoben ueber GitHub API und lokale Dateiinspektion:
+Erhoben über GitHub API und lokale Dateiinspektion:
 - Vorhandensein `SECURITY.md` (FileClassifier: repo-root `SECURITY.md`; andere Repos ggf. alternativ `.github/SECURITY.md`)
 - Status `private-vulnerability-reporting`
 - Sichtbare `security_and_analysis`-Felder (`dependabot_security_updates`, `secret_scanning`)
@@ -46,8 +46,8 @@ Erhoben ueber GitHub API und lokale Dateiinspektion:
 | NLog/NLog | ja | true | unknown | unknown | nein | ja |
 
 Hinweis:
-- `unknown` bedeutet: Feld wird ueber GitHub API fuer das betrachtete Fremdrepo nicht veroeffentlicht bzw. nicht sichtbar geliefert.
-- `false_or_unavailable` bedeutet: API liefert fuer den Endpunkt keine aktive Konfiguration.
+- `unknown` bedeutet: Feld wird über GitHub API für das betrachtete Fremdrepo nicht veröffentlicht bzw. nicht sichtbar geliefert.
+- `false_or_unavailable` bedeutet: API liefert für den Endpunkt keine aktive Konfiguration.
 
 ## 4. Ergebnis B - SECURITY.md Inhaltsvergleich
 | Repository | Support-Versionen | Reporting-Abschnitt | SLA-Zeitwerte | Safe Harbor | ISO/IEC 29147/30111 | Koordinierte Offenlegung |
@@ -62,23 +62,23 @@ Hinweis:
 ## 5. Interpretation (faktennah)
 - Die neue `SECURITY.md` von FileClassifier ist inhaltlich umfangreicher als die untersuchten Vergleichsdateien (insbesondere Safe Harbor, ISO/IEC-Orientierung, koordinierte Offenlegung).
 - Snapshot-Hinweis: Zum Erhebungszeitpunkt lag die Datei im PR-Branch `tomtastisch-patch-1` und noch nicht in `main`.
-- Repo-seitige Sicherheitsmechanismen sind fuer FileClassifier nachweisbar aktiv:
+- Repo-seitige Sicherheitsmechanismen sind für FileClassifier nachweisbar aktiv:
   - Private Vulnerability Reporting (`enabled=true`)
   - Dependabot Security Updates (`enabled`)
   - Secret Scanning (`enabled`)
   - CI-Sicherheitsgate `security-nuget` (lokal mit `pass` verifiziert)
 
-## 6. Rest-Gaps fuer "zertifizierungsnahe" Einsatzfaehigkeit
-Diese Punkte sind ausserhalb einer einzelnen `SECURITY.md`, aber notwendig fuer belastbare Audit-/Zertifizierungsfaehigkeit:
+## 6. Rest-Gaps für "zertifizierungsnahe" Einsatzfähigkeit
+Diese Punkte sind ausserhalb einer einzelnen `SECURITY.md`, aber notwendig für belastbare Audit-/Zertifizierungsfähigkeit:
 - formaler SDLC-Nachweis (dokumentierte Rollen, Freigaben, Change-Management)
-- Threat-Modeling-Artefakte mit regelmaessiger Aktualisierung
+- Threat-Modeling-Artefakte mit regelmäßiger Aktualisierung
 - Incident-Response-Runbooks mit Uebungen und Nachweisen
-- SBOM/Provenance-Strategie fuer Releases (inkl. Aufbewahrung)
-- formaler Nachweis fuer Produktionsbetriebskontrollen beim Betreiber
+- SBOM/Provenance-Strategie für Releases (inkl. Aufbewahrung)
+- formaler Nachweis für Produktionsbetriebskontrollen beim Betreiber
 
 ## 7. Reproduzierbarkeit
 Verwendete Kommandos (Auszug):
-Alle Kommandos sind fuer die Ausfuehrung im Repository-Root gedacht.
+Alle Kommandos sind für die Ausführung im Repository-Root gedacht.
 ```bash
 REPO="<owner>/<repo>"
 gh api "repos/$REPO"
@@ -89,7 +89,7 @@ gh api "repos/$REPO/contents/.github/workflows"
 gh api "repos/$REPO/contents/.github/dependabot.yml"
 ```
 
-Lokale Verifikation fuer FileClassifier:
+Lokale Verifikation für FileClassifier:
 ```bash
 python3 tools/check-docs.py
 dotnet build FileClassifier.sln -v minimal

@@ -18,7 +18,7 @@ Es dient als Freigabebasis vor Merge und als Guard gegen unabsichtliche API-Drif
 - `Hmac*Sha256` ist optionaler keyed Digest (HMAC-SHA256) für Authentizität/Tamper-Evidence.
   - Aktivierung: `HashOptions.IncludeSecureHash = true`
   - Key: Environment Variable `FILECLASSIFIER_HMAC_KEY_B64` (Base64)
-  - Wenn Key fehlt/ungueltig: HMAC-Digests bleiben leer und Evidence-Notes enthalten einen Hinweis.
+  - Wenn Key fehlt/ungültig: HMAC-Digests bleiben leer und Evidence-Notes enthalten einen Hinweis.
 - Overloads ohne `options` verwenden `FileTypeOptions.GetSnapshot().DeterministicHash` als globale Default-Policy.
 
 ## 3. Public Surface (freigegeben)

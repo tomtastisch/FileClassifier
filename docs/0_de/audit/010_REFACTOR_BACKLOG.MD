@@ -33,12 +33,12 @@ Scope candidates:
 - `src/FileTypeDetection/EvidenceHashing.vb`
 
 Rules:
-- generisches `Catch ex As Exception` durch engere Exception-Behandlung ersetzen, wo deterministisch moeglich
+- generisches `Catch ex As Exception` durch engere Exception-Behandlung ersetzen, wo deterministisch möglich
 - fail-closed Verhalten beibehalten
 - aktuelle public API und Return-Contracts erhalten
 
 Required checks:
-Alle Kommandos sind fuer Ausfuehrung im Repository-Root gedacht.
+Alle Kommandos sind für Ausführung im Repository-Root gedacht.
 ```bash
 dotnet build FileClassifier.sln -v minimal
 dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release -v minimal
@@ -52,8 +52,8 @@ Scope candidates:
 - `src/FileTypeDetection/Infrastructure/ArchiveManagedInternals.vb`
 
 Rules:
-- duplizierte Guard-Fragmente nur konsolidieren, wenn das Verhalten auf Outputs byte-for-byte aequivalent bleibt
-- fokussierte Regression-Tests fuer Guard-Edge-Cases ergaenzen
+- duplizierte Guard-Fragmente nur konsolidieren, wenn das Verhalten auf Outputs byte-for-byte äquivalent bleibt
+- fokussierte Regression-Tests für Guard-Edge-Cases ergänzen
 
 Required checks:
 ```bash
@@ -77,13 +77,13 @@ dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -
 bash tools/audit/verify-code-analysis-evidence.sh
 ```
 
-## 3. Ausfuehrungsreihenfolge
+## 3. Ausführungsreihenfolge
 1. Package A
 2. Package B
 3. Package C
 
 ## 4. Definition of Done pro Package
 - Targeted Code-Changes sind auf den Package-Scope begrenzt
-- Regression-Tests sind fuer geaenderte Behavior-Branches hinzugefuegt/aktualisiert
-- Full CI auf der PR ist gruen
+- Regression-Tests sind für geänderte Behavior-Branches hinzugefügt/aktualisiert
+- Full CI auf der PR ist grün
 - `docs/audit/006_CODE_REVIEW_FINDINGS.MD` wurde mit geschlossenen/verschobenen Findings aktualisiert

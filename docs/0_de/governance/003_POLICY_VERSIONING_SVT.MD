@@ -5,18 +5,18 @@
 # Versionierungsrichtlinie (SVT)
 
 ## 1. Zweck
-Diese Richtlinie erzwingt Single Version Truth (SVT) fuer die kanonische Paket-Release-Pipeline.
+Diese Richtlinie erzwingt Single Version Truth (SVT) für die kanonische Paket-Release-Pipeline.
 
 ## 2. SSOT
 Normative Quelle: `tools/ci/policies/data/versioning.json`.
 
 ## 3. SVT-Definition
-Fuer das kanonische Paket `Tomtastisch.FileClassifier` MUESSEN die folgenden Werte exakt uebereinstimmen:
+Für das kanonische Paket `Tomtastisch.FileClassifier` MUESSEN die folgenden Werte exakt übereinstimmen:
 - `git tag vX.Y.Z`
 - vbproj `<Version>X.Y.Z</Version>`
 - vbproj `<PackageVersion>X.Y.Z</PackageVersion>`
 - erzeugte `.nupkg`-Version `X.Y.Z`
-- veroeffentlichte NuGet-Version `X.Y.Z` (Release-Job)
+- veröffentlichte NuGet-Version `X.Y.Z` (Release-Job)
 
 ## 4. SHALL-Statements
 - Release-Tags SHALL den Prefix `v` sowie einen semantischen Versionskern verwenden (`vMAJOR.MINOR.PATCH`).

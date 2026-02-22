@@ -5,16 +5,16 @@
 # Supply-Chain-Basislinie
 
 ## 1. Ziel
-Minimum an reproduzierbaren Kontrollen fuer Source-to-Package-Integritaet in diesem Repository definieren.
+Minimum an reproduzierbaren Kontrollen für Source-to-Package-Integrität in diesem Repository definieren.
 
 ## 2. Kontroll-Basislinie
-- S1 Source-Integritaet:
+- S1 Source-Integrität:
   - Branch-Protections und Required Status Checks auf dem Default-Branch
   - deterministische CI-Gates (`preflight`, `build`, `security-nuget`, `summary`)
-- S2 Build-Integritaet:
+- S2 Build-Integrität:
   - `dotnet restore --locked-mode` in CI/Release-Pfaden
   - fail-closed Policy-Checks in `tools/ci/bin/run.sh`
-- S3 Release-Integritaet:
+- S3 Release-Integrität:
   - OIDC Trusted Publishing in `.github/workflows/release.yml`
   - Provenance Attestation via `actions/attest-build-provenance@v2`
 - S4 Vulnerability Hygiene:
@@ -33,14 +33,14 @@ Minimum an reproduzierbaren Kontrollen fuer Source-to-Package-Integritaet in die
   - `artifacts/ci/code-analysis-evidence/result.json`
 - E4 Release/Provenance-Nachweise:
   - `.github/workflows/release.yml`
-  - `artifacts/nuget/attestation-verify.txt` (wenn der Release-Workflow laeuft)
+  - `artifacts/nuget/attestation-verify.txt` (wenn der Release-Workflow läuft)
 - E5 Dependency-Canary-Nachweise:
   - `.github/workflows/dependency-canary.yml`
   - Workflow-Artefakte `canary-*` mit Qodana-Contract-Output (`artifacts/ci/qodana/`)
   - Laufhistorie: https://github.com/tomtastisch/FileClassifier/actions/workflows/dependency-canary.yml
 
 ## 4. Verifikationskommandos
-Alle Kommandos sind fuer Ausfuehrung im Repository-Root gedacht.
+Alle Kommandos sind für Ausführung im Repository-Root gedacht.
 ```bash
 bash tools/ci/bin/run.sh security-nuget
 bash tools/audit/verify-security-claims.sh
@@ -56,18 +56,18 @@ gh run list --workflow dependency-canary.yml --limit 5
 ## 5. Operative Kadenz
 - Jede PR: CI, Security-Claims und Code-Analysis Evidence Workflows
 - Jeder Release: Attestation-Generierung und Verifikation
-- Regelmaessiger Review: Baseline-Dokus aktualisieren, wenn sich Controls oder Workflows aendern
+- Regelmäßiger Review: Baseline-Dokus aktualisieren, wenn sich Controls oder Workflows ändern
 
 ## 6. Grenzen und Limits
 - Diese Basislinie liefert Assurance-Nachweise, keine formale Third-Party-Zertifizierung.
 - Downstream Runtime-Hardening bleibt Verantwortung von Deployern/Operatoren.
 
-## 7. Dependency-Strategie fuer netstandard2.0-Transitives
+## 7. Dependency-Strategie für netstandard2.0-Transitives
 - D1 Kontrollierte Pinning-Strategie:
-  - `System.Text.Encoding.CodePages` wird explizit als direkte Abhaengigkeit gepinnt (SSOT: `Directory.Packages.props`), damit SharpCompress-bezogene Encoding-Pfade nicht von impliziten Transitives abhaengen.
+  - `System.Text.Encoding.CodePages` wird explizit als direkte Abhängigkeit gepinnt (SSOT: `Directory.Packages.props`), damit SharpCompress-bezogene Encoding-Pfade nicht von impliziten Transitives abhängen.
 - D2 Dokumentierte Ausnahme (Meta-Paket):
   - `Microsoft.NETCore.Platforms` bleibt als `netstandard2.0`-Transitiv aus `NETStandard.Library` sichtbar.
-  - Diese Abweichung wird aktuell akzeptiert, da sie aus dem TFM-Meta-Paket stammt und nicht als eigenstaendiger Runtime-Upgrade-Pfad fuer das Produkt genutzt wird.
+  - Diese Abweichung wird aktuell akzeptiert, da sie aus dem TFM-Meta-Paket stammt und nicht als eigenständiger Runtime-Upgrade-Pfad für das Produkt genutzt wird.
   - Security-Gate bleibt fail-closed: jede neue High/Critical-Vulnerability in diesem Pfad bleibt blocker.
 
 Verifikationskommandos:

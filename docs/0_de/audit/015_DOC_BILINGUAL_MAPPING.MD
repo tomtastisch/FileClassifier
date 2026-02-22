@@ -5,14 +5,14 @@
 # Bilinguale Dokumentation: DE<->EN Mapping (0NN_ -> 1NN_)
 
 ## 1. Ziel und Geltungsbereich
-Dieser Report dokumentiert deterministisch das Mapping aller Dokumente nach dem Schema `NNN_*` (DE ist primaer) auf ihre englischen Spiegeldateien `1NN_*`.
+Dieser Report dokumentiert deterministisch das Mapping aller Dokumente nach dem Schema `NNN_*` (DE ist primär) auf ihre englischen Spiegeldateien `1NN_*`.
 
 Geltungsbereich:
-- Betrifft alle Dokumente mit Dateinamen `NNN_<slug>.md` oder `NNN_<slug>.MD` (unabhaengig vom Ordner).
-- EN ist semantisch aequivalent zur DE-Version (gleiche Struktur/Abschnitte; Codebloecke/Commands identisch).
+- Betrifft alle Dokumente mit Dateinamen `NNN_<slug>.md` oder `NNN_<slug>.MD` (unabhängig vom Ordner).
+- EN ist semantisch äquivalent zur DE-Version (gleiche Struktur/Abschnitte; Codeblöcke/Commands identisch).
 
 Nicht-Ziele:
-- Keine Code-/Build-/CI-Aenderungen (ausser Markdown-Linkfixes innerhalb von `.md/.MD`).
+- Keine Code-/Build-/CI-Änderungen (ausser Markdown-Linkfixes innerhalb von `.md/.MD`).
 
 ## 2. Namensregeln (SSOT)
 - DE-Datei: `0NN_<slug>.<ext>` mit dreistelliger Nummer `0NN` (z. B. `030_...`).
@@ -79,7 +79,7 @@ Mapping-Funktion:
 | `docs/versioning/004_POLICY_LABELING.MD` | `docs/versioning/104_POLICY_LABELING.MD` | vorhanden |  |
 
 ## 4. Checks (fail-closed)
-Alle Checks sind vom Repo-Root ausfuehrbar.
+Alle Checks sind vom Repo-Root ausführbar.
 
 ### 4.1 Inventory-Listen (sorted)
 Kommandos:
@@ -198,7 +198,7 @@ docs/versioning/103_CHANGELOG_RELEASES.MD
 docs/versioning/104_POLICY_LABELING.MD
 ```
 
-### 4.2 Zaehlung + Diff-Listen (missing/orphan/collision)
+### 4.2 Zählung + Diff-Listen (missing/orphan/collision)
 Kommandos:
 ```bash
 sed 's|/0\\([0-9][0-9]\\)_|/1\\1_|' /tmp/docs_0nn.txt | sort > /tmp/docs_expected_1nn.txt
@@ -269,11 +269,11 @@ Ausgabe:
 
 ## 5. Edge Cases
 - Nummern ausserhalb `0NN` (z. B. `230_*`): keine gefunden (siehe Check 4.3).
-- `docs/verification/103_CATALOG_BDD.MD`: enthält kanonische deutsche Satzmuster (Gherkin) als SSOT; EN-Dokument erlaeutert die Patterns, aber die Pattern-Texte selbst bleiben absichtlich deutsch.
-- `docs/versioning/102_HISTORY_VERSIONS.MD`: Spalte "Short description" wird fuer deterministische Traceability bewusst nicht auf eine Sprache normalisiert (Original-Commit/PR-Intent).
-- `docs/audit/103_SECURITY_ASSERTION_TRACEABILITY.MD`: Spalte "SECURITY Anchor" nutzt die originalen deutschen Ueberschriften aus der eingefrorenen `SECURITY.md` als SSOT.
+- `docs/verification/103_CATALOG_BDD.MD`: enthält kanonische deutsche Satzmuster (Gherkin) als SSOT; EN-Dokument erläutert die Patterns, aber die Pattern-Texte selbst bleiben absichtlich deutsch.
+- `docs/versioning/102_HISTORY_VERSIONS.MD`: Spalte "Short description" wird für deterministische Traceability bewusst nicht auf eine Sprache normalisiert (Original-Commit/PR-Intent).
+- `docs/audit/103_SECURITY_ASSERTION_TRACEABILITY.MD`: Spalte "SECURITY Anchor" nutzt die originalen deutschen Überschriften aus der eingefrorenen `SECURITY.md` als SSOT.
 
 ## 6. Decision Log
 - 2026-02-15: EN-Spiegeldateien initial durch 1:1 Copy angelegt (Translation + Link-Fixes folgen).
-- 2026-02-15: Repo-weite Link-Ausrichtung in EN-Dokumenten (EN soll primaer EN referenzieren), ohne Aenderung von Codebloecken/CLI-Beispielen.
-- 2026-02-15: `docs/120_ARCH_CORE.MD` vollstaendig ins Englische ueberfuehrt, Struktur identisch zu `docs/020_ARCH_CORE.MD`.
+- 2026-02-15: Repo-weite Link-Ausrichtung in EN-Dokumenten (EN soll primär EN referenzieren), ohne Änderung von Codeblöcken/CLI-Beispielen.
+- 2026-02-15: `docs/120_ARCH_CORE.MD` vollständig ins Englische überführt, Struktur identisch zu `docs/020_ARCH_CORE.MD`.

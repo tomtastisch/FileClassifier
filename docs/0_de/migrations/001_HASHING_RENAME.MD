@@ -5,7 +5,7 @@
 # Migration: Hashing-Rename (Deterministic* -> Evidence/Hash*)
 
 ## Zweck und Scope
-Dieses Dokument mappt das Breaking-Rename der oeffentlichen API im Hashing/Evidence-Subsystem.
+Dieses Dokument mappt das Breaking-Rename der öffentlichen API im Hashing/Evidence-Subsystem.
 Das Verhalten bleibt deterministisch und fail-closed; nur Identifier und Dateinamen wurden umbenannt.
 
 ## Type-Renames
@@ -29,13 +29,13 @@ Das Verhalten bleibt deterministisch und fail-closed; nur Identifier und Dateina
 | `src/FileTypeDetection/Abstractions/Hashing/DeterministicHashSourceType.vb` | `src/FileTypeDetection/Abstractions/Hashing/HashSourceType.vb` |
 
 Hinweis:
-- Die Eintraege unter `Alter Pfad` sind historisch und existieren auf `main` nach dem Rename-Commit nicht mehr.
+- Die Einträge unter `Alter Pfad` sind historisch und existieren auf `main` nach dem Rename-Commit nicht mehr.
 - Repo-lokale Verifikation:
   - `git log --follow --oneline -- src/FileTypeDetection/DeterministicHashing.vb`
   - `git show <baseline_sha>:src/FileTypeDetection/DeterministicHashing.vb`
 
 ## Optionale Secure Digests (HMAC-SHA256)
-Neue optionale Digests wurden hinzugefuegt:
+Neue optionale Digests wurden hinzugefügt:
 - `HashDigestSet.HmacPhysicalSha256`
 - `HashDigestSet.HmacLogicalSha256`
 
@@ -43,13 +43,13 @@ Aktivierung:
 - Set `HashOptions.IncludeSecureHash = true`.
 - Provide a Base64 key via `FILECLASSIFIER_HMAC_KEY_B64`.
 
-Wenn Secure Hashing angefordert wird, aber der Key fehlt oder ungueltig ist:
+Wenn Secure Hashing angefordert wird, aber der Key fehlt oder ungültig ist:
 - Das bestehende SHA-256 und xxHash3 Verhalten bleibt erhalten.
 - HMAC-Digests sind leer.
-- `HashEvidence.Notes` enthaelt eine klare Nachricht, dass HMAC angefordert wurde, aber nicht gesetzt war.
+- `HashEvidence.Notes` enthält eine klare Nachricht, dass HMAC angefordert wurde, aber nicht gesetzt war.
 
 ## JSON-Optionen (FileTypeOptions)
-Die JSON-Keys fuer die globalen Hashing-Optionen bleiben unter dem bestehenden Namespace `deterministicHash`.
+Die JSON-Keys für die globalen Hashing-Optionen bleiben unter dem bestehenden Namespace `deterministicHash`.
 Neuer Key:
 - `deterministicHash.includeSecureHash` (object form)
 - `deterministicHashIncludeSecureHash` (flat form)

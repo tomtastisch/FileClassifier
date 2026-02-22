@@ -5,7 +5,7 @@
 # CI-Richtlinie (SSOT)
 
 ## Geltungsbereich
-Dieses Dokument definiert Richtlinienprinzipien, Severity-Behandlung und Exit-Code-Politik fuer die CI.
+Dieses Dokument definiert Richtlinienprinzipien, Severity-Behandlung und Exit-Code-Politik für die CI.
 Normative Richtliniendefinitionen liegen in:
 - `tools/ci/policies/schema/rules.schema.json`
 - `tools/ci/policies/rules/`
@@ -27,7 +27,7 @@ Alle erforderlichen Checks MUESSEN schreiben:
 `result.json` muss `tools/ci/schema/result.schema.json` entsprechen.
 Implementierungsnachweis: `tools/ci/lib/result.sh:12-20`, `tools/ci/lib/result.sh:28-34`, `tools/ci/lib/result.sh:78-112`.
 
-## Governance-Sicht (Ausfuehrungsgrenze)
+## Governance-Sicht (Ausführungsgrenze)
 ```mermaid
 flowchart LR
   yml["Workflow-Deklarationen\n.github/workflows/*.yml"] --> run["Einziger Einstiegspunkt\n tools/ci/bin/run.sh <check_id>"]
@@ -48,7 +48,7 @@ Der detaillierte Job-DAG und die Vertragsmatrix liegen in `docs/ci/001_PIPELINE_
 ## Exit-Code-Matrix
 - `0`: Erfolg (`pass` oder `warn`)
 - `1`: Richtlinien-/Vertrags-/Check-Fehler (`fail`)
-- `2`: ungueltiger Aufruf oder fehlende Voraussetzungen
+- `2`: ungültiger Aufruf oder fehlende Voraussetzungen
 
 ## Allow-Lists
 Allow-List-Definitionen werden in Regelparametern unter `tools/ci/policies/rules/` gepflegt.

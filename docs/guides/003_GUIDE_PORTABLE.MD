@@ -5,7 +5,7 @@
 # Portable Adoption Guide (NuGet)
 
 ## 1. Ziel
-Diese Anleitung beschreibt die portable Uebernahme als NuGet-Paket ohne `ProjectReference`.
+Diese Anleitung beschreibt die portable Übernahme als NuGet-Paket ohne `ProjectReference`.
 
 ## 2. Package-Daten
 - PackageId: `Tomtastisch.FileClassifier`
@@ -27,13 +27,13 @@ Diese Anleitung beschreibt die portable Uebernahme als NuGet-Paket ohne `Project
 5. `dotnet restore tests/PackageBacked.Tests/PackageBacked.Tests.csproj --configfile tests/PackageBacked.Tests/NuGet.config -p:PackageBackedVersion=x.y.z -v minimal`
 6. `dotnet test tests/PackageBacked.Tests/PackageBacked.Tests.csproj -c Release --no-restore -p:PackageBackedVersion=x.y.z -v minimal`
 
-## 5. Kern-Invarianten fuer "1:1 identisch"
-- API-Identitaet: Public-API-Snapshot bleibt unveraendert (`tests/FileTypeDetectionLib.Tests/Contracts/public-api.snapshot.txt`).
-- Verhaltensidentitaet: `tests/PackageBacked.Tests` prueft Kernfaelle gegen das gepackte Paket:
+## 5. Kern-Invarianten für "1:1 identisch"
+- API-Identität: Public-API-Snapshot bleibt unverändert (`tests/FileTypeDetectionLib.Tests/Contracts/public-api.snapshot.txt`).
+- Verhaltensidentität: `tests/PackageBacked.Tests` prüft Kernfälle gegen das gepackte Paket:
   - `Detect_And_Hash_Contracts_RemainStable`
   - `Materializer_Persists_Bytes_FailClosedContract`
-- Consumer-Smoke: `samples/PortableConsumer` baut und laeuft nur via `PackageReference`.
+- Consumer-Smoke: `samples/PortableConsumer` baut und läuft nur via `PackageReference`.
 
 ## 6. Troubleshooting
-- Fehler `NU1101`: Paketversion nicht im Feed gefunden -> Version/Feed in `NuGet.config` pruefen.
+- Fehler `NU1101`: Paketversion nicht im Feed gefunden -> Version/Feed in `NuGet.config` prüfen.
 - Fehler `NUGET_API_KEY ... placeholder`: Repo-Secret `NUGET_API_KEY` auf echten NuGet.org API-Key setzen.

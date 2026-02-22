@@ -5,8 +5,8 @@
 # Audit-Index
 
 ## Zweck und Geltungsbereich
-Zentraler Index fuer Nachweis-/Hardeningsdokumente, die Aussagen aus `SECURITY.md` belegbar machen, ohne `SECURITY.md` selbst zu aendern.
-Zentrale Einstiegsseite fuer Dritte: `SECURITY_ASSURANCE_INDEX.md`.
+Zentraler Index für Nachweis-/Hardeningsdokumente, die Aussagen aus `SECURITY.md` belegbar machen, ohne `SECURITY.md` selbst zu ändern.
+Zentrale Einstiegsseite für Dritte: `SECURITY_ASSURANCE_INDEX.md`.
 
 ## Dokumente
 - `docs/audit/000_HASHING_BASELINE.MD`
@@ -38,7 +38,7 @@ Zentrale Einstiegsseite fuer Dritte: `SECURITY_ASSURANCE_INDEX.md`.
 - `artifacts/audit/hardening_candidates.json`
 
 ## Repro-Kommandos
-Alle Kommandos sind fuer Ausfuehrung im Repository-Root gedacht.
+Alle Kommandos sind für Ausführung im Repository-Root gedacht.
 ```bash
 bash tools/audit/verify-security-claims.sh
 bash tools/audit/verify-code-analysis-evidence.sh

@@ -59,8 +59,8 @@ Quelle: `FileTypeDetector.vb` (Fallback) und `src/FileClassifier.CSCore/Utilitie
 | CSCore Runtime-Bridge | `Infrastructure/Utils/CsCoreRuntimeBridge.vb` | deterministische Delegation auf C#-Utilities mit VB-Fallback | CSCore Modul (ausserhalb dieses PR-Blocks) |
 | CSCore Detection Policy | `src/FileClassifier.CSCore/Utilities/DetectionPolicyUtility.cs` | Endungs-Policy, Reason-Code-Mapping, Summary-Projektion | CSCore Utilities (ausserhalb dieses PR-Blocks) |
 | CSCore Office Policy | `src/FileClassifier.CSCore/Utilities/OfficePolicyUtility.cs` | OpenXML/OpenDocument/Legacy-Office-Entscheidungslogik (kind-key-basiert) | CSCore Utilities (ausserhalb dieses PR-Blocks) |
-| CSCore Evidence Policy | `src/FileClassifier.CSCore/Utilities/EvidencePolicyUtility.cs` | Label-/Notes-Policy und HMAC-Env-Key-Resolution fuer Hash-Evidence | CSCore Utilities (ausserhalb dieses PR-Blocks) |
-| CSCore Archive/Path Policy | `src/FileClassifier.CSCore/Utilities/ArchivePathPolicyUtility.cs` | Relative-Archivpfad-Normalisierung und Root-Path-Policy fuer Zielpfade | CSCore Utilities (ausserhalb dieses PR-Blocks) |
+| CSCore Evidence Policy | `src/FileClassifier.CSCore/Utilities/EvidencePolicyUtility.cs` | Label-/Notes-Policy und HMAC-Env-Key-Resolution für Hash-Evidence | CSCore Utilities (ausserhalb dieses PR-Blocks) |
+| CSCore Archive/Path Policy | `src/FileClassifier.CSCore/Utilities/ArchivePathPolicyUtility.cs` | Relative-Archivpfad-Normalisierung und Root-Path-Policy für Zielpfade | CSCore Utilities (ausserhalb dieses PR-Blocks) |
 
 ## 5. Externe Abhängigkeiten
 ### 5.1 Diagramm
@@ -89,9 +89,9 @@ flowchart LR
 | `Mime` | `Infrastructure/MimeProvider.vb` | MIME-Auflösung aus Extension |
 | `Microsoft.IO.RecyclableMemoryStream` | `Infrastructure/ArchiveManagedInternals.vb` | kontrollierte Memory-Streams |
 | `SharpCompress` | `Infrastructure/ArchiveInternals.vb`, `FileMaterializer.vb` | Archive-Type-Erkennung, generische Archiv-Iteration, defensiver Lesbarkeits-Check |
-| `Microsoft.Extensions.Logging.Abstractions` | `Configuration/FileTypeProjectOptions.vb`, `FileTypeOptions.vb`, `Infrastructure/CoreInternals.vb` | Logging-Interfaces fuer optionale Diagnostik ohne ASP.NET-FrameworkReference |
-| `Riok.Mapperly` | `src/FileClassifier.CSCore/Mapping/*.cs` | compile-time Mapping-Generator fuer C#-Modelprojektionen |
-| `PolySharp` | `src/FileClassifier.CSCore/FileClassifier.CSCore.csproj` | C# Sprach-/TFM-Kompatibilitaet fuer moderne Features |
+| `Microsoft.Extensions.Logging.Abstractions` | `Configuration/FileTypeProjectOptions.vb`, `FileTypeOptions.vb`, `Infrastructure/CoreInternals.vb` | Logging-Interfaces für optionale Diagnostik ohne ASP.NET-FrameworkReference |
+| `Riok.Mapperly` | `src/FileClassifier.CSCore/Mapping/*.cs` | compile-time Mapping-Generator für C#-Modelprojektionen |
+| `PolySharp` | `src/FileClassifier.CSCore/FileClassifier.CSCore.csproj` | C# Sprach-/TFM-Kompatibilität für moderne Features |
 
 ## 6. Referenz-Index (wo finde ich was?)
 | Thema | Primardokument |

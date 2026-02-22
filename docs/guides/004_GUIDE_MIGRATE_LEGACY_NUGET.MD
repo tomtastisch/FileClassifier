@@ -9,8 +9,8 @@ Dieser Leitfaden beschreibt die Migration vom veralteten Paket `Tomtastisch.File
 
 ## Warum
 - Das Legacy-Paket ist veraltet und auf NuGet.org unlisted.
-- Das kanonische Paket erhaelt laufende Updates und Policy-gestuetzte CI-Validierung.
-- Der oeffentliche Root-Namespace ist auf `Tomtastisch.FileClassifier` vereinheitlicht (Level-3 Public-Surface-Rename).
+- Das kanonische Paket erhält laufende Updates und Policy-gestützte CI-Validierung.
+- Der öffentliche Root-Namespace ist auf `Tomtastisch.FileClassifier` vereinheitlicht (Level-3 Public-Surface-Rename).
 
 ## PackageReference-Migration
 Ersetze:
@@ -33,4 +33,4 @@ Passe Source-Imports/Usings vom Legacy-Root-Namespace auf `Tomtastisch.FileClass
 ## Unlist- und Deprecation-Policy
 - Legacy-Versionen werden mit `dotnet nuget delete` unlisted (NuGet.org-Unlist-Semantik).
 - Deprecation soll auf `Tomtastisch.FileClassifier` verweisen.
-- Falls CLI-Deprecation nicht verfuegbar ist, Deprecation fuer alle Legacy-Versionen in der NuGet.org-UI setzen.
+- Falls CLI-Deprecation nicht verfügbar ist, Deprecation für alle Legacy-Versionen in der NuGet.org-UI setzen.

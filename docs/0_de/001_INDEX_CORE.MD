@@ -39,7 +39,7 @@ Zentrale Einstiegsstelle für alle Projektdokumente mit klarer Trennung nach Ver
 ## 6. Test- und Nachweisdokumente
 1. [Test Matrix - Deterministic Hashing](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/004_MATRIX_HASHING.MD)
 2. [BDD-Satzkatalog (Deutsch, kanonisch)](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/003_CATALOG_BDD.MD)
-3. [BDD-Ausfuehrung und Gherkin-Flow](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/002_FLOW_BDD.MD)
+3. [BDD-Ausführung und Gherkin-Flow](https://github.com/tomtastisch/FileClassifier/blob/main/docs/verification/002_FLOW_BDD.MD)
 
 ## 7. Modulnahe Dokumentation
 - [FileTypeDetection Modul](https://github.com/tomtastisch/FileClassifier/blob/main/src/FileTypeDetection/README.md)

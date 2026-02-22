@@ -5,7 +5,7 @@
 # Inventory: netstandard2 Compat Baseline
 
 ## 1. Zweck
-Dieses Dokument protokolliert den Ausgangs-/Zwischenstand der TFM- und API-sensitiven Fundstellen fuer den netstandard2.0-Refactor.
+Dieses Dokument protokolliert den Ausgangs-/Zwischenstand der TFM- und API-sensitiven Fundstellen für den netstandard2.0-Refactor.
 
 ## 2. Geltungsbereich
 - Library-Projekt: `src/FileTypeDetection/FileTypeDetectionLib.vbproj`

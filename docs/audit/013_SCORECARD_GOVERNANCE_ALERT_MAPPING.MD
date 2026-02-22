@@ -50,7 +50,7 @@ Diese Datei mappt die repo-/governance-basierten Scorecard-Alerts ohne konkrete 
 3. Bei Drift (`fail`) sofortige Korrektur in Ruleset/Workflow.
 4. Nach Korrektur Re-Run von Scorecard + Security-Claims-Evidence.
 5. Merge-Gate: `security/code-scanning/tools` muss `0` offene Alerts liefern.
-   - Standard: Gate prueft `main` (verhindert Merges, solange `main` rot ist).
-   - Ausnahme fuer Remediation-PRs: PRs mit Label `area:qodana` pruefen die Alerts gegen den PR-Ref (`refs/pull/<nr>/merge`), damit ein Qodana-Fix-PR trotz bereits rotem `main` mergebar bleibt.
-   - Implementierung: `tools/ci/check-code-scanning-tools-zero.sh` (ref-Auswahl ueber PR-Label).
-6. Nicht technisch remediierbare Heuristik-Alerts (z. B. Repo-Alter `<90 Tage`) werden nur mit begruendetem Dismissal-Kommentar geschlossen und im PR-Evidence protokolliert.
+   - Standard: Gate prüft `main` (verhindert Merges, solange `main` rot ist).
+   - Ausnahme für Remediation-PRs: PRs mit Label `area:qodana` prüfen die Alerts gegen den PR-Ref (`refs/pull/<nr>/merge`), damit ein Qodana-Fix-PR trotz bereits rotem `main` mergebar bleibt.
+   - Implementierung: `tools/ci/check-code-scanning-tools-zero.sh` (ref-Auswahl über PR-Label).
+6. Nicht technisch remediierbare Heuristik-Alerts (z. B. Repo-Alter `<90 Tage`) werden nur mit begründetem Dismissal-Kommentar geschlossen und im PR-Evidence protokolliert.

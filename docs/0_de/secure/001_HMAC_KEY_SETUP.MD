@@ -5,7 +5,7 @@
 # HMAC-Key Setup (FILECLASSIFIER_HMAC_KEY_B64)
 
 ## Zweck
-Die optionalen HMAC-SHA256-Digests, die von `EvidenceHashing` erzeugt werden, liefern Authentizitaet und Tamper-Evidence fuer Hash-Evidence.
+Die optionalen HMAC-SHA256-Digests, die von `EvidenceHashing` erzeugt werden, liefern Authentizität und Tamper-Evidence für Hash-Evidence.
 Sie sind nicht "besseres Hashing" als SHA-256, sondern keyed Digests, die einen geteilten Secret-Key voraussetzen.
 
 ## Key-Format (SSOT)
@@ -38,28 +38,28 @@ $bytes = New-Object byte[] 32
 
 ## FILECLASSIFIER_HMAC_KEY_B64 setzen
 ### Windows (PowerShell)
-Fuer die aktuelle Session:
+Für die aktuelle Session:
 ```powershell
 $env:FILECLASSIFIER_HMAC_KEY_B64 = "<base64>"
 ```
 
-Persistent fuer den aktuellen User:
+Persistent für den aktuellen User:
 ```powershell
 [System.Environment]::SetEnvironmentVariable("FILECLASSIFIER_HMAC_KEY_B64", "<base64>", "User")
 ```
 
-Persistent maschinenweit (erfordert erhoehte Rechte):
+Persistent maschinenweit (erfordert erhöhte Rechte):
 ```powershell
 [System.Environment]::SetEnvironmentVariable("FILECLASSIFIER_HMAC_KEY_B64", "<base64>", "Machine")
 ```
 
 ### Linux (bash/zsh)
-Fuer die aktuelle Shell:
+Für die aktuelle Shell:
 ```bash
 export FILECLASSIFIER_HMAC_KEY_B64="<base64>"
 ```
 
-Persistent fuer den User (Beispiel):
+Persistent für den User (Beispiel):
 - Export-Zeile in `~/.bashrc`, `~/.zshrc` oder ein dediziertes Profilfile eintragen, das von der Shell gesourced wird.
 
 Optionales systemd-Service-Beispiel:
@@ -69,12 +69,12 @@ Environment=FILECLASSIFIER_HMAC_KEY_B64=<base64>
 ```
 
 ### macOS (zsh)
-Fuer die aktuelle Shell:
+Für die aktuelle Shell:
 ```bash
 export FILECLASSIFIER_HMAC_KEY_B64="<base64>"
 ```
 
-Optionen fuer ein persistentes User-Setup:
+Optionen für ein persistentes User-Setup:
 - Shell-Profil: in `~/.zshrc` eintragen (Dateirechte restriktiv halten).
 - Keychain-Ansatz: Secret in Keychain speichern und beim Prozessstart injizieren.
 - CI-freundlich: im Environment des aufrufenden Prozesses setzen (GitHub Actions, launchd, etc.).

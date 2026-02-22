@@ -17,7 +17,7 @@ Out of scope:
 ## 2. Assets
 - A1: Untrusted File-Payloads, die in Detection-/Extraction-Pfade gelangen
 - A2: Extrahierte Archive-Entries im Memory
-- A3: Hash-/Evidence-Artefakte fuer Integritaets-Assertions
+- A3: Hash-/Evidence-Artefakte für Integritäts-Assertions
 - A4: Erzeugtes NuGet-Paket (`.nupkg`) und dessen Provenance
 - A5: Vulnerability-Reports und Status der koordinierten Offenlegung
 
@@ -29,17 +29,17 @@ Out of scope:
 
 ## 4. Attacker Capabilities
 - C1: Crafted Files/Archives einspeisen, um unsafe Parsing/Extraction-Logik zu triggern
-- C2: Path Traversal oder Resource Exhaustion ueber Archive-Payloads versuchen
+- C2: Path Traversal oder Resource Exhaustion über Archive-Payloads versuchen
 - C3: Supply-Chain-Tampering zwischen Build und Publication versuchen
-- C4: Disclosure-Abuse ueber oeffentliche Kanaele vor Fix-Readiness versuchen
+- C4: Disclosure-Abuse über öffentliche Kanäle vor Fix-Readiness versuchen
 
 ## 5. Threat Scenarios und Kontrollen
 - T1: Archive Traversal (zip-slip style path escape)
-  - Impact: Write/Read ausserhalb des intended Scope waehrend der Extraktion.
-  - Current controls: fail-closed Archive-Safety-Gates in Archive-Internals und Detector-Pfaden; Extraction-APIs sind auf sichere Flows eingeschraenkt.
+  - Impact: Write/Read ausserhalb des intended Scope während der Extraktion.
+  - Current controls: fail-closed Archive-Safety-Gates in Archive-Internals und Detector-Pfaden; Extraction-APIs sind auf sichere Flows eingeschränkt.
   - Evidence: `tests/FileTypeDetectionLib.Tests/*` plus CI-Job `tests-bdd-coverage` in `.github/workflows/ci.yml`.
 - T2: Decompression/Resource Exhaustion
-  - Impact: Memory/CPU Pressure, moeglicher Denial-of-Service.
+  - Impact: Memory/CPU Pressure, möglicher Denial-of-Service.
   - Current controls: guarded Archive-Processing-Pfade und bounded Validation/Extraction-Flows.
   - Evidence: Source-Pfade unter `src/FileTypeDetection/Infrastructure/*` und CI Execution Traces.
 - T3: Release-Artifact Provenance Tampering
@@ -51,22 +51,22 @@ Out of scope:
   - Current controls: CI-Gate `security-nuget` (`dotnet list ... --vulnerable --include-transitive`) mit High/Critical fail behavior.
   - Evidence: `tools/ci/bin/run.sh` (`run_security_nuget`) und CI-Artefakte `artifacts/ci/security-nuget/*`.
 - T5: Unkoordinierte Public Disclosure vor Patch
-  - Impact: Exploitability-Window erhoeht sich, bevor Mitigation verfuegbar ist.
+  - Impact: Exploitability-Window erhöht sich, bevor Mitigation verfügbar ist.
   - Current controls: Private Vulnerability Reporting Path und Coordinated Disclosure Prozess (wie in `SECURITY.md` deklariert).
   - Evidence: `tools/audit/verify-security-claims.sh` Claim-Checks und `docs/audit/008_INCIDENT_RESPONSE_RUNBOOK.MD`.
 
 ## 6. Annahmen
 - Maintainer-Access-Controls und Repo-Permissions bleiben korrekt konfiguriert.
-- GitHub-hosted Security-Features bleiben fuer das Repository verfuegbar.
+- GitHub-hosted Security-Features bleiben für das Repository verfügbar.
 - Consumer setzen ihre eigenen Runtime-Hardening-Kontrollen um; dieses Repository kann sie nicht erzwingen.
 
 ## 7. Residual Risks
-- R1: Runtime Denial-of-Service Risk kann fuer hostile Inputs nur reduziert, nicht eliminiert werden.
-- R2: Organisatorische Response-Speed haengt von Maintainer-Verfuegbarkeit ab.
-- R3: Third-Party-Platform-Outages koennen Triage/Release-Aktionen verzoegern.
+- R1: Runtime Denial-of-Service Risk kann für hostile Inputs nur reduziert, nicht eliminiert werden.
+- R2: Organisatorische Response-Speed hängt von Maintainer-Verfügbarkeit ab.
+- R3: Third-Party-Platform-Outages können Triage/Release-Aktionen verzögern.
 
 ## 8. Reproduzierbare Verifikation
-Alle Kommandos sind fuer Ausfuehrung im Repository-Root gedacht.
+Alle Kommandos sind für Ausführung im Repository-Root gedacht.
 ```bash
 bash tools/audit/verify-security-claims.sh
 bash tools/ci/bin/run.sh security-nuget

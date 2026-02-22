@@ -21,8 +21,8 @@ Die aktive Trusted-Publishing-Policy ist an folgende Identität gebunden:
 - Nach erfolgreichem `dotnet nuget push` kann die NuGet-Indexierung (Search/Registration/Flatcontainer) zeitverzögert sichtbar sein.
 - Gate 4 im Release-Workflow bleibt **fail-closed** für publish-kritische Endpunkte:
   - `REQUIRE_FLATCONTAINER=1`
-  - `REQUIRE_REGISTRATION=1` fuer stabile Tags `vX.Y.Z`
-  - `REQUIRE_REGISTRATION=0` fuer Pre-Release-Tags `vX.Y.Z-<label>` (per Default; via `SVT_POSTPUBLISH_REQUIRE_REGISTRATION=1` übersteuerbar)
+  - `REQUIRE_REGISTRATION=1` für stabile Tags `vX.Y.Z`
+  - `REQUIRE_REGISTRATION=0` für Pre-Release-Tags `vX.Y.Z-<label>` (per Default; via `SVT_POSTPUBLISH_REQUIRE_REGISTRATION=1` übersteuerbar)
   - `REQUIRE_SEARCH=0` (Search ist aus dem blocking Gate entkoppelt).
 - Default-Wartefenster für Gate 4:
   - stabil: `SVT_POSTPUBLISH_RETRY_SCHEDULE_SECONDS=2,3,5,8,13,21,34,55,89,89,89`

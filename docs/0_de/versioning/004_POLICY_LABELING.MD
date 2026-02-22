@@ -5,7 +5,7 @@
 # Auto-Labeling und Auto-Versionierung (SSOT)
 
 ## 1. Zweck
-Diese Spezifikation definiert den deterministischen Entscheidungsfluss fuer PR-Labeling und Versionierungsnachweise.
+Diese Spezifikation definiert den deterministischen Entscheidungsfluss für PR-Labeling und Versionierungsnachweise.
 
 ## 2. Verbindliche Caps
 Pro PR-Lauf erzwingt der Auto-Labeler:
@@ -14,25 +14,25 @@ Pro PR-Lauf erzwingt der Auto-Labeler:
 - maximal ein `impl:*`
 - maximal zwei `area:*`
 
-Es gibt keine zusaetzliche Keyword-Labelgruppe.
+Es gibt keine zusätzliche Keyword-Labelgruppe.
 
 ## 3. Versioning-SSOT
 `tools/versioning/check-versioning.sh` liefert die SemVer-Entscheidung.
-Im CI-Nachweis muessen enthalten sein:
+Im CI-Nachweis müssen enthalten sein:
 - `required=<major|minor|patch|none>`
 - `actual=<major|minor|patch|none>`
 - `reason=<deterministic-reason>`
 
-## 4. Prioritaetsregel
+## 4. Prioritätsregel
 Feste Reihenfolge:
 `breaking > feature > fix > refactor > ci > test > docs > tooling > chore`
 
 ## 5. Mapping-Regeln
 ### 5.1 `impl:*` (max 1)
-- `impl:security` fuer Security-/Vuln-Aenderungen
-- `impl:docs` fuer reine Dokumentationsumsetzung
-- `impl:config` fuer CI/Tooling/Config/Versioning-Mechanik
-- `impl:quality` fuer Code-/Test-Qualitaetsarbeit
+- `impl:security` für Security-/Vuln-Änderungen
+- `impl:docs` für reine Dokumentationsumsetzung
+- `impl:config` für CI/Tooling/Config/Versioning-Mechanik
+- `impl:quality` für Code-/Test-Qualitätsarbeit
 
 ### 5.2 `area:*` (max 2)
 - `area:pipeline` -> `.github/workflows/**`
@@ -50,7 +50,7 @@ Feste Reihenfolge:
 ```mermaid
 flowchart TD
   A["PR Event"] --> B["Changed files + existing labels laden"]
-  B --> C["Versioning-Guard ausfuehren"]
+  B --> C["Versioning-Guard ausführen"]
   C --> D["Deterministische Entscheidung berechnen"]
   D --> E["Schema validieren"]
   E --> F["Veraltete Auto-Labels entfernen"]
@@ -63,19 +63,19 @@ flowchart TD
 flowchart TD
   A["Input: required bump, title, changed files"] --> B{"required == major?"}
   B -- Yes --> C["primary=breaking"]
-  B -- No --> D{"src geaendert oder feat keyword?"}
+  B -- No --> D{"src geändert oder feat keyword?"}
   D -- Yes --> E["primary=feature"]
   D -- No --> F{"fix keyword?"}
   F -- Yes --> G["primary=fix"]
   F -- No --> H{"refactor keyword?"}
   H -- Yes --> I["primary=refactor"]
-  H -- No --> J{"ci geaendert?"}
+  H -- No --> J{"ci geändert?"}
   J -- Yes --> K["primary=ci"]
-  J -- No --> L{"tests geaendert?"}
+  J -- No --> L{"tests geändert?"}
   L -- Yes --> M["primary=test"]
-  L -- No --> N{"docs geaendert?"}
+  L -- No --> N{"docs geändert?"}
   N -- Yes --> O["primary=docs"]
-  N -- No --> P{"tools geaendert?"}
+  N -- No --> P{"tools geändert?"}
   P -- Yes --> Q["primary=tooling"]
   P -- No --> R["primary=chore"]
 ```
@@ -105,7 +105,7 @@ flowchart TD
   A["check-versioning.sh"] --> B{"guard erfolgreich?"}
   B -- Yes --> C["required + actual verwenden"]
   B -- No --> D["Fallback required=none actual=none"]
-  C --> E{"actual erfuellt required?"}
+  C --> E{"actual erfüllt required?"}
   D --> F["reason=guard-unavailable-fallback"]
   E -- Yes --> G["Pass + Labeling mit reason"]
   E -- No --> H["Fail in preflight/versioning-guard"]
