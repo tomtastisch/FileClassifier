@@ -788,3 +788,16 @@ Diese Policy ist in der CI-RoC-Matrix auf folgende Regeldateien gemappt:
   - `Microsoft.CodeAnalysis.BannedApiAnalyzers` (fail-closed über `BannedSymbols.txt`)
   - `Meziantou.Analyzer`
 - Für `FileTypeDetectionLib` ist mindestens `Microsoft.CodeAnalysis.BannedApiAnalyzers` mit derselben zentralen Banlist (`tools/analyzers/BannedSymbols.txt`) verpflichtend.
+
+## 13. Public-API-Governance (fail-closed)
+- `FileTypeDetectionLib` muss `Microsoft.CodeAnalysis.PublicApiAnalyzers` als `PrivateAssets=all` referenzieren.
+- Baseline-Dateien liegen unter `src/FileTypeDetection/`:
+  - `PublicAPI.Shipped.txt` (veröffentlichte API)
+  - `PublicAPI.Unshipped.txt` (noch nicht veröffentlichte API-Änderungen)
+- Bei absichtlichen API-Änderungen:
+  1. Eintrag zuerst in `PublicAPI.Unshipped.txt`.
+  2. Vor Stable-Release in `PublicAPI.Shipped.txt` überführen und `PublicAPI.Unshipped.txt` leeren.
+  3. Changelog/Versionshistorie aktualisieren und Evidence im PR nachziehen.
+- Der Build läuft fail-closed über folgende RS-Fehler:
+  - `RS0016`, `RS0017`, `RS0022`, `RS0023`, `RS0024`, `RS0025`, `RS0026`, `RS0027`
+- Nicht beabsichtigte API-Drift ist blocker und darf nicht gemerged werden.

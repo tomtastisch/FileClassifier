@@ -155,3 +155,16 @@ This policy is mapped in the CI RoC matrix to the following rule files:
 - `tools/ci/policies/rules/naming_snt.yaml`
 - `tools/ci/policies/rules/shell_safety.yaml`
 - `tools/ci/policies/rules/versioning_svt.yaml`
+
+## 12. Public API Governance (fail-closed)
+- `FileTypeDetectionLib` must reference `Microsoft.CodeAnalysis.PublicApiAnalyzers` with `PrivateAssets=all`.
+- Baseline files are stored in `src/FileTypeDetection/`:
+  - `PublicAPI.Shipped.txt` (released API)
+  - `PublicAPI.Unshipped.txt` (not-yet-released API changes)
+- For intentional API changes:
+  1. Add entries to `PublicAPI.Unshipped.txt` first.
+  2. Move entries into `PublicAPI.Shipped.txt` before a stable release and clear `PublicAPI.Unshipped.txt`.
+  3. Update changelog/version history and attach PR evidence.
+- Build enforcement is fail-closed via these RS diagnostics:
+  - `RS0016`, `RS0017`, `RS0022`, `RS0023`, `RS0024`, `RS0025`, `RS0026`, `RS0027`
+- Unintended public API drift is a blocker and must not be merged.

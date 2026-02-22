@@ -6,6 +6,16 @@
 
 All changes are documented here in technical terms. The release version itself is the Git tag `vX.Y.Z` (optional `-prerelease`) as SSOT.
 
+## [6.1.16]
+- Added:
+  - Added `Microsoft.CodeAnalysis.PublicApiAnalyzers` as a centrally managed analyzer package and enabled it for `FileTypeDetectionLib`.
+  - Introduced public API baseline files `src/FileTypeDetection/PublicAPI.Shipped.txt` and `src/FileTypeDetection/PublicAPI.Unshipped.txt`.
+- Changed:
+  - Public API build gate is now fail-closed: any public API change must be declared explicitly as shipped/unshipped.
+- Docs/CI/Tooling:
+  - Extended governance policy docs (DE/EN + mirrors) with a mandatory API-change process.
+  - Version convergence set to `6.1.16` (`RepoVersion`, `Version`, `PackageVersion`, DE/EN version history).
+
 ## [6.1.15]
 - Changed:
   - Harmonized the governance mapping for `CodeReviewID` with the verified branch-protection state (`required_approving_review_count = 0`, `require_code_owner_reviews = false`, `require_last_push_approval = false`).
