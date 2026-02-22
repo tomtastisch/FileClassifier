@@ -12,13 +12,14 @@ Heuristics for retroactive classification:
 - `docs|test|ci|chore|tooling|refactor|fix` => patch
 
 Current state:
-- Current release line contains `6.x` (current working state: `v6.1.16`; details in `docs/versioning/103_CHANGELOG_RELEASES.MD`).
+- Current release line contains `6.x` (current working state: `v6.1.17`; details in `docs/versioning/103_CHANGELOG_RELEASES.MD`).
 
 Note:
 - The \"short description\" column follows the original commit/PR intent text for deterministic traceability and is not normalized to a single language.
 
 | Version | Short description | Commit | Keyword |
 |---|---|---|---|
+| `6.1.17` | Bridge and in-code hardening completed: `CsCoreRuntimeBridge` was structurally de-duplicated (tuple/assembly helpers), XML docs were aligned for German-language consistency, and edge-case delegation/fallback tests were added | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.16` | API auditability fail-closed enabled: `Microsoft.CodeAnalysis.PublicApiAnalyzers` was added centrally, a public API baseline (`PublicAPI.Shipped.txt`/`PublicAPI.Unshipped.txt`) was introduced for `FileTypeDetectionLib`, and governance/versioning docs now define the mandatory API-change process | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.15` | Governance drift closed: branch-protection review policy and Scorecard governance mappings were aligned to the verified state `required_approving_review_count = 0`, including updated process controls for mandatory required checks and review-thread evidence per `AGENTS.md` | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.14` | 6.1.14 pipeline convergence closed: release workflow now enforces NuGet online convergence fail-closed for `workflow_dispatch` too, resolves release metadata deterministically via artifact, and aligns fuzzing-blocker/governance evidence documentation | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |

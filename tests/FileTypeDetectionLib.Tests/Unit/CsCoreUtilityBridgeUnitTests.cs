@@ -203,6 +203,84 @@ public sealed class CsCoreUtilityBridgeUnitTests
         }
     }
 
+    [Fact]
+    public void Bridge_NormalizeArchiveRelativePath_InvalidTraversal_RemainsFailClosed()
+    {
+        CsCoreRuntimeBridge.ResetTelemetry();
+
+        var isValid = true;
+        var normalizedPath = "seed";
+        var isDirectory = true;
+
+        var bridgeCall = CsCoreRuntimeBridge.TryNormalizeArchiveRelativePath(
+            "../escape.txt",
+            allowDirectoryMarker: false,
+            ref isValid,
+            ref normalizedPath,
+            ref isDirectory);
+
+        var snapshot = CsCoreRuntimeBridge.GetTelemetrySnapshot();
+        if (snapshot.IsCsCoreAvailable)
+        {
+            Assert.True(bridgeCall);
+            Assert.False(isValid);
+            Assert.Equal(string.Empty, normalizedPath);
+            Assert.False(isDirectory);
+            Assert.True(snapshot.GetDelegatedCount("NormalizeArchiveRelativePath") > 0);
+            return;
+        }
+
+        Assert.False(bridgeCall);
+        Assert.False(isValid);
+        Assert.Equal(string.Empty, normalizedPath);
+        Assert.False(isDirectory);
+        Assert.True(snapshot.GetFallbackCount("NormalizeArchiveRelativePath") > 0);
+    }
+
+    [Fact]
+    public void Bridge_ResolveHmacKeyFromEnvironment_InvalidBase64_RemainsDeterministic()
+    {
+        CsCoreRuntimeBridge.ResetTelemetry();
+
+        const string environmentVariableName = "FILECLASSIFIER_BRIDGE_TEST_HMAC_B64";
+        var original = Environment.GetEnvironmentVariable(environmentVariableName);
+        try
+        {
+            Environment.SetEnvironmentVariable(environmentVariableName, "invalid-base64");
+
+            var isResolved = false;
+            var key = Array.Empty<byte>();
+            var note = string.Empty;
+
+            var bridgeCall = CsCoreRuntimeBridge.TryResolveHmacKeyFromEnvironment(
+                environmentVariableName,
+                ref isResolved,
+                ref key,
+                ref note);
+
+            var snapshot = CsCoreRuntimeBridge.GetTelemetrySnapshot();
+            if (snapshot.IsCsCoreAvailable)
+            {
+                Assert.True(bridgeCall);
+                Assert.False(isResolved);
+                Assert.Empty(key);
+                Assert.Contains("invalid Base64", note, StringComparison.Ordinal);
+                Assert.True(snapshot.GetDelegatedCount("ResolveHmacKeyFromEnvironment") > 0);
+                return;
+            }
+
+            Assert.False(bridgeCall);
+            Assert.False(isResolved);
+            Assert.Empty(key);
+            Assert.Equal(string.Empty, note);
+            Assert.True(snapshot.GetFallbackCount("ResolveHmacKeyFromEnvironment") > 0);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(environmentVariableName, original);
+        }
+    }
+
     private static byte[] CreateOpenDocumentPackage(string mimeType)
     {
         using var ms = new MemoryStream();

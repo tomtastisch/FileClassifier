@@ -12,7 +12,7 @@ Heuristik für die Rückwirkungs-Zuordnung:
 - `docs|test|ci|chore|tooling|refactor|fix` => Patch
 
 Aktueller Entwicklungsstand:
-- Aktuelle Entwicklungslinie enthält `6.x` (aktueller Arbeitsstand: `v6.1.16`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
+- Aktuelle Entwicklungslinie enthält `6.x` (aktueller Arbeitsstand: `v6.1.17`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
 
 Hinweis:
 - Die Spalte `Keyword` verwendet den technischen Klassifizierungswert aus der Historie.
@@ -20,6 +20,7 @@ Hinweis:
 
 | Version | Kurzbeschreibung | Commit | Keyword |
 |---|---|---|---|
+| `6.1.17` | Bridge-/In-Code-Härtung abgeschlossen: `CsCoreRuntimeBridge` strukturell entdoppelt (Tuple-/Assembly-Helper), XML-Dokumentation mit konsistenter deutscher Umlautschreibweise vereinheitlicht und Randfalltests für Delegation/Fallback ergänzt | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.16` | API-Auditierbarkeit fail-closed aktiviert: `Microsoft.CodeAnalysis.PublicApiAnalyzers` zentral eingebunden, Public-API-Baseline (`PublicAPI.Shipped.txt`/`PublicAPI.Unshipped.txt`) für `FileTypeDetectionLib` eingeführt und Governance-/Versioning-Dokumentation um den verbindlichen API-Änderungsprozess erweitert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.15` | Governance-Drift geschlossen: Branch-Protection-Review-Policy und Scorecard-Governance-Mappings auf den verifizierten Ist-Stand `required_approving_review_count = 0` konsolidiert, inklusive aktualisierter Prozesskontrollen für verpflichtende Required-Checks und Review-Thread-Evidence gemäß `AGENTS.md` | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.14` | 6.1.14 Pipeline-Konvergenz geschlossen: Release-Workflow erzwingt NuGet-Online-Konvergenz jetzt fail-closed auch für `workflow_dispatch`, Release-Metadaten werden artefaktbasiert deterministisch aufgelöst und Fuzzing-Blocker-/Governance-Evidence-Dokumentation entsprechend nachgezogen | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |

@@ -6,6 +6,16 @@
 
 All changes are documented here in technical terms. The release version itself is the Git tag `vX.Y.Z` (optional `-prerelease`) as SSOT.
 
+## [6.1.17]
+- Added:
+  - Added two bridge edge-case tests for fail-closed delegation/fallback (`NormalizeArchiveRelativePath`, `ResolveHmacKeyFromEnvironment`).
+- Changed:
+  - Reduced redundancy in `CsCoreRuntimeBridge`: tuple mapping is centralized in dedicated helpers and assembly path probing now uses one shared directory-probe function.
+  - Harmonized in-code XML documentation in bridge comments with consistent German umlaut spelling (`Brücke`, `Rückgabe`, `Prüfung`, `Länge`).
+- Docs/CI/Tooling:
+  - Executed phase-C local gates successfully: `preflight`, `tests-bdd-coverage`, `api-contract`.
+  - Version convergence set to `6.1.17` (`RepoVersion`, `Version`, `PackageVersion`, DE/EN version history).
+
 ## [6.1.16]
 - Added:
   - Added `Microsoft.CodeAnalysis.PublicApiAnalyzers` as a centrally managed analyzer package and enabled it for `FileTypeDetectionLib`.

@@ -7,8 +7,8 @@
 ' - Variablen im Deklarationsblock, spaltenartig ausgerichtet
 '
 ' Kontext:
-' - Runtime-Bruecke fuer optionale Delegation auf C#-CSCore Utilities.
-' - Fail-closed: Falls CSCore nicht aufloesbar ist, bleibt VB-Fallback aktiv.
+' - Runtime-Brücke für optionale Delegation auf C#-CSCore Utilities.
+' - Fail-closed: Falls CSCore nicht auflösbar ist, bleibt VB-Fallback aktiv.
 ' ============================================================================
 
 Option Strict On
@@ -24,12 +24,12 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
 
     ''' <summary>
     '''     <b>Zweck:</b><br/>
-    '''     Runtime-Bruecke zwischen VB-Core und optionalem CSCore-Utility-Layer.
+    '''     Runtime-Brücke zwischen VB-Core und optionalem CSCore-Utility-Layer.
     ''' </summary>
     ''' <remarks>
     '''     <b>Fail-Closed:</b><br/>
-    '''     - Ist die CSCore-Assembly oder ein erwarteter Typ/Member nicht verfuegbar,
-    '''       liefert die Bruecke deterministisch <c>False</c> und der VB-Fallback bleibt aktiv.
+    '''     - Ist die CSCore-Assembly oder ein erwarteter Typ/Member nicht verfügbar,
+    '''       liefert die Brücke deterministisch <c>False</c> und der VB-Fallback bleibt aktiv.
     ''' </remarks>
     <System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage>
     Friend NotInheritable Class CsCoreRuntimeBridge
@@ -127,8 +127,8 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         End Sub
 
         ''' <summary>
-        '''     <b>Rueckgabe:</b><br/>
-        '''     Laufzeitindikator fuer Unit-Tests und Diagnostik.
+        '''     <b>Rückgabe:</b><br/>
+        '''     Laufzeitindikator für Unit-Tests und Diagnostik.
         ''' </summary>
         Friend Shared ReadOnly Property IsCsCoreAvailable As Boolean
             Get
@@ -139,7 +139,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
 
         ''' <summary>
         '''     <b>Aktion:</b><br/>
-        '''     Setzt die Telemetry-Zaehler zurueck (nur fuer Tests/Diagnostik).
+        '''     Setzt die Telemetry-Zähler zurück (nur für Tests/Diagnostik).
         ''' </summary>
         Friend Shared Sub ResetTelemetry()
 
@@ -148,8 +148,8 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         End Sub
 
         ''' <summary>
-        '''     <b>Rueckgabe:</b><br/>
-        '''     Liefert eine unveraenderliche Telemetry-Sicht fuer Audit/Tests.
+        '''     <b>Rückgabe:</b><br/>
+        '''     Liefert eine unveränderliche Telemetry-Sicht für Audit/Tests.
         ''' </summary>
         Friend Shared Function GetTelemetrySnapshot() As CsCoreRuntimeBridgeTelemetrySnapshot
 
@@ -823,22 +823,21 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 Return False
             End If
 
-            Try
-                ' Striktes Tuple-Shape: [Boolean, Byte(), String]
-                isResolved = CBool(values(0))
-                key = If(CType(values(1), Byte()), Array.Empty(Of Byte)())
-                note = If(CStr(values(2)), String.Empty)
-                Return True
-            Catch ex As Exception When _
-                TypeOf ex Is InvalidCastException OrElse
-                TypeOf ex Is NullReferenceException OrElse
-                TypeOf ex Is IndexOutOfRangeException
+            ' Striktes Tuple-Shape: [Boolean, Byte(), String]
+            If Not TryReadHmacResolutionTuple(
+                OperationResolveHmacKeyFromEnvironment,
+                values,
+                isResolved,
+                key,
+                note
+            ) Then
                 isResolved = False
                 key = Array.Empty(Of Byte)()
                 note = String.Empty
-                RecordFallback(OperationResolveHmacKeyFromEnvironment)
                 Return False
-            End Try
+            End If
+
+            Return True
         End Function
 
         Friend Shared Function TryNormalizeArchiveRelativePath _
@@ -873,22 +872,21 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 Return False
             End If
 
-            Try
-                ' Striktes Tuple-Shape: [Boolean, String, Boolean]
-                isValid = CBool(values(0))
-                normalizedPath = If(CStr(values(1)), String.Empty)
-                isDirectory = CBool(values(2))
-                Return True
-            Catch ex As Exception When _
-                TypeOf ex Is InvalidCastException OrElse
-                TypeOf ex Is NullReferenceException OrElse
-                TypeOf ex Is IndexOutOfRangeException
+            ' Striktes Tuple-Shape: [Boolean, String, Boolean]
+            If Not TryReadArchivePathTuple(
+                OperationNormalizeArchiveRelativePath,
+                values,
+                isValid,
+                normalizedPath,
+                isDirectory
+            ) Then
                 isValid = False
                 normalizedPath = String.Empty
                 isDirectory = False
-                RecordFallback(OperationNormalizeArchiveRelativePath)
                 Return False
-            End Try
+            End If
+
+            Return True
         End Function
 
         Friend Shared Function TryIsRootPath _
@@ -1200,6 +1198,11 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             End SyncLock
         End Sub
 
+        ''' <summary>
+        '''     <b>Auflösung:</b><br/>
+        '''     Ermittelt die CSCore-Assembly deterministisch über geladene Domäne, Assembly-Name
+        '''     und vertrauenswürdige Basisverzeichnisse.
+        ''' </summary>
         Private Shared Function ResolveCsCoreAssembly() As Assembly
 
             Dim loadedAssemblies() As Assembly
@@ -1207,7 +1210,6 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             Dim loadedName         As String
             Dim resolvedAssembly   As Assembly
             Dim assemblyDirectory  As String
-            Dim assemblyPath       As String
             Dim baseDirectoryPath  As String
 
             resolvedAssembly = Nothing
@@ -1229,24 +1231,41 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             End Try
 
             assemblyDirectory = IO.Path.GetDirectoryName(GetType(CsCoreRuntimeBridge).Assembly.Location)
-            If Not String.IsNullOrWhiteSpace(assemblyDirectory) Then
-                assemblyPath = IO.Path.Combine(assemblyDirectory, CsCoreAssemblyFileName)
-                If TryLoadAssemblyFromPath(assemblyPath, resolvedAssembly) Then
-                    Return resolvedAssembly
-                End If
+            If TryResolveAssemblyFromDirectory(assemblyDirectory, resolvedAssembly) Then
+                Return resolvedAssembly
             End If
 
             baseDirectoryPath = AppContext.BaseDirectory
-            If Not String.IsNullOrWhiteSpace(baseDirectoryPath) Then
-                assemblyPath = IO.Path.Combine(baseDirectoryPath, CsCoreAssemblyFileName)
-                If TryLoadAssemblyFromPath(assemblyPath, resolvedAssembly) Then
-                    Return resolvedAssembly
-                End If
+            If TryResolveAssemblyFromDirectory(baseDirectoryPath, resolvedAssembly) Then
+                Return resolvedAssembly
             End If
 
             Return Nothing
         End Function
 
+        ''' <summary>
+        '''     <b>Auflösung:</b><br/>
+        '''     Versucht eine Assembly-Datei aus einem angegebenen Verzeichnis zu laden.
+        ''' </summary>
+        Private Shared Function TryResolveAssemblyFromDirectory _
+            (
+                directoryPath As String,
+                ByRef resolvedAssembly As Assembly
+            ) As Boolean
+
+            Dim assemblyPath As String
+
+            resolvedAssembly = Nothing
+            If String.IsNullOrWhiteSpace(directoryPath) Then Return False
+
+            assemblyPath = IO.Path.Combine(directoryPath, CsCoreAssemblyFileName)
+            Return TryLoadAssemblyFromPath(assemblyPath, resolvedAssembly)
+        End Function
+
+        ''' <summary>
+        '''     <b>Ladevorgang:</b><br/>
+        '''     Lädt eine Assembly defensiv über Rohbytes und liefert bei Fehlern deterministisch <c>False</c>.
+        ''' </summary>
         Private Shared Function TryLoadAssemblyFromPath _
             (
                 assemblyPath As String,
@@ -1319,8 +1338,8 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         End Function
 
         ''' <summary>
-        '''     <b>Pruefung:</b><br/>
-        '''     Stellt sicher, dass CSCore initialisiert und als verfuegbar markiert ist.
+        '''     <b>Prüfung:</b><br/>
+        '''     Stellt sicher, dass CSCore initialisiert und als verfügbar markiert ist.
         ''' </summary>
         Private Shared Function TryEnsureCsCoreAvailable _
             (
@@ -1337,8 +1356,8 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         End Function
 
         ''' <summary>
-        '''     <b>Pruefung:</b><br/>
-        '''     Fuehrt Verfuegbarkeits- und Methodenguard zusammen und zaehlt Delegation.
+        '''     <b>Prüfung:</b><br/>
+        '''     Führt Verfügbarkeits- und Methodenguard zusammen und zählt Delegation.
         ''' </summary>
         Private Shared Function TryPrepareInvocation _
             (
@@ -1360,7 +1379,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         End Function
 
         ''' <summary>
-        '''     <b>Typisierte Rueckgabe:</b><br/>
+        '''     <b>Typisierte Rückgabe:</b><br/>
         '''     Invoked Ergebnis muss String sein; sonst fail-closed Fallback.
         ''' </summary>
         Private Shared Function TryInvokeStringForFallback _
@@ -1388,7 +1407,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         End Function
 
         ''' <summary>
-        '''     <b>Typisierte Rueckgabe:</b><br/>
+        '''     <b>Typisierte Rückgabe:</b><br/>
         '''     Invoked Ergebnis muss Integer sein; sonst fail-closed Fallback.
         ''' </summary>
         Private Shared Function TryInvokeIntegerForFallback _
@@ -1417,7 +1436,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
 
         ''' <summary>
         '''     <b>Shape-Guard:</b><br/>
-        '''     Invoked Ergebnis muss <c>Object()</c> mit exakt erwarteter Laenge liefern.
+        '''     Invoked Ergebnis muss <c>Object()</c> mit exakt erwarteter Länge liefern.
         ''' </summary>
         Private Shared Function TryInvokeObjectArrayForFallback _
             (
@@ -1452,7 +1471,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
 
         ''' <summary>
         '''     <b>Shape-Guard:</b><br/>
-        '''     Invoked Ergebnis muss <c>String()</c> mit exakt erwarteter Laenge liefern.
+        '''     Invoked Ergebnis muss <c>String()</c> mit exakt erwarteter Länge liefern.
         ''' </summary>
         Private Shared Function TryInvokeStringArrayForFallback _
             (
@@ -1483,6 +1502,72 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             End If
 
             Return True
+        End Function
+
+        ''' <summary>
+        '''     <b>Tuple-Guard:</b><br/>
+        '''     Liest das HMAC-Tuple im festen Format
+        '''     <c>[isResolved(Boolean), key(Byte()), note(String)]</c>.
+        ''' </summary>
+        Private Shared Function TryReadHmacResolutionTuple _
+            (
+                operationName As String,
+                values() As Object,
+                ByRef isResolved As Boolean,
+                ByRef key As Byte(),
+                ByRef note As String
+            ) As Boolean
+
+            If values Is Nothing OrElse values.Length <> ExpectedHmacResolutionValuesCount Then
+                RecordFallback(operationName)
+                Return False
+            End If
+
+            Try
+                isResolved = CBool(values(0))
+                key = If(CType(values(1), Byte()), Array.Empty(Of Byte)())
+                note = If(CStr(values(2)), String.Empty)
+                Return True
+            Catch ex As Exception When _
+                TypeOf ex Is InvalidCastException OrElse
+                TypeOf ex Is NullReferenceException OrElse
+                TypeOf ex Is IndexOutOfRangeException
+                RecordFallback(operationName)
+                Return False
+            End Try
+        End Function
+
+        ''' <summary>
+        '''     <b>Tuple-Guard:</b><br/>
+        '''     Liest das Archivpfad-Tuple im festen Format
+        '''     <c>[isValid(Boolean), normalizedPath(String), isDirectory(Boolean)]</c>.
+        ''' </summary>
+        Private Shared Function TryReadArchivePathTuple _
+            (
+                operationName As String,
+                values() As Object,
+                ByRef isValid As Boolean,
+                ByRef normalizedPath As String,
+                ByRef isDirectory As Boolean
+            ) As Boolean
+
+            If values Is Nothing OrElse values.Length <> ExpectedArchivePathValuesCount Then
+                RecordFallback(operationName)
+                Return False
+            End If
+
+            Try
+                isValid = CBool(values(0))
+                normalizedPath = If(CStr(values(1)), String.Empty)
+                isDirectory = CBool(values(2))
+                Return True
+            Catch ex As Exception When _
+                TypeOf ex Is InvalidCastException OrElse
+                TypeOf ex Is NullReferenceException OrElse
+                TypeOf ex Is IndexOutOfRangeException
+                RecordFallback(operationName)
+                Return False
+            End Try
         End Function
 
         Private Shared Function TryGetClosedGenericMethod _
