@@ -6,6 +6,14 @@
 
 All changes are documented here in technical terms. The release version itself is the Git tag `vX.Y.Z` (optional `-prerelease`) as SSOT.
 
+## [6.1.15]
+- Changed:
+  - Harmonized the governance mapping for `CodeReviewID` with the verified branch-protection state (`required_approving_review_count = 0`, `require_code_owner_reviews = false`, `require_last_push_approval = false`).
+  - Removed claims that merge without review is impossible and replaced them with mandatory process controls (required checks + review-thread evidence per `AGENTS.md`).
+- Docs/CI/Tooling:
+  - Consolidated Scorecard governance alert mappings across root and DE/EN mirrors.
+  - Version convergence set to `6.1.15` (`RepoVersion`, `Version`, `PackageVersion`, DE/EN version history).
+
 ## [6.1.14]
 - Added:
   - Introduced release metadata artifact path (`write_release_meta_artifact.sh`) and asynchronous resolution for `workflow_dispatch`.

@@ -4,13 +4,13 @@
 
 # Scorecard Governance Alert Mapping (Ruleset/Process)
 
-As of: 2026-02-13
+As of: 2026-02-22
 
-## Verified Current State (2026-02-13)
+## Verified Current State (2026-02-22)
 - Branch protection `main`:
-  - `required_pull_request_reviews.required_approving_review_count = 1`
-  - `require_code_owner_reviews = true`
-  - `require_last_push_approval = true`
+  - `required_pull_request_reviews.required_approving_review_count = 0`
+  - `require_code_owner_reviews = false`
+  - `require_last_push_approval = false`
 - Fuzzing:
   - Workflow `.github/workflows/fuzzing-baseline.yml` active.
   - Last manual evidence run: `22003901268` (`success`).
@@ -33,7 +33,7 @@ Map repo/governance-based Scorecard alerts without a concrete file (`no file ass
 | Alert ID | Control (target) | Current implementation | Evidence (deterministic) | DoD A | DoD B |
 |---|---|---|---|---|---|
 | `BranchProtectionID` | `main` only via PR + required checks | branch protection/ruleset active, required checks configured | `gh api repos/tomtastisch/FileClassifier/branches/main/protection` | `required_status_checks` present | direct push to `main` is technically blocked |
-| `CodeReviewID` | at least 1 PR review before merge | PR review policy in branch protection/ruleset | `gh api repos/tomtastisch/FileClassifier/branches/main/protection --jq '.required_pull_request_reviews'` | `required_approving_review_count >= 1` | merge without review not possible |
+| `CodeReviewID` | no mandatory approving review (workaround active) | branch protection sets `review_count=0`; quality is enforced via required checks + review-thread process per `AGENTS.md` | `gh api repos/tomtastisch/FileClassifier/branches/main/protection --jq '.required_pull_request_reviews'` | `required_approving_review_count == 0` | merge without review is possible; process controls remain mandatory |
 | `MaintainedID` | evidence of active maintenance | continuous commits/releases + active CI | `gh api repos/tomtastisch/FileClassifier/commits?per_page=20` and `gh api repos/tomtastisch/FileClassifier/actions/runs?per_page=20` | commits exist in last 90 days | successful workflow runs exist in last 30 days |
 | `FuzzingID` | fuzzing baseline exists (additionally enforced as a release blocker) | workflow `.github/workflows/fuzzing-baseline.yml` | `gh workflow view fuzzing-baseline.yml --yaml` and `gh run list --workflow fuzzing-baseline.yml --limit 10` | workflow exists and is executable | at least one successful run in last 30 days |
 | `CIIBestPracticesID` | process/security baseline documented and traceable | audit/governance docs + CI evidence + security policy | `ls docs/audit` + `bash tools/audit/verify-security-claims.sh` | audit index exists and links | security claims evidence returns `pass` for blocker claims |
