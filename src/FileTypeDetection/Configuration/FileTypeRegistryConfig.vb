@@ -7,7 +7,7 @@
 ' - Variablen im Deklarationsblock, spaltenartig ausgerichtet
 '
 ' SSOT CONFIG (verbindlich)
-' - AliasGroups: zentrale “Wildcard”-Semantik (FileKind.* steht für viele Aliaswerte)
+' - AliasGroups: zentrale Wildcard-Semantik (FileKind.* steht für viele Aliaswerte)
 ' - AliasOverrides: Kind -> AliasGroup
 ' - ExtensionOverrides: Canonical-Extension Overrides
 ' - MagicPatternCatalog: zentrale Magic-Signaturen
@@ -43,7 +43,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
         ''' <summary>
         '''     Aliasgruppen (SSOT) zur Abbildung der Wildcard-Semantik.
-        '''     Gruppen fassen gleichartige Aliaswerte zusammen (z.B. Archive, Office-Container).
+        '''     Gruppen fassen gleichartige Aliaswerte zusammen (zum Beispiel Archive, Dokument-Container).
         ''' </summary>
         Friend ReadOnly AliasGroups _
                             As ImmutableDictionary(Of String, ImmutableArray(Of String)) = _
@@ -112,18 +112,12 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <returns>Unveränderliches Dictionary Gruppenname-&gt;Aliasliste.</returns>
         Private Function BuildAliasGroups() As ImmutableDictionary(Of String, ImmutableArray(Of String))
-            Dim aliasGruppenBuilder = ImmutableDictionary.CreateBuilder _
-                (
-                    Of String,
-                    ImmutableArray(Of String)
-                ) _
-                (
-                    StringComparer.OrdinalIgnoreCase
-                )
+            Dim aliasGruppenBuilder As ImmutableDictionary(Of String, ImmutableArray(Of String)).Builder =
+                ImmutableDictionary.CreateBuilder(Of String, ImmutableArray(Of String))(StringComparer.OrdinalIgnoreCase)
 
             ' Wildcard-Semantik (Gruppen):
             ' - ARCHIVE: alle Archive/Container, die über FileKind.Zip normalisiert werden.
-            ' - DOC/XLS/PPT: Office-/OpenDocument-Container (Doc/Xls/Ppt), deren Content/Container-Detection separat läuft.
+            ' - DOC/XLS/PPT: Dokument-/OpenDocument-Container (Doc/Xls/Ppt), deren Content/Container-Detection separat läuft.
 
             aliasGruppenBuilder("JPEG") = A("jpe")
 
@@ -205,11 +199,12 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Function BuildMagicPatternCatalog _
             () As ImmutableDictionary(Of FileKind, ImmutableArray(Of FileTypeRegistry.MagicPattern))
 
-            Dim magicPatternBuilder = ImmutableDictionary.CreateBuilder _
+            Dim magicPatternBuilder As ImmutableDictionary _
                 (
                     Of FileKind,
                     ImmutableArray(Of FileTypeRegistry.MagicPattern)
-                )()
+                ).Builder =
+                ImmutableDictionary.CreateBuilder(Of FileKind, ImmutableArray(Of FileTypeRegistry.MagicPattern))()
 
             magicPatternBuilder(FileKind.Pdf) = ImmutableArray.Create(
                 Pattern(Prefix(0, &H25, &H50, &H44, &H46, &H2D))
