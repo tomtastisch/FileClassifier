@@ -17,6 +17,7 @@ tests/PackageBacked.Tests/**
 tools/ci/**
 tools/tests/**
 .github/workflows/codeql.yml
+.github/workflows/release.yml
 
 # active documentation scope for the CSCore migration chain
 
