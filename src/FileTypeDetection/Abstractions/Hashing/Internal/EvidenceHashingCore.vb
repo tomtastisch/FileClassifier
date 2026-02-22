@@ -49,25 +49,25 @@ Namespace Global.Tomtastisch.FileClassifier
                 notes As String
             ) As HashEvidence
 
-            Dim normalizedEntries As List(Of NormalizedEntry) = Nothing
-            Dim normalizeError As String = String.Empty
-            Dim logicalBytes As Byte()
-            Dim logicalSha As String
-            Dim fastLogical As String
-            Dim hmacLogical As String
-            Dim physicalSha As String
-            Dim fastPhysical As String
-            Dim hmacPhysical As String
-            Dim hasPhysical As Boolean
-            Dim secureNote As String
-            Dim hmacKey As Byte()
-            Dim hasHmacKey As Boolean
-            Dim firstEntry As ZipExtractedEntry = Nothing
-            Dim digestSet As HashDigestSet
-            Dim combinedNotes As String
-            Dim totalBytes As Long
+            Dim normalizedEntries   As List(Of NormalizedEntry) = Nothing
+            Dim normalizeError      As String                   = String.Empty
+            Dim logicalBytes        As Byte()
+            Dim logicalSha          As String
+            Dim fastLogical         As String
+            Dim hmacLogical         As String
+            Dim physicalSha         As String
+            Dim fastPhysical        As String
+            Dim hmacPhysical        As String
+            Dim hasPhysical         As Boolean
+            Dim secureNote          As String
+            Dim hmacKey             As Byte()
+            Dim hasHmacKey          As Boolean
+            Dim firstEntry          As ZipExtractedEntry        = Nothing
+            Dim digestSet           As HashDigestSet
+            Dim combinedNotes       As String
+            Dim totalBytes          As Long
             Dim persistedCompressed As Byte()
-            Dim persistedLogical As Byte()
+            Dim persistedLogical    As Byte()
 
             If Not TryNormalizeEntries(entries, normalizedEntries, normalizeError) Then
                 Return HashEvidence.CreateFailure(sourceType, label, normalizeError)
@@ -165,19 +165,19 @@ Namespace Global.Tomtastisch.FileClassifier
                 notes As String
             ) As HashEvidence
 
-            Dim safePayload As Byte() = If(payload, Array.Empty(Of Byte)())
-            Dim physicalSha As String = ComputeSha256Hex(safePayload)
-            Dim logicalSha As String = physicalSha
-            Dim fastPhysical As String = ComputeFastHash(safePayload, hashOptions)
-            Dim fastLogical As String = fastPhysical
-            Dim hmacPhysical As String = String.Empty
-            Dim hmacLogical As String = String.Empty
-            Dim secureNote As String = String.Empty
-            Dim hmacKey As Byte() = Array.Empty(Of Byte)()
+            Dim safePayload      As Byte()            = If(payload, Array.Empty(Of Byte)())
+            Dim physicalSha      As String            = ComputeSha256Hex(safePayload)
+            Dim logicalSha       As String            = physicalSha
+            Dim fastPhysical     As String            = ComputeFastHash(safePayload, hashOptions)
+            Dim fastLogical      As String            = fastPhysical
+            Dim hmacPhysical     As String            = String.Empty
+            Dim hmacLogical      As String            = String.Empty
+            Dim secureNote       As String            = String.Empty
+            Dim hmacKey          As Byte()            = Array.Empty(Of Byte)()
             Dim persistedPayload As Byte()
-            Dim entry As ZipExtractedEntry
-            Dim digestSet As HashDigestSet
-            Dim combinedNotes As String
+            Dim entry            As ZipExtractedEntry
+            Dim digestSet        As HashDigestSet
+            Dim combinedNotes    As String
 
             If hashOptions IsNot Nothing AndAlso hashOptions.IncludeSecureHash Then
                 If TryResolveHmacKey(hmacKey, secureNote) Then
@@ -232,9 +232,9 @@ Namespace Global.Tomtastisch.FileClassifier
                 ByRef errorMessage As String
             ) As Boolean
 
-            Dim seen As HashSet(Of String) = New HashSet(Of String)(StringComparer.Ordinal)
+            Dim seen           As HashSet(Of String) = New HashSet(Of String)(StringComparer.Ordinal)
             Dim normalizedPath As String
-            Dim payload As Byte()
+            Dim payload        As Byte()
 
             normalizedEntries = New List(Of NormalizedEntry)()
             errorMessage = String.Empty
@@ -300,8 +300,8 @@ Namespace Global.Tomtastisch.FileClassifier
             ) As Byte()
 
             Dim versionBytes As Byte()
-            Dim pathBytes As Byte()
-            Dim contentHash As Byte()
+            Dim pathBytes    As Byte()
+            Dim contentHash  As Byte()
 
             Using ms As New IO.MemoryStream()
                 Using writer As New IO.BinaryWriter(ms, Text.Encoding.UTF8, leaveOpen:=True)
@@ -372,7 +372,7 @@ Namespace Global.Tomtastisch.FileClassifier
             ) As String
 
             Dim safeKey As Byte() = If(key, Array.Empty(Of Byte)())
-            Dim data As Byte() = If(payload, Array.Empty(Of Byte)())
+            Dim data    As Byte() = If(payload, Array.Empty(Of Byte)())
 
             Using hmac As New Security.Cryptography.HMACSHA256(safeKey)
                 Return HashPrimitives.Current.HexCodec.EncodeLowerHex(hmac.ComputeHash(data))
@@ -432,7 +432,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 toAppend As String
             ) As String
 
-            Dim left As String = If(baseNotes, String.Empty).Trim()
+            Dim left  As String = If(baseNotes, String.Empty).Trim()
             Dim right As String = If(toAppend, String.Empty).Trim()
 
             If right.Length = 0 Then Return left

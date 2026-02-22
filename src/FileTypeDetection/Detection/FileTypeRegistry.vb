@@ -92,8 +92,8 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Shared Function BuildDefinitionsFromEnum() As ImmutableArray(Of FileTypeDefinition)
             Dim b = ImmutableArray.CreateBuilder(Of FileTypeDefinition)()
             Dim canonicalExtension As String
-            Dim aliases As String()
-            Dim magicPatterns As ImmutableArray(Of MagicPattern)
+            Dim aliases            As String()
+            Dim magicPatterns      As ImmutableArray(Of MagicPattern)
 
             For Each kind In OrderedKindsCache
                 If kind = FileKind.Unknown Then Continue For
@@ -151,10 +151,10 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="canonicalExtension">Canonical-Extension inklusive führendem Punkt.</param>
         ''' <returns>Sortierte Aliasliste (ohne führende Punkte, kleingeschrieben).</returns>
         Private Shared Function BuildAliases(kind As FileKind, canonicalExtension As String) As String()
-            Dim aliases As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
-            Dim extAlias As String
-            Dim enumAlias As String
-            Dim additional As ImmutableArray(Of String) = ImmutableArray(Of String).Empty
+            Dim aliases        As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
+            Dim extAlias       As String
+            Dim enumAlias      As String
+            Dim additional     As ImmutableArray(Of String)                                = ImmutableArray(Of String).Empty
             Dim orderedAliases As List(Of String)
 
             extAlias = NormalizeAlias(canonicalExtension)
@@ -234,7 +234,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="header">Dateiheader (mindestens so lang wie die benötigten Segmente).</param>
         ''' <returns>Erkannter <see cref="FileKind"/> oder <see cref="FileKind.Unknown"/>.</returns>
         Friend Shared Function DetectByMagic(header As Byte()) As FileKind
-            Dim rule As MagicRule
+            Dim rule     As MagicRule
             Dim patterns As ImmutableArray(Of MagicPattern)
 
             If header Is Nothing OrElse header.Length = 0 Then Return FileKind.Unknown
@@ -363,8 +363,8 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Shared Function BuildAliasMap(types As ImmutableDictionary(Of FileKind, FileType)) _
             As ImmutableDictionary(Of String, FileKind)
             Dim builder As ImmutableDictionary(Of String, FileKind).Builder
-            Dim kind As FileKind
-            Dim t As FileType = Nothing
+            Dim kind    As FileKind
+            Dim t       As FileType                                         = Nothing
 
             If types Is Nothing Then Return ImmutableDictionary(Of String, FileKind).Empty
 

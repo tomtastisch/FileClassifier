@@ -60,10 +60,10 @@ Namespace Global.Tomtastisch.FileClassifier
             ) As Boolean
 
             Dim totalUncompressed As Long
-            Dim ordered As IEnumerable(Of ZipArchiveEntry)
-            Dim u As Long
-            Dim c As Long
-            Dim ratio As Double
+            Dim ordered           As IEnumerable(Of ZipArchiveEntry)
+            Dim u                 As Long
+            Dim c                 As Long
+            Dim ratio             As Double
 
             If Not StreamGuard.IsReadable(stream) Then Return False
             If opt Is Nothing Then Return False
@@ -156,8 +156,8 @@ Namespace Global.Tomtastisch.FileClassifier
             ) As Boolean
 
             Dim header(15) As Byte
-            Dim read As Integer
-            Dim exact As Byte()
+            Dim read       As Integer
+            Dim exact      As Byte()
 
             If entry Is Nothing Then Return False
             If opt Is Nothing Then Return False

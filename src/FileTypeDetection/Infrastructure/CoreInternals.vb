@@ -84,12 +84,12 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="stream">Zu analysierender ZIP-Stream.</param>
         ''' <returns>Gemappter Dokumenttyp oder <see cref="FileKind.Unknown"/>.</returns>
         Private Shared Function DetectKindFromArchivePackage(stream As Stream) As FileType
-            Dim hasContentTypes           As Boolean     = False
-            Dim hasDocxMarker             As Boolean     = False
-            Dim hasXlsxMarker             As Boolean     = False
-            Dim hasPptxMarker             As Boolean     = False
-            Dim openDocumentKind          As FileKind    = FileKind.Unknown
-            Dim hasOpenDocumentConflict   As Boolean     = False
+            Dim hasContentTypes           As Boolean  = False
+            Dim hasDocxMarker             As Boolean  = False
+            Dim hasXlsxMarker             As Boolean  = False
+            Dim hasPptxMarker             As Boolean  = False
+            Dim openDocumentKind          As FileKind = FileKind.Unknown
+            Dim hasOpenDocumentConflict   As Boolean  = False
             Dim structuredMarkerCount     As Integer
             Dim name                      As String
             Dim candidateOpenDocumentKind As FileKind

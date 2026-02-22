@@ -61,8 +61,8 @@ Namespace Global.Tomtastisch.FileClassifier
                 aliases As IEnumerable(Of String)
             )
 
-            Dim dedup As HashSet(Of String) = New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
-            Dim n As String
+            Dim dedup          As HashSet(Of String) = New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
+            Dim n              As String
             Dim orderedAliases As List(Of String)
 
             Me.Kind = kind

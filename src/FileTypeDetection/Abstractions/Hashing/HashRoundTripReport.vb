@@ -105,14 +105,14 @@ Namespace Global.Tomtastisch.FileClassifier
             )
 
             ' Deklarationsblock (Pflicht, spaltenartig)
-            Dim slotCount As Integer = RequiredSlots.Length
-            Dim i As Integer
-            Dim idx As Integer
-            Dim baseEvidence As HashEvidence
-            Dim otherEvidence As HashEvidence
-            Dim otherSlot As HashSlot
-            Dim eqLogical As Boolean
-            Dim consistentLocal As Boolean = True
+            Dim slotCount       As Integer      = RequiredSlots.Length
+            Dim i               As Integer
+            Dim idx             As Integer
+            Dim baseEvidence    As HashEvidence
+            Dim otherEvidence   As HashEvidence
+            Dim otherSlot       As HashSlot
+            Dim eqLogical       As Boolean
+            Dim consistentLocal As Boolean      = True
 
             ' -----------------------------------------------------------------
             ' Guard-Clauses (fail-closed)

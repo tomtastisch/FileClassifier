@@ -54,8 +54,8 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             )
 
             Dim buf(InternalIoDefaults.CopyBufferSize - 1) As Byte
-            Dim total As Long = 0
-            Dim n As Integer
+            Dim total                                      As Long    = 0
+            Dim n                                          As Integer
 
             While True
                 n = input.Read(buf, 0, buf.Length)

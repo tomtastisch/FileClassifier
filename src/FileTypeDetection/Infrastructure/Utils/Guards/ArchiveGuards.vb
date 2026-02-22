@@ -242,7 +242,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 ByRef isDirectory As Boolean
             ) As Boolean
 
-            Dim safe As String = String.Empty
+            Dim safe    As String = String.Empty
             Dim trimmed As String
 
             normalizedPath = String.Empty

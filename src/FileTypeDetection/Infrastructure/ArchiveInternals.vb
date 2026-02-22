@@ -454,7 +454,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 ByRef descriptor As ArchiveDescriptor
             ) As Boolean
 
-            Dim mapped As ArchiveContainerType
+            Dim mapped      As ArchiveContainerType
             Dim gzipWrapped As Boolean
 
             descriptor = ArchiveDescriptor.UnknownDescriptor()
@@ -621,7 +621,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 opt As FileTypeProjectOptions
             ) As IReadOnlyList(Of ZipExtractedEntry)
 
-            Dim descriptor As ArchiveDescriptor = Nothing
+            Dim descriptor  As ArchiveDescriptor                   = Nothing
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             If Not ArchiveTypeResolver.TryDescribeStream(stream, opt, descriptor) Then Return emptyResult
 
@@ -643,8 +643,8 @@ Namespace Global.Tomtastisch.FileClassifier
             ) As IReadOnlyList(Of ZipExtractedEntry)
 
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
-            Dim entries As List(Of ZipExtractedEntry) = New List(Of ZipExtractedEntry)()
-            Dim ok As Boolean
+            Dim entries     As List(Of ZipExtractedEntry)          = New List(Of ZipExtractedEntry)()
+            Dim ok          As Boolean
 
             If Not StreamGuard.IsReadable(stream) Then Return emptyResult
             If opt Is Nothing Then Return emptyResult
@@ -720,11 +720,11 @@ Namespace Global.Tomtastisch.FileClassifier
                 descriptor As ArchiveDescriptor
             ) As Boolean
 
-            Dim destinationFull As String = String.Empty
-            Dim parent As String
-            Dim stageDir As String
-            Dim stagePrefix As String
-            Dim ok As Boolean
+            Dim destinationFull As String  = String.Empty
+            Dim parent          As String
+            Dim stageDir        As String
+            Dim stagePrefix     As String
+            Dim ok              As Boolean
 
             If Not StreamGuard.IsReadable(stream) Then Return False
             If opt Is Nothing Then Return False
@@ -811,10 +811,10 @@ Namespace Global.Tomtastisch.FileClassifier
                 opt As FileTypeProjectOptions
             ) As Boolean
 
-            Dim entryName As String = Nothing
+            Dim entryName   As String  = Nothing
             Dim isDirectory As Boolean = False
-            Dim targetPath As String = String.Empty
-            Dim targetDir As String
+            Dim targetPath  As String  = String.Empty
+            Dim targetDir   As String
 
             If entry Is Nothing Then Return False
             If opt Is Nothing Then Return False
@@ -892,9 +892,9 @@ Namespace Global.Tomtastisch.FileClassifier
                 opt As FileTypeProjectOptions
             ) As Boolean
 
-            Dim entryName As String = Nothing
+            Dim entryName   As String  = Nothing
             Dim isDirectory As Boolean = False
-            Dim payload As Byte()
+            Dim payload     As Byte()
 
             If entry Is Nothing OrElse entries Is Nothing Then Return False
             If opt Is Nothing Then Return False
@@ -948,7 +948,7 @@ Namespace Global.Tomtastisch.FileClassifier
                  ByRef isDirectory As Boolean
             ) As Boolean
 
-            Dim entryName As String = Nothing
+            Dim entryName               As String  = Nothing
             Dim normalizedDirectoryFlag As Boolean = False
 
             safeEntryName = Nothing
@@ -1160,16 +1160,16 @@ Namespace Global.Tomtastisch.FileClassifier
                 extractEntry As Func(Of IArchiveEntryModel, Boolean)
             ) As Boolean Implements IArchiveBackend.Process
 
-            Dim mapped As ArchiveContainerType
-            Dim entries As List(Of SharpCompress.Archives.IArchiveEntry)
-            Dim nestedResult As Boolean = False
-            Dim nestedHandled As Boolean
-            Dim totalUncompressed As Long
-            Dim model As IArchiveEntryModel
-            Dim knownSize As Long
+            Dim mapped               As ArchiveContainerType
+            Dim entries              As List(Of SharpCompress.Archives.IArchiveEntry)
+            Dim nestedResult         As Boolean                                       = False
+            Dim nestedHandled        As Boolean
+            Dim totalUncompressed    As Long
+            Dim model                As IArchiveEntryModel
+            Dim knownSize            As Long
             Dim requireKnownForTotal As Boolean
-            Dim gzipWrapped As Boolean
-            Dim gzipWrappedTar As Boolean
+            Dim gzipWrapped          As Boolean
+            Dim gzipWrappedTar       As Boolean
 
             If Not StreamGuard.IsReadable(stream) Then Return False
             If opt Is Nothing Then Return False
@@ -1300,10 +1300,10 @@ Namespace Global.Tomtastisch.FileClassifier
                 ByRef nestedResult As Boolean
             ) As Boolean
 
-            Dim onlyEntry As SharpCompress.Archives.IArchiveEntry
-            Dim model As IArchiveEntryModel
-            Dim payload As Byte() = Nothing
-            Dim nestedDescriptor As ArchiveDescriptor = Nothing
+            Dim onlyEntry        As SharpCompress.Archives.IArchiveEntry
+            Dim model            As IArchiveEntryModel
+            Dim payload          As Byte()                               = Nothing
+            Dim nestedDescriptor As ArchiveDescriptor                    = Nothing
 
             nestedResult = False
             If containerType <> ArchiveContainerType.GZip Then Return False
@@ -1449,7 +1449,7 @@ Namespace Global.Tomtastisch.FileClassifier
             ) As Boolean
 
             Dim buf(InternalIoDefaults.CopyBufferSize - 1) As Byte
-            Dim n As Integer
+            Dim n                                          As Integer
 
             measured = 0
             If entry Is Nothing OrElse opt Is Nothing Then Return False

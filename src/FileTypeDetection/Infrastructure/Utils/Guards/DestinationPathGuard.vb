@@ -156,7 +156,7 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 overwrite As Boolean
             ) As Boolean
 
-            Dim existsAsFile As Boolean
+            Dim existsAsFile      As Boolean
             Dim existsAsDirectory As Boolean
 
             existsAsFile = File.Exists(destinationFull)

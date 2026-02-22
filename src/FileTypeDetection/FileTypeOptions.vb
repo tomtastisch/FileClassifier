@@ -54,25 +54,25 @@ Namespace Global.Tomtastisch.FileClassifier
                 json As String
             ) As Boolean
 
-            Dim defaults As FileTypeProjectOptions = FileTypeProjectOptions.DefaultOptions()
-            Dim headerOnlyNonZip As Boolean = defaults.HeaderOnlyNonZip
-            Dim maxBytes As Long = defaults.MaxBytes
-            Dim sniffBytes As Integer = defaults.SniffBytes
-            Dim maxZipEntries As Integer = defaults.MaxZipEntries
-            Dim maxZipTotalUncompressedBytes As Long = defaults.MaxZipTotalUncompressedBytes
-            Dim maxZipEntryUncompressedBytes As Long = defaults.MaxZipEntryUncompressedBytes
-            Dim maxZipCompressionRatio As Integer = defaults.MaxZipCompressionRatio
-            Dim maxZipNestingDepth As Integer = defaults.MaxZipNestingDepth
-            Dim maxZipNestedBytes As Long = defaults.MaxZipNestedBytes
-            Dim rejectArchiveLinks As Boolean = defaults.RejectArchiveLinks
-            Dim allowUnknownArchiveEntrySize As Boolean = defaults.AllowUnknownArchiveEntrySize
-            Dim hashIncludePayloadCopies As Boolean = defaults.DeterministicHash.IncludePayloadCopies
-            Dim hashIncludeFastHash As Boolean = defaults.DeterministicHash.IncludeFastHash
-            Dim hashIncludeSecureHash As Boolean = defaults.DeterministicHash.IncludeSecureHash
-            Dim hashMaterializedFileName As String = defaults.DeterministicHash.MaterializedFileName
-            Dim logger As Microsoft.Extensions.Logging.ILogger = defaults.Logger
-            Dim nextHashOptions As HashOptions
-            Dim nextOptions As FileTypeProjectOptions
+            Dim defaults                     As FileTypeProjectOptions               = FileTypeProjectOptions.DefaultOptions()
+            Dim headerOnlyNonZip             As Boolean                              = defaults.HeaderOnlyNonZip
+            Dim maxBytes                     As Long                                 = defaults.MaxBytes
+            Dim sniffBytes                   As Integer                              = defaults.SniffBytes
+            Dim maxZipEntries                As Integer                              = defaults.MaxZipEntries
+            Dim maxZipTotalUncompressedBytes As Long                                 = defaults.MaxZipTotalUncompressedBytes
+            Dim maxZipEntryUncompressedBytes As Long                                 = defaults.MaxZipEntryUncompressedBytes
+            Dim maxZipCompressionRatio       As Integer                              = defaults.MaxZipCompressionRatio
+            Dim maxZipNestingDepth           As Integer                              = defaults.MaxZipNestingDepth
+            Dim maxZipNestedBytes            As Long                                 = defaults.MaxZipNestedBytes
+            Dim rejectArchiveLinks           As Boolean                              = defaults.RejectArchiveLinks
+            Dim allowUnknownArchiveEntrySize As Boolean                              = defaults.AllowUnknownArchiveEntrySize
+            Dim hashIncludePayloadCopies     As Boolean                              = defaults.DeterministicHash.IncludePayloadCopies
+            Dim hashIncludeFastHash          As Boolean                              = defaults.DeterministicHash.IncludeFastHash
+            Dim hashIncludeSecureHash        As Boolean                              = defaults.DeterministicHash.IncludeSecureHash
+            Dim hashMaterializedFileName     As String                               = defaults.DeterministicHash.MaterializedFileName
+            Dim logger                       As Microsoft.Extensions.Logging.ILogger = defaults.Logger
+            Dim nextHashOptions              As HashOptions
+            Dim nextOptions                  As FileTypeProjectOptions
 
             If String.IsNullOrWhiteSpace(json) Then Return False
 

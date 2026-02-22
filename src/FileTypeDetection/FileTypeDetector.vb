@@ -103,7 +103,7 @@ Namespace Global.Tomtastisch.FileClassifier
             ) As Byte()
 
             Dim opt As FileTypeProjectOptions = GetDefaultOptions()
-            Dim fi As FileInfo
+            Dim fi  As FileInfo
 
             ' Guard-Clauses: Pfad und Dateiexistenz.
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
@@ -297,9 +297,9 @@ Namespace Global.Tomtastisch.FileClassifier
                 path As String
             ) As Boolean
 
-            Dim opt As FileTypeProjectOptions = GetDefaultOptions()
-            Dim descriptor As ArchiveDescriptor = ArchiveDescriptor.UnknownDescriptor()
-            Dim detected As FileType
+            Dim opt        As FileTypeProjectOptions = GetDefaultOptions()
+            Dim descriptor As ArchiveDescriptor      = ArchiveDescriptor.UnknownDescriptor()
+            Dim detected   As FileType
 
             ' Guard-Clauses: Pfad und Dateiexistenz.
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then Return False
@@ -360,7 +360,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 ByRef trace As DetectionTrace
             ) As FileType
 
-            Dim fi As FileInfo
+            Dim fi     As FileInfo
             Dim header As Byte()
 
             If String.IsNullOrWhiteSpace(path) OrElse Not File.Exists(path) Then
@@ -468,7 +468,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 verifyBeforeExtract As Boolean
             ) As Boolean
 
-            Dim opt As FileTypeProjectOptions = GetDefaultOptions()
+            Dim opt     As FileTypeProjectOptions = GetDefaultOptions()
             Dim payload As Byte()
             If Not CanExtractArchivePath(path, verifyBeforeExtract, opt) Then Return False
 
@@ -670,8 +670,8 @@ Namespace Global.Tomtastisch.FileClassifier
                                                tryRefineLegacyOffice As Func(Of FileType)
                                                ) As FileType
 
-            Dim magicKind As FileKind
-            Dim descriptor As ArchiveDescriptor
+            Dim magicKind        As FileKind
+            Dim descriptor       As ArchiveDescriptor
             Dim legacyOfficeType As FileType
 
             If header Is Nothing OrElse header.Length = 0 Then
@@ -871,9 +871,9 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function ExtensionMatchesKind(path As String, detectedKind As FileKind) As Boolean
 
-            Dim ext As String = IO.Path.GetExtension(If(path, String.Empty))
+            Dim ext           As String   = IO.Path.GetExtension(If(path, String.Empty))
             Dim normalizedExt As String
-            Dim detectedType As FileType
+            Dim detectedType  As FileType
 
             If String.IsNullOrWhiteSpace(ext) Then Return True
 
@@ -896,11 +896,11 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function ReadHeader(input As FileStream, sniffBytes As Integer, maxBytes As Long) As Byte()
 
-            Dim want As Integer
-            Dim take As Integer
-            Dim off As Integer
-            Dim n As Integer
-            Dim buf As Byte()
+            Dim want  As Integer
+            Dim take  As Integer
+            Dim off   As Integer
+            Dim n     As Integer
+            Dim buf   As Byte()
             Dim exact As Byte()
 
             Try
