@@ -30,6 +30,6 @@
     <WarningsAsErrors>$(WarningsAsErrors);RS0016;RS0017;RS0026;RS0027;RS0022;RS0023;RS0024;RS0025</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
-    <RepoVersion>6.1.17</RepoVersion>
+    <RepoVersion>6.1.18</RepoVersion>
   </PropertyGroup>
 </Project>

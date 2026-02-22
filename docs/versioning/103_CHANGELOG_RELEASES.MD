@@ -6,6 +6,13 @@
 
 All changes are documented here in technical terms. The release version itself is the Git tag `vX.Y.Z` (optional `-prerelease`) as SSOT.
 
+## [6.1.18]
+- Changed:
+  - Raised the versioning SSOT for the release path to `6.1.18` (`RepoVersion`, package `Version`, `PackageVersion`).
+- Docs/CI/Tooling:
+  - Synchronized version history and changelog to `6.1.18` across root and DE/EN mirrors.
+  - Completed release preparation for RC canary `v6.1.18-rc.1` (no runtime or API changes).
+
 ## [6.1.17]
 - Added:
   - Added two bridge edge-case tests for fail-closed delegation/fallback (`NormalizeArchiveRelativePath`, `ResolveHmacKeyFromEnvironment`).
