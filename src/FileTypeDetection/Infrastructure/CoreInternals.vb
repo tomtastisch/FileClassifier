@@ -90,7 +90,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim hasPptxMarker             As Boolean  = False
             Dim openDocumentKind          As FileKind = FileKind.Unknown
             Dim hasOpenDocumentConflict   As Boolean  = False
-            Dim resolvedKind              As FileKind = FileKind.Unknown
+            Dim resolvedKind              As FileKind
             Dim name                      As String
             Dim candidateOpenDocumentKind As FileKind
 
@@ -146,7 +146,6 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return FileTypeRegistry.Resolve(FileKind.Unknown)
             End Try
 
-            Return FileTypeRegistry.Resolve(FileKind.Unknown)
         End Function
 
         Private Shared Function ResolveArchivePackageKind(
@@ -420,7 +419,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim hasWord       As Boolean
             Dim hasExcel      As Boolean
             Dim hasPowerPoint As Boolean
-            Dim resolvedKind  As FileKind = FileKind.Unknown
+            Dim resolvedKind  As FileKind
 
             If Not IsOleCompoundHeader(data) Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
 

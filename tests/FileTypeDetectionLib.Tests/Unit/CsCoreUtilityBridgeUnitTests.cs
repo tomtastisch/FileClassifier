@@ -1,9 +1,7 @@
-using System.IO;
 using System.IO.Compression;
 using System.Reflection;
 using FileTypeDetectionLib.Tests.Support;
 using Tomtastisch.FileClassifier;
-using Tomtastisch.FileClassifier.Infrastructure.Utils;
 
 namespace FileTypeDetectionLib.Tests.Unit;
 
@@ -153,7 +151,7 @@ public sealed class CsCoreUtilityBridgeUnitTests
 
             var lockedPath = Path.Combine(tempRoot.RootPath, "locked.bin");
             File.WriteAllBytes(lockedPath, "%PDF-"u8.ToArray());
-            using (var locked = new FileStream(lockedPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            using (new FileStream(lockedPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
             {
                 var ioDetail = new FileTypeDetector().DetectDetailed(lockedPath);
                 Assert.Equal("ExceptionIO", ioDetail.ReasonCode);

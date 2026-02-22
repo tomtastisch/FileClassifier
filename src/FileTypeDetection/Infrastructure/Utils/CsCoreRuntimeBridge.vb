@@ -922,20 +922,20 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
 
                 Try
                     Dim csCoreAssembly                          As Assembly = ResolveCsCoreAssembly()
-                    Dim enumUtilityType                         As Type     = Nothing
-                    Dim iterableUtilityType                     As Type     = Nothing
-                    Dim guardUtilityType                        As Type     = Nothing
-                    Dim exceptionFilterUtilityType              As Type     = Nothing
-                    Dim hashNormalizationUtilityType            As Type     = Nothing
-                    Dim materializationUtilityType              As Type     = Nothing
-                    Dim projectOptionsUtilityType               As Type     = Nothing
-                    Dim detectionPolicyUtilityType              As Type     = Nothing
-                    Dim officePolicyUtilityType                 As Type     = Nothing
-                    Dim evidencePolicyUtilityType               As Type     = Nothing
-                    Dim archivePathPolicyUtilityType            As Type     = Nothing
-                    Dim expectedGuardParameterTypes()           As Type     = Nothing
-                    Dim expectedExceptionFilterParameterTypes() As Type     = Nothing
-                    Dim expectedHashStringParameterTypes()      As Type     = Nothing
+                    Dim enumUtilityType                         As Type
+                    Dim iterableUtilityType                     As Type
+                    Dim guardUtilityType                        As Type
+                    Dim exceptionFilterUtilityType              As Type
+                    Dim hashNormalizationUtilityType            As Type
+                    Dim materializationUtilityType              As Type
+                    Dim projectOptionsUtilityType               As Type
+                    Dim detectionPolicyUtilityType              As Type
+                    Dim officePolicyUtilityType                 As Type
+                    Dim evidencePolicyUtilityType               As Type
+                    Dim archivePathPolicyUtilityType            As Type
+                    Dim expectedGuardParameterTypes()           As Type
+                    Dim expectedExceptionFilterParameterTypes() As Type
+                    Dim expectedHashStringParameterTypes()      As Type
 
                     If csCoreAssembly Is Nothing Then
                         _isAvailable = False

@@ -128,7 +128,7 @@ Namespace Global.Tomtastisch.FileClassifier
             Dim archiveSafetyPassed          As Boolean                = False
             Dim archiveSignatureCandidate    As Boolean                = False
             Dim delegatedMaterializationMode As Integer                = MaterializationModePersistRaw
-            Dim materializationMode          As Integer                = MaterializationModePersistRaw
+            Dim materializationMode          As Integer
 
             ' Guard-Clauses: Null-, Größen- und Zielpfadprüfung.
             If data Is Nothing Then Return False
