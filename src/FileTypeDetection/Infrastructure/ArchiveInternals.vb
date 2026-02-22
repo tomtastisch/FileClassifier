@@ -1223,11 +1223,10 @@ Namespace Global.Tomtastisch.FileClassifier
                         model = New SharpCompressEntryModel(entry)
 
                         If ArchiveLinkGuard.IsRejectedLink(
-                                opt,
-                                model.LinkTarget,
-                                "[ArchiveGate]",
-                                logWhenRejected:=True
-                            ) Then
+                            opt,
+                            model.LinkTarget,
+                            "[ArchiveGate]",
+                            logWhenRejected:=True) Then
                             Return False
                         End If
 
