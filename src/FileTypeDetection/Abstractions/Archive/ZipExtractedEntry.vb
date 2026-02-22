@@ -37,6 +37,11 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public ReadOnly Property Size As Integer
 
+        ''' <summary>
+        '''     Initialisiert ein unveränderliches In-Memory-Modell für einen Archiveintrag.
+        ''' </summary>
+        ''' <param name="entryPath">Normalisierter relativer Eintragspfad.</param>
+        ''' <param name="payload">Extrahierter Byteinhalt des Eintrags.</param>
         Friend Sub New _
             (
                 entryPath As String,

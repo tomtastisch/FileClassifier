@@ -37,6 +37,9 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
     ''' </remarks>
     Friend NotInheritable Class EnumUtils
 
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
@@ -160,21 +163,21 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             ) As TEnum()
 
             ' Deklarationsblock
-            Dim enumType As Type = GetType(TEnum)
-            Dim raw As Array
+            Dim enumType As Type  = GetType(TEnum)
+            Dim raw      As Array
 
             Dim values() As TEnum
-            Dim keys() As Long
+            Dim keys()   As Long
 
-            Dim i As Integer
-            Dim count As Integer
+            Dim i        As Integer
+            Dim count    As Integer
             Dim maxIndex As Integer
 
-            Dim effectiveTo As Integer
+            Dim effectiveTo      As Integer
             Dim effectiveMaxFrom As Integer
-            Dim effectiveFrom As Integer
+            Dim effectiveFrom    As Integer
 
-            Dim length As Integer
+            Dim length   As Integer
             Dim result() As TEnum
 
 

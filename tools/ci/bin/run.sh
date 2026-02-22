@@ -171,7 +171,9 @@ run_preflight() {
   run_or_fail "CI-PREFLIGHT-001" "Doc shell compatibility guard" python3 "${ROOT_DIR}/tools/check-doc-shell-compat.py"
   run_or_fail "CI-PREFLIGHT-001" "Docs checker unit tests" python3 -m unittest discover -s "${ROOT_DIR}/tools/tests" -p "test_*.py" -v
   run_or_fail "CI-PREFLIGHT-001" "Policy/RoC bijection" python3 "${ROOT_DIR}/tools/check-policy-roc.py" --out "${ROOT_DIR}/artifacts/policy_roc_matrix.tsv"
-  run_or_fail "CI-PREFLIGHT-001" "Format check" dotnet format "${ROOT_DIR}/FileClassifier.sln" --verify-no-changes
+  run_or_fail "CI-PREFLIGHT-001" "VB Dim alignment check" python3 "${ROOT_DIR}/tools/ci/check-vb-dim-alignment.py" --root "${ROOT_DIR}/src/FileTypeDetection"
+  run_or_fail "CI-PREFLIGHT-001" "Format check (style)" dotnet format "${ROOT_DIR}/FileClassifier.sln" style --verify-no-changes
+  run_or_fail "CI-PREFLIGHT-001" "Format check (analyzers)" dotnet format "${ROOT_DIR}/FileClassifier.sln" analyzers --verify-no-changes
   if ! run_policy_runner_bridge "preflight" "artifacts/ci/_policy_preflight" "Policy shell safety" "tools/ci/bin/run.sh"; then
     return 1
   fi

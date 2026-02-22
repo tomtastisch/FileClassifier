@@ -12,14 +12,13 @@ Heuristics for retroactive classification:
 - `docs|test|ci|chore|tooling|refactor|fix` => patch
 
 Current state:
-- Current release line contains `6.x` (current working state: `v6.0.1`; details in `docs/versioning/103_CHANGELOG_RELEASES.MD`).
+- Current release line contains `6.x` (current working state: `v6.0.0`; details in `docs/versioning/103_CHANGELOG_RELEASES.MD`).
 
 Note:
 - The \"short description\" column follows the original commit/PR intent text for deterministic traceability and is not normalized to a single language.
 
 | Version | Short description | Commit | Keyword |
 |---|---|---|---|
-| `6.0.1` | Refactor hardening: consolidated internal SSOT utilities into `Infrastructure/Utils`, split core utility logic into dedicated files, and unified duplicate byte guards | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v5.2.1...HEAD) | patch |
 | `6.0.0` | Breaking release: migrated `FileKind` enum and `HashRoundTripReport` public API to the new slot/method model and split hashing internals into core/roundtrip/io services | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v5.2.1...HEAD) | breaking |
 | `5.2.1` | Switched SharpCompress calls to type-safe APIs, hardened tar.gz fail-closed handling, and enforced/documented Qodana CI as a mandatory gate | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v5.2.0...HEAD) | patch |
 | `5.2.0` | Introduce netstandard2.0 compatibility layer, consolidate provider structure, and extend TFM multi-targeting | [8d65a52](https://github.com/tomtastisch/FileClassifier/commit/8d65a52) | minor |

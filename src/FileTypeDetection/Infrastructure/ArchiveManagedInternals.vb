@@ -21,9 +21,18 @@ Namespace Global.Tomtastisch.FileClassifier
     Friend NotInheritable Class ArchiveStreamEngine
         Private Shared ReadOnly RecyclableStreams As New Microsoft.IO.RecyclableMemoryStreamManager()
 
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Validiert einen ZIP-Stream ohne Extraktion einzelner Einträge.
+        ''' </summary>
+        ''' <param name="stream">Zu validierender Quellstream.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Sicherheitsgrenzen.</param>
+        ''' <param name="depth">Aktuelle Verschachtelungstiefe.</param>
         Friend Shared Function ValidateArchiveStream _
             (
                 stream As Stream,
@@ -34,6 +43,14 @@ Namespace Global.Tomtastisch.FileClassifier
             Return ProcessArchiveStream(stream, opt, depth, Nothing)
         End Function
 
+        ''' <summary>
+        '''     Verarbeitet einen ZIP-Stream deterministisch und fail-closed.
+        ''' </summary>
+        ''' <param name="stream">Zu verarbeitender Quellstream.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Sicherheitsgrenzen.</param>
+        ''' <param name="depth">Aktuelle Verschachtelungstiefe.</param>
+        ''' <param name="extractEntry">Optionaler Callback für Eintragsverarbeitung auf Root-Ebene.</param>
+        ''' <returns><c>True</c> nur bei vollständiger, erfolgreicher Verarbeitung.</returns>
         Friend Shared Function ProcessArchiveStream _
             (
                 stream As Stream,
@@ -43,10 +60,10 @@ Namespace Global.Tomtastisch.FileClassifier
             ) As Boolean
 
             Dim totalUncompressed As Long
-            Dim ordered As IEnumerable(Of ZipArchiveEntry)
-            Dim u As Long
-            Dim c As Long
-            Dim ratio As Double
+            Dim ordered           As IEnumerable(Of ZipArchiveEntry)
+            Dim u                 As Long
+            Dim c                 As Long
+            Dim ratio             As Double
 
             If Not StreamGuard.IsReadable(stream) Then Return False
             If opt Is Nothing Then Return False
@@ -126,6 +143,12 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Prüft, ob ein ZIP-Eintrag selbst wieder als verschachteltes Archiv behandelt werden muss.
+        ''' </summary>
+        ''' <param name="entry">Zu prüfender ZIP-Eintrag.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Logger.</param>
+        ''' <returns><c>True</c>, wenn der Header auf ein verschachteltes ZIP hindeutet.</returns>
         Private Shared Function IsNestedArchiveEntry _
             (
                 entry As ZipArchiveEntry,
@@ -133,8 +156,8 @@ Namespace Global.Tomtastisch.FileClassifier
             ) As Boolean
 
             Dim header(15) As Byte
-            Dim read As Integer
-            Dim exact As Byte()
+            Dim read       As Integer
+            Dim exact      As Byte()
 
             If entry Is Nothing Then Return False
             If opt Is Nothing Then Return False
@@ -220,6 +243,10 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private ReadOnly _entry As ZipArchiveEntry
 
+        ''' <summary>
+        '''     Initialisiert das Managed-Entry-Wrappermodell.
+        ''' </summary>
+        ''' <param name="entry">Zu kapselnder ZIP-Eintrag.</param>
         Friend Sub New(entry As ZipArchiveEntry)
             _entry = entry
         End Sub

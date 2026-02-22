@@ -29,7 +29,8 @@ Namespace Global.Tomtastisch.FileClassifier
 
     ''' <summary>
     '''     Unveränderlicher Deskriptor zur Beschreibung erkannter Archivtypen und Containerketten.
-    '''     Enthält Metadaten zu <see cref="LogicalKind"/>, <see cref="ContainerType"/> und <see cref="ContainerChain"/>.
+    '''     Enthält Metadaten zu <see cref="LogicalKind"/>, <see cref="ContainerType"/> und
+    '''     <see cref="ContainerChain"/>.
     ''' </summary>
     Friend NotInheritable Class ArchiveDescriptor
         ''' <summary>
@@ -47,6 +48,12 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public ReadOnly Property ContainerChain As IReadOnlyList(Of ArchiveContainerType)
 
+        ''' <summary>
+        '''     Initialisiert den unveränderlichen Archivdeskriptor.
+        ''' </summary>
+        ''' <param name="logicalKind">Logischer Dateityp für den aktuellen Deskriptor.</param>
+        ''' <param name="containerType">Physischer Primärtyp des Containers.</param>
+        ''' <param name="containerChain">Containerkette inklusive Verschachtelung, falls vorhanden.</param>
         Private Sub New _
             (
                 logicalKind As FileKind,
@@ -60,6 +67,9 @@ Namespace Global.Tomtastisch.FileClassifier
             Me.ContainerChain = Array.AsReadOnly(CType(chain.Clone(), ArchiveContainerType()))
         End Sub
 
+        ''' <summary>
+        '''     Liefert einen fail-closed Standarddeskriptor für unbekannte Container.
+        ''' </summary>
         Friend Shared Function UnknownDescriptor() As ArchiveDescriptor
             Return New ArchiveDescriptor(
                 FileKind.Unknown,
@@ -68,11 +78,23 @@ Namespace Global.Tomtastisch.FileClassifier
             )
         End Function
 
+        ''' <summary>
+        '''     Erzeugt einen Deskriptor für einen bekannten Container.
+        ''' </summary>
+        ''' <param name="containerType">Zu beschreibender Containertyp.</param>
+        ''' <returns>
+        '''     Deskriptor mit logischem Typ und initialer Containerkette oder UNKNOWN-Deskriptor bei
+        '''     ungültigem Eingabewert.
+        ''' </returns>
         Friend Shared Function ForContainerType(containerType As ArchiveContainerType) As ArchiveDescriptor
             If containerType = ArchiveContainerType.Unknown Then Return UnknownDescriptor()
             Return New ArchiveDescriptor(FileKind.Zip, containerType, {containerType})
         End Function
 
+        ''' <summary>
+        '''     Erzeugt eine neue Instanz mit identischem Primärtyp und ausgetauschter Containerkette.
+        ''' </summary>
+        ''' <param name="chain">Neue, deterministisch zu speichernde Containerkette.</param>
         Friend Function WithChain(chain As ArchiveContainerType()) As ArchiveDescriptor
             Return New ArchiveDescriptor(LogicalKind, ContainerType, chain)
         End Function
@@ -82,11 +104,34 @@ Namespace Global.Tomtastisch.FileClassifier
     '''     Interner Vertrag <c>IArchiveEntryModel</c> für austauschbare Infrastrukturkomponenten.
     ''' </summary>
     Friend Interface IArchiveEntryModel
+        ''' <summary>
+        '''     Relativer Pfad des Archiveintrags.
+        ''' </summary>
         ReadOnly Property RelativePath As String
+
+        ''' <summary>
+        '''     Kennzeichnet, ob der Eintrag ein Verzeichnis repräsentiert.
+        ''' </summary>
         ReadOnly Property IsDirectory As Boolean
+
+        ''' <summary>
+        '''     Unkomprimierte Größe, sofern vom Backend verfügbar.
+        ''' </summary>
         ReadOnly Property UncompressedSize As Long?
+
+        ''' <summary>
+        '''     Komprimierte Größe, sofern vom Backend verfügbar.
+        ''' </summary>
         ReadOnly Property CompressedSize As Long?
+
+        ''' <summary>
+        '''     Linkziel bei Link-Einträgen, sonst leere Zeichenfolge.
+        ''' </summary>
         ReadOnly Property LinkTarget As String
+
+        ''' <summary>
+        '''     Öffnet einen lesbaren Stream für den Eintragsinhalt.
+        ''' </summary>
         Function OpenStream() As Stream
     End Interface
 
@@ -94,8 +139,20 @@ Namespace Global.Tomtastisch.FileClassifier
     '''     Interner Vertrag <c>IArchiveBackend</c> für austauschbare Infrastrukturkomponenten.
     ''' </summary>
     Friend Interface IArchiveBackend
+        ''' <summary>
+        '''     Vom Backend unterstützter Primärtyp.
+        ''' </summary>
         ReadOnly Property ContainerType As ArchiveContainerType
 
+        ''' <summary>
+        '''     Verarbeitet einen Archivstream deterministisch und fail-closed.
+        ''' </summary>
+        ''' <param name="stream">Zu verarbeitender Quellstream.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Sicherheitsgrenzen.</param>
+        ''' <param name="depth">Aktuelle Verschachtelungstiefe.</param>
+        ''' <param name="containerTypeValue">Erwarteter Containertyp.</param>
+        ''' <param name="extractEntry">Optionaler Callback für Extraktion pro Eintrag.</param>
+        ''' <returns><c>True</c> nur bei vollständiger, erfolgreicher Verarbeitung.</returns>
         Function Process _
             (
                 stream As Stream,
@@ -107,15 +164,31 @@ Namespace Global.Tomtastisch.FileClassifier
     End Interface
 
     ''' <summary>
-    '''     Interne Hilfsklasse <c>ArchiveBackendRegistry</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    '''     Interne Hilfsklasse <c>ArchiveBackendRegistry</c> zur kapselnden Umsetzung
+    '''     von Guard-, I/O- und Policy-Logik.
     ''' </summary>
     Friend NotInheritable Class ArchiveBackendRegistry
+        ''' <summary>
+        '''     ZIP-Backend auf Basis der Managed-Bibliothek.
+        ''' </summary>
         Private Shared ReadOnly ManagedArchiveBackend As New ArchiveManagedBackend()
+
+        ''' <summary>
+        '''     Backend für SharpCompress-basierte Formate.
+        ''' </summary>
         Private Shared ReadOnly SharpCompressBackend As New SharpCompressArchiveBackend()
 
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Liefert das passende Backend für den gewünschten Containertyp.
+        ''' </summary>
+        ''' <param name="containerType">Gesuchter Containertyp.</param>
+        ''' <returns>Backendinstanz oder <c>Nothing</c> für unbekannte Typen.</returns>
         Friend Shared Function Resolve _
             (
                 containerType As ArchiveContainerType
@@ -133,10 +206,25 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
     End Class
 
+    ''' <summary>
+    '''     Kompatibilitätsschicht für SharpCompress API-Varianten (`OpenArchive` vs. `Open`).
+    '''     Kapselt Reflection-Auflösung fail-closed und ohne Public-API-Drift.
+    ''' </summary>
     Friend NotInheritable Class ArchiveSharpCompressCompat
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Öffnet ein Archiv über die kompatible SharpCompress-Factory.
+        ''' </summary>
+        ''' <param name="stream">Quellstream auf Archivdaten.</param>
+        ''' <returns>
+        '''     Archivinstanz bei Erfolg, sonst <c>Nothing</c> bei erwarteten Kompatibilitäts- oder
+        '''     Formatfehlern.
+        ''' </returns>
         Friend Shared Function OpenArchive _
             (
                 stream As Stream
@@ -158,6 +246,12 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Öffnet ein Archiv unter Berücksichtigung des erwarteten Containertyps.
+        ''' </summary>
+        ''' <param name="stream">Quellstream auf Archivdaten.</param>
+        ''' <param name="containerTypeValue">Erwarteter Containertyp.</param>
+        ''' <returns>Archivinstanz oder <c>Nothing</c>, wenn kein kompatibles Öffnen möglich ist.</returns>
         Friend Shared Function OpenArchiveForContainer _
             (
                 stream As Stream,
@@ -171,6 +265,11 @@ Namespace Global.Tomtastisch.FileClassifier
             Return OpenArchive(stream)
         End Function
 
+        ''' <summary>
+        '''     Prüft die GZip-Magic-Bytes am Streamanfang ohne Seiteneffekte außerhalb der aktuellen
+        '''     Position.
+        ''' </summary>
+        ''' <param name="stream">Zu prüfender Stream.</param>
         Friend Shared Function HasGZipMagic _
             (
                 stream As Stream
@@ -185,6 +284,11 @@ Namespace Global.Tomtastisch.FileClassifier
             Return first = &H1F AndAlso second = &H8B
         End Function
 
+        ''' <summary>
+        '''     Öffnet einen GZip-Container über die kompatible SharpCompress-API.
+        ''' </summary>
+        ''' <param name="stream">Quellstream auf GZip-Daten.</param>
+        ''' <returns>Archivinstanz oder <c>Nothing</c> bei erwartbaren Öffnungsfehlern.</returns>
         Private Shared Function OpenGZipArchive _
             (
                 stream As Stream
@@ -206,6 +310,10 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Prüft, ob eine Reflection-Invocation auf erwartete Format-/I/O-Fehler zurückgeht.
+        ''' </summary>
+        ''' <param name="ex">Zu prüfende Invocation-Exception.</param>
         Private Shared Function IsExpectedInvocationException _
             (
                 ex As TargetInvocationException
@@ -221,6 +329,11 @@ Namespace Global.Tomtastisch.FileClassifier
                 TypeOf inner Is IOException
         End Function
 
+        ''' <summary>
+        '''     Öffnet ein Archiv über die dynamisch ermittelte Factory-Methode.
+        ''' </summary>
+        ''' <param name="stream">Quellstream auf Archivdaten.</param>
+        ''' <param name="options">Reader-Optionen für SharpCompress.</param>
         Private Shared Function OpenArchiveFactoryCompat _
             (
                 stream As Stream,
@@ -233,6 +346,11 @@ Namespace Global.Tomtastisch.FileClassifier
             Return CType(opened, SharpCompress.Archives.IArchive)
         End Function
 
+        ''' <summary>
+        '''     Öffnet ein GZip-Archiv über die dynamisch ermittelte statische API.
+        ''' </summary>
+        ''' <param name="stream">Quellstream auf GZip-Daten.</param>
+        ''' <param name="options">Reader-Optionen für SharpCompress.</param>
         Private Shared Function OpenGZipArchiveCompat _
             (
                 stream As Stream,
@@ -245,6 +363,11 @@ Namespace Global.Tomtastisch.FileClassifier
             Return CType(opened, SharpCompress.Archives.IArchive)
         End Function
 
+        ''' <summary>
+        '''     Ermittelt deterministisch die kompatible statische Öffnungsmethode (`OpenArchive` oder `Open`).
+        ''' </summary>
+        ''' <param name="type">Zieltyp der SharpCompress-Factory.</param>
+        ''' <returns>Gefundene statische Methode mit Signatur `(Stream, ReaderOptions)`.</returns>
         Private Shared Function GetOpenCompatMethod(type As Type) As MethodInfo
             Dim signature = New Type() {GetType(Stream), GetType(SharpCompress.Readers.ReaderOptions)}
             Dim method = type.GetMethod(
@@ -274,9 +397,19 @@ Namespace Global.Tomtastisch.FileClassifier
     '''     Interne Hilfsklasse <c>ArchiveTypeResolver</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
     ''' </summary>
     Friend NotInheritable Class ArchiveTypeResolver
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Beschreibt einen Byte-Payload als Archivdeskriptor.
+        ''' </summary>
+        ''' <param name="data">Zu prüfender Archivpayload.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Logger.</param>
+        ''' <param name="descriptor">Ausgabeparameter für den ermittelten Deskriptor.</param>
+        ''' <returns><c>True</c>, wenn ein bekannter Containertyp sicher ermittelt wurde.</returns>
         Friend Shared Function TryDescribeBytes _
             (
                 data As Byte(),
@@ -307,6 +440,13 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Beschreibt einen Stream als Archivdeskriptor.
+        ''' </summary>
+        ''' <param name="stream">Zu prüfender Stream.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Logger.</param>
+        ''' <param name="descriptor">Ausgabeparameter für den ermittelten Deskriptor.</param>
+        ''' <returns><c>True</c>, wenn ein bekannter Containertyp sicher ermittelt wurde.</returns>
         Friend Shared Function TryDescribeStream _
             (
                 stream As Stream,
@@ -314,7 +454,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 ByRef descriptor As ArchiveDescriptor
             ) As Boolean
 
-            Dim mapped As ArchiveContainerType
+            Dim mapped      As ArchiveContainerType
             Dim gzipWrapped As Boolean
 
             descriptor = ArchiveDescriptor.UnknownDescriptor()
@@ -322,6 +462,9 @@ Namespace Global.Tomtastisch.FileClassifier
             If opt Is Nothing Then Return False
 
             Try
+                ' Erstkennung von GZip-Magic vor dem eigentlichen Öffnen:
+                ' dieser Marker wird benötigt, um TAR-in-GZip deterministisch als GZip-Container
+                ' zu klassifizieren und nicht als reines TAR.
                 StreamGuard.RewindToStart(stream)
                 gzipWrapped = ArchiveSharpCompressCompat.HasGZipMagic(stream)
                 StreamGuard.RewindToStart(stream)
@@ -365,6 +508,11 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Mappt SharpCompress-Containertypen auf das interne <see cref="ArchiveContainerType"/>-Modell.
+        ''' </summary>
+        ''' <param name="type">Externer SharpCompress-Typ.</param>
+        ''' <returns>Internes Mapping oder <see cref="ArchiveContainerType.Unknown"/>.</returns>
         Friend Shared Function MapArchiveType _
             (
                 type As SharpCompress.Common.ArchiveType
@@ -389,12 +537,24 @@ Namespace Global.Tomtastisch.FileClassifier
     End Class
 
     ''' <summary>
-    '''     Interne Hilfsklasse <c>ArchiveProcessingEngine</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    '''     Interne Hilfsklasse <c>ArchiveProcessingEngine</c> zur kapselnden Umsetzung
+    '''     von Guard-, I/O- und Policy-Logik.
     ''' </summary>
     Friend NotInheritable Class ArchiveProcessingEngine
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Validiert einen Archivstream ohne Extraktion von Einträgen.
+        ''' </summary>
+        ''' <param name="stream">Zu validierender Stream.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Sicherheitsgrenzen.</param>
+        ''' <param name="depth">Aktuelle Verschachtelungstiefe.</param>
+        ''' <param name="descriptor">Archivdeskriptor inklusive Containertyp.</param>
+        ''' <returns><c>True</c>, wenn die Backend-Verarbeitung erfolgreich war.</returns>
         Friend Shared Function ValidateArchiveStream _
             (
                 stream As Stream,
@@ -406,6 +566,15 @@ Namespace Global.Tomtastisch.FileClassifier
             Return ProcessArchiveStream(stream, opt, depth, descriptor, Nothing)
         End Function
 
+        ''' <summary>
+        '''     Führt die eigentliche Backend-Verarbeitung inklusive optionaler Entry-Extraktion aus.
+        ''' </summary>
+        ''' <param name="stream">Zu verarbeitender Stream.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Sicherheitsgrenzen.</param>
+        ''' <param name="depth">Aktuelle Verschachtelungstiefe.</param>
+        ''' <param name="descriptor">Archivdeskriptor inklusive Containertyp.</param>
+        ''' <param name="extractEntry">Optionaler Callback je Eintrag.</param>
+        ''' <returns><c>True</c> nur bei vollständiger, fehlerfreier Verarbeitung.</returns>
         Friend Shared Function ProcessArchiveStream _
             (
                 stream As Stream,
@@ -434,22 +603,38 @@ Namespace Global.Tomtastisch.FileClassifier
     Friend NotInheritable Class ArchiveExtractor
         Private Shared ReadOnly RecyclableStreams As New Microsoft.IO.RecyclableMemoryStreamManager()
 
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Extrahiert einen Archivstream in den Speicher nach vorheriger Typermittlung.
+        ''' </summary>
+        ''' <param name="stream">Zu extrahierender Stream.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Sicherheitsgrenzen.</param>
+        ''' <returns>Unveränderliche Liste extrahierter Einträge oder leere Liste bei Fehlern.</returns>
         Friend Shared Function TryExtractArchiveStreamToMemory _
             (
                 stream As Stream,
                 opt As FileTypeProjectOptions
             ) As IReadOnlyList(Of ZipExtractedEntry)
 
-            Dim descriptor As ArchiveDescriptor = Nothing
+            Dim descriptor  As ArchiveDescriptor                   = Nothing
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
             If Not ArchiveTypeResolver.TryDescribeStream(stream, opt, descriptor) Then Return emptyResult
 
             Return TryExtractArchiveStreamToMemory(stream, opt, descriptor)
         End Function
 
+        ''' <summary>
+        '''     Extrahiert einen Archivstream mit vorab bekanntem Deskriptor in den Speicher.
+        ''' </summary>
+        ''' <param name="stream">Zu extrahierender Stream.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Sicherheitsgrenzen.</param>
+        ''' <param name="descriptor">Vorab ermittelter Archivdeskriptor.</param>
+        ''' <returns>Unveränderliche Liste extrahierter Einträge oder leere Liste bei Fehlern.</returns>
         Friend Shared Function TryExtractArchiveStreamToMemory _
             (
                 stream As Stream,
@@ -458,8 +643,8 @@ Namespace Global.Tomtastisch.FileClassifier
             ) As IReadOnlyList(Of ZipExtractedEntry)
 
             Dim emptyResult As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
-            Dim entries As List(Of ZipExtractedEntry) = New List(Of ZipExtractedEntry)()
-            Dim ok As Boolean
+            Dim entries     As List(Of ZipExtractedEntry)          = New List(Of ZipExtractedEntry)()
+            Dim ok          As Boolean
 
             If Not StreamGuard.IsReadable(stream) Then Return emptyResult
             If opt Is Nothing Then Return emptyResult
@@ -500,6 +685,13 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Extrahiert einen Archivstream in ein Zielverzeichnis nach vorheriger Typermittlung.
+        ''' </summary>
+        ''' <param name="stream">Zu extrahierender Stream.</param>
+        ''' <param name="destinationDirectory">Zielverzeichnis für die Extraktion.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Sicherheitsgrenzen.</param>
+        ''' <returns><c>True</c>, wenn die Extraktion erfolgreich abgeschlossen wurde.</returns>
         Friend Shared Function TryExtractArchiveStream _
             (
                 stream As Stream,
@@ -512,6 +704,14 @@ Namespace Global.Tomtastisch.FileClassifier
             Return TryExtractArchiveStream(stream, destinationDirectory, opt, descriptor)
         End Function
 
+        ''' <summary>
+        '''     Extrahiert einen Archivstream in ein Zielverzeichnis mit vorab bekanntem Deskriptor.
+        ''' </summary>
+        ''' <param name="stream">Zu extrahierender Stream.</param>
+        ''' <param name="destinationDirectory">Zielverzeichnis für die Extraktion.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Sicherheitsgrenzen.</param>
+        ''' <param name="descriptor">Vorab ermittelter Archivdeskriptor.</param>
+        ''' <returns><c>True</c>, wenn die Extraktion erfolgreich abgeschlossen wurde.</returns>
         Friend Shared Function TryExtractArchiveStream _
             (
                 stream As Stream,
@@ -520,11 +720,11 @@ Namespace Global.Tomtastisch.FileClassifier
                 descriptor As ArchiveDescriptor
             ) As Boolean
 
-            Dim destinationFull As String = String.Empty
-            Dim parent As String
-            Dim stageDir As String
-            Dim stagePrefix As String
-            Dim ok As Boolean
+            Dim destinationFull As String  = String.Empty
+            Dim parent          As String
+            Dim stageDir        As String
+            Dim stagePrefix     As String
+            Dim ok              As Boolean
 
             If Not StreamGuard.IsReadable(stream) Then Return False
             If opt Is Nothing Then Return False
@@ -546,6 +746,8 @@ Namespace Global.Tomtastisch.FileClassifier
             parent = Path.GetDirectoryName(destinationFull)
             If String.IsNullOrWhiteSpace(parent) Then Return False
 
+            ' Die Extraktion läuft immer in ein Stage-Verzeichnis und wird erst nach vollständigem Erfolg
+            ' atomar in das finale Ziel verschoben. So bleiben Teilzustände fail-closed unsichtbar.
             stageDir = destinationFull & ".stage-" & Guid.NewGuid().ToString("N")
             Try
                 Directory.CreateDirectory(parent)
@@ -595,6 +797,13 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Extrahiert einen einzelnen Archiveintrag sicher in das Dateisystem.
+        ''' </summary>
+        ''' <param name="entry">Zu extrahierender Archiveintrag.</param>
+        ''' <param name="destinationPrefix">Normierter Zielpräfixpfad inklusive Separator.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Sicherheitsgrenzen.</param>
+        ''' <returns><c>True</c>, wenn der Eintrag sicher verarbeitet wurde.</returns>
         Private Shared Function ExtractEntryToDirectory _
             (
                 entry As IArchiveEntryModel,
@@ -602,10 +811,10 @@ Namespace Global.Tomtastisch.FileClassifier
                 opt As FileTypeProjectOptions
             ) As Boolean
 
-            Dim entryName As String = Nothing
+            Dim entryName   As String  = Nothing
             Dim isDirectory As Boolean = False
-            Dim targetPath As String = String.Empty
-            Dim targetDir As String
+            Dim targetPath  As String  = String.Empty
+            Dim targetDir   As String
 
             If entry Is Nothing Then Return False
             If opt Is Nothing Then Return False
@@ -669,6 +878,13 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Extrahiert einen einzelnen Archiveintrag in den Speicher.
+        ''' </summary>
+        ''' <param name="entry">Zu extrahierender Archiveintrag.</param>
+        ''' <param name="entries">Zielsammlung für extrahierte Speicherobjekte.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Sicherheitsgrenzen.</param>
+        ''' <returns><c>True</c>, wenn der Eintrag sicher verarbeitet wurde.</returns>
         Private Shared Function ExtractEntryToMemory _
             (
                 entry As IArchiveEntryModel,
@@ -676,9 +892,9 @@ Namespace Global.Tomtastisch.FileClassifier
                 opt As FileTypeProjectOptions
             ) As Boolean
 
-            Dim entryName As String = Nothing
+            Dim entryName   As String  = Nothing
             Dim isDirectory As Boolean = False
-            Dim payload As Byte()
+            Dim payload     As Byte()
 
             If entry Is Nothing OrElse entries Is Nothing Then Return False
             If opt Is Nothing Then Return False
@@ -716,6 +932,14 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Normalisiert und validiert einen Archiveintragspfad gegen Traversal und Link-Missbrauch.
+        ''' </summary>
+        ''' <param name="entry">Zu prüfender Archiveintrag.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Logger.</param>
+        ''' <param name="safeEntryName">Ausgabeparameter für den normalisierten Pfad.</param>
+        ''' <param name="isDirectory">Ausgabeparameter für Verzeichniskennzeichnung.</param>
+        ''' <returns><c>True</c>, wenn der Eintragspfad sicher verwendbar ist.</returns>
         Private Shared Function TryGetSafeEntryName _
             (
                  entry As IArchiveEntryModel,
@@ -724,7 +948,7 @@ Namespace Global.Tomtastisch.FileClassifier
                  ByRef isDirectory As Boolean
             ) As Boolean
 
-            Dim entryName As String = Nothing
+            Dim entryName               As String  = Nothing
             Dim normalizedDirectoryFlag As Boolean = False
 
             safeEntryName = Nothing
@@ -752,6 +976,12 @@ Namespace Global.Tomtastisch.FileClassifier
             Return True
         End Function
 
+        ''' <summary>
+        '''     Validiert die Eintragsgröße gegen konfigurierte Grenzwerte.
+        ''' </summary>
+        ''' <param name="entry">Zu prüfender Archiveintrag.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Größenlimits.</param>
+        ''' <returns><c>True</c>, wenn die Größe zulässig ist.</returns>
         Private Shared Function ValidateEntrySize _
             (
                 entry As IArchiveEntryModel,
@@ -774,6 +1004,10 @@ Namespace Global.Tomtastisch.FileClassifier
             Return opt.AllowUnknownArchiveEntrySize
         End Function
 
+        ''' <summary>
+        '''     Ergänzt einen fehlenden Pfadseparator am Ende eines Verzeichnispfades.
+        ''' </summary>
+        ''' <param name="dirPath">Zu normalisierender Verzeichnispfad.</param>
         Private Shared Function EnsureTrailingSeparator _
             (
                 dirPath As String
@@ -793,9 +1027,19 @@ Namespace Global.Tomtastisch.FileClassifier
     '''     Interne Hilfsklasse <c>ArchiveEntryCollector</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
     ''' </summary>
     Friend NotInheritable Class ArchiveEntryCollector
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Liest Archiveinträge aus einer Datei in eine Speicherliste ein.
+        ''' </summary>
+        ''' <param name="path">Dateipfad zum Archiv.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Sicherheitsgrenzen.</param>
+        ''' <param name="entries">Ausgabeparameter für die extrahierten Einträge.</param>
+        ''' <returns><c>True</c>, wenn mindestens ein Eintrag erfolgreich gelesen wurde.</returns>
         Friend Shared Function TryCollectFromFile _
             (
                 path As String,
@@ -844,6 +1088,13 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Liest Archiveinträge aus einem Byte-Payload in eine Speicherliste ein.
+        ''' </summary>
+        ''' <param name="data">Archivpayload als Bytefolge.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Sicherheitsgrenzen.</param>
+        ''' <param name="entries">Ausgabeparameter für die extrahierten Einträge.</param>
+        ''' <returns><c>True</c>, wenn mindestens ein Eintrag erfolgreich gelesen wurde.</returns>
         Friend Shared Function TryCollectFromBytes _
             (
                 data As Byte(),
@@ -909,16 +1160,16 @@ Namespace Global.Tomtastisch.FileClassifier
                 extractEntry As Func(Of IArchiveEntryModel, Boolean)
             ) As Boolean Implements IArchiveBackend.Process
 
-            Dim mapped As ArchiveContainerType
-            Dim entries As List(Of SharpCompress.Archives.IArchiveEntry)
-            Dim nestedResult As Boolean = False
-            Dim nestedHandled As Boolean
-            Dim totalUncompressed As Long
-            Dim model As IArchiveEntryModel
-            Dim knownSize As Long
+            Dim mapped               As ArchiveContainerType
+            Dim entries              As List(Of SharpCompress.Archives.IArchiveEntry)
+            Dim nestedResult         As Boolean                                       = False
+            Dim nestedHandled        As Boolean
+            Dim totalUncompressed    As Long
+            Dim model                As IArchiveEntryModel
+            Dim knownSize            As Long
             Dim requireKnownForTotal As Boolean
-            Dim gzipWrapped As Boolean
-            Dim gzipWrappedTar As Boolean
+            Dim gzipWrapped          As Boolean
+            Dim gzipWrappedTar       As Boolean
 
             If Not StreamGuard.IsReadable(stream) Then Return False
             If opt Is Nothing Then Return False
@@ -947,6 +1198,8 @@ Namespace Global.Tomtastisch.FileClassifier
                         StringComparer.Ordinal
                     ).ToList()
 
+                    ' GZip kann einen einzelnen TAR-Container kapseln. Dieser Pfad wird getrennt behandelt,
+                    ' damit Größen- und Tiefenlimits auf den entpackten inneren Container angewendet werden.
                     If Not gzipWrappedTar Then
                         nestedHandled = TryProcessNestedGArchive(
                             entries,
@@ -969,7 +1222,11 @@ Namespace Global.Tomtastisch.FileClassifier
 
                         model = New SharpCompressEntryModel(entry)
 
-                        If ArchiveLinkGuard.IsRejectedLink(opt, model.LinkTarget, "[ArchiveGate]", logWhenRejected:=True) Then
+                        If ArchiveLinkGuard.IsRejectedLink(
+                            opt,
+                            model.LinkTarget,
+                            "[ArchiveGate]",
+                            logWhenRejected:=True) Then
                             Return False
                         End If
 
@@ -1007,6 +1264,11 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Öffnet ein Archiv für den erwarteten Containertyp über die Kompatibilitätsschicht.
+        ''' </summary>
+        ''' <param name="stream">Quellstream auf Archivdaten.</param>
+        ''' <param name="containerTypeValue">Erwarteter Containertyp.</param>
         Private Shared Function OpenArchiveForContainerCompat _
             (
                 stream As Stream,
@@ -1016,6 +1278,19 @@ Namespace Global.Tomtastisch.FileClassifier
             Return ArchiveSharpCompressCompat.OpenArchiveForContainer(stream, containerTypeValue)
         End Function
 
+        ''' <summary>
+        '''     Verarbeitet den Sonderfall eines GZip-Containers mit genau einem verschachtelten Archiv.
+        ''' </summary>
+        ''' <param name="entries">Archivliste der äußeren GZip-Ebene.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Sicherheitsgrenzen.</param>
+        ''' <param name="depth">Aktuelle Verschachtelungstiefe.</param>
+        ''' <param name="containerType">Aktueller äußerer Containertyp.</param>
+        ''' <param name="extractEntry">Optionaler Callback für Extraktion pro Eintrag.</param>
+        ''' <param name="nestedResult">Ausgabeparameter für das Ergebnis der inneren Verarbeitung.</param>
+        ''' <returns>
+        '''     <c>True</c>, wenn der Sonderfall verarbeitet wurde (unabhängig vom Ergebniswert),
+        '''     sonst <c>False</c>, wenn kein Sonderfall vorlag.
+        ''' </returns>
         Private Shared Function TryProcessNestedGArchive(
                 entries As List(Of SharpCompress.Archives.IArchiveEntry),
                 opt As FileTypeProjectOptions,
@@ -1025,10 +1300,10 @@ Namespace Global.Tomtastisch.FileClassifier
                 ByRef nestedResult As Boolean
             ) As Boolean
 
-            Dim onlyEntry As SharpCompress.Archives.IArchiveEntry
-            Dim model As IArchiveEntryModel
-            Dim payload As Byte() = Nothing
-            Dim nestedDescriptor As ArchiveDescriptor = Nothing
+            Dim onlyEntry        As SharpCompress.Archives.IArchiveEntry
+            Dim model            As IArchiveEntryModel
+            Dim payload          As Byte()                               = Nothing
+            Dim nestedDescriptor As ArchiveDescriptor                    = Nothing
 
             nestedResult = False
             If containerType <> ArchiveContainerType.GZip Then Return False
@@ -1072,6 +1347,14 @@ Namespace Global.Tomtastisch.FileClassifier
             Return True
         End Function
 
+        ''' <summary>
+        '''     Liest den Payload eines SharpCompress-Eintrags begrenzt in den Speicher ein.
+        ''' </summary>
+        ''' <param name="entry">Zu lesender Archiveintrag.</param>
+        ''' <param name="maxBytes">Maximal zulässige Anzahl Bytes.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Logger.</param>
+        ''' <param name="payload">Ausgabeparameter für den gelesenen Payload.</param>
+        ''' <returns><c>True</c>, wenn der Payload vollständig und innerhalb der Grenzen gelesen wurde.</returns>
         Private Shared Function TryReadEntryPayloadBoundedWithOptions _
             (
                 entry As SharpCompress.Archives.IArchiveEntry,
@@ -1112,6 +1395,15 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Validiert oder ermittelt die unkomprimierte Eintragsgröße für Summen- und Limitprüfungen.
+        ''' </summary>
+        ''' <param name="entry">Zu prüfender Archiveintrag.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Größenlimits.</param>
+        ''' <param name="knownSize">Ausgabeparameter für die validierte Größe.</param>
+        ''' <param name="requireKnownForTotal">
+        '''     Erzwingt die Größenmessung, wenn keine verlässliche Metadaten-Größe vorliegt.
+        ''' </param>
         Private Shared Function TryGetValidatedSize _
             (
                 entry As IArchiveEntryModel,
@@ -1142,6 +1434,13 @@ Namespace Global.Tomtastisch.FileClassifier
             Return TryMeasureEntrySize(entry, opt, knownSize)
         End Function
 
+        ''' <summary>
+        '''     Misst die effektive Eintragsgröße durch begrenztes Lesen des Inhalts.
+        ''' </summary>
+        ''' <param name="entry">Zu messender Archiveintrag.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Größenlimits.</param>
+        ''' <param name="measured">Ausgabeparameter für die gemessene Größe.</param>
+        ''' <returns><c>True</c>, wenn die Messung vollständig innerhalb der Limits möglich war.</returns>
         Private Shared Function TryMeasureEntrySize _
             (
                 entry As IArchiveEntryModel,
@@ -1150,7 +1449,7 @@ Namespace Global.Tomtastisch.FileClassifier
             ) As Boolean
 
             Dim buf(InternalIoDefaults.CopyBufferSize - 1) As Byte
-            Dim n As Integer
+            Dim n                                          As Integer
 
             measured = 0
             If entry Is Nothing OrElse opt Is Nothing Then Return False
@@ -1187,13 +1486,18 @@ Namespace Global.Tomtastisch.FileClassifier
     End Class
 
     ''' <summary>
-    '''     Interne Hilfsklasse <c>SharpCompressEntryModel</c> zur kapselnden Umsetzung von Guard-, I/O- und Policy-Logik.
+    '''     Interne Hilfsklasse <c>SharpCompressEntryModel</c> zur kapselnden Umsetzung
+    '''     von Guard-, I/O- und Policy-Logik.
     ''' </summary>
     Friend NotInheritable Class SharpCompressEntryModel
         Implements IArchiveEntryModel
 
         Private ReadOnly _entry As SharpCompress.Archives.IArchiveEntry
 
+        ''' <summary>
+        '''     Initialisiert das Wrappermodell für einen SharpCompress-Eintrag.
+        ''' </summary>
+        ''' <param name="entry">Zu kapselnder Archiveintrag.</param>
         Friend Sub New(entry As SharpCompress.Archives.IArchiveEntry)
             _entry = entry
         End Sub

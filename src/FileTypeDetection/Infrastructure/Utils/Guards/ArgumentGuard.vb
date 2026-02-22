@@ -34,6 +34,9 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
     ''' </remarks>
     Friend NotInheritable Class ArgumentGuard
 
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
@@ -86,8 +89,12 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         ''' <param name="value">Array, das geprüft werden soll.</param>
         ''' <param name="expectedLength">Erwartete Länge.</param>
         ''' <param name="paramName">Parametername für Exception-Metadaten.</param>
-        ''' <exception cref="ArgumentNullException">Wird ausgelöst, wenn <paramref name="value"/> <c>Nothing</c> ist.</exception>
-        ''' <exception cref="ArgumentException">Wird ausgelöst, wenn die Länge nicht <paramref name="expectedLength"/> entspricht.</exception>
+        ''' <exception cref="ArgumentNullException">
+        '''     Wird ausgelöst, wenn <paramref name="value"/> <c>Nothing</c> ist.
+        ''' </exception>
+        ''' <exception cref="ArgumentException">
+        '''     Wird ausgelöst, wenn die Länge nicht <paramref name="expectedLength"/> entspricht.
+        ''' </exception>
         Public Shared Sub RequireLength _
             (
                 value As Array,
@@ -130,9 +137,15 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         ''' <param name="enumType">Enum-Typ, gegen den geprüft wird.</param>
         ''' <param name="value">Zu prüfender Enum-Wert (boxed).</param>
         ''' <param name="paramName">Parametername für Exception-Metadaten.</param>
-        ''' <exception cref="ArgumentNullException">Wird ausgelöst, wenn <paramref name="enumType"/> <c>Nothing</c> ist.</exception>
-        ''' <exception cref="ArgumentException">Wird ausgelöst, wenn <paramref name="enumType"/> kein Enum ist.</exception>
-        ''' <exception cref="ArgumentOutOfRangeException">Wird ausgelöst, wenn <paramref name="value"/> nicht definiert ist.</exception>
+        ''' <exception cref="ArgumentNullException">
+        '''     Wird ausgelöst, wenn <paramref name="enumType"/> <c>Nothing</c> ist.
+        ''' </exception>
+        ''' <exception cref="ArgumentException">
+        '''     Wird ausgelöst, wenn <paramref name="enumType"/> kein Enum ist.
+        ''' </exception>
+        ''' <exception cref="ArgumentOutOfRangeException">
+        '''     Wird ausgelöst, wenn <paramref name="value"/> nicht definiert ist.
+        ''' </exception>
         Public Shared Sub EnumDefined _
             (
                 enumType As Type,

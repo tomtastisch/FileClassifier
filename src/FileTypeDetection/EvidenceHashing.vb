@@ -81,12 +81,12 @@ Namespace Global.Tomtastisch.FileClassifier
                 options As HashOptions
             ) As HashEvidence
 
-            Dim detectorOptions As FileTypeProjectOptions = FileTypeOptions.GetSnapshot()
-            Dim normalizedOptions As HashOptions = ResolveHashOptions(detectorOptions, options)
-            Dim fileBytes As Byte() = Array.Empty(Of Byte)()
-            Dim readError As String = String.Empty
-            Dim detectedType As FileType
-            Dim entries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
+            Dim detectorOptions   As FileTypeProjectOptions              = FileTypeOptions.GetSnapshot()
+            Dim normalizedOptions As HashOptions                         = ResolveHashOptions(detectorOptions, options)
+            Dim fileBytes         As Byte()                              = Array.Empty(Of Byte)()
+            Dim readError         As String                              = String.Empty
+            Dim detectedType      As FileType
+            Dim entries           As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
 
             If String.IsNullOrWhiteSpace(path) OrElse Not IO.File.Exists(path) Then
                 Return Failure(HashSourceType.FilePath, path, "Datei nicht gefunden.")
@@ -186,10 +186,10 @@ Namespace Global.Tomtastisch.FileClassifier
                 options As HashOptions
             ) As HashEvidence
 
-            Dim detectorOptions As FileTypeProjectOptions = FileTypeOptions.GetSnapshot()
-            Dim normalizedOptions As HashOptions = ResolveHashOptions(detectorOptions, options)
-            Dim detectedType As FileType
-            Dim entries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
+            Dim detectorOptions   As FileTypeProjectOptions              = FileTypeOptions.GetSnapshot()
+            Dim normalizedOptions As HashOptions                         = ResolveHashOptions(detectorOptions, options)
+            Dim detectedType      As FileType
+            Dim entries           As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
 
             If data Is Nothing Then
                 Return Failure(HashSourceType.RawBytes, label, "Payload ist null.")
@@ -288,8 +288,8 @@ Namespace Global.Tomtastisch.FileClassifier
                 options As HashOptions
             ) As HashEvidence
 
-            Dim projectOptions As FileTypeProjectOptions = FileTypeOptions.GetSnapshot()
-            Dim normalizedOptions As HashOptions = ResolveHashOptions(projectOptions, options)
+            Dim projectOptions    As FileTypeProjectOptions = FileTypeOptions.GetSnapshot()
+            Dim normalizedOptions As HashOptions            = ResolveHashOptions(projectOptions, options)
 
             Return EvidenceHashingCore.BuildEvidenceFromEntries(
                 sourceType:=HashSourceType.ArchiveEntries,

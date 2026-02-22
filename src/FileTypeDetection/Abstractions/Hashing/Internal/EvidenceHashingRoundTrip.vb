@@ -33,20 +33,20 @@ Namespace Global.Tomtastisch.FileClassifier
                 options As HashOptions
             ) As HashRoundTripReport
 
-            Dim detectorOptions As FileTypeProjectOptions = FileTypeOptions.GetSnapshot()
-            Dim normalizedOptions As HashOptions = EvidenceHashing.ResolveHashOptionsCore(detectorOptions, options)
-            Dim failed As HashEvidence
-            Dim h1 As HashEvidence
-            Dim originalBytes As Byte() = Array.Empty(Of Byte)()
-            Dim readError As String = String.Empty
-            Dim archiveEntries As IReadOnlyList(Of ZipExtractedEntry) = Array.Empty(Of ZipExtractedEntry)()
-            Dim isArchiveInput As Boolean
-            Dim h2 As HashEvidence
-            Dim canonicalBytes As Byte()
+            Dim detectorOptions   As FileTypeProjectOptions                       = FileTypeOptions.GetSnapshot()
+            Dim normalizedOptions As HashOptions                                  = EvidenceHashing.ResolveHashOptionsCore(detectorOptions, options)
+            Dim failed            As HashEvidence
+            Dim h1                As HashEvidence
+            Dim originalBytes     As Byte()                                       = Array.Empty(Of Byte)()
+            Dim readError         As String                                       = String.Empty
+            Dim archiveEntries    As IReadOnlyList(Of ZipExtractedEntry)          = Array.Empty(Of ZipExtractedEntry)()
+            Dim isArchiveInput    As Boolean
+            Dim h2                As HashEvidence
+            Dim canonicalBytes    As Byte()
             Dim normalizedEntries As List(Of EvidenceHashingCore.NormalizedEntry)
-            Dim normalizeError As String
-            Dim h3 As HashEvidence
-            Dim h4 As HashEvidence = HashEvidence.CreateFailure(
+            Dim normalizeError    As String
+            Dim h3                As HashEvidence
+            Dim h4                As HashEvidence                                 = HashEvidence.CreateFailure(
                 HashSourceType.MaterializedFile,
                 "roundtrip-h4-file",
                 "Materialization failed.")
@@ -56,7 +56,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 "ftd-roundtrip-" & Guid.NewGuid().ToString("N", Globalization.CultureInfo.InvariantCulture))
 
             Dim targetFile As String
-            Dim notes As String
+            Dim notes      As String
 
             If String.IsNullOrWhiteSpace(path) OrElse Not IO.File.Exists(path) Then
                 failed = HashEvidence.CreateFailure(HashSourceType.FilePath, path, "Datei nicht gefunden.")

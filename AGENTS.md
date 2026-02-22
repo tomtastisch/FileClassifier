@@ -109,3 +109,16 @@ Abweichung ist blocker und vor Merge/Release zu beheben.
 ## 10) Lokale Overrides
 - Optional: `AGENTS.override.md` wird zusaetzlich angewendet.
 - `AGENTS.override.md` ist lokal-only und darf nicht committed werden.
+
+## 11) VB.NET Deklarationsstil (verbindlich)
+- Lokale Variablendeklarationen mit `Dim` werden in zusammenhängenden Blöcken spaltenweise ausgerichtet.
+- Ausrichtung erfolgt mindestens über diese Spalten:
+  - `Dim`
+  - Variablenname
+  - `As <Typ>`
+  - optionale Initialisierung `= <Wert>`
+- Die Einrückung startet linksbündig identisch je Block.
+- Beispiel:
+  - `Dim hasContentTypes           As Boolean     = False`
+  - `Dim hasOpenDocumentConflict   As Boolean     = False`
+  - `Dim candidateOpenDocumentKind As FileKind`

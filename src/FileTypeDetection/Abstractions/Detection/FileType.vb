@@ -28,7 +28,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <summary>Enum-Schlüssel des Typs.</summary>
         Public ReadOnly Property Kind As FileKind
 
-        ''' <summary>Kanonische Endung inklusive Punkt, bei Unknown leer.</summary>
+        ''' <summary>Kanonische Endung inklusive Punkt, bei UNKNOWN leer.</summary>
         Public ReadOnly Property CanonicalExtension As String
 
         ''' <summary>Kanonischer MIME-Typ als Metadatum, kann leer sein.</summary>
@@ -44,6 +44,14 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public ReadOnly Property Aliases As ImmutableArray(Of String)
 
+        ''' <summary>
+        '''     Initialisiert ein unveränderliches Dateityp-Wertobjekt.
+        ''' </summary>
+        ''' <param name="kind">Enum-Schlüssel des Dateityps.</param>
+        ''' <param name="canonicalExtension">Kanonische Endung inklusive Punkt.</param>
+        ''' <param name="mime">Kanonischer MIME-Typ als Metadatum.</param>
+        ''' <param name="allowed">Kennzeichnet die Policy-Zulässigkeit.</param>
+        ''' <param name="aliases">Aliasmenge für Endungszuordnung.</param>
         Friend Sub New _
             (
                 kind As FileKind,
@@ -53,8 +61,8 @@ Namespace Global.Tomtastisch.FileClassifier
                 aliases As IEnumerable(Of String)
             )
 
-            Dim dedup As HashSet(Of String) = New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
-            Dim n As String
+            Dim dedup          As HashSet(Of String) = New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
+            Dim n              As String
             Dim orderedAliases As List(Of String)
 
             Me.Kind = kind
@@ -83,7 +91,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <returns>String-Repräsentation des Feldes <see cref="Kind"/>.</returns>
         Public Overrides Function ToString() As String
-
             Return Kind.ToString()
         End Function
     End Class

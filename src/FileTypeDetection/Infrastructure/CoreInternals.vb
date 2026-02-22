@@ -20,12 +20,20 @@ Namespace Global.Tomtastisch.FileClassifier
     '''     Verfeinert ZIP-basierte Office-Container zu Dokumenttypen anhand kanonischer Paketmarker.
     '''     Implementationsprinzip:
     '''     - reduziert False-Positives bei generischen ZIP-Dateien
-    '''     - bleibt fail-closed (Fehler => Unknown)
+    '''     - bleibt fail-closed (Fehler => UNKNOWN)
     ''' </summary>
     Friend NotInheritable Class OpenXmlRefiner
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Verfeinert einen Stream-Factory-Einstieg auf Office/OpenDocument-Zieltypen.
+        ''' </summary>
+        ''' <param name="streamFactory">Factory für einen lesbaren Quellstream.</param>
+        ''' <returns>Verfeinerter Dateityp oder <see cref="FileKind.Unknown"/> bei Fehlern.</returns>
         Friend Shared Function TryRefine(streamFactory As Func(Of Stream)) As FileType
             If streamFactory Is Nothing Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
 
@@ -35,7 +43,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -46,6 +54,11 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Verfeinert einen vorhandenen Stream auf Office/OpenDocument-Zieltypen.
+        ''' </summary>
+        ''' <param name="stream">Zu prüfender Quellstream.</param>
+        ''' <returns>Verfeinerter Dateityp oder <see cref="FileKind.Unknown"/> bei Fehlern.</returns>
         Friend Shared Function TryRefineStream(stream As Stream) As FileType
             If Not StreamGuard.IsReadable(stream) Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
 
@@ -54,7 +67,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return DetectKindFromArchivePackage(stream)
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -65,15 +78,20 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Führt die eigentliche Marker-basierte Paketanalyse für OpenXML/ODF durch.
+        ''' </summary>
+        ''' <param name="stream">Zu analysierender ZIP-Stream.</param>
+        ''' <returns>Gemappter Dokumenttyp oder <see cref="FileKind.Unknown"/>.</returns>
         Private Shared Function DetectKindFromArchivePackage(stream As Stream) As FileType
-            Dim hasContentTypes As Boolean = False
-            Dim hasDocxMarker As Boolean = False
-            Dim hasXlsxMarker As Boolean = False
-            Dim hasPptxMarker As Boolean = False
-            Dim openDocumentKind As FileKind = FileKind.Unknown
-            Dim hasOpenDocumentConflict As Boolean = False
-            Dim structuredMarkerCount As Integer
-            Dim name As String
+            Dim hasContentTypes           As Boolean  = False
+            Dim hasDocxMarker             As Boolean  = False
+            Dim hasXlsxMarker             As Boolean  = False
+            Dim hasPptxMarker             As Boolean  = False
+            Dim openDocumentKind          As FileKind = FileKind.Unknown
+            Dim hasOpenDocumentConflict   As Boolean  = False
+            Dim structuredMarkerCount     As Integer
+            Dim name                      As String
             Dim candidateOpenDocumentKind As FileKind
 
             Try
@@ -107,6 +125,9 @@ Namespace Global.Tomtastisch.FileClassifier
                     Next
 
                     If hasContentTypes Then
+                        ' OpenXML-Fall:
+                        ' Es muss genau ein strukturierter Marker eindeutig sein. Mehrdeutigkeit oder
+                        ' gleichzeitige ODF-Marker führen deterministisch zu UNKNOWN (fail-closed).
                         structuredMarkerCount = 0
                         If hasDocxMarker Then structuredMarkerCount += 1
                         If hasXlsxMarker Then structuredMarkerCount += 1
@@ -135,7 +156,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -152,12 +173,13 @@ Namespace Global.Tomtastisch.FileClassifier
         '''     Liest den OpenDocument-MIME-Eintrag aus einem ZIP-Entry und mappt ihn auf die interne Office-Gruppierung.
         ''' </summary>
         ''' <remarks>
-        '''     Fail-closed: Unbekannte, leere oder widersprüchliche MIME-Werte werden als <see cref="FileKind.Unknown"/> behandelt.
+        '''     Fail-closed: Unbekannte, leere oder widersprüchliche MIME-Werte
+        '''     werden als <see cref="FileKind.Unknown"/> behandelt.
         ''' </remarks>
         ''' <param name="entry">ZIP-Entry, der den ODF-MIME-Inhalt enthalten kann.</param>
         ''' <returns>Gemappter Office-Typ oder <see cref="FileKind.Unknown"/>.</returns>
         Private Shared Function TryDetectOpenDocumentKind(entry As ZipArchiveEntry) As FileKind
-            Dim mimeValue As String
+            Dim mimeValue      As String
             Dim normalizedMime As String
 
             If entry Is Nothing Then Return FileKind.Unknown
@@ -194,7 +216,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 entry As ZipArchiveEntry,
                 maxBytes As Integer
             ) As String
-            Dim buffer As Byte()
+            Dim buffer    As Byte()
             Dim readTotal As Integer
             Dim readCount As Integer
 
@@ -217,7 +239,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -248,6 +270,9 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Shared ReadOnly ExcelBookMarker As Byte() = Encoding.ASCII.GetBytes("Book")
         Private Shared ReadOnly PowerPointMarker As Byte() = Encoding.ASCII.GetBytes("PowerPoint Document")
 
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
@@ -281,7 +306,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return RefineByMarkers(data)
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -303,12 +328,12 @@ Namespace Global.Tomtastisch.FileClassifier
                 stream As Stream,
                 maxProbeBytes As Integer
             ) As FileType
-            Dim probeLimit As Integer
-            Dim chunk(4095) As Byte
-            Dim readTotal As Integer
-            Dim readCount As Integer
+            Dim probeLimit   As Integer
+            Dim chunk(4095)  As Byte
+            Dim readTotal    As Integer
+            Dim readCount    As Integer
             Dim targetStream As MemoryStream
-            Dim buffer As Byte()
+            Dim buffer       As Byte()
 
             If Not StreamGuard.IsReadable(stream) Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
 
@@ -334,7 +359,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Try
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -351,10 +376,10 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="data">OLE-Bytepuffer.</param>
         ''' <returns>Gruppierter Office-Typ oder <see cref="FileKind.Unknown"/>.</returns>
         Private Shared Function RefineByMarkers(data As Byte()) As FileType
-            Dim hasWord As Boolean
-            Dim hasExcel As Boolean
+            Dim hasWord       As Boolean
+            Dim hasExcel      As Boolean
             Dim hasPowerPoint As Boolean
-            Dim markerCount As Integer
+            Dim markerCount   As Integer
 
             If Not IsOleCompoundHeader(data) Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
 

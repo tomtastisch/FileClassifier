@@ -20,6 +20,9 @@ Namespace Global.Tomtastisch.FileClassifier
     Friend NotInheritable Class MimeProvider
         Friend Shared ReadOnly Instance As New MimeProvider()
 
+        ''' <summary>
+        '''     Verhindert direkte Instanziierung; Zugriff ausschließlich über <see cref="Instance"/>.
+        ''' </summary>
         Private Sub New()
         End Sub
 
@@ -55,6 +58,9 @@ Namespace Global.Tomtastisch.FileClassifier
     '''     Liefert Diagnose-Information für Tests ohne Öffnung der öffentlichen API.
     ''' </summary>
     Friend NotInheritable Class MimeProviderDiagnostics
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 

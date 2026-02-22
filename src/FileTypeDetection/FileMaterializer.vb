@@ -116,9 +116,9 @@ Namespace Global.Tomtastisch.FileClassifier
                 secureExtract As Boolean
             ) As Boolean
 
-            Dim opt As FileTypeProjectOptions = FileTypeOptions.GetSnapshot()
-            Dim destinationFull As String = String.Empty
-            Dim descriptor As ArchiveDescriptor = Nothing
+            Dim opt             As FileTypeProjectOptions = FileTypeOptions.GetSnapshot()
+            Dim destinationFull As String                 = String.Empty
+            Dim descriptor      As ArchiveDescriptor      = Nothing
 
             ' Guard-Clauses: Null-, Größen- und Zielpfadprüfung.
             If data Is Nothing Then Return False

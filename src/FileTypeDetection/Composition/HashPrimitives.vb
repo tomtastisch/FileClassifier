@@ -15,15 +15,23 @@ Namespace Global.Tomtastisch.FileClassifier
     '''     Zweck: Stellt genau eine compile-time gebundene Providerinstanz für den Core bereit.
     ''' </remarks>
     Friend NotInheritable Class HashPrimitives
-        Private Shared ReadOnly _current As IHashPrimitives = New HashPrimitivesProvider()
 
+        ''' <summary>
+        '''     Liefert die zentrale, TFM-spezifische Implementierung der Hash-Primitive als SSOT.
+        ''' </summary>
+        ''' <remarks>
+        '''     Vertrag:
+        '''     - Genau eine Instanz pro Prozess (Shared, ReadOnly).
+        '''     - Initialisierung erfolgt deterministisch beim ersten Zugriff auf die Property.
+        '''     - Die konkrete Providerwahl ist compile-time gebunden (TFM/Projekt-Referenzen).
+        ''' </remarks>
+        Friend Shared ReadOnly Property Current As IHashPrimitives = New HashPrimitivesProvider()
+
+        ''' <summary>
+        '''     Verhindert die Instanziierung; diese Klasse dient ausschließlich als statischer Zugriffspunkt.
+        ''' </summary>
         Private Sub New()
         End Sub
 
-        Friend Shared ReadOnly Property Current As IHashPrimitives
-            Get
-                Return _current
-            End Get
-        End Property
     End Class
 End Namespace
