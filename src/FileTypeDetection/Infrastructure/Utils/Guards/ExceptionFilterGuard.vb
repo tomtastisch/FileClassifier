@@ -23,9 +23,16 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
     '''     Duplikate zu vermeiden und die Filter-Semantik zentral auditierbar zu halten.
     ''' </remarks>
     Friend NotInheritable Class ExceptionFilterGuard
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Prüft, ob eine Exception zum standardisierten Archiv-Validierungsfehler-Set gehört.
+        ''' </summary>
+        ''' <param name="ex">Zu prüfende Exception.</param>
         Friend Shared Function IsArchiveValidationException(ex As Exception) As Boolean
 
             Return TypeOf ex Is UnauthorizedAccessException OrElse
@@ -38,6 +45,10 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 TypeOf ex Is ObjectDisposedException
         End Function
 
+        ''' <summary>
+        '''     Prüft, ob eine Exception zur Pfadnormalisierung gehört.
+        ''' </summary>
+        ''' <param name="ex">Zu prüfende Exception.</param>
         Friend Shared Function IsPathNormalizationException(ex As Exception) As Boolean
 
             Return TypeOf ex Is UnauthorizedAccessException OrElse
@@ -47,12 +58,20 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 TypeOf ex Is ArgumentException
         End Function
 
+        ''' <summary>
+        '''     Prüft, ob eine Exception zur FullPath-Auflösung gehört.
+        ''' </summary>
+        ''' <param name="ex">Zu prüfende Exception.</param>
         Friend Shared Function IsPathResolutionException(ex As Exception) As Boolean
 
             Return IsPathNormalizationException(ex) OrElse
                 TypeOf ex Is PathTooLongException
         End Function
 
+        ''' <summary>
+        '''     Prüft, ob eine Exception aus dem Logger-Schreibpfad erwartbar ist.
+        ''' </summary>
+        ''' <param name="ex">Zu prüfende Exception.</param>
         Friend Shared Function IsLoggerWriteException(ex As Exception) As Boolean
 
             Return TypeOf ex Is InvalidOperationException OrElse

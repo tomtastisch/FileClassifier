@@ -20,9 +20,21 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
     '''     Zentrale FullPath-Auflösung mit fail-closed Fehlerbehandlung und konfigurierbarer Protokollstufe.
     ''' </summary>
     Friend NotInheritable Class PathResolutionGuard
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Ermittelt einen vollqualifizierten Pfad mit fail-closed Fehlerbehandlung.
+        ''' </summary>
+        ''' <param name="rawPath">Unaufgelöster Eingabepfad.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Logger.</param>
+        ''' <param name="logPrefix">Präfix für Logmeldungen.</param>
+        ''' <param name="warnLevel"><c>True</c> für Warn-Logging, sonst Debug-Logging.</param>
+        ''' <param name="fullPath">Ausgabeparameter für den aufgelösten Pfad.</param>
+        ''' <returns><c>True</c>, wenn die Auflösung erfolgreich war.</returns>
         Friend Shared Function TryGetFullPath _
             (
                 rawPath As String,

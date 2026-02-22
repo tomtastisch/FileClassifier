@@ -22,6 +22,9 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         Friend Const FileStreamBufferSize As Integer = 81920
         Friend Const DefaultSniffBytes As Integer = 4096
 
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über Konstanten.
+        ''' </summary>
         Private Sub New()
         End Sub
     End Class
@@ -31,9 +34,18 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
     '''     SSOT-Regel: bounded copy wird nur hier gepflegt.
     ''' </summary>
     Friend NotInheritable Class StreamBounds
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Kopiert einen Stream mit harter Byte-Grenze fail-closed.
+        ''' </summary>
+        ''' <param name="input">Lesbarer Eingabestream.</param>
+        ''' <param name="output">Schreibbarer Ausgabestream.</param>
+        ''' <param name="maxBytes">Maximal erlaubte kopierte Byteanzahl.</param>
         Friend Shared Sub CopyBounded _
             (
                 input As Stream,
@@ -61,9 +73,16 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
     '''     Keine Semantik: reine Abfrage/Positionierung.
     ''' </summary>
     Friend NotInheritable Class StreamGuard
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Prüft, ob ein Stream gesetzt und lesbar ist.
+        ''' </summary>
+        ''' <param name="stream">Zu prüfender Stream.</param>
         Friend Shared Function IsReadable _
             (
                 stream As Stream
@@ -72,6 +91,10 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             Return stream IsNot Nothing AndAlso stream.CanRead
         End Function
 
+        ''' <summary>
+        '''     Setzt einen seekfähigen Stream deterministisch auf Position 0 zurück.
+        ''' </summary>
+        ''' <param name="stream">Zurückzusetzender Stream.</param>
         Friend Shared Sub RewindToStart _
             (
                 stream As Stream

@@ -20,9 +20,17 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
     '''     Logging darf niemals zu Erkennungsfehlern oder Exceptions führen.
     ''' </summary>
     Friend NotInheritable Class LogGuard
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Schreibt eine Debug-Meldung fail-closed.
+        ''' </summary>
+        ''' <param name="logger">Ziel-Logger.</param>
+        ''' <param name="message">Zu schreibende Meldung.</param>
         Friend Shared Sub Debug _
             (
                 logger As ILogger,
@@ -38,6 +46,11 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             End Try
         End Sub
 
+        ''' <summary>
+        '''     Schreibt eine Warn-Meldung fail-closed.
+        ''' </summary>
+        ''' <param name="logger">Ziel-Logger.</param>
+        ''' <param name="message">Zu schreibende Meldung.</param>
         Friend Shared Sub Warn _
             (
                 logger As ILogger,
@@ -53,6 +66,12 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             End Try
         End Sub
 
+        ''' <summary>
+        '''     Schreibt eine Error-Meldung inklusive Exception fail-closed.
+        ''' </summary>
+        ''' <param name="logger">Ziel-Logger.</param>
+        ''' <param name="message">Zu schreibende Meldung.</param>
+        ''' <param name="ex">Optionale Kontext-Exception für den Logeintrag.</param>
         Friend Shared Sub [Error] _
             (
                 logger As ILogger,

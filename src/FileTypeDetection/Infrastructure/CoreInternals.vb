@@ -23,9 +23,17 @@ Namespace Global.Tomtastisch.FileClassifier
     '''     - bleibt fail-closed (Fehler => Unknown)
     ''' </summary>
     Friend NotInheritable Class OpenXmlRefiner
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Verfeinert einen Stream-Factory-Einstieg auf Office/OpenDocument-Zieltypen.
+        ''' </summary>
+        ''' <param name="streamFactory">Factory für einen lesbaren Quellstream.</param>
+        ''' <returns>Verfeinerter Dateityp oder <see cref="FileKind.Unknown"/> bei Fehlern.</returns>
         Friend Shared Function TryRefine(streamFactory As Func(Of Stream)) As FileType
             If streamFactory Is Nothing Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
 
@@ -46,6 +54,11 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Verfeinert einen vorhandenen Stream auf Office/OpenDocument-Zieltypen.
+        ''' </summary>
+        ''' <param name="stream">Zu prüfender Quellstream.</param>
+        ''' <returns>Verfeinerter Dateityp oder <see cref="FileKind.Unknown"/> bei Fehlern.</returns>
         Friend Shared Function TryRefineStream(stream As Stream) As FileType
             If Not StreamGuard.IsReadable(stream) Then Return FileTypeRegistry.Resolve(FileKind.Unknown)
 
@@ -65,6 +78,11 @@ Namespace Global.Tomtastisch.FileClassifier
             End Try
         End Function
 
+        ''' <summary>
+        '''     Führt die eigentliche Marker-basierte Paketanalyse für OpenXML/ODF durch.
+        ''' </summary>
+        ''' <param name="stream">Zu analysierender ZIP-Stream.</param>
+        ''' <returns>Gemappter Dokumenttyp oder <see cref="FileKind.Unknown"/>.</returns>
         Private Shared Function DetectKindFromArchivePackage(stream As Stream) As FileType
             Dim hasContentTypes As Boolean = False
             Dim hasDocxMarker As Boolean = False
@@ -107,6 +125,9 @@ Namespace Global.Tomtastisch.FileClassifier
                     Next
 
                     If hasContentTypes Then
+                        ' OpenXML-Fall:
+                        ' Es muss genau ein strukturierter Marker eindeutig sein. Mehrdeutigkeit oder
+                        ' gleichzeitige ODF-Marker führen deterministisch zu Unknown (fail-closed).
                         structuredMarkerCount = 0
                         If hasDocxMarker Then structuredMarkerCount += 1
                         If hasXlsxMarker Then structuredMarkerCount += 1
@@ -152,7 +173,8 @@ Namespace Global.Tomtastisch.FileClassifier
         '''     Liest den OpenDocument-MIME-Eintrag aus einem ZIP-Entry und mappt ihn auf die interne Office-Gruppierung.
         ''' </summary>
         ''' <remarks>
-        '''     Fail-closed: Unbekannte, leere oder widersprüchliche MIME-Werte werden als <see cref="FileKind.Unknown"/> behandelt.
+        '''     Fail-closed: Unbekannte, leere oder widersprüchliche MIME-Werte
+        '''     werden als <see cref="FileKind.Unknown"/> behandelt.
         ''' </remarks>
         ''' <param name="entry">ZIP-Entry, der den ODF-MIME-Inhalt enthalten kann.</param>
         ''' <returns>Gemappter Office-Typ oder <see cref="FileKind.Unknown"/>.</returns>
@@ -248,6 +270,9 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Shared ReadOnly ExcelBookMarker As Byte() = Encoding.ASCII.GetBytes("Book")
         Private Shared ReadOnly PowerPointMarker As Byte() = Encoding.ASCII.GetBytes("PowerPoint Document")
 
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 

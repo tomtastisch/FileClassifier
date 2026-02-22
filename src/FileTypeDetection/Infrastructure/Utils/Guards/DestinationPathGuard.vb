@@ -20,6 +20,9 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
     '''     Gemeinsame Zielpfad-Policy für Materialisierung und Archiv-Extraktion.
     ''' </summary>
     Friend Interface IDestinationPathPolicy
+        ''' <summary>
+        '''     Bereitet ein Materialisierungsziel vor und beachtet Overwrite-Policy.
+        ''' </summary>
         Function PrepareMaterializationTarget _
             (
                 destinationFull As String,
@@ -27,12 +30,18 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 opt As FileTypeProjectOptions
             ) As Boolean
 
+        ''' <summary>
+        '''     Prüft, ob ein neues Extraktionsziel erstellt werden darf.
+        ''' </summary>
         Function ValidateNewExtractionTarget _
             (
                 destinationFull As String,
                 opt As FileTypeProjectOptions
             ) As Boolean
 
+        ''' <summary>
+        '''     Prüft, ob ein Zielpfad auf ein Root-Verzeichnis zeigt.
+        ''' </summary>
         Function IsRootPath _
             (
                 destinationFull As String
@@ -48,9 +57,18 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         Friend Shared ReadOnly Instance As IDestinationPathPolicy = _
             New DefaultDestinationPathPolicy()
 
+        ''' <summary>
+        '''     Verhindert direkte Instanziierung; Zugriff ausschließlich über <see cref="Instance"/>.
+        ''' </summary>
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Bereitet ein Materialisierungsziel vor (Root-Schutz, Overwrite-Handling).
+        ''' </summary>
+        ''' <param name="destinationFull">Vollqualifizierter Zielpfad.</param>
+        ''' <param name="overwrite">Steuert, ob bestehende Ziele gelöscht werden dürfen.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Logger.</param>
         Public Function PrepareMaterializationTarget _
             (
                 destinationFull As String,
@@ -68,6 +86,11 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             Return True
         End Function
 
+        ''' <summary>
+        '''     Validiert ein neues Extraktionsziel ohne bestehende Kollisionen.
+        ''' </summary>
+        ''' <param name="destinationFull">Vollqualifizierter Zielpfad.</param>
+        ''' <param name="opt">Laufzeitoptionen inklusive Logger.</param>
         Public Function ValidateNewExtractionTarget _
             (
                 destinationFull As String,
@@ -95,6 +118,10 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             Return True
         End Function
 
+        ''' <summary>
+        '''     Ermittelt, ob der Zielpfad auf ein Root-Verzeichnis zeigt.
+        ''' </summary>
+        ''' <param name="destinationFull">Zu prüfender Zielpfad.</param>
         Public Function IsRootPath _
             (
                 destinationFull As String
@@ -118,6 +145,11 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
                 StringComparison.OrdinalIgnoreCase)
         End Function
 
+        ''' <summary>
+        '''     Löscht ein bestehendes Ziel abhängig von der Overwrite-Einstellung.
+        ''' </summary>
+        ''' <param name="destinationFull">Vollqualifizierter Zielpfad.</param>
+        ''' <param name="overwrite">Steuert, ob Löschung erlaubt ist.</param>
         Private Shared Function TryDeleteExistingTarget _
             (
                 destinationFull As String,
@@ -147,9 +179,15 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
         Private Shared ReadOnly Policy As IDestinationPathPolicy = _
             DefaultDestinationPathPolicy.Instance
 
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
+        ''' <summary>
+        '''     Delegiert die Materialisierungsziel-Validierung an die aktive Policy.
+        ''' </summary>
         Friend Shared Function PrepareMaterializationTarget _
             (
                 destinationFull As String,
@@ -160,6 +198,9 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             Return Policy.PrepareMaterializationTarget(destinationFull, overwrite, opt)
         End Function
 
+        ''' <summary>
+        '''     Delegiert die Extraktionsziel-Validierung an die aktive Policy.
+        ''' </summary>
         Friend Shared Function ValidateNewExtractionTarget _
             (
                 destinationFull As String,
@@ -170,6 +211,9 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
             Return Policy.ValidateNewExtractionTarget(destinationFull, opt)
         End Function
 
+        ''' <summary>
+        '''     Delegiert die Root-Pfad-Prüfung an die aktive Policy.
+        ''' </summary>
         Friend Shared Function IsRootPath _
             (
                 destinationFull As String

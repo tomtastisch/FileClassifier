@@ -31,6 +31,9 @@ Namespace Global.Tomtastisch.FileClassifier.Infrastructure.Utils
     ''' </remarks>
     Friend NotInheritable Class IterableUtils
 
+        ''' <summary>
+        '''     Verhindert die Instanziierung; Nutzung ausschließlich über statische Members.
+        ''' </summary>
         Private Sub New()
         End Sub
 
