@@ -12,11 +12,14 @@ if [[ -z "${package_id}" ]]; then
 fi
 
 mkdir -p "$(dirname -- "${out_file}")"
-cat > "${out_file}" <<JSON
-{
-  "release_tag": "${release_tag}",
-  "release_version": "${release_version}",
-  "package_id": "${package_id}",
-  "release_run_url": "${release_run_url}"
-}
-JSON
+jq -n \
+  --arg release_tag "${release_tag}" \
+  --arg release_version "${release_version}" \
+  --arg package_id "${package_id}" \
+  --arg release_run_url "${release_run_url}" \
+  '{
+    release_tag: $release_tag,
+    release_version: $release_version,
+    package_id: $package_id,
+    release_run_url: $release_run_url
+  }' > "${out_file}"

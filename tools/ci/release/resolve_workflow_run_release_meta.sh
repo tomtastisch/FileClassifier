@@ -49,6 +49,10 @@ fi
 if [[ -z "${release_run_url}" ]]; then
   release_run_url="${release_run_url_from_meta}"
 fi
+if [[ -z "${release_run_url}" ]]; then
+  echo "release_run_url is missing: provide as second argument or in '${meta_json_path}' (.release_run_url)" >&2
+  exit 1
+fi
 mkdir -p artifacts/ci/nuget-online-convergence
 
 {

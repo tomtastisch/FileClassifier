@@ -85,13 +85,13 @@ jobs:
         run: dotnet build FileClassifier.sln -c Release --no-restore -warnaserror -v minimal
 
       - name: Source-based tests
-        run: dotnet test --project tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --no-build -v minimal
+        run: dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --no-build -v minimal
 
       - name: Fuzz tests (release blocker)
-        run: dotnet test --project tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --no-build --filter "Category=Fuzz" -v minimal
+        run: bash tools/ci/release/run_fuzz_release_gate.sh tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj
 
       - name: API contract tests
-        run: dotnet test --project tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --no-build --filter "Category=ApiContract" -v minimal
+        run: dotnet test tests/FileTypeDetectionLib.Tests/FileTypeDetectionLib.Tests.csproj -c Release --no-build --filter "Category=ApiContract" -v minimal
 
       - name: Pack with tag version (SSOT)
         run: bash tools/ci/release/pack_with_tag.sh "${{ steps.tag.outputs.version }}" "${{ steps.tag.outputs.tag }}" "${{ steps.tag.outputs.assembly_version }}" "${{ steps.tag.outputs.file_version }}"
