@@ -33,8 +33,9 @@ Die aktive Trusted-Publishing-Policy ist an folgende Identität gebunden:
 - Bei Incident-Diagnose kann das Fenster über die beiden Variablen erhöht werden, ohne Workflow-Jobnamen oder Required Contexts zu ändern.
 
 ## 5. Entkoppelte Online-Konvergenz (Async)
+- Zusätzlich läuft im Release-Workflow ein synchrones Blocker-Gate `enforce-online-convergence`, das nach Publish die Endpunkt-Konvergenz strikt erzwingt (auch für `workflow_dispatch`-Releases).
 - Workflow: `.github/workflows/nuget-online-convergence.yml`
-- Trigger: `workflow_run` nach erfolgreichem `Release Publish`.
+- Trigger: `workflow_run` nach erfolgreichem `Release Publish` (unabhängig davon, ob via Tag-Push oder `workflow_dispatch` ausgelöst).
 - Der Async-Workflow prüft weiterhin **alle** Endpunkte als harte Konvergenzbedingungen:
   - `REQUIRE_SEARCH=1`
   - `REQUIRE_REGISTRATION=1`

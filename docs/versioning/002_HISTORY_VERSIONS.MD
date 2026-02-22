@@ -12,7 +12,7 @@ Heuristik für die Rückwirkungs-Zuordnung:
 - `docs|test|ci|chore|tooling|refactor|fix` => Patch
 
 Aktueller Entwicklungsstand:
-- Aktuelle Entwicklungslinie enthält `6.x` (aktueller Arbeitsstand: `v6.1.13`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
+- Aktuelle Entwicklungslinie enthält `6.x` (aktueller Arbeitsstand: `v6.1.14`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
 
 Hinweis:
 - Die Spalte `Keyword` verwendet den technischen Klassifizierungswert aus der Historie.
@@ -20,6 +20,7 @@ Hinweis:
 
 | Version | Kurzbeschreibung | Commit | Keyword |
 |---|---|---|---|
+| `6.1.14` | 6.1.14 Pipeline-Konvergenz geschlossen: Release-Workflow erzwingt NuGet-Online-Konvergenz jetzt fail-closed auch für `workflow_dispatch`, Release-Metadaten werden artefaktbasiert deterministisch aufgelöst und Fuzzing-Blocker-/Governance-Evidence-Dokumentation entsprechend nachgezogen | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.13` | FC-0016 abgeschlossen: In-Code-XML-Dokumentation im gesamten CSCore sprachlich auf Deutsch vereinheitlicht (inkl. konsistenter `<b>`- und `<br/>`-Verwendungsstruktur) und Terminologie für Audit-/Betriebskontexte konsolidiert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.12` | FC-0015 abgeschlossen: Bilinguale Doku-Rasterstruktur in `docs/0_de` und `docs/1_en` mit identischer Dateimenge und verpflichtenden Language-Switch-Headern kanonisch eingeführt; Sync-Tooling fail-closed gehärtet (Parity/Switch-Checks + Stale-Pruning) und PR-Scope-Allowlist für die neue Struktur erweitert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.11` | FC-0014 abgeschlossen: Archive-/Path-Policy-Kernlogik (relative Archivpfad-Normalisierung und Root-Path-Policy) in CSCore zentralisiert (`ArchivePathPolicyUtility`) und via Bridge produktiv in `ArchiveEntryPathPolicy`/`DestinationPathGuard` genutzt; Telemetrie-/Contract-Abdeckung erweitert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |

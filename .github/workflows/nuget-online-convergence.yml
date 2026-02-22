@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   verify-convergence:
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.event == 'push'
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -31,13 +31,20 @@ jobs:
           ref: ${{ github.event.repository.default_branch }}
           persist-credentials: false
 
+      - name: Download release metadata artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          name: release-meta
+          path: artifacts/ci/nuget-online-convergence/release-meta/
+
       - name: Resolve release metadata
         id: meta
         env:
-          RELEASE_TAG: ${{ github.event.workflow_run.head_branch }}
           RELEASE_RUN_URL: ${{ github.event.workflow_run.html_url }}
         shell: bash
-        run: bash tools/ci/release/resolve_workflow_run_release_meta.sh "${RELEASE_TAG}" "${RELEASE_RUN_URL}"
+        run: bash tools/ci/release/resolve_workflow_run_release_meta.sh artifacts/ci/nuget-online-convergence/release-meta/release-meta.json "${RELEASE_RUN_URL}"
 
       - name: Verify NuGet online convergence (all endpoints required)
         shell: bash
