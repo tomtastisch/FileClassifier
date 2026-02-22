@@ -3,6 +3,7 @@ namespace FileTypeDetectionLib.Tests.Unit.Fuzzing;
 public sealed class FsCheckSmokeTests
 {
     [Fact]
+    [Trait("Category", "Fuzz")]
     public void FuzzingSmoke_GeneratorProducesSamples()
     {
         // FsCheck-based fuzzing signal: randomized sample generation.

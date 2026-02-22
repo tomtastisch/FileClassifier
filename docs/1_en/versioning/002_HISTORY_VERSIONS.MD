@@ -12,13 +12,14 @@ Heuristics for retroactive classification:
 - `docs|test|ci|chore|tooling|refactor|fix` => patch
 
 Current state:
-- Current release line contains `6.x` (current working state: `v6.1.13`; details in `docs/versioning/103_CHANGELOG_RELEASES.MD`).
+- Current release line contains `6.x` (current working state: `v6.1.14`; details in `docs/versioning/103_CHANGELOG_RELEASES.MD`).
 
 Note:
 - The \"short description\" column follows the original commit/PR intent text for deterministic traceability and is not normalized to a single language.
 
 | Version | Short description | Commit | Keyword |
 |---|---|---|---|
+| `6.1.14` | 6.1.14 pipeline convergence closed: release workflow now enforces NuGet online convergence fail-closed for `workflow_dispatch` too, resolves release metadata deterministically via artifact, and aligns fuzzing-blocker/governance evidence documentation | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.13` | FC-0016 completed: unified in-code XML documentation language to German across CSCore (including consistent `<b>` and `<br/>` structure) and consolidated terminology for audit/operational contexts | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.12` | FC-0015 completed: introduced canonical bilingual docs grid under `docs/0_de` and `docs/1_en` with identical file sets and mandatory language-switch headers; hardened sync tooling fail-closed (parity/switch checks + stale file pruning) and expanded PR-scope allowlist for the new structure | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.11` | FC-0014 completed: centralized archive/path policy core logic (archive-relative-path normalization and root-path policy) in CSCore (`ArchivePathPolicyUtility`) and enabled productive bridge usage in `ArchiveEntryPathPolicy`/`DestinationPathGuard`; telemetry and package-contract coverage extended | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |

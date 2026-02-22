@@ -26,6 +26,6 @@
                      Condition="Exists('$(MSBuildThisFileDirectory)tools/analyzers/BannedSymbols.txt')" />
   </ItemGroup>
   <PropertyGroup>
-    <RepoVersion>6.1.13</RepoVersion>
+    <RepoVersion>6.1.14</RepoVersion>
   </PropertyGroup>
 </Project>

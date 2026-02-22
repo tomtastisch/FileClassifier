@@ -33,8 +33,9 @@ The active trusted-publishing policy is bound to the following identity:
 - For incident diagnostics, the window can be increased via these variables without changing workflow job names or required contexts.
 
 ## 5. Decoupled Online Convergence (Async)
+- The release workflow now also contains a synchronous blocker gate `enforce-online-convergence` that strictly enforces endpoint convergence after publish (including `workflow_dispatch` releases).
 - Workflow: `.github/workflows/nuget-online-convergence.yml`
-- Trigger: `workflow_run` after a successful `Release Publish`.
+- Trigger: `workflow_run` after a successful `Release Publish` (independent of whether the release was triggered by tag push or `workflow_dispatch`).
 - The async workflow still checks **all** endpoints as hard convergence conditions:
   - `REQUIRE_SEARCH=1`
   - `REQUIRE_REGISTRATION=1`
