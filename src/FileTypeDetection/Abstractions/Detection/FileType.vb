@@ -44,6 +44,14 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public ReadOnly Property Aliases As ImmutableArray(Of String)
 
+        ''' <summary>
+        '''     Initialisiert ein unveränderliches Dateityp-Wertobjekt.
+        ''' </summary>
+        ''' <param name="kind">Enum-Schlüssel des Dateityps.</param>
+        ''' <param name="canonicalExtension">Kanonische Endung inklusive Punkt.</param>
+        ''' <param name="mime">Kanonischer MIME-Typ als Metadatum.</param>
+        ''' <param name="allowed">Kennzeichnet die Policy-Zulässigkeit.</param>
+        ''' <param name="aliases">Aliasmenge für Endungszuordnung.</param>
         Friend Sub New _
             (
                 kind As FileKind,

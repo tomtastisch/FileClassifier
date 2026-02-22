@@ -44,6 +44,14 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         Public ReadOnly Property ExtensionVerified As Boolean
 
+        ''' <summary>
+        '''     Initialisiert ein detailliertes Detektionsergebnis.
+        ''' </summary>
+        ''' <param name="detectedType">Finaler, nach allen Policies ermittelter Dateityp.</param>
+        ''' <param name="reasonCode">Deterministischer Reason-Code für den Entscheidungspfad.</param>
+        ''' <param name="usedZipContentCheck">Kennzeichnet eine inhaltsbasierte Archivprüfung.</param>
+        ''' <param name="usedStructuredRefinement">Kennzeichnet ein strukturiertes Archiv-Refinement.</param>
+        ''' <param name="extensionVerified">Kennzeichnet die bestätigte Endungsprüfung.</param>
         Friend Sub New _
             (
                 detectedType As FileType,
