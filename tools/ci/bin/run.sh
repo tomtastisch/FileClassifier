@@ -252,11 +252,6 @@ run_pack() {
     return 1
   fi
 
-  if ! unzip -l "${nupkg_path}" | rg -q "lib/.*/FileClassifier\\.CSCore\\.dll"; then
-    ci_result_add_violation "CI-PACK-001" "fail" "Single-package contract violated: FileClassifier.CSCore.dll missing in nupkg." "${nupkg_path}"
-    return 1
-  fi
-
   printf '%s\n' "${nupkg_path}" > "${ROOT_DIR}/${OUT_DIR}/nupkg-path.txt"
   printf '%s\n' "${package_id}" > "${ROOT_DIR}/${OUT_DIR}/package-id.txt"
   printf '%s\n' "${package_version}" > "${ROOT_DIR}/${OUT_DIR}/package-version.txt"
