@@ -207,6 +207,7 @@ run_docs_links_full() {
 
 run_build() {
   run_or_fail "CI-BUILD-001" "Restore solution (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/FileClassifier.sln" -v minimal
+  run_or_fail "CI-BUILD-001" "Restore CSCore bridge project (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/src/FileClassifier.CSCore/FileClassifier.CSCore.csproj" -v minimal
   run_or_fail "CI-BUILD-001" "Build solution" dotnet build "${ROOT_DIR}/FileClassifier.sln" --no-restore -warnaserror -v minimal
   ci_result_append_summary "Build completed."
 }
@@ -229,6 +230,7 @@ run_pack() {
 
   mkdir -p "${pack_output_dir}"
   run_or_fail "CI-PACK-001" "Restore package project (locked mode)" dotnet restore --locked-mode "${package_project}" -v minimal
+  run_or_fail "CI-PACK-001" "Restore CSCore bridge project (locked mode)" dotnet restore --locked-mode "${ROOT_DIR}/src/FileClassifier.CSCore/FileClassifier.CSCore.csproj" -v minimal
   run_or_fail "CI-PACK-001" "Build package project" dotnet build "${package_project}" -c Release --no-restore -warnaserror -v minimal
   run_or_fail "CI-PACK-001" "Pack package project" dotnet pack "${package_project}" -c Release --no-build -o "${pack_output_dir}" -v minimal
 
