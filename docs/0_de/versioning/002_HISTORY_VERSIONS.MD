@@ -12,57 +12,58 @@ Heuristik für die Rückwirkungs-Zuordnung:
 - `docs|test|ci|chore|tooling|refactor|fix` => Patch
 
 Aktueller Entwicklungsstand:
-- Aktuelle Entwicklungslinie enthält `6.x` (aktueller Arbeitsstand: `v6.1.12`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
+- Aktuelle Entwicklungslinie enthält `6.x` (aktueller Arbeitsstand: `v6.1.13`; Details in `docs/versioning/003_CHANGELOG_RELEASES.MD`).
 
 Hinweis:
 - Die Spalte `Keyword` verwendet den technischen Klassifizierungswert aus der Historie.
-- Einzelne Committitel bleiben in der Originalsprache, wenn sie als exakter Quelltextnachweis uebernommen wurden.
+- Einzelne Committitel bleiben in der Originalsprache, wenn sie als exakter Quelltextnachweis übernommen wurden.
 
 | Version | Kurzbeschreibung | Commit | Keyword |
 |---|---|---|---|
-| `6.1.12` | FC-0015 abgeschlossen: Bilinguale Doku-Rasterstruktur in `docs/0_de` und `docs/1_en` mit identischer Dateimenge und verpflichtenden Language-Switch-Headern kanonisch eingefuehrt; Sync-Tooling fail-closed gehaertet (Parity/Switch-Checks + Stale-Pruning) und PR-Scope-Allowlist fuer die neue Struktur erweitert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.13` | FC-0016 abgeschlossen: In-Code-XML-Dokumentation im gesamten CSCore sprachlich auf Deutsch vereinheitlicht (inkl. konsistenter `<b>`- und `<br/>`-Verwendungsstruktur) und Terminologie für Audit-/Betriebskontexte konsolidiert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.12` | FC-0015 abgeschlossen: Bilinguale Doku-Rasterstruktur in `docs/0_de` und `docs/1_en` mit identischer Dateimenge und verpflichtenden Language-Switch-Headern kanonisch eingeführt; Sync-Tooling fail-closed gehärtet (Parity/Switch-Checks + Stale-Pruning) und PR-Scope-Allowlist für die neue Struktur erweitert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.11` | FC-0014 abgeschlossen: Archive-/Path-Policy-Kernlogik (relative Archivpfad-Normalisierung und Root-Path-Policy) in CSCore zentralisiert (`ArchivePathPolicyUtility`) und via Bridge produktiv in `ArchiveEntryPathPolicy`/`DestinationPathGuard` genutzt; Telemetrie-/Contract-Abdeckung erweitert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.10` | FC-0013 abgeschlossen: Hash-Evidence-Policy (Label/Notes/HMAC-Env-Key) in CSCore zentralisiert (`EvidencePolicyUtility`), Bridge-Delegation im `EvidenceHashingCore` produktiv aktiviert und Contracts/Telemetry entsprechend erweitert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.9` | FC-0012 abgeschlossen: OpenXML/OpenDocument- und Legacy-Office-Entscheidungslogik weiter in CSCore ausgelagert (`OfficePolicyUtility`) und via Bridge in `CoreInternals` produktiv genutzt; Telemetrie-/Regressionstests sowie Referenzdokumentation entsprechend erweitert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
-| `6.1.8` | FC-0011 abgeschlossen: DetectDetailed-Endungs- und ReasonCode-Policy weiter in CSCore ausgelagert (inkl. produktiver Nutzung von `DetectionSignal`/`DetectionSummary` via Mapperly), Bridge-Telemetrie erweitert und vollstaendige CSCore-Moduldokumentation (Root/Model/Mapping/Utilities) nachgezogen | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
-| `6.1.7` | FC-0010 abgeschlossen: Analyzer-Major-Upgrade (`Meziantou 3.0.12`, `NetAnalyzers 10.0.103`), netstandard2.0-Dependency-Strategie via direktes CodePages-Pinning + dokumentiertem Microsoft.NETCore.Platforms-Meta-Ausnahmefall sowie end-to-end run.sh-Checks gruen verifiziert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
-| `6.1.6` | FC-0009 abgeschlossen: PolySharp-basierter `IsExternalInit`-Polyfill eingefuehrt, `DotNet.ReproducibleBuilds` auf `2.0.2` angehoben und fail-closed Banned-API-Gate auf VB-Core inkl. unsicherer ZIP-Extraktions-APIs erweitert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
-| `6.1.5` | FC-0008 abgeschlossen: Reproducible-Build-Basis als zentrales Paket eingefuehrt und damit Build-/Provenance-Auditierbarkeit systemweit gehaertet | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.8` | FC-0011 abgeschlossen: DetectDetailed-Endungs- und ReasonCode-Policy weiter in CSCore ausgelagert (inkl. produktiver Nutzung von `DetectionSignal`/`DetectionSummary` via Mapperly), Bridge-Telemetrie erweitert und vollständige CSCore-Moduldokumentation (Root/Model/Mapping/Utilities) nachgezogen | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.7` | FC-0010 abgeschlossen: Analyzer-Major-Upgrade (`Meziantou 3.0.12`, `NetAnalyzers 10.0.103`), netstandard2.0-Dependency-Strategie via direktes CodePages-Pinning + dokumentiertem Microsoft.NETCore.Platforms-Meta-Ausnahmefall sowie end-to-end run.sh-Checks grün verifiziert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.6` | FC-0009 abgeschlossen: PolySharp-basierter `IsExternalInit`-Polyfill eingeführt, `DotNet.ReproducibleBuilds` auf `2.0.2` angehoben und fail-closed Banned-API-Gate auf VB-Core inkl. unsicherer ZIP-Extraktions-APIs erweitert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.5` | FC-0008 abgeschlossen: Reproducible-Build-Basis als zentrales Paket eingeführt und damit Build-/Provenance-Auditierbarkeit systemweit gehärtet | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.4` | FC-0007 abgeschlossen: Analyzer-/Banned-API-Baseline auf alle relevanten C#-Projekte erweitert und Options-Normalisierung via CSCore-Record+Mapperly Utility zentralisiert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.3` | FC-0006 abgeschlossen: Hash-/Materializer-Logik weiter in CSCore ausgelagert (inkl. fail-closed Telemetry/Audit-Snapshot und deterministischem Decision-Matrix-Regressionstest) | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
-| `6.1.2` | FC-0005 gestartet: CSCore-Utility-Offloading fuer Enum/Iterable/Argument- und Exception-Filter-Gates via fail-closed Runtime-Bridge und package-backed Contract-Haertung | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.1.2` | FC-0005 gestartet: CSCore-Utility-Offloading für Enum/Iterable/Argument- und Exception-Filter-Gates via fail-closed Runtime-Bridge und package-backed Contract-Härtung | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.1` | FC-0004 abgeschlossen: Records/Mapperly-Pilot in CSCore mit fail-closed CI-/Governance-Nachweisen und netstandard-Compat (`IsExternalInit`) | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.1.0` | FC-0003 abgeschlossen: Single-Package-Integration von CSCore inkl. Packaging-/Consumer-Gate und transitive Runtime-Verifikation | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | minor |
-| `6.0.2` | FC-0002 abgeschlossen: CSCore-TFM/SDK-Kompatibilitaet festgelegt, dokumentiert und gegen fail-closed Build-Checks verifiziert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
-| `6.0.1` | FC-0001 abgeschlossen: CSCore-Unterprojekt eingefuehrt und deterministische Build-Baseline fuer Cross-Language-Single-Package gesetzt | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.0.2` | FC-0002 abgeschlossen: CSCore-TFM/SDK-Kompatibilität festgelegt, dokumentiert und gegen fail-closed Build-Checks verifiziert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
+| `6.0.1` | FC-0001 abgeschlossen: CSCore-Unterprojekt eingeführt und deterministische Build-Baseline für Cross-Language-Single-Package gesetzt | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/main...HEAD) | patch |
 | `6.0.0` | Breaking-Release: `FileKind`-Enum und `HashRoundTripReport`-Public-API auf neues Slot-/Methodenmodell umgestellt, Hashing-Interna in Core/RoundTrip/Io ausgelagert | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v5.2.1...HEAD) | breaking |
-| `5.2.1` | SharpCompress-API auf typsichere Aufrufe umgestellt, tar.gz-Verarbeitung fail-closed gehaertet und Qodana-CI-Gate als Pflichtlauf dokumentiert/erzwungen | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v5.2.0...HEAD) | patch |
-| `5.2.0` | netstandard2.0-Compat-Layer eingefuehrt, Provider-Struktur konsolidiert und TFM-Multi-Targeting erweitert | [8d65a52](https://github.com/tomtastisch/FileClassifier/commit/8d65a52) | minor |
-| `5.1.4` | Refactor-Cluster 7C abgeschlossen + Qodana-Alerts auf 0 + Version-Bump fuer Release | [2adeb83](https://github.com/tomtastisch/FileClassifier/commit/2adeb83) | patch |
-| `5.1.3` | PR-Governance-Haertung (DE-Naming, PR-Template, fail-closed Gate fuer `security/code-scanning/tools = 0`) | [0b488ac](https://github.com/tomtastisch/FileClassifier/commit/0b488ac) | patch |
-| `5.1.2` | Gate4 Polling-Optimierung und Release-Haertung | [f12711d](https://github.com/tomtastisch/FileClassifier/commit/f12711d) | patch |
-| `5.1.1` | Dependabot security-only mode und fail-closed Guards fuer secret-pflichtige Workflows | [d0ad8ec](https://github.com/tomtastisch/FileClassifier/commit/d0ad8ec) | patch |
-| `5.1.0` | Security-/Governance-Haertungswelle: gepinnte Actions, Dependency-Review, Labeler-Fixes, Root-Assurance-Index | [e2a4a42](https://github.com/tomtastisch/FileClassifier/commit/e2a4a42) | minor |
-| `5.0.0` | Hashing-API-Rename auf `EvidenceHashing` finalisiert und optionale HMAC-Digests hinzugefuegt | [444d027](https://github.com/tomtastisch/FileClassifier/commit/444d027) | breaking |
-| `4.2.1` | Version auf 4.2.1 fuer Quality-Gate-Haertung angehoben | [8ab274d](https://github.com/tomtastisch/FileClassifier/commit/8ab274d) | chore |
-| `4.2.0` | Dokumentation: Root-README-Paritaet korrigiert, SHA-Links angepasst und Preflight-Version-Gate haerter gemacht | [9691bec](https://github.com/tomtastisch/FileClassifier/commit/9691bec) | docs |
+| `5.2.1` | SharpCompress-API auf typsichere Aufrufe umgestellt, tar.gz-Verarbeitung fail-closed gehärtet und Qodana-CI-Gate als Pflichtlauf dokumentiert/erzwungen | [unreleased](https://github.com/tomtastisch/FileClassifier/compare/v5.2.0...HEAD) | patch |
+| `5.2.0` | netstandard2.0-Compat-Layer eingeführt, Provider-Struktur konsolidiert und TFM-Multi-Targeting erweitert | [8d65a52](https://github.com/tomtastisch/FileClassifier/commit/8d65a52) | minor |
+| `5.1.4` | Refactor-Cluster 7C abgeschlossen + Qodana-Alerts auf 0 + Version-Bump für Release | [2adeb83](https://github.com/tomtastisch/FileClassifier/commit/2adeb83) | patch |
+| `5.1.3` | PR-Governance-Härtung (DE-Naming, PR-Template, fail-closed Gate für `security/code-scanning/tools = 0`) | [0b488ac](https://github.com/tomtastisch/FileClassifier/commit/0b488ac) | patch |
+| `5.1.2` | Gate4 Polling-Optimierung und Release-Härtung | [f12711d](https://github.com/tomtastisch/FileClassifier/commit/f12711d) | patch |
+| `5.1.1` | Dependabot security-only mode und fail-closed Guards für secret-pflichtige Workflows | [d0ad8ec](https://github.com/tomtastisch/FileClassifier/commit/d0ad8ec) | patch |
+| `5.1.0` | Security-/Governance-Härtungswelle: gepinnte Actions, Dependency-Review, Labeler-Fixes, Root-Assurance-Index | [e2a4a42](https://github.com/tomtastisch/FileClassifier/commit/e2a4a42) | minor |
+| `5.0.0` | Hashing-API-Rename auf `EvidenceHashing` finalisiert und optionale HMAC-Digests hinzugefügt | [444d027](https://github.com/tomtastisch/FileClassifier/commit/444d027) | breaking |
+| `4.2.1` | Version auf 4.2.1 für Quality-Gate-Härtung angehoben | [8ab274d](https://github.com/tomtastisch/FileClassifier/commit/8ab274d) | chore |
+| `4.2.0` | Dokumentation: Root-README-Parität korrigiert, SHA-Links angepasst und Preflight-Version-Gate härter gemacht | [9691bec](https://github.com/tomtastisch/FileClassifier/commit/9691bec) | docs |
 | `4.1.3` | Dokumentation: deterministische Restrukturierung mit SHA-fixierten Links und Policy-RoC-Gate | [90a2825](https://github.com/tomtastisch/FileClassifier/commit/90a2825) | docs |
-| `4.1.2` | Versionierungs-Chore: Versionsbump fuer xUnit-v3-Migrationsrelease | [d1ed2a9](https://github.com/tomtastisch/FileClassifier/commit/d1ed2a9) | chore |
-| `4.1.1` | Versionierungs-Chore: Patch-Version erhoeht, um CI-Guard zu erfuellen | [d67050c](https://github.com/tomtastisch/FileClassifier/commit/d67050c) | chore |
+| `4.1.2` | Versionierungs-Chore: Versionsbump für xUnit-v3-Migrationsrelease | [d1ed2a9](https://github.com/tomtastisch/FileClassifier/commit/d1ed2a9) | chore |
+| `4.1.1` | Versionierungs-Chore: Patch-Version erhöht, um CI-Guard zu erfüllen | [d67050c](https://github.com/tomtastisch/FileClassifier/commit/d67050c) | chore |
 | `4.1.0` | Version auf 4.1.0 aktualisiert und Versionierungslogik verbessert | [a3dfe23](https://github.com/tomtastisch/FileClassifier/commit/a3dfe23) | chore |
 | `4.0.0` | Versionierungs-Basislinie auf 4.0.0 angehoben | [2a78f97](https://github.com/tomtastisch/FileClassifier/commit/2a78f97) | chore |
 | `3.0.24` | Dokumentation: Umlaut-Schreibweisen korrigiert | [22d40b9](https://github.com/tomtastisch/FileClassifier/commit/22d40b9) | docs |
 | `3.0.23` | Dokumentation: Markdown-Sprache normalisiert | [90310a0](https://github.com/tomtastisch/FileClassifier/commit/90310a0) | docs |
-| `3.0.22` | Dokumentation: Struktur vereinheitlicht und Wartungs-Checklisten ergaenzt | [cb3341d](https://github.com/tomtastisch/FileClassifier/commit/cb3341d) | docs |
-| `3.0.21` | Dokumentation (Guides): Struktur vereinheitlicht und Schritt-fuer-Schritt-Checklisten mit Beispielen ergaenzt | [5f5c6ab](https://github.com/tomtastisch/FileClassifier/commit/5f5c6ab) | docs |
-| `3.0.20` | Dokumentation: Leitfaeden fuer Optionen und Datentyp-Erweiterungen hinzugefuegt (#5) | [392c628](https://github.com/tomtastisch/FileClassifier/commit/392c628) | docs |
-| `3.0.19` | Dokumentation (Guides): Playbooks fuer Optionen und Datentyp-Erweiterungen hinzugefuegt | [1427e1e](https://github.com/tomtastisch/FileClassifier/commit/1427e1e) | docs |
-| `3.0.18` | Refactor: deterministisches Hashing, Archive-Haertung und Test/CI-Stabilisierung (#4) | [374732a](https://github.com/tomtastisch/FileClassifier/commit/374732a) | refactor |
+| `3.0.22` | Dokumentation: Struktur vereinheitlicht und Wartungs-Checklisten ergänzt | [cb3341d](https://github.com/tomtastisch/FileClassifier/commit/cb3341d) | docs |
+| `3.0.21` | Dokumentation (Guides): Struktur vereinheitlicht und Schritt-für-Schritt-Checklisten mit Beispielen ergänzt | [5f5c6ab](https://github.com/tomtastisch/FileClassifier/commit/5f5c6ab) | docs |
+| `3.0.20` | Dokumentation: Leitfäden für Optionen und Datentyp-Erweiterungen hinzugefügt (#5) | [392c628](https://github.com/tomtastisch/FileClassifier/commit/392c628) | docs |
+| `3.0.19` | Dokumentation (Guides): Playbooks für Optionen und Datentyp-Erweiterungen hinzugefügt | [1427e1e](https://github.com/tomtastisch/FileClassifier/commit/1427e1e) | docs |
+| `3.0.18` | Refactor: deterministisches Hashing, Archive-Härtung und Test/CI-Stabilisierung (#4) | [374732a](https://github.com/tomtastisch/FileClassifier/commit/374732a) | refactor |
 | `3.0.17` | Tooling (Test): lesbares Ausgabeformat vereinfacht und technisches Testrauschen reduziert | [514922c](https://github.com/tomtastisch/FileClassifier/commit/514922c) | tooling |
 | `3.0.16` | CI (Docs): Markdown-Heading-Anker im Link-Checker validiert | [02884ff](https://github.com/tomtastisch/FileClassifier/commit/02884ff) | ci |
-| `3.0.15` | CI (Docs): Markdown-Link-Check als Gate hinzugefuegt | [cdbdfbd](https://github.com/tomtastisch/FileClassifier/commit/cdbdfbd) | ci |
+| `3.0.15` | CI (Docs): Markdown-Link-Check als Gate hinzugefügt | [cdbdfbd](https://github.com/tomtastisch/FileClassifier/commit/cdbdfbd) | ci |
 | `3.0.14` | Dokumentation (Struktur): README-Abdeckung erzwungen und Abstraction-Referenzen aktualisiert | [0d4cc5e](https://github.com/tomtastisch/FileClassifier/commit/0d4cc5e) | docs |
-| `3.0.13` | Dokumentation (README): Grafik fuer Abstractions-Ordnerhierarchie hinzugefuegt | [5853dd9](https://github.com/tomtastisch/FileClassifier/commit/5853dd9) | docs |
+| `3.0.13` | Dokumentation (README): Grafik für Abstractions-Ordnerhierarchie hinzugefügt | [5853dd9](https://github.com/tomtastisch/FileClassifier/commit/5853dd9) | docs |
 | `3.0.12` | Dokumentation (Abstractions): Referenzen nach Model-Ordnersplit finalisiert | [afdc592](https://github.com/tomtastisch/FileClassifier/commit/afdc592) | docs |
 | `3.0.11` | refactor(abstractions): split models into detection archive hashing folders | [f25256f](https://github.com/tomtastisch/FileClassifier/commit/f25256f) | refactor |
 | `3.0.10` | tooling(test): render bdd-readable output as clean per-test blocks | [268afe5](https://github.com/tomtastisch/FileClassifier/commit/268afe5) | tooling |
@@ -72,13 +73,13 @@ Hinweis:
 | `3.0.6` | chore(version): introduce central deterministic project versioning | [b62ac79](https://github.com/tomtastisch/FileClassifier/commit/b62ac79) | chore |
 | `3.0.5` | test(archive): table-drive archive hash and facade coverage | [1bc9b04](https://github.com/tomtastisch/FileClassifier/commit/1bc9b04) | test |
 | `3.0.4` | refactor(test-docs): unify archive naming and add glossary | [c412613](https://github.com/tomtastisch/FileClassifier/commit/c412613) | refactor |
-| `3.0.3` | test(e2e): erweitere hash-invarianz fuer archive positiv und negativ | [12dbe32](https://github.com/tomtastisch/FileClassifier/commit/12dbe32) | test |
+| `3.0.3` | test(e2e): erweitere hash-invarianz für archive positiv und negativ | [12dbe32](https://github.com/tomtastisch/FileClassifier/commit/12dbe32) | test |
 | `3.0.2` | test(hash): prove archive extract-materialize hash invariance | [48c3f8b](https://github.com/tomtastisch/FileClassifier/commit/48c3f8b) | test |
 | `3.0.1` | docs: vereinheitliche zip-terminologie auf archiv-kontext | [33eac47](https://github.com/tomtastisch/FileClassifier/commit/33eac47) | docs |
 | `3.0.0` | refactor(config): centralize project options and hashing defaults | [fd03389](https://github.com/tomtastisch/FileClassifier/commit/fd03389) | breaking |
 | `2.0.3` | refactor: vereinheitliche archive reason-codes und detector flow | [254ea22](https://github.com/tomtastisch/FileClassifier/commit/254ea22) | refactor |
-| `2.0.2` | refactor: konsolidiere archive-entry flow und haerte hash optionen | [d888f35](https://github.com/tomtastisch/FileClassifier/commit/d888f35) | refactor |
-| `2.0.1` | docs: korrigiere reason-code referenzen fuer archive naming | [cffbb4b](https://github.com/tomtastisch/FileClassifier/commit/cffbb4b) | docs |
+| `2.0.2` | refactor: konsolidiere archive-entry flow und härte hash optionen | [d888f35](https://github.com/tomtastisch/FileClassifier/commit/d888f35) | refactor |
+| `2.0.1` | docs: korrigiere reason-code referenzen für archive naming | [cffbb4b](https://github.com/tomtastisch/FileClassifier/commit/cffbb4b) | docs |
 | `2.0.0` | refactor: vereinheitliche zip-benennungen auf archive | [5255724](https://github.com/tomtastisch/FileClassifier/commit/5255724) | breaking |
 | `1.6.2` | test(hash): assert physical equals logical for plain files | [9c2749c](https://github.com/tomtastisch/FileClassifier/commit/9c2749c) | test |
 | `1.6.1` | test(ci): freeze hashing api contract and enforce coverage gates | [84b1d8f](https://github.com/tomtastisch/FileClassifier/commit/84b1d8f) | test |

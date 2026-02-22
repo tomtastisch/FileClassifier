@@ -6,6 +6,15 @@
 
 All changes are documented here in technical terms. The release version itself is the Git tag `vX.Y.Z` (optional `-prerelease`) as SSOT.
 
+## [6.1.13]
+- Added:
+  - Completed German language unification for remaining CSCore XML in-code documentation areas (`Model`, `Mapping`, `Utilities`).
+- Changed:
+  - Consolidated C# XML comment terminology (for example `Nutzlast`, `Aufzaehlungssequenzen`, `Protokollierungspfade`) while preserving technical identifiers (for example `<c>ReasonCode</c>`, `<c>Unknown</c>`).
+  - Applied consistent readability structure in comments (`<b>...</b>` for emphasis, `<br/>` for hover-friendly line wraps).
+- Docs/CI/Tooling:
+  - Version convergence set to `6.1.13` (`RepoVersion`, `Version`, `PackageVersion`, DE/EN version history).
+
 ## [6.1.12]
 - Added:
   - Introduced the canonical bilingual documentation grid in `docs/0_de` and `docs/1_en` with identical file sets per language.
