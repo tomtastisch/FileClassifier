@@ -7,6 +7,15 @@
 Alle Änderungen werden hier technisch dokumentiert. Die Release-Version selbst ist
 der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
 
+## [6.1.14]
+- Added:
+  - Release-Metadaten-Artefaktpfad eingeführt (`write_release_meta_artifact.sh`) und asynchrone Auflösung für `workflow_dispatch` ergänzt.
+- Changed:
+  - NuGet-Online-Konvergenz wird im Release-Workflow jetzt fail-closed auch für `workflow_dispatch` erzwungen.
+  - Fuzzing-Release-Gate wurde gehärtet: No-Test-Erkennung mit `rg`-Fallback auf `grep`.
+- Docs/CI/Tooling:
+  - Versionskonvergenz aktiv auf `6.1.14` gesetzt (`RepoVersion`, `Version`, `PackageVersion`, Versionshistorie DE/EN).
+
 ## [6.1.13]
 - Added:
   - Sprachlich vereinheitlichte XML-In-Code-Dokumentation für die verbleibenden CSCore-Bereiche (`Model`, `Mapping`, `Utilities`) auf Deutsch abgeschlossen.
