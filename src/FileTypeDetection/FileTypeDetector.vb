@@ -234,16 +234,21 @@ Namespace Global.Tomtastisch.FileClassifier
                 verifyExtension As Boolean
             ) As DetectionDetail
 
-            Dim opt = GetDefaultOptions()
-            Dim trace As DetectionTrace = DetectionTrace.Empty
+            Dim opt        As FileTypeProjectOptions
+            Dim trace      As DetectionTrace             = DetectionTrace.Empty
+            Dim detected   As FileType
+            Dim projection As DetectionSummaryProjection
 
+            opt = GetDefaultOptions()
             ' Inhaltsdetektion: Primärentscheidung auf Basis Header/Container.
-            Dim detected As FileType = DetectPathCoreWithTrace(path, opt, trace)
+            detected = DetectPathCoreWithTrace(path, opt, trace)
+            projection = BuildDetectionSummaryProjection(detected, opt.SniffBytes)
+            LogDetectionSummaryProjection(opt, projection)
 
             ' Endungs-Policy: optionaler, nachgelagerter Konsistenzcheck.
             Dim extensionOk = True
             If verifyExtension Then
-                extensionOk = ExtensionMatchesKind(path, detected.Kind)
+                extensionOk = ExtensionMatchesKindWithProjection(path, detected, projection)
                 If Not extensionOk Then
                     detected = UnknownType()
                     trace.ReasonCode = ReasonExtensionMismatch
@@ -272,8 +277,11 @@ Namespace Global.Tomtastisch.FileClassifier
                 path As String
             ) As Boolean
 
-            Dim detected = Detect(path)
-            Return ExtensionMatchesKind(path, detected.Kind)
+            Dim detected   As FileType                   = Detect(path)
+            Dim projection As DetectionSummaryProjection =
+                    BuildDetectionSummaryProjection(detected, InternalIoDefaults.DefaultSniffBytes)
+
+            Return ExtensionMatchesKindWithProjection(path, detected, projection)
         End Function
 
         ''' <summary>
@@ -845,8 +853,11 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Shared Function ApplyExtensionPolicy(path As String, detected As FileType, verifyExtension As Boolean) _
             As FileType
 
+            Dim projection As DetectionSummaryProjection =
+                    BuildDetectionSummaryProjection(detected, InternalIoDefaults.DefaultSniffBytes)
+
             If Not verifyExtension Then Return detected
-            If ExtensionMatchesKind(path, detected.Kind) Then Return detected
+            If ExtensionMatchesKindWithProjection(path, detected, projection) Then Return detected
             Return UnknownType()
         End Function
 
@@ -871,18 +882,42 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function ExtensionMatchesKind(path As String, detectedKind As FileKind) As Boolean
 
-            Dim ext           As String   = IO.Path.GetExtension(If(path, String.Empty))
+            Dim detectedType As FileType                   = FileTypeRegistry.Resolve(detectedKind)
+            Dim projection   As DetectionSummaryProjection =
+                    BuildDetectionSummaryProjection(detectedType, InternalIoDefaults.DefaultSniffBytes)
+
+            Return ExtensionMatchesKindWithProjection(path, detectedType, projection)
+        End Function
+
+        Private Shared Function ExtensionMatchesKindWithProjection(
+                path As String,
+                detectedType As FileType,
+                projection As DetectionSummaryProjection
+            ) As Boolean
+
+            Dim ext           As String  = IO.Path.GetExtension(If(path, String.Empty))
             Dim normalizedExt As String
-            Dim detectedType  As FileType
+            Dim aliases()     As String  = ResolveAliases(detectedType)
+            Dim isMatch       As Boolean = False
+
+            If CsCoreRuntimeBridge.TryIsExtensionMatch(
+                    path:=path,
+                    detectedIsUnknown:=detectedType Is Nothing OrElse detectedType.Kind = FileKind.Unknown,
+                    canonicalExtension:=projection.CanonicalExtension,
+                    aliases:=aliases,
+                    mimeType:=projection.MimeType,
+                    headerBytes:=projection.HeaderBytes,
+                    isMatch:=isMatch
+                ) Then
+                Return isMatch
+            End If
 
             If String.IsNullOrWhiteSpace(ext) Then Return True
-
-            If detectedKind = FileKind.Unknown Then Return False
+            If detectedType Is Nothing OrElse detectedType.Kind = FileKind.Unknown Then Return False
 
             normalizedExt = FileTypeRegistry.NormalizeAlias(ext)
-            detectedType = FileTypeRegistry.Resolve(detectedKind)
 
-            If normalizedExt = FileTypeRegistry.NormalizeAlias(detectedType.CanonicalExtension) Then
+            If normalizedExt = FileTypeRegistry.NormalizeAlias(projection.CanonicalExtension) Then
                 Return True
             End If
 
@@ -975,6 +1010,13 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Private Shared Function ExceptionToReasonCode(ex As Exception) As String
 
+            Dim reasonFromCsCore As String = Nothing
+
+            If CsCoreRuntimeBridge.TryExceptionToReasonCode(ex, reasonFromCsCore) AndAlso
+                Not String.IsNullOrWhiteSpace(reasonFromCsCore) Then
+                Return reasonFromCsCore
+            End If
+
             If ex Is Nothing Then Return ReasonException
 
             If TypeOf ex Is UnauthorizedAccessException Then Return ReasonExceptionUnauthorizedAccess
@@ -1006,6 +1048,85 @@ Namespace Global.Tomtastisch.FileClassifier
             Return New MemoryStream(data, 0, data.Length, writable:=False, publiclyVisible:=False)
         End Function
 
+        Private Shared Function BuildDetectionSummaryProjection(
+                detectedType As FileType,
+                sniffBytes As Integer
+            ) As DetectionSummaryProjection
+
+            Dim projection As DetectionSummaryProjection = DetectionSummaryProjection.FromFileType(
+                    detectedType,
+                    sniffBytes
+                )
+            Dim summaryValues() As Object               = Nothing
+
+            If CsCoreRuntimeBridge.TryBuildSummaryValues(
+                    canonicalExtension:=projection.CanonicalExtension,
+                    mimeType:=projection.MimeType,
+                    headerBytes:=projection.HeaderBytes,
+                    summaryValues:=summaryValues
+                ) Then
+                If TryApplyDetectionSummaryValues(summaryValues, projection) Then
+                    Return projection
+                End If
+            End If
+
+            projection.HasStructuredMime = projection.MimeType.IndexOf("/"c) >= 0
+            Return projection
+        End Function
+
+        Private Shared Function TryApplyDetectionSummaryValues(
+                summaryValues() As Object,
+                ByRef projection As DetectionSummaryProjection
+            ) As Boolean
+
+            Try
+                If summaryValues Is Nothing OrElse summaryValues.Length <> 4 Then Return False
+
+                projection.CanonicalExtension = If(CStr(summaryValues(0)), String.Empty)
+                projection.MimeType = If(CStr(summaryValues(1)), String.Empty)
+                projection.HeaderBytes = CInt(summaryValues(2))
+                projection.HasStructuredMime = CBool(summaryValues(3))
+                Return True
+            Catch ex As Exception When _
+                TypeOf ex Is InvalidCastException OrElse
+                TypeOf ex Is OverflowException OrElse
+                TypeOf ex Is IndexOutOfRangeException OrElse
+                TypeOf ex Is ArgumentException OrElse
+                TypeOf ex Is FormatException
+                Return False
+            End Try
+        End Function
+
+        Private Shared Sub LogDetectionSummaryProjection(
+                opt As FileTypeProjectOptions,
+                projection As DetectionSummaryProjection
+            )
+
+            LogGuard.Debug(
+                opt.Logger,
+                $"[DetectDetailed] Projection: ext='{projection.CanonicalExtension}', mime='{projection.MimeType}', headerBytes={projection.HeaderBytes}, structuredMime={projection.HasStructuredMime}."
+            )
+        End Sub
+
+        Private Shared Function ResolveAliases(
+                detectedType As FileType
+            ) As String()
+
+            Dim aliases() As String
+            Dim index     As Integer
+
+            If detectedType Is Nothing OrElse detectedType.Aliases.IsDefaultOrEmpty Then
+                Return Array.Empty(Of String)()
+            End If
+
+            aliases = New String(detectedType.Aliases.Length - 1) {}
+            For index = 0 To detectedType.Aliases.Length - 1
+                aliases(index) = If(detectedType.Aliases(index), String.Empty)
+            Next
+
+            Return aliases
+        End Function
+
         ''' <summary>
         '''     Interner, unveränderlicher Datenträger <c>DetectionTrace</c> für strukturierte Verarbeitungsschritte.
         ''' </summary>
@@ -1019,6 +1140,37 @@ Namespace Global.Tomtastisch.FileClassifier
                     Return New DetectionTrace With {.ReasonCode = ReasonUnknown}
                 End Get
             End Property
+        End Structure
+
+        ''' <summary>
+        '''     Interner, unveraenderlicher Datentraeger fuer projektierten Detektionskontext.
+        ''' </summary>
+        Private Structure DetectionSummaryProjection
+            Friend CanonicalExtension As String
+            Friend MimeType As String
+            Friend HeaderBytes As Integer
+            Friend HasStructuredMime As Boolean
+
+            Friend Shared Function FromFileType(
+                    detectedType As FileType,
+                    sniffBytes As Integer
+                ) As DetectionSummaryProjection
+
+                Dim projection As DetectionSummaryProjection
+
+                projection.CanonicalExtension = String.Empty
+                projection.MimeType = String.Empty
+                projection.HeaderBytes = If(sniffBytes > 0, sniffBytes, InternalIoDefaults.DefaultSniffBytes)
+                projection.HasStructuredMime = False
+
+                If detectedType IsNot Nothing Then
+                    projection.CanonicalExtension = If(detectedType.CanonicalExtension, String.Empty)
+                    projection.MimeType = If(detectedType.Mime, String.Empty)
+                    projection.HasStructuredMime = projection.MimeType.IndexOf("/"c) >= 0
+                End If
+
+                Return projection
+            End Function
         End Structure
     End Class
 End Namespace
