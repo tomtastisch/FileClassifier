@@ -22,10 +22,14 @@
   </ItemGroup>
   <ItemGroup Condition="'$(MSBuildProjectName)' == 'FileTypeDetectionLib'">
     <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)tools/analyzers/BannedSymbols.txt"
                      Condition="Exists('$(MSBuildThisFileDirectory)tools/analyzers/BannedSymbols.txt')" />
   </ItemGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FileTypeDetectionLib'">
+    <WarningsAsErrors>$(WarningsAsErrors);RS0016;RS0017;RS0026;RS0027;RS0022;RS0023;RS0024;RS0025</WarningsAsErrors>
+  </PropertyGroup>
   <PropertyGroup>
-    <RepoVersion>6.1.15</RepoVersion>
+    <RepoVersion>6.1.16</RepoVersion>
   </PropertyGroup>
 </Project>

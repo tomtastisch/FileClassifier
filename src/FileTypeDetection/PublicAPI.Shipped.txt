@@ -1,0 +1,144 @@
+Overrides Tomtastisch.FileClassifier.FileType.ToString() -> String
+Shared Tomtastisch.FileClassifier.ArchiveProcessing.ExtractToMemory(path As String, verifyBeforeExtract As Boolean) -> System.Collections.Generic.IReadOnlyList(Of Tomtastisch.FileClassifier.ZipExtractedEntry)
+Shared Tomtastisch.FileClassifier.ArchiveProcessing.TryExtractToMemory(data As Byte()) -> System.Collections.Generic.IReadOnlyList(Of Tomtastisch.FileClassifier.ZipExtractedEntry)
+Shared Tomtastisch.FileClassifier.ArchiveProcessing.TryValidate(data As Byte()) -> Boolean
+Shared Tomtastisch.FileClassifier.ArchiveProcessing.TryValidate(path As String) -> Boolean
+Shared Tomtastisch.FileClassifier.EvidenceHashing.HashBytes(data As Byte()) -> Tomtastisch.FileClassifier.HashEvidence
+Shared Tomtastisch.FileClassifier.EvidenceHashing.HashBytes(data As Byte(), label As String) -> Tomtastisch.FileClassifier.HashEvidence
+Shared Tomtastisch.FileClassifier.EvidenceHashing.HashBytes(data As Byte(), label As String, options As Tomtastisch.FileClassifier.HashOptions) -> Tomtastisch.FileClassifier.HashEvidence
+Shared Tomtastisch.FileClassifier.EvidenceHashing.HashEntries(entries As System.Collections.Generic.IReadOnlyList(Of Tomtastisch.FileClassifier.ZipExtractedEntry)) -> Tomtastisch.FileClassifier.HashEvidence
+Shared Tomtastisch.FileClassifier.EvidenceHashing.HashEntries(entries As System.Collections.Generic.IReadOnlyList(Of Tomtastisch.FileClassifier.ZipExtractedEntry), label As String) -> Tomtastisch.FileClassifier.HashEvidence
+Shared Tomtastisch.FileClassifier.EvidenceHashing.HashEntries(entries As System.Collections.Generic.IReadOnlyList(Of Tomtastisch.FileClassifier.ZipExtractedEntry), label As String, options As Tomtastisch.FileClassifier.HashOptions) -> Tomtastisch.FileClassifier.HashEvidence
+Shared Tomtastisch.FileClassifier.EvidenceHashing.HashFile(path As String) -> Tomtastisch.FileClassifier.HashEvidence
+Shared Tomtastisch.FileClassifier.EvidenceHashing.HashFile(path As String, options As Tomtastisch.FileClassifier.HashOptions) -> Tomtastisch.FileClassifier.HashEvidence
+Shared Tomtastisch.FileClassifier.EvidenceHashing.VerifyRoundTrip(path As String) -> Tomtastisch.FileClassifier.HashRoundTripReport
+Shared Tomtastisch.FileClassifier.EvidenceHashing.VerifyRoundTrip(path As String, options As Tomtastisch.FileClassifier.HashOptions) -> Tomtastisch.FileClassifier.HashRoundTripReport
+Shared Tomtastisch.FileClassifier.FileMaterializer.Persist(data As Byte(), destinationPath As String) -> Boolean
+Shared Tomtastisch.FileClassifier.FileMaterializer.Persist(data As Byte(), destinationPath As String, overwrite As Boolean) -> Boolean
+Shared Tomtastisch.FileClassifier.FileMaterializer.Persist(data As Byte(), destinationPath As String, overwrite As Boolean, secureExtract As Boolean) -> Boolean
+Shared Tomtastisch.FileClassifier.FileTypeDetector.ReadFileSafe(path As String) -> Byte()
+Shared Tomtastisch.FileClassifier.FileTypeDetector.TryValidateArchive(path As String) -> Boolean
+Shared Tomtastisch.FileClassifier.FileTypeOptions.GetOptions() -> String
+Shared Tomtastisch.FileClassifier.FileTypeOptions.LoadOptions(json As String) -> Boolean
+Shared Tomtastisch.FileClassifier.FileTypeProjectBaseline.ApplyDeterministicDefaults() -> Void
+Tomtastisch.FileClassifier.ArchiveProcessing
+Tomtastisch.FileClassifier.DetectionDetail
+Tomtastisch.FileClassifier.DetectionDetail.DetectedType() -> Tomtastisch.FileClassifier.FileType
+Tomtastisch.FileClassifier.DetectionDetail.ExtensionVerified() -> Boolean
+Tomtastisch.FileClassifier.DetectionDetail.ReasonCode() -> String
+Tomtastisch.FileClassifier.DetectionDetail.UsedStructuredRefinement() -> Boolean
+Tomtastisch.FileClassifier.DetectionDetail.UsedZipContentCheck() -> Boolean
+Tomtastisch.FileClassifier.EvidenceHashing
+Tomtastisch.FileClassifier.FileKind
+Tomtastisch.FileClassifier.FileKind.Doc = 7 -> Tomtastisch.FileClassifier.FileKind
+Tomtastisch.FileClassifier.FileKind.Gif = 4 -> Tomtastisch.FileClassifier.FileKind
+Tomtastisch.FileClassifier.FileKind.Jpeg = 3 -> Tomtastisch.FileClassifier.FileKind
+Tomtastisch.FileClassifier.FileKind.Pdf = 1 -> Tomtastisch.FileClassifier.FileKind
+Tomtastisch.FileClassifier.FileKind.Png = 2 -> Tomtastisch.FileClassifier.FileKind
+Tomtastisch.FileClassifier.FileKind.Ppt = 9 -> Tomtastisch.FileClassifier.FileKind
+Tomtastisch.FileClassifier.FileKind.Unknown = 0 -> Tomtastisch.FileClassifier.FileKind
+Tomtastisch.FileClassifier.FileKind.Webp = 5 -> Tomtastisch.FileClassifier.FileKind
+Tomtastisch.FileClassifier.FileKind.Xls = 8 -> Tomtastisch.FileClassifier.FileKind
+Tomtastisch.FileClassifier.FileKind.Zip = 6 -> Tomtastisch.FileClassifier.FileKind
+Tomtastisch.FileClassifier.FileMaterializer
+Tomtastisch.FileClassifier.FileType
+Tomtastisch.FileClassifier.FileType.Aliases() -> System.Collections.Immutable.ImmutableArray(Of String)
+Tomtastisch.FileClassifier.FileType.Allowed() -> Boolean
+Tomtastisch.FileClassifier.FileType.CanonicalExtension() -> String
+Tomtastisch.FileClassifier.FileType.Kind() -> Tomtastisch.FileClassifier.FileKind
+Tomtastisch.FileClassifier.FileType.Mime() -> String
+Tomtastisch.FileClassifier.FileTypeDetector
+Tomtastisch.FileClassifier.FileTypeDetector.Detect(data As Byte()) -> Tomtastisch.FileClassifier.FileType
+Tomtastisch.FileClassifier.FileTypeDetector.Detect(path As String) -> Tomtastisch.FileClassifier.FileType
+Tomtastisch.FileClassifier.FileTypeDetector.Detect(path As String, verifyExtension As Boolean) -> Tomtastisch.FileClassifier.FileType
+Tomtastisch.FileClassifier.FileTypeDetector.DetectAndVerifyExtension(path As String) -> Boolean
+Tomtastisch.FileClassifier.FileTypeDetector.DetectDetailed(path As String) -> Tomtastisch.FileClassifier.DetectionDetail
+Tomtastisch.FileClassifier.FileTypeDetector.DetectDetailed(path As String, verifyExtension As Boolean) -> Tomtastisch.FileClassifier.DetectionDetail
+Tomtastisch.FileClassifier.FileTypeDetector.ExtractArchiveSafe(path As String, destinationDirectory As String, verifyBeforeExtract As Boolean) -> Boolean
+Tomtastisch.FileClassifier.FileTypeDetector.ExtractArchiveSafeToMemory(path As String, verifyBeforeExtract As Boolean) -> System.Collections.Generic.IReadOnlyList(Of Tomtastisch.FileClassifier.ZipExtractedEntry)
+Tomtastisch.FileClassifier.FileTypeDetector.IsOfType(data As Byte(), kind As Tomtastisch.FileClassifier.FileKind) -> Boolean
+Tomtastisch.FileClassifier.FileTypeDetector.New() -> Void
+Tomtastisch.FileClassifier.FileTypeOptions
+Tomtastisch.FileClassifier.FileTypeProjectBaseline
+Tomtastisch.FileClassifier.FileTypeProjectOptions
+Tomtastisch.FileClassifier.FileTypeProjectOptions.AllowUnknownArchiveEntrySize() -> Boolean
+Tomtastisch.FileClassifier.FileTypeProjectOptions.AllowUnknownArchiveEntrySize(AutoPropertyValue As Boolean) -> Void
+Tomtastisch.FileClassifier.FileTypeProjectOptions.DeterministicHash() -> Tomtastisch.FileClassifier.HashOptions
+Tomtastisch.FileClassifier.FileTypeProjectOptions.DeterministicHash(AutoPropertyValue As Tomtastisch.FileClassifier.HashOptions) -> Void
+Tomtastisch.FileClassifier.FileTypeProjectOptions.HeaderOnlyNonZip() -> Boolean
+Tomtastisch.FileClassifier.FileTypeProjectOptions.Logger() -> Microsoft.Extensions.Logging.ILogger
+Tomtastisch.FileClassifier.FileTypeProjectOptions.Logger(AutoPropertyValue As Microsoft.Extensions.Logging.ILogger) -> Void
+Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxBytes() -> Long
+Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxBytes(AutoPropertyValue As Long) -> Void
+Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipCompressionRatio() -> Integer
+Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipCompressionRatio(AutoPropertyValue As Integer) -> Void
+Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipEntries() -> Integer
+Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipEntries(AutoPropertyValue As Integer) -> Void
+Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipEntryUncompressedBytes() -> Long
+Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipEntryUncompressedBytes(AutoPropertyValue As Long) -> Void
+Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipNestedBytes() -> Long
+Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipNestedBytes(AutoPropertyValue As Long) -> Void
+Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipNestingDepth() -> Integer
+Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipNestingDepth(AutoPropertyValue As Integer) -> Void
+Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipTotalUncompressedBytes() -> Long
+Tomtastisch.FileClassifier.FileTypeProjectOptions.MaxZipTotalUncompressedBytes(AutoPropertyValue As Long) -> Void
+Tomtastisch.FileClassifier.FileTypeProjectOptions.New() -> Void
+Tomtastisch.FileClassifier.FileTypeProjectOptions.RejectArchiveLinks() -> Boolean
+Tomtastisch.FileClassifier.FileTypeProjectOptions.RejectArchiveLinks(AutoPropertyValue As Boolean) -> Void
+Tomtastisch.FileClassifier.FileTypeProjectOptions.SniffBytes() -> Integer
+Tomtastisch.FileClassifier.FileTypeProjectOptions.SniffBytes(AutoPropertyValue As Integer) -> Void
+Tomtastisch.FileClassifier.HashDigestSet
+Tomtastisch.FileClassifier.HashDigestSet.FastLogicalXxHash3() -> String
+Tomtastisch.FileClassifier.HashDigestSet.FastPhysicalXxHash3() -> String
+Tomtastisch.FileClassifier.HashDigestSet.HasLogicalHash() -> Boolean
+Tomtastisch.FileClassifier.HashDigestSet.HasPhysicalHash() -> Boolean
+Tomtastisch.FileClassifier.HashDigestSet.HmacLogicalSha256() -> String
+Tomtastisch.FileClassifier.HashDigestSet.HmacPhysicalSha256() -> String
+Tomtastisch.FileClassifier.HashDigestSet.LogicalSha256() -> String
+Tomtastisch.FileClassifier.HashDigestSet.PhysicalSha256() -> String
+Tomtastisch.FileClassifier.HashEvidence
+Tomtastisch.FileClassifier.HashEvidence.CompressedBytes() -> System.Collections.Immutable.ImmutableArray(Of Byte)
+Tomtastisch.FileClassifier.HashEvidence.DetectedType() -> Tomtastisch.FileClassifier.FileType
+Tomtastisch.FileClassifier.HashEvidence.Digests() -> Tomtastisch.FileClassifier.HashDigestSet
+Tomtastisch.FileClassifier.HashEvidence.Entry() -> Tomtastisch.FileClassifier.ZipExtractedEntry
+Tomtastisch.FileClassifier.HashEvidence.EntryCount() -> Integer
+Tomtastisch.FileClassifier.HashEvidence.Label() -> String
+Tomtastisch.FileClassifier.HashEvidence.Notes() -> String
+Tomtastisch.FileClassifier.HashEvidence.SourceType() -> Tomtastisch.FileClassifier.HashSourceType
+Tomtastisch.FileClassifier.HashEvidence.TotalUncompressedBytes() -> Long
+Tomtastisch.FileClassifier.HashEvidence.UncompressedBytes() -> System.Collections.Immutable.ImmutableArray(Of Byte)
+Tomtastisch.FileClassifier.HashOptions
+Tomtastisch.FileClassifier.HashOptions.IncludeFastHash() -> Boolean
+Tomtastisch.FileClassifier.HashOptions.IncludeFastHash(AutoPropertyValue As Boolean) -> Void
+Tomtastisch.FileClassifier.HashOptions.IncludePayloadCopies() -> Boolean
+Tomtastisch.FileClassifier.HashOptions.IncludePayloadCopies(AutoPropertyValue As Boolean) -> Void
+Tomtastisch.FileClassifier.HashOptions.IncludeSecureHash() -> Boolean
+Tomtastisch.FileClassifier.HashOptions.IncludeSecureHash(AutoPropertyValue As Boolean) -> Void
+Tomtastisch.FileClassifier.HashOptions.MaterializedFileName() -> String
+Tomtastisch.FileClassifier.HashOptions.MaterializedFileName(AutoPropertyValue As String) -> Void
+Tomtastisch.FileClassifier.HashOptions.New() -> Void
+Tomtastisch.FileClassifier.HashRoundTripReport
+Tomtastisch.FileClassifier.HashRoundTripReport.Evidence(slot As Tomtastisch.FileClassifier.HashRoundTripReport.HashSlot) -> Tomtastisch.FileClassifier.HashEvidence
+Tomtastisch.FileClassifier.HashRoundTripReport.HashSlot
+Tomtastisch.FileClassifier.HashRoundTripReport.HashSlot.H1 = 1 -> Tomtastisch.FileClassifier.HashRoundTripReport.HashSlot
+Tomtastisch.FileClassifier.HashRoundTripReport.HashSlot.H2 = 2 -> Tomtastisch.FileClassifier.HashRoundTripReport.HashSlot
+Tomtastisch.FileClassifier.HashRoundTripReport.HashSlot.H3 = 3 -> Tomtastisch.FileClassifier.HashRoundTripReport.HashSlot
+Tomtastisch.FileClassifier.HashRoundTripReport.HashSlot.H4 = 4 -> Tomtastisch.FileClassifier.HashRoundTripReport.HashSlot
+Tomtastisch.FileClassifier.HashRoundTripReport.InputPath() -> String
+Tomtastisch.FileClassifier.HashRoundTripReport.IsArchiveInput() -> Boolean
+Tomtastisch.FileClassifier.HashRoundTripReport.LogicalConsistent() -> Boolean
+Tomtastisch.FileClassifier.HashRoundTripReport.LogicalEquals(otherSlot As Tomtastisch.FileClassifier.HashRoundTripReport.HashSlot) -> Boolean
+Tomtastisch.FileClassifier.HashRoundTripReport.Notes() -> String
+Tomtastisch.FileClassifier.HashRoundTripReport.PhysicalEquals(otherSlot As Tomtastisch.FileClassifier.HashRoundTripReport.HashSlot) -> Boolean
+Tomtastisch.FileClassifier.HashRoundTripReport.Slots() -> Tomtastisch.FileClassifier.HashRoundTripReport.HashSlot()
+Tomtastisch.FileClassifier.HashSourceType
+Tomtastisch.FileClassifier.HashSourceType.ArchiveEntries = 3 -> Tomtastisch.FileClassifier.HashSourceType
+Tomtastisch.FileClassifier.HashSourceType.FilePath = 1 -> Tomtastisch.FileClassifier.HashSourceType
+Tomtastisch.FileClassifier.HashSourceType.MaterializedFile = 4 -> Tomtastisch.FileClassifier.HashSourceType
+Tomtastisch.FileClassifier.HashSourceType.RawBytes = 2 -> Tomtastisch.FileClassifier.HashSourceType
+Tomtastisch.FileClassifier.HashSourceType.Unknown = 0 -> Tomtastisch.FileClassifier.HashSourceType
+Tomtastisch.FileClassifier.ZipExtractedEntry
+Tomtastisch.FileClassifier.ZipExtractedEntry.Content() -> System.Collections.Immutable.ImmutableArray(Of Byte)
+Tomtastisch.FileClassifier.ZipExtractedEntry.OpenReadOnlyStream() -> System.IO.MemoryStream
+Tomtastisch.FileClassifier.ZipExtractedEntry.RelativePath() -> String
+Tomtastisch.FileClassifier.ZipExtractedEntry.Size() -> Integer
