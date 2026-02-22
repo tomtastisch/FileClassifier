@@ -114,7 +114,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <param name="sourceType">Herkunftskanal der Hashquelle.</param>
         ''' <param name="label">Fachliches Quelllabel.</param>
         ''' <param name="notes">Fehler-/Hinweistext.</param>
-        ''' <returns>Evidence mit leerem Digest-Satz und Unknown-Typkontext.</returns>
+        ''' <returns>Evidence mit leerem Digest-Satz und UNKNOWN-Typkontext.</returns>
         Friend Shared Function CreateFailure _
             (
                 sourceType As HashSourceType,

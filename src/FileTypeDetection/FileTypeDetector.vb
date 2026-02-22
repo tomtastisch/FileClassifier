@@ -43,7 +43,7 @@ Namespace Global.Tomtastisch.FileClassifier
     '''     </para>
     ''' </remarks>
     Public NotInheritable Class FileTypeDetector
-        Private Const ReasonUnknown As String = "Unknown"
+        Private Const ReasonUnknown As String = "UNKNOWN"
         Private Const ReasonFileNotFound As String = "FileNotFound"
         Private Const ReasonInvalidLength As String = "InvalidLength"
         Private Const ReasonFileTooLarge As String = "FileTooLarge"

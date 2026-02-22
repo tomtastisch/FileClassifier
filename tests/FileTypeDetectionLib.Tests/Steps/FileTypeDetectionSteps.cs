@@ -284,7 +284,7 @@ public sealed class FileTypeDetectionSteps
         var state = State();
         Assert.NotNull(state.CurrentPayload);
         Assert.True(TryParseFileKindLiteral(expectedKind, out var kind),
-            $"Unknown FileKind literal in feature: {expectedKind}");
+            $"UNKNOWN FileKind literal in feature: {expectedKind}");
 
         var detector = new FileTypeDetector();
         state.LastIsOfTypeResult = detector.IsOfType(state.CurrentPayload!, kind);
@@ -297,7 +297,7 @@ public sealed class FileTypeDetectionSteps
         Assert.NotNull(state.LastResult);
 
         Assert.True(TryParseFileKindLiteral(expectedKind, out var expected),
-            $"Unknown FileKind literal in feature: {expectedKind}");
+            $"UNKNOWN FileKind literal in feature: {expectedKind}");
 
         Assert.Equal(expected, state.LastResult!.Kind);
     }

@@ -17,7 +17,7 @@ Namespace Global.Tomtastisch.FileClassifier
     ''' <remarks>
     '''     <para>
     '''         Sicherheitsannahmen:
-    '''         1) Grenzwerte sind konservativ gesetzt, um Ressourcenangriffe (z. B. Zip-Bombs) zu reduzieren.
+    '''         1) Grenzwerte sind konservativ gesetzt, um Ressourcenangriffe (z. B. ZIP-Bombs) zu reduzieren.
     '''         2) Der Logger darf ausschließlich Beobachtbarkeit liefern und keine Entscheidungslogik beeinflussen.
     '''     </para>
     '''     <para>
@@ -107,33 +107,34 @@ Namespace Global.Tomtastisch.FileClassifier
 
         Friend Function Clone() As FileTypeProjectOptions
             Dim cloned = New FileTypeProjectOptions(HeaderOnlyNonZip) With {
-                    .MaxBytes = MaxBytes,
-                    .SniffBytes = SniffBytes,
-                    .MaxZipEntries = MaxZipEntries,
-                    .MaxZipTotalUncompressedBytes = MaxZipTotalUncompressedBytes,
-                    .MaxZipEntryUncompressedBytes = MaxZipEntryUncompressedBytes,
-                    .MaxZipCompressionRatio = MaxZipCompressionRatio,
-                    .MaxZipNestingDepth = MaxZipNestingDepth,
-                    .MaxZipNestedBytes = MaxZipNestedBytes,
-                    .RejectArchiveLinks = RejectArchiveLinks,
-                    .AllowUnknownArchiveEntrySize = AllowUnknownArchiveEntrySize,
-                    .Logger = Logger,
-                    .DeterministicHash = HashOptions.Normalize(DeterministicHash)
+                        .MaxBytes = MaxBytes,
+                        .SniffBytes = SniffBytes,
+                        .MaxZipEntries = MaxZipEntries,
+                        .MaxZipTotalUncompressedBytes = MaxZipTotalUncompressedBytes,
+                        .MaxZipEntryUncompressedBytes = MaxZipEntryUncompressedBytes,
+                        .MaxZipCompressionRatio = MaxZipCompressionRatio,
+                        .MaxZipNestingDepth = MaxZipNestingDepth,
+                        .MaxZipNestedBytes = MaxZipNestedBytes,
+                        .RejectArchiveLinks = RejectArchiveLinks,
+                        .AllowUnknownArchiveEntrySize = AllowUnknownArchiveEntrySize,
+                        .Logger = Logger,
+                        .DeterministicHash = HashOptions.Normalize(DeterministicHash)
                     }
             cloned.NormalizeInPlace()
+            
             Return cloned
         End Function
 
         Friend Sub NormalizeInPlace()
-            MaxBytes = Max(MinPositiveLong, MaxBytes)
-            SniffBytes = Max(MinPositiveInt, SniffBytes)
-            MaxZipEntries = Max(MinPositiveInt, MaxZipEntries)
+            MaxBytes                     = Max(MinPositiveLong, MaxBytes)
+            SniffBytes                   = Max(MinPositiveInt, SniffBytes)
+            MaxZipEntries                = Max(MinPositiveInt, MaxZipEntries)
             MaxZipTotalUncompressedBytes = Max(MinPositiveLong, MaxZipTotalUncompressedBytes)
             MaxZipEntryUncompressedBytes = Max(MinPositiveLong, MaxZipEntryUncompressedBytes)
-            MaxZipCompressionRatio = Max(MinNonNegativeInt, MaxZipCompressionRatio)
-            MaxZipNestingDepth = Max(MinNonNegativeInt, MaxZipNestingDepth)
-            MaxZipNestedBytes = Max(MinPositiveLong, MaxZipNestedBytes)
-            DeterministicHash = HashOptions.Normalize(DeterministicHash)
+            MaxZipCompressionRatio       = Max(MinNonNegativeInt, MaxZipCompressionRatio)
+            MaxZipNestingDepth           = Max(MinNonNegativeInt, MaxZipNestingDepth)
+            MaxZipNestedBytes            = Max(MinPositiveLong, MaxZipNestedBytes)
+            DeterministicHash            = HashOptions.Normalize(DeterministicHash)
         End Sub
 
         Private Shared Function Max(minimum As Integer, value As Integer) As Integer

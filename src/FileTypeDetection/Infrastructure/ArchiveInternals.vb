@@ -83,7 +83,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <param name="containerType">Zu beschreibender Containertyp.</param>
         ''' <returns>
-        '''     Deskriptor mit logischem Typ und initialer Containerkette oder Unknown-Deskriptor bei
+        '''     Deskriptor mit logischem Typ und initialer Containerkette oder UNKNOWN-Deskriptor bei
         '''     ungültigem Eingabewert.
         ''' </returns>
         Friend Shared Function ForContainerType(containerType As ArchiveContainerType) As ArchiveDescriptor

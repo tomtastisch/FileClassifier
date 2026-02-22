@@ -96,7 +96,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 normalized = IO.Path.GetFileName(normalized)
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is IO.IOException OrElse
                 TypeOf ex Is NotSupportedException OrElse
                 TypeOf ex Is ArgumentException

@@ -19,7 +19,7 @@ Namespace Global.Tomtastisch.FileClassifier
     '''     Regeln:
     '''     - Neue Typen werden primär über FileKind erweitert.
     '''     - Metadaten werden deterministisch aus FileKind + zentralen Overrides aufgebaut.
-    '''     - Unknown ist immer als fail-closed Fallback vorhanden.
+    '''     - UNKNOWN ist immer als fail-closed Fallback vorhanden.
     ''' </summary>
     Friend NotInheritable Class FileTypeRegistry
         Private Sub New()
@@ -86,9 +86,9 @@ Namespace Global.Tomtastisch.FileClassifier
 
         ''' <summary>
         '''     Erzeugt die vollständige Menge an <see cref="FileTypeDefinition"/> aus der Enumquelle.
-        '''     <see cref="FileKind.Unknown"/> wird bewusst ausgeschlossen, da Unknown als separater fail-closed Typ geführt wird.
+        '''     <see cref="FileKind.Unknown"/> wird bewusst ausgeschlossen, da UNKNOWN als separater fail-closed Typ geführt wird.
         ''' </summary>
-        ''' <returns>Unveränderliche Liste aller Definitionsobjekte (ohne Unknown).</returns>
+        ''' <returns>Unveränderliche Liste aller Definitionsobjekte (ohne UNKNOWN).</returns>
         Private Shared Function BuildDefinitionsFromEnum() As ImmutableArray(Of FileTypeDefinition)
             Dim b = ImmutableArray.CreateBuilder(Of FileTypeDefinition)()
             Dim canonicalExtension As String
@@ -191,10 +191,10 @@ Namespace Global.Tomtastisch.FileClassifier
 
         ''' <summary>
         '''     Erzeugt die Typ-Registry (<see cref="TypesByKind"/>) aus den Definitionsobjekten.
-        '''     Unknown wird als eigener, fail-closed Eintrag hinzugefügt.
+        '''     UNKNOWN wird als eigener, fail-closed Eintrag hinzugefügt.
         ''' </summary>
-        ''' <param name="definitions">Definitionsobjekte (ohne Unknown).</param>
-        ''' <returns>Unveränderliches Dictionary mit Einträgen für alle Typen inklusive Unknown.</returns>
+        ''' <param name="definitions">Definitionsobjekte (ohne UNKNOWN).</param>
+        ''' <returns>Unveränderliches Dictionary mit Einträgen für alle Typen inklusive UNKNOWN.</returns>
         Private Shared Function BuildTypes(definitions As ImmutableArray(Of FileTypeDefinition)) _
             As ImmutableDictionary(Of FileKind, FileType)
             Dim b = ImmutableDictionary.CreateBuilder(Of FileKind, FileType)()
@@ -217,7 +217,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <summary>
         '''     Erzeugt den fail-closed <see cref="FileType"/> für <see cref="FileKind.Unknown"/>.
         ''' </summary>
-        ''' <returns>Unknown-Typ ohne Extension und ohne MIME.</returns>
+        ''' <returns>UNKNOWN-Typ ohne Extension und ohne MIME.</returns>
         Private Shared Function CreateUnknownType() As FileType
             Return New FileType(FileKind.Unknown,
                                 Nothing,
@@ -307,7 +307,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
         ''' <summary>
         '''     Liefert alle Typen, die keine direkte Content-Detection besitzen.
-        '''     Unknown ist ausgeschlossen.
+        '''     UNKNOWN ist ausgeschlossen.
         ''' </summary>
         ''' <returns>Liste der Typen ohne direkte Content-Detection.</returns>
         Friend Shared Function KindsWithoutDirectContentDetection() As ImmutableArray(Of FileKind)
@@ -321,7 +321,7 @@ Namespace Global.Tomtastisch.FileClassifier
         '''     Baut die Magic-Regeln aus den Definitionsobjekten.
         '''     Es werden ausschließlich Definitionsobjekte mit mindestens einem Magic-Pattern berücksichtigt.
         ''' </summary>
-        ''' <param name="definitions">Definitionsobjekte (ohne Unknown).</param>
+        ''' <param name="definitions">Definitionsobjekte (ohne UNKNOWN).</param>
         ''' <returns>Unveränderliche Liste der Magic-Regeln.</returns>
         Private Shared Function BuildMagicRules(definitions As ImmutableArray(Of FileTypeDefinition)) _
             As ImmutableArray(Of MagicRule)
@@ -405,7 +405,7 @@ Namespace Global.Tomtastisch.FileClassifier
         '''     Liefert den zugeordneten FileType für einen Enumwert.
         ''' </summary>
         ''' <param name="kind">Enumwert des Typs.</param>
-        ''' <returns>Registrierter Typ oder Unknown.</returns>
+        ''' <returns>Registrierter Typ oder UNKNOWN.</returns>
         Friend Shared Function Resolve(kind As FileKind) As FileType
             Dim t As FileType = Nothing
             If TypesByKind.TryGetValue(kind, t) AndAlso t IsNot Nothing Then Return t
@@ -416,7 +416,7 @@ Namespace Global.Tomtastisch.FileClassifier
         '''     Liefert den zugeordneten FileType für einen Aliaswert.
         ''' </summary>
         ''' <param name="aliasKey">Alias mit oder ohne führenden Punkt.</param>
-        ''' <returns>Registrierter Typ oder Unknown.</returns>
+        ''' <returns>Registrierter Typ oder UNKNOWN.</returns>
         Friend Shared Function ResolveByAlias(aliasKey As String) As FileType
             Dim k = FileKind.Unknown
             If KindByAlias.TryGetValue(NormalizeAlias(aliasKey), k) Then

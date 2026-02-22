@@ -28,7 +28,7 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' <summary>Enum-Schlüssel des Typs.</summary>
         Public ReadOnly Property Kind As FileKind
 
-        ''' <summary>Kanonische Endung inklusive Punkt, bei Unknown leer.</summary>
+        ''' <summary>Kanonische Endung inklusive Punkt, bei UNKNOWN leer.</summary>
         Public ReadOnly Property CanonicalExtension As String
 
         ''' <summary>Kanonischer MIME-Typ als Metadatum, kann leer sein.</summary>
@@ -91,7 +91,6 @@ Namespace Global.Tomtastisch.FileClassifier
         ''' </summary>
         ''' <returns>String-Repräsentation des Feldes <see cref="Kind"/>.</returns>
         Public Overrides Function ToString() As String
-
             Return Kind.ToString()
         End Function
     End Class

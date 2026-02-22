@@ -117,7 +117,7 @@ Namespace Global.Tomtastisch.FileClassifier
 
             ' Wildcard-Semantik (Gruppen):
             ' - ARCHIVE: alle Archive/Container, die über FileKind.Zip normalisiert werden.
-            ' - DOC/XLS/PPT: Dokument-/OpenDocument-Container (Doc/Xls/Ppt), deren Content/Container-Detection separat läuft.
+            ' - DOC/XLS/PPT: Dokument-/OpenDocument-Container (DOC/XLS/PPT), deren Content/Container-Detection separat läuft.
 
             aliasGruppenBuilder("JPEG") = A("jpe")
 

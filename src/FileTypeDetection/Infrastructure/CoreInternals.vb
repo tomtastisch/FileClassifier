@@ -20,7 +20,7 @@ Namespace Global.Tomtastisch.FileClassifier
     '''     Verfeinert ZIP-basierte Office-Container zu Dokumenttypen anhand kanonischer Paketmarker.
     '''     Implementationsprinzip:
     '''     - reduziert False-Positives bei generischen ZIP-Dateien
-    '''     - bleibt fail-closed (Fehler => Unknown)
+    '''     - bleibt fail-closed (Fehler => UNKNOWN)
     ''' </summary>
     Friend NotInheritable Class OpenXmlRefiner
         ''' <summary>
@@ -43,7 +43,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -67,7 +67,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return DetectKindFromArchivePackage(stream)
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -127,7 +127,7 @@ Namespace Global.Tomtastisch.FileClassifier
                     If hasContentTypes Then
                         ' OpenXML-Fall:
                         ' Es muss genau ein strukturierter Marker eindeutig sein. Mehrdeutigkeit oder
-                        ' gleichzeitige ODF-Marker führen deterministisch zu Unknown (fail-closed).
+                        ' gleichzeitige ODF-Marker führen deterministisch zu UNKNOWN (fail-closed).
                         structuredMarkerCount = 0
                         If hasDocxMarker Then structuredMarkerCount += 1
                         If hasXlsxMarker Then structuredMarkerCount += 1
@@ -156,7 +156,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -239,7 +239,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Using
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -306,7 +306,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 Return RefineByMarkers(data)
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
@@ -359,7 +359,7 @@ Namespace Global.Tomtastisch.FileClassifier
                 End Try
             Catch ex As Exception When _
                 TypeOf ex Is UnauthorizedAccessException OrElse
-                TypeOf ex Is System.Security.SecurityException OrElse
+                TypeOf ex Is Security.SecurityException OrElse
                 TypeOf ex Is IOException OrElse
                 TypeOf ex Is InvalidDataException OrElse
                 TypeOf ex Is NotSupportedException OrElse
