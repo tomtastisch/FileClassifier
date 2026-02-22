@@ -28,6 +28,21 @@ Namespace Global.Tomtastisch.FileClassifier
         Private Const MinPositiveLong As Long = 1
         Private Const MinPositiveInt As Integer = 1
         Private Const MinNonNegativeInt As Integer = 0
+        Private Const NormalizedValueCount As Integer = 14
+        Private Const ValueIndexMaxBytes As Integer = 0
+        Private Const ValueIndexSniffBytes As Integer = 1
+        Private Const ValueIndexMaxZipEntries As Integer = 2
+        Private Const ValueIndexMaxZipTotalUncompressedBytes As Integer = 3
+        Private Const ValueIndexMaxZipEntryUncompressedBytes As Integer = 4
+        Private Const ValueIndexMaxZipCompressionRatio As Integer = 5
+        Private Const ValueIndexMaxZipNestingDepth As Integer = 6
+        Private Const ValueIndexMaxZipNestedBytes As Integer = 7
+        Private Const ValueIndexRejectArchiveLinks As Integer = 8
+        Private Const ValueIndexAllowUnknownArchiveEntrySize As Integer = 9
+        Private Const ValueIndexHashIncludePayloadCopies As Integer = 10
+        Private Const ValueIndexHashIncludeFastHash As Integer = 11
+        Private Const ValueIndexHashIncludeSecureHash As Integer = 12
+        Private Const ValueIndexHashMaterializedFileName As Integer = 13
 
         ''' <summary>
         '''     Erzwingt Header-only-Erkennung für Nicht-ZIP-Typen.
@@ -126,16 +141,83 @@ Namespace Global.Tomtastisch.FileClassifier
         End Function
 
         Friend Sub NormalizeInPlace()
-            MaxBytes                     = Max(MinPositiveLong, MaxBytes)
-            SniffBytes                   = Max(MinPositiveInt, SniffBytes)
-            MaxZipEntries                = Max(MinPositiveInt, MaxZipEntries)
+            Dim normalizedValues() As Object      = Nothing
+            Dim hashOptions        As HashOptions = HashOptions.Normalize(DeterministicHash)
+
+            If CsCoreRuntimeBridge.TryNormalizeProjectOptionsValues(
+                headerOnlyNonZip:=HeaderOnlyNonZip,
+                maxBytes:=MaxBytes,
+                sniffBytes:=SniffBytes,
+                maxZipEntries:=MaxZipEntries,
+                maxZipTotalUncompressedBytes:=MaxZipTotalUncompressedBytes,
+                maxZipEntryUncompressedBytes:=MaxZipEntryUncompressedBytes,
+                maxZipCompressionRatio:=MaxZipCompressionRatio,
+                maxZipNestingDepth:=MaxZipNestingDepth,
+                maxZipNestedBytes:=MaxZipNestedBytes,
+                rejectArchiveLinks:=RejectArchiveLinks,
+                allowUnknownArchiveEntrySize:=AllowUnknownArchiveEntrySize,
+                hashIncludePayloadCopies:=hashOptions.IncludePayloadCopies,
+                hashIncludeFastHash:=hashOptions.IncludeFastHash,
+                hashIncludeSecureHash:=hashOptions.IncludeSecureHash,
+                hashMaterializedFileName:=hashOptions.MaterializedFileName,
+                normalizedValues:=normalizedValues
+            ) Then
+                If TryApplyNormalizedValues(normalizedValues) Then
+                    Return
+                End If
+            End If
+
+            MaxBytes = Max(MinPositiveLong, MaxBytes)
+            SniffBytes = Max(MinPositiveInt, SniffBytes)
+            MaxZipEntries = Max(MinPositiveInt, MaxZipEntries)
             MaxZipTotalUncompressedBytes = Max(MinPositiveLong, MaxZipTotalUncompressedBytes)
             MaxZipEntryUncompressedBytes = Max(MinPositiveLong, MaxZipEntryUncompressedBytes)
-            MaxZipCompressionRatio       = Max(MinNonNegativeInt, MaxZipCompressionRatio)
-            MaxZipNestingDepth           = Max(MinNonNegativeInt, MaxZipNestingDepth)
-            MaxZipNestedBytes            = Max(MinPositiveLong, MaxZipNestedBytes)
-            DeterministicHash            = HashOptions.Normalize(DeterministicHash)
+            MaxZipCompressionRatio = Max(MinNonNegativeInt, MaxZipCompressionRatio)
+            MaxZipNestingDepth = Max(MinNonNegativeInt, MaxZipNestingDepth)
+            MaxZipNestedBytes = Max(MinPositiveLong, MaxZipNestedBytes)
+            DeterministicHash = hashOptions
         End Sub
+
+        Private Function TryApplyNormalizedValues _
+            (
+                normalizedValues() As Object
+            ) As Boolean
+
+            Try
+                If normalizedValues Is Nothing OrElse normalizedValues.Length <> NormalizedValueCount Then
+                    Return False
+                End If
+
+                MaxBytes = CLng(normalizedValues(ValueIndexMaxBytes))
+                SniffBytes = CInt(normalizedValues(ValueIndexSniffBytes))
+                MaxZipEntries = CInt(normalizedValues(ValueIndexMaxZipEntries))
+                MaxZipTotalUncompressedBytes = CLng(normalizedValues(ValueIndexMaxZipTotalUncompressedBytes))
+                MaxZipEntryUncompressedBytes = CLng(normalizedValues(ValueIndexMaxZipEntryUncompressedBytes))
+                MaxZipCompressionRatio = CInt(normalizedValues(ValueIndexMaxZipCompressionRatio))
+                MaxZipNestingDepth = CInt(normalizedValues(ValueIndexMaxZipNestingDepth))
+                MaxZipNestedBytes = CLng(normalizedValues(ValueIndexMaxZipNestedBytes))
+                RejectArchiveLinks = CBool(normalizedValues(ValueIndexRejectArchiveLinks))
+                AllowUnknownArchiveEntrySize = CBool(normalizedValues(ValueIndexAllowUnknownArchiveEntrySize))
+
+                DeterministicHash = HashOptions.Normalize(
+                    New HashOptions With {
+                        .IncludePayloadCopies = CBool(normalizedValues(ValueIndexHashIncludePayloadCopies)),
+                        .IncludeFastHash = CBool(normalizedValues(ValueIndexHashIncludeFastHash)),
+                        .IncludeSecureHash = CBool(normalizedValues(ValueIndexHashIncludeSecureHash)),
+                        .MaterializedFileName = CStr(normalizedValues(ValueIndexHashMaterializedFileName))
+                    }
+                )
+
+                Return True
+            Catch ex As Exception When _
+                TypeOf ex Is InvalidCastException OrElse
+                TypeOf ex Is OverflowException OrElse
+                TypeOf ex Is IndexOutOfRangeException OrElse
+                TypeOf ex Is ArgumentException OrElse
+                TypeOf ex Is FormatException
+                Return False
+            End Try
+        End Function
 
         Private Shared Function Max(minimum As Integer, value As Integer) As Integer
             If value < minimum Then Return minimum
