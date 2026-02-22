@@ -7,8 +7,8 @@
         <IsPackable>true</IsPackable>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>Tomtastisch.FileClassifier</PackageId>
-        <Version>6.1.12</Version>
-        <PackageVersion>6.1.12</PackageVersion>
+        <Version>6.1.13</Version>
+        <PackageVersion>6.1.13</PackageVersion>
         <Authors>tomtastisch</Authors>
         <Description>Deterministic file type and MIME detection with fail-closed archive safety checks, secure extraction primitives, and reproducible hashing evidence for .NET.</Description>
         <PackageTags>filetype;mime;detection;magic-bytes;sniffing;archive;zip;tar;7z;rar;zipslip;security;hashing;sha256;deterministic;dotnet;netstandard2.0;net8;net10</PackageTags>
@@ -19,6 +19,7 @@
         <PackageProjectUrl>https://github.com/tomtastisch/FileClassifier</PackageProjectUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeCsCoreBuildOutput</TargetsForTfmSpecificBuildOutput>
     </PropertyGroup>
 
     <ItemGroup>
@@ -35,6 +36,7 @@
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
         <PackageReference Include="System.Collections.Immutable"/>
+        <PackageReference Include="System.Text.Encoding.CodePages"/>
         <PackageReference Include="System.Text.Json"/>
         <Compile Include="Providers/NetStandard2_0/**/*.vb"/>
     </ItemGroup>
@@ -52,6 +54,48 @@
     <ItemGroup>
         <Import Include="Tomtastisch.FileClassifier.Infrastructure.Utils"/>
     </ItemGroup>
+
+    <Target Name="RestoreCsCoreAssets"
+            Condition="'$(DesignTimeBuild)' != 'true' And '$(TargetFramework)' == ''"
+            BeforeTargets="Restore">
+        <MSBuild Projects="$(MSBuildThisFileDirectory)../FileClassifier.CSCore/FileClassifier.CSCore.csproj"
+                 Targets="Restore"
+                 Properties="Configuration=$(Configuration);RestoreLockedMode=$(RestoreLockedMode)"/>
+    </Target>
+
+    <Target Name="BuildCsCoreForCurrentTfm"
+            Condition="'$(DesignTimeBuild)' != 'true' And '$(NoBuild)' != 'true'"
+            BeforeTargets="Build;Pack">
+        <MSBuild Projects="$(MSBuildThisFileDirectory)../FileClassifier.CSCore/FileClassifier.CSCore.csproj"
+                 Targets="Build"
+                 Properties="Configuration=$(Configuration);TargetFramework=$(TargetFramework);Restore=false"/>
+    </Target>
+
+    <Target Name="IncludeCsCoreBuildOutput"
+            DependsOnTargets="BuildCsCoreForCurrentTfm">
+        <ItemGroup>
+            <BuildOutputInPackage Include="$(MSBuildThisFileDirectory)../FileClassifier.CSCore/bin/$(Configuration)/$(TargetFramework)/FileClassifier.CSCore.dll"
+                                  Condition="Exists('$(MSBuildThisFileDirectory)../FileClassifier.CSCore/bin/$(Configuration)/$(TargetFramework)/FileClassifier.CSCore.dll')"/>
+            <BuildOutputInPackage Include="$(MSBuildThisFileDirectory)../FileClassifier.CSCore/bin/$(Configuration)/$(TargetFramework)/FileClassifier.CSCore.pdb"
+                                  Condition="Exists('$(MSBuildThisFileDirectory)../FileClassifier.CSCore/bin/$(Configuration)/$(TargetFramework)/FileClassifier.CSCore.pdb')"/>
+        </ItemGroup>
+    </Target>
+
+    <Target Name="CopyCsCoreBuildOutputToTargetDir"
+            DependsOnTargets="BuildCsCoreForCurrentTfm"
+            AfterTargets="Build"
+            Condition="'$(DesignTimeBuild)' != 'true' And '$(TargetFramework)' != ''">
+        <ItemGroup>
+            <CsCoreRuntimeAsset Include="$(MSBuildThisFileDirectory)../FileClassifier.CSCore/bin/$(Configuration)/$(TargetFramework)/FileClassifier.CSCore.dll"
+                                Condition="Exists('$(MSBuildThisFileDirectory)../FileClassifier.CSCore/bin/$(Configuration)/$(TargetFramework)/FileClassifier.CSCore.dll')"/>
+            <CsCoreRuntimeAsset Include="$(MSBuildThisFileDirectory)../FileClassifier.CSCore/bin/$(Configuration)/$(TargetFramework)/FileClassifier.CSCore.pdb"
+                                Condition="Exists('$(MSBuildThisFileDirectory)../FileClassifier.CSCore/bin/$(Configuration)/$(TargetFramework)/FileClassifier.CSCore.pdb')"/>
+        </ItemGroup>
+        <Copy SourceFiles="@(CsCoreRuntimeAsset)"
+              DestinationFolder="$(TargetDir)"
+              SkipUnchangedFiles="true"
+              Condition="'@(CsCoreRuntimeAsset)' != ''"/>
+    </Target>
 
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\"/>
