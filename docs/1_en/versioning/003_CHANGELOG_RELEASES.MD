@@ -11,7 +11,7 @@ All changes are documented here in technical terms. The release version itself i
   - Raised the versioning SSOT for the release path to `6.1.18` (`RepoVersion`, package `Version`, `PackageVersion`).
 - Docs/CI/Tooling:
   - Synchronized version history and changelog to `6.1.18` across root and DE/EN mirrors.
-  - Completed release preparation for RC canary `v6.1.18-rc.1` (no runtime or API changes).
+  - Published RC canary `v6.1.18-rc.1` and stable release `v6.1.18`; `Release Publish` and `NuGet Online Convergence` completed successfully.
 
 ## [6.1.17]
 - Added:
