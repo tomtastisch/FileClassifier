@@ -12,7 +12,7 @@ der Git-Tag `vX.Y.Z` (optional `-prerelease`) als SSOT.
   - Versionierungs-SSOT für den Releasepfad auf `6.1.18` angehoben (`RepoVersion`, Paket-`Version`, `PackageVersion`).
 - Docs/CI/Tooling:
   - Versionshistorie und Changelog in Root sowie in DE/EN-Spiegeln auf `6.1.18` synchronisiert.
-  - Release-Vorbereitung für RC-Canary `v6.1.18-rc.1` abgeschlossen (ohne Laufzeit- oder API-Änderung).
+  - RC-Canary `v6.1.18-rc.1` und Stable-Release `v6.1.18` veröffentlicht; `Release Publish` sowie `NuGet Online Convergence` erfolgreich abgeschlossen.
 
 ## [6.1.17]
 - Added:
